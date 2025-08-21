@@ -1,0 +1,33 @@
+{
+  "required": true,
+  "package": "me.retucio.camtweaks.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "StringHelperMixin",
+    "accessor.StatusEffectInstanceAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "client": [
+    "CameraMixin",
+    "ChatHudLineMixin",
+    "ChatHudLineVisibleMixin",
+    "ChatHudMixin",
+    "ChatInputSuggestorMixin",
+    "ChatScreenMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "GameOptionsMixin",
+    "GameRendererMixin",
+    "HeldItemRendererMixin",
+    "InGameHudMixin",
+    "KeyboardMixin",
+    "LightmapTextureManagerMixin",
+    "MessageHandlerMixin",
+    "MinecraftClientMixin",
+    "MouseMixin"
+  ]
+}

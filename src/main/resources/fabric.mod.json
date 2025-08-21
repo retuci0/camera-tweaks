@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "camtweaks",
+	"version": "${version}",
+	"name": "mod de putas de retucio",
+	"description": "cositas chulas pa la cámara",
+	"authors": [
+		"prepucio"
+	],
+	"contact": {
+		"homepage": "https://github.com/retuci0",
+		"sources": "https://github.com/retuci0/camera-tweaks"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/camtweaks/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"me.retucio.camtweaks.CameraTweaks"
+		]
+	},
+	"mixins": [
+		"camtweaks.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.6",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
