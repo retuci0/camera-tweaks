@@ -13,6 +13,8 @@ import java.util.Comparator;
 // registro de comandos
 public class CommandManager {
 
+    public static CommandManager INSTANCE;
+
     private String prefix = "$";
 
     public static final List<Command> commands = new ArrayList<>();
@@ -26,9 +28,12 @@ public class CommandManager {
 
     public static void registerCommands() {
         addCommand(new BindCommand());
-        addCommand(new ToggleCommand());
-        addCommand(new SendCommand());
+//        addCommand(new EnderChestCommand());  no funciona D:
+        addCommand(new PeekCommand());
         addCommand(new PrefixCommand());
+        addCommand(new SendCommand());
+        addCommand(new ToggleCommand());
+
         commands.sort(Comparator.comparing(Command::getName));
     }
 
@@ -43,9 +48,13 @@ public class CommandManager {
     }
 
     public static Command getCommandByName(String name) {
-        for (Command command : commands)
+        for (Command command : commands) {
             if (command.getName().equals(name))
                 return command;
+            for (String alias : command.getAliases())
+                if (alias.equals(name))
+                    return command;
+        }
         return null;
     }
 

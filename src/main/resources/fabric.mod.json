@@ -5,7 +5,7 @@
 	"name": "mod de putas de retucio",
 	"description": "cositas chulas pa la cámara",
 	"authors": [
-		"prepucio"
+		"el prepu"
 	],
 	"contact": {
 		"homepage": "https://github.com/retuci0",
@@ -16,6 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
+		], "client": [
 			"me.retucio.camtweaks.CameraTweaks"
 		]
 	},

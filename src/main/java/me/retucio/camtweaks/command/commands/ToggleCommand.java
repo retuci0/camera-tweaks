@@ -4,9 +4,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.camtweaks.command.Command;
 import me.retucio.camtweaks.command.args.ModuleArgumentType;
 import me.retucio.camtweaks.module.Module;
+import me.retucio.camtweaks.module.ModuleManager;
 import net.minecraft.command.CommandSource;
-
-import static me.retucio.camtweaks.CameraTweaks.moduleManager;
 
 // porque usar el ratón es más lento que escribir, a menos que tengas toque con el teclado como yo
 public class ToggleCommand extends Command {
@@ -21,14 +20,14 @@ public class ToggleCommand extends Command {
                 .then(literal("todos")
                         .then(literal("on")
                                 .executes(ctx -> {
-                                    moduleManager.getModules().forEach(module -> {
+                                    ModuleManager.INSTANCE.getModules().forEach(module -> {
                                         if (!module.isEnabled()) module.toggle();
                                     }); return SUCCESS;
                                 })
                         )
                         .then(literal("off")
                                 .executes(ctx -> {
-                                    moduleManager.getEnabledModules().forEach(Module::toggle);
+                                    ModuleManager.INSTANCE.getEnabledModules().forEach(Module::toggle);
                                     return SUCCESS;
                                 })
                         )

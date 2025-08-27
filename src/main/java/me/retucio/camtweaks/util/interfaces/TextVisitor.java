@@ -1,3 +1,5 @@
+/* code by meteorclient dev team */
+
 package me.retucio.camtweaks.util.interfaces;
 
 import net.minecraft.text.PlainTextContent;
@@ -8,6 +10,9 @@ import net.minecraft.text.Text;
 import java.util.ArrayDeque;
 import java.util.Optional;
 import java.util.Queue;
+
+// lo siento por robaros el código, meteor :(
+// sorry for stealing your code, meteor dev team
 
 @FunctionalInterface
 public interface TextVisitor<T> {

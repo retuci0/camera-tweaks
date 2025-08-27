@@ -1,11 +1,15 @@
 package me.retucio.camtweaks.module.settings;
 
+import me.retucio.camtweaks.module.Module;
+
 // base para los tipos de ajustes
 public class Setting {
 
     private final String name;
     private final String description;
     private boolean visible = true;
+
+    private Module module;
 
     protected Setting(String name, String description) {
         this.name = name;
@@ -26,5 +30,13 @@ public class Setting {
 
     public String getDescription() {
         return description;
+    }
+
+    public Module getModule() {
+        return module;
+    }
+
+    public void setModule(Module module) {
+        this.module = module;
     }
 }

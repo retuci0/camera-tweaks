@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.module;
 
 import me.retucio.camtweaks.event.EventBus;
-import me.retucio.camtweaks.event.Subscribe;
+import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.module.modules.*;
 
 import java.lang.reflect.Method;
@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-// donde se regisran los módulos, y los "listeners" de eventos en cada módulo que lo necesite
+// donde se registran los módulos, y los "listeners" de eventos en cada módulo que lo necesite
 public class ModuleManager {
+
+    public static ModuleManager INSTANCE;
 
     private final List<Module> modules = new ArrayList<>();
     private final EventBus eventBus;
@@ -20,17 +22,23 @@ public class ModuleManager {
         addModules();
     }
 
+    // por order alfabético y todo, flipas
     private void addModules() {
+        modules.add(new BossbarStack());
+        modules.add(new ChatPlus());
+        modules.add(new Freecam());
+        modules.add(new Freelook());
         modules.add(new Fullbright());
-        modules.add(new Zoom());
-        modules.add(new Perspective());
         modules.add(new HandView());
-        modules.add(new BetterChat());
+        modules.add(new PerspectivePlus());
+        modules.add(new Nametags());
+        modules.add(new TimeChanger());
+        modules.add(new Zoom());
 
         // registrar los "listeners" necesarios
         for (Module module : getEnabledModules()) {
             for (Method method : module.getClass().getDeclaredMethods()) {
-                if (method.isAnnotationPresent(Subscribe.class)) {
+                if (method.isAnnotationPresent(SubscribeEvent.class)) {
                     eventBus.register(module);
                     break;
                 }

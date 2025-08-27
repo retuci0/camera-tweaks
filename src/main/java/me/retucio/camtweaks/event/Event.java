@@ -1,6 +1,6 @@
 package me.retucio.camtweaks.event;
 
-// evento base, cancelable
+// evento base, cancelable (usado en mixins)
 public class Event {
     private boolean cancelled;
 

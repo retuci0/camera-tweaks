@@ -26,7 +26,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
     private void onSendMessage(String message, CallbackInfo ci) {
         if (ignoreChatMessage) return;
-        if (!message.startsWith(commandManager.getPrefix())) {
+        if (!message.startsWith(CommandManager.INSTANCE.getPrefix())) {
             SendMessageEvent event = EVENT_BUS.post(new SendMessageEvent(message));
             if (!event.isCancelled()) {
                 ignoreChatMessage = true;
@@ -38,7 +38,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
         };
 
         try {
-            CommandManager.dispatch(message.substring(commandManager.getPrefix().length()));
+            CommandManager.dispatch(message.substring(CommandManager.INSTANCE.getPrefix().length()));
         } catch (CommandSyntaxException e) {
             ChatUtil.error(e.getMessage());
         }

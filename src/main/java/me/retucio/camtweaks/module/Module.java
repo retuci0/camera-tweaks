@@ -1,7 +1,8 @@
 package me.retucio.camtweaks.module;
 
 import me.retucio.camtweaks.CameraTweaks;
-import me.retucio.camtweaks.event.Subscribe;
+import me.retucio.camtweaks.event.SubscribeEvent;
+import me.retucio.camtweaks.event.events.camtweaks.ToggleModuleEvent;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.EnumSetting;
 import me.retucio.camtweaks.module.settings.KeySetting;
@@ -43,8 +44,11 @@ public class Module {
         return settings;
     }
 
-    public void addSetting(Setting setting) {
+    @SuppressWarnings("unchecked")
+    public <S extends Setting> S addSetting(Setting setting) {
         settings.add(setting);
+        setting.setModule(this);
+        return (S) setting;  // por convenciencia
     }
 
     public void addSettings(Setting... settings) {
@@ -57,35 +61,30 @@ public class Module {
         enabled = !enabled;
         if (enabled) onEnable();
         else onDisable();
+        CameraTweaks.EVENT_BUS.post(new ToggleModuleEvent(this));
     }
 
     public void onEnable() {
         if (notify.isEnabled()) ChatUtil.info(getName() + " fue activado");
-        for (Method method : getClass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Subscribe.class)) {
+        for (Method method : getClass().getDeclaredMethods())
+            if (method.isAnnotationPresent(SubscribeEvent.class)) {
                 CameraTweaks.EVENT_BUS.register(this);
                 break;
-            }
         }
+        CameraTweaks.EVENT_BUS.post(new ToggleModuleEvent(this));
     }
 
     public void onDisable() {
         if (notify.isEnabled()) ChatUtil.info(getName() + " fue desactivado");
         if (CameraTweaks.EVENT_BUS.isRegistered(this))
             CameraTweaks.EVENT_BUS.unregister(this);
+        CameraTweaks.EVENT_BUS.post(new ToggleModuleEvent(this));
     }
 
 
     // otros métodos
     public void onTick() {}
     public void onKey(int key, int action) {}
-
-    public boolean nullCheck() {
-        return mc.player == null;
-    }
-    public boolean fullNullCheck() {
-        return mc.player == null || mc.world == null;
-    }
 
     // getters y setters
     public String getName() {
@@ -106,6 +105,7 @@ public class Module {
         return enabled;
     }
     public void setEnabled(boolean enabled) {
+        if (this.enabled == enabled) return;  // para evitar NPEs al cargar ajustes porque soy imbécil
         this.enabled = enabled;
         if (enabled) onEnable();
         else onDisable();
@@ -121,7 +121,11 @@ public class Module {
 
     public void setKey(int key) {
         bind.setKey(key);
+    }
+
+    public void assignKey(int key) {
         bind.setDefaultKey(key);
+        bind.setKey(key);
     }
 
     public KeySetting getBind() {
@@ -132,6 +136,7 @@ public class Module {
         HOLD("mantener"),
         TOGGLE("alternar");
 
+        // ojalá hubiera una manera de evitar repetirse con esto pero no la hay (creo) ...
         private final String name;
         KeyModes(String name) { this.name = name; }
         @Override public String toString() { return name; }

@@ -1,12 +1,15 @@
 package me.retucio.camtweaks.module.settings;
 
+import me.retucio.camtweaks.CameraTweaks;
+import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
+
 import java.util.function.Consumer;
 
 // ajuste numérico, es decir, que eliges un valor númerico entre el mínimo y el máximo disponibles
 public class NumberSetting extends Setting {
 
     private double value;
-    private final double defaultValue;
+    private double defaultValue;
 
     private final double min;
     private final double max;
@@ -49,15 +52,24 @@ public class NumberSetting extends Setting {
         return (int) value;  // en "int" (número entero) por conveniencia
     }
 
+    public long getLongValue() {
+        return (long) value;  // lo mismo para "longs"
+    }
+
     public void setValue(double value) {
         if (this.value == value) return;
         double clamped = clamp(value, min, max);
         this.value = Math.round(clamped / increment) * increment;
+        CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
         if (updateListener != null) updateListener.accept(this.value);
     }
 
     public double getDefaultValue() {
         return defaultValue;
+    }
+
+    public void setDefaultValue(double value) {
+        defaultValue = value;
     }
 
     public void reset() {
@@ -78,5 +90,6 @@ public class NumberSetting extends Setting {
 
     public void onUpdate(Consumer<Double> listener) {
         this.updateListener = listener;
+        CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
     }
 }

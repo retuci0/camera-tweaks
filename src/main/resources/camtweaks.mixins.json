@@ -3,7 +3,14 @@
   "package": "me.retucio.camtweaks.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ClientConnectionMixin",
+    "DimensionTypeMixin",
+    "EntityMixin",
+    "ItemEntityMixin",
+    "KeyInputMixin",
+    "PlayerEntityMixin",
     "StringHelperMixin",
+    "Vec3dMixin",
     "accessor.StatusEffectInstanceAccessor"
   ],
   "injectors": {
@@ -13,21 +20,34 @@
     "requireAnnotations": true
   },
   "client": [
+    "BossBarHudMixin",
     "CameraMixin",
     "ChatHudLineMixin",
     "ChatHudLineVisibleMixin",
     "ChatHudMixin",
     "ChatInputSuggestorMixin",
     "ChatScreenMixin",
+    "ChunkBorderDebugRendererMixin",
+    "ChunkOcclusionDataBuilderMixin",
     "ClientPlayNetworkHandlerMixin",
+    "ClientWorldPropertiesMixin",
+    "CompassStateMixin",
+    "EntityRendererMixin",
     "GameOptionsMixin",
     "GameRendererMixin",
     "HeldItemRendererMixin",
     "InGameHudMixin",
     "KeyboardMixin",
     "LightmapTextureManagerMixin",
+    "LivingEntityRendererMixin",
     "MessageHandlerMixin",
     "MinecraftClientMixin",
-    "MouseMixin"
+    "MouseMixin",
+    "ScreenMixin",
+    "SkyRendererMixin",
+    "WorldRendererMixin",
+    "accessor.ClientPlayNetworkHandlerAccessor",
+    "accessor.EntityRenderStateAccessor",
+    "accessor.KeyBindingAccessor"
   ]
 }

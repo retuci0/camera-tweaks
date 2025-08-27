@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.CompletableFuture;
 
-import static me.retucio.camtweaks.CameraTweaks.commandManager;
 import static me.retucio.camtweaks.CameraTweaks.mc;
 
 @Mixin(ChatInputSuggestor.class)
@@ -42,7 +41,7 @@ public abstract class ChatInputSuggestorMixin {
 
     @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true)
     private void onRefresh(CallbackInfo ci, @Local StringReader reader) {
-        String prefix = commandManager.getPrefix();
+        String prefix = CommandManager.INSTANCE.getPrefix();
         int length = prefix.length();
 
         if (reader.canRead(length) && reader.getString().startsWith(prefix, reader.getCursor())) {

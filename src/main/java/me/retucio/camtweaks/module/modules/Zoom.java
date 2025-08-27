@@ -1,36 +1,34 @@
 package me.retucio.camtweaks.module.modules;
 
 import me.retucio.camtweaks.CameraTweaks;
-import me.retucio.camtweaks.event.Subscribe;
+import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.GetFOVEvent;
 import me.retucio.camtweaks.event.events.MouseScrollEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.KeySetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
-import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
-import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 // continúa en GameRendererMixin
 public class Zoom extends Module {
 
-    public BooleanSetting showHands = new BooleanSetting("mostrar manos", "esconde o muestra las manos al hacer zoom", true);
-    public BooleanSetting showHUD = new BooleanSetting("mostrar HUD", "esconde o muestra los indicadores en pantalla", true);
+    public BooleanSetting showHands = addSetting(new BooleanSetting("mostrar manos", "esconde o muestra las manos al hacer zoom", true));
+    public BooleanSetting showHUD = addSetting(new BooleanSetting("mostrar HUD", "esconde o muestra los indicadores en pantalla", true));
 
-    public NumberSetting scrollSens = new NumberSetting("sensibilidad del scroll", "sensibilidad de la rueda del ratón (0 para desactivar)",
-            0.4, 0, 8, 0.1);
+    public NumberSetting scrollSens = addSetting(new NumberSetting("sensibilidad del scroll", "sensibilidad de la rueda del ratón (0 para desactivar)",
+            0.4, 0, 8, 0.1));
 
-    public KeySetting scrollKey = new KeySetting("tecla del scroll", "qué tecla mantener para usar la rueda del ratón", GLFW.GLFW_KEY_LEFT_CONTROL);
+    public KeySetting scrollKey = addSetting(new KeySetting("tecla del scroll", "qué tecla mantener para usar la rueda del ratón", GLFW.GLFW_KEY_LEFT_CONTROL));
 
-    public NumberSetting defaultZoom = new NumberSetting("zoom", "cantidad de zoom",
-            6, 1, 10, 0.1);
+    public NumberSetting defaultZoom = addSetting(new NumberSetting("zoom", "cantidad de zoom",
+            6, 1, 10, 0.1));
 
-    public NumberSetting mouseSensMultiplier = new NumberSetting("sensibilidad", "multiplicador de la sensibilidad del ratón",
-            0.7, 0.01, 1, 0.05);
+    public NumberSetting mouseSensMultiplier = addSetting(new NumberSetting("sensibilidad", "multiplicador de la sensibilidad del ratón",
+            0.7, 0.01, 1, 0.05));
 
-    public BooleanSetting smoothCam = new BooleanSetting("cámara cinemática", "usa la cámara cinemática mientras hagas zoom", false);
+    public BooleanSetting smoothCam = addSetting(new BooleanSetting("cámara cinemática", "usa la cámara cinemática mientras hagas zoom", false));
 
     private boolean prevSmoothCam;
     private double prevMouseSens;
@@ -44,12 +42,13 @@ public class Zoom extends Module {
         super.keyMode.setDefaultValue(KeyModes.HOLD);
         super.notify.setEnabled(false);
         super.notify.setDefaultValue(false);
-        setKey(GLFW.GLFW_KEY_F);
-        addSettings(showHands, showHUD, scrollSens, scrollKey, defaultZoom, mouseSensMultiplier, smoothCam);
+        assignKey(GLFW.GLFW_KEY_F);
     }
 
     @Override
     public void onEnable() {
+        if (mc.options == null) return;
+
         CameraTweaks.EVENT_BUS.register(this);
 
         prevSmoothCam = mc.options.smoothCameraEnabled;
@@ -63,6 +62,7 @@ public class Zoom extends Module {
 
     @Override
     public void onDisable() {
+        if (mc.options == null) return;
         CameraTweaks.EVENT_BUS.unregister(this);
 
         mc.options.smoothCameraEnabled = prevSmoothCam;
@@ -79,9 +79,10 @@ public class Zoom extends Module {
             mc.options.getMouseSensitivity().setValue(prevMouseSens * mouseSensMultiplier.getValue());
     }
 
-    @Subscribe
+    @SubscribeEvent
     private void onMouseScroll(MouseScrollEvent event) {
-        if (scrollSens.getValue() > 0 && isEnabled() && KeyUtil.isKeyDown(scrollKey.getKey())) {
+        boolean key = scrollKey.getKey() == GLFW.GLFW_KEY_UNKNOWN || KeyUtil.isKeyDown(scrollKey.getKey());
+        if (isEnabled() && scrollSens.getValue() > 0 && key) {
             value += event.getVertical() * 0.25 * (scrollSens.getValue() * value);
             if (value < 1) value = 1;
 
@@ -89,7 +90,7 @@ public class Zoom extends Module {
         }
     }
 
-    @Subscribe
+    @SubscribeEvent
     private void onGetFov(GetFOVEvent event) {
         event.setFov((float) (event.getFov() / value));
 

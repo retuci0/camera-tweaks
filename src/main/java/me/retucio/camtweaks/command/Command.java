@@ -12,13 +12,12 @@ import net.minecraft.server.command.CommandManager;
 
 import java.util.List;
 
-import static me.retucio.camtweaks.CameraTweaks.commandManager;
-
 public abstract class Command {
 
     // utilizar los "registries" ya existentes de Brigadier para el autocompletado
     protected static final CommandRegistryAccess REGISTRY_ACCESS = CommandManager.createRegistryAccess(BuiltinRegistries.createWrapperLookup());
     protected static final int SUCCESS = com.mojang.brigadier.Command.SINGLE_SUCCESS;
+
     protected static final MinecraftClient mc = MinecraftClient.getInstance();
 
     private final String name, description;
@@ -66,7 +65,7 @@ public abstract class Command {
     }
 
     public String toString() {
-        return commandManager.getPrefix() + name;
+        return me.retucio.camtweaks.command.CommandManager.INSTANCE.getPrefix() + name;
     }
 
     public String toString(String... args) {

@@ -8,22 +8,24 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.registry.Registries;
 import org.lwjgl.glfw.GLFW;
 
-// continúa en LightmapTextureManagerMixin
+/** continúa en:
+ * @see me.retucio.camtweaks.mixin.LightmapTextureManagerMixin
+ */
+
 public class Fullbright extends Module {
 
-    public EnumSetting<Modes> mode = new EnumSetting<>("modo", "qué modo de iluminación emplear (usar poción con shaders)", Modes.class, Modes.GAMMA);
+    public EnumSetting<Modes> mode = addSetting(new EnumSetting<>("modo", "qué modo de iluminación emplear (usar poción con shaders)", Modes.class, Modes.GAMMA));
 
     public Fullbright() {
-        super("brilli-brilli", "deshabilita la oscuridad");
-        setKey(GLFW.GLFW_KEY_B);
-        addSetting(mode);
-
+        super("brilli brilli", "deshabilita la oscuridad");
+        assignKey(GLFW.GLFW_KEY_K);
         mode.onUpdate(mode -> { if (mode != Modes.POTION) disableNightVision(); });
     }
 
     @Override
     public void onDisable() {
         disableNightVision();
+        super.onDisable();
     }
 
     @Override

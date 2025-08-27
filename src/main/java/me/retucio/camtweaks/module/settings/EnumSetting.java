@@ -1,5 +1,8 @@
 package me.retucio.camtweaks.module.settings;
 
+import me.retucio.camtweaks.CameraTweaks;
+import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,6 +36,7 @@ public class EnumSetting<E extends Enum<E>> extends Setting {
         if (this.value != value) {
             this.value = value;
             this.index = values.indexOf(value);
+            CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
             if (updateListener != null) updateListener.accept(value);
         }
     }

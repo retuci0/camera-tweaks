@@ -2,7 +2,10 @@ package me.retucio.camtweaks.event.events;
 
 import me.retucio.camtweaks.event.Event;
 
-// se genera en MouseMixin
+/**
+ * @see me.retucio.camtweaks.mixin.MouseMixin#onMouseScroll
+ */
+
 public class MouseScrollEvent extends Event {
 
     private double horizontal, vertical;
