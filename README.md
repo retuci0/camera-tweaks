@@ -13,7 +13,7 @@ mod para Minecraft Fabric 1.21.6 que añade algunas cosas QOL, mayormente relaci
 asegúrate de tener una version de Minecraft y Fabric compatibles con el mod
 
 ### para frikis de 200 de iq
-1. clona el respositorio
+1. clona el respositorio (`git clone https://github.com/retuci0/camera-tweaks`)
 2. `gradlew build` para Windows o `chmod +x gradlew` + `./gradlew build` para Linux
 3. el resultado estará en `/build/libs` (el que no lleva "sources" en el nombre)
 
@@ -22,6 +22,8 @@ asegúrate de tener una version de Minecraft y Fabric compatibles con el mod
 `shift derecho` por defecto para abrir la interfaz
 
 `$` como prefijo por defecto para comandos (se autocompletan)
+
+algunos módulos tienen teclas asignadas por defecto, asígnales `ESC` para desactivar sus teclas
 
 ## interfaz
 
@@ -37,14 +39,15 @@ asegúrate de tener una version de Minecraft y Fabric compatibles con el mod
 - shift mientras pasas el puntero por encima de un ajuste de modos para ver los modos disponibles
 - clic derecho para ciclar hacia atrás en ajustes de modo
 - usa la rueda del ratón para mover la interfaz verticalmente
+- shift + rueda del ratón para mover todos los marcos a un rango visible en la pantalla
 
 ## capturas
 
-<img src="screenshots/2025-08-19_23.20.15.png" alt="captura 1 (foto vieja)">
-<img src="screenshots/2025-08-22_00.18.51.png" alt="captura 2 (interfaz)">
-<img src="screenshots/2025-08-22_00.19.11.png" alt="captura 3 (interfaz)">
-<img src="screenshots/2025-08-22_00.22.41.png" alt="captura 5 (comandos)">
-<img src="screenshots/2025-08-27_18.44.41.png" alt="captura 6 (nametags & apilar bossbars)">
+<img src="screenshots/ui.png" alt="interfaz">
+<img src="screenshots/nametags.png" alt="nametags mostrando daño de un tridente">
+<img src="screenshots/chatplus.png" alt="chatplus y capturas en uso">
+<img src="screenshots/crits.png" alt="críticos">
+<img src="screenshots/fullbright.png" alt="fullbright en modo gamma cambiando el color de los shaders">
 
 ## contibuciones
 
