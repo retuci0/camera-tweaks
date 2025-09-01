@@ -2,7 +2,7 @@ package me.retucio.camtweaks.util;
 
 import java.awt.*;
 
-import static me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame.guiSettings;
+import static me.retucio.camtweaks.ui.frames.ClientSettingsFrame.guiSettings;
 
 
 // clase para los colores, para no repetirme (regla DRY)

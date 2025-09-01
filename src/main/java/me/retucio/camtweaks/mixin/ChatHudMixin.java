@@ -103,6 +103,11 @@ public abstract class ChatHudMixin implements IChatHud {
         return line;
     }
 
+    @Override
+    public List<ChatHudLine.Visible> smegma$getVisibleMessages() {
+        return visibleMessages;
+    }
+
 
 
     // modificar contenido del mensaje

@@ -5,16 +5,10 @@ import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.Freelook;
 import me.retucio.camtweaks.module.modules.Nametags;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.AgeableMobEntityRenderer;
+import me.retucio.camtweaks.util.ChatUtil;
 import net.minecraft.entity.*;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.vehicle.VehicleEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
@@ -31,11 +25,11 @@ import static me.retucio.camtweaks.CameraTweaks.mc;
 @Mixin(Entity.class)
 public abstract class EntityMixin {
 
-    @Shadow public int age;
+    @Shadow
+    public abstract Text getName();
 
-    @Shadow public abstract Text getName();
-
-    @Shadow @Nullable public abstract Text getCustomName();
+    @Shadow
+    public abstract EntityType<?> getType();
 
     @Unique
     Freecam freecam;
@@ -82,15 +76,8 @@ public abstract class EntityMixin {
     @ModifyReturnValue(method = "isCustomNameVisible", at = @At("RETURN"))
     private boolean renderEntityNametags(boolean original) {
         if (!nametags.isEnabled()) return original;
-        return switch ((Object) this) {
-            case PlayerEntity player -> nametags.namePlayers.isEnabled();
-            case ItemEntity item -> nametags.nameItems.isEnabled();
-            case ProjectileEntity projectile -> nametags.nameProjectiles.isEnabled();
-            case Monster hostile -> nametags.nameHostileMobs.isEnabled() || original;  // monster en vez de HostileEntity para también incluir slimes
-            case PassiveEntity passive -> nametags.namePassiveMobs.isEnabled() || original;
-            case VehicleEntity vehicle -> nametags.nameVehicles.isEnabled();
-            default -> nametags.nameMiscMobs.isEnabled() || original;
-        };
+        if ((Object) this instanceof PersistentProjectileEntity p && p.isOnGround()) return false;
+        return nametags.entities.isEnabled((this.getType()));
     }
 
     @ModifyReturnValue(method = "getName", at = @At("RETURN"))
@@ -98,9 +85,10 @@ public abstract class EntityMixin {
         if (!nametags.isEnabled() || !nametags.showProjectileDamage.isEnabled()) return original;
 
         if ((Object) this instanceof PersistentProjectileEntity arrow) {  // aunque lo llame "arrow", también cubre flechas espectrales y tridentes
-            float damage = nametags.getArrowDamage(arrow);
-            if (damage > 0) return original.copy().append(Text.literal(" (" + damage + ")").formatted(Formatting.RED));
+            String damage = nametags.getArrowDamage(arrow);
+            if (!damage.equals("0")) return original.copy().append(Text.literal(" (" + damage + ")").formatted(Formatting.RED));
         }
+
         return original;
     }
 

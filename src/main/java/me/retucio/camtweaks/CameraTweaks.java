@@ -10,6 +10,9 @@ import me.retucio.camtweaks.event.EventBus;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.ShutdownEvent;
 
+import me.retucio.camtweaks.event.events.camtweaks.LoadClickGUIEvent;
+import me.retucio.camtweaks.event.events.camtweaks.LoadCommandManagerEvent;
+import me.retucio.camtweaks.event.events.camtweaks.LoadModuleManagerEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
 
@@ -17,10 +20,12 @@ import me.retucio.camtweaks.ui.ClickGUI;
 import me.retucio.camtweaks.ui.buttons.BindButton;
 import me.retucio.camtweaks.ui.buttons.SettingButton;
 import me.retucio.camtweaks.ui.buttons.TextButton;
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
+import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 
+import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
+import me.retucio.camtweaks.util.Lists;
 import me.retucio.camtweaks.util.MiscUtil;
 
 
@@ -50,16 +55,27 @@ public class CameraTweaks implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // por algún motivo aunque lo añada a los args de la JVM sigue siendo true a menos que haga esto??? puta vida
+        System.setProperty("java.awt.headless", "false");
+
         mc = MinecraftClient.getInstance();
-
-        ModuleManager.INSTANCE = new ModuleManager(EVENT_BUS);
-        CommandManager.INSTANCE = new CommandManager();
-        ClickGUI.INSTANCE = new ClickGUI();
-
-        ConfigManager.load();
 
         EVENT_BUS.register(this);
         EVENT_BUS.register(MiscUtil.class);
+        EVENT_BUS.register(ChatUtil.class);
+
+        Lists.init();
+
+        ModuleManager.INSTANCE = new ModuleManager(EVENT_BUS);
+        EVENT_BUS.post(new LoadModuleManagerEvent());
+
+        CommandManager.INSTANCE = new CommandManager();
+        EVENT_BUS.post(new LoadCommandManagerEvent());
+
+        ClickGUI.INSTANCE = new ClickGUI();
+        EVENT_BUS.post(new LoadClickGUIEvent());
+
+        ConfigManager.load();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             ConfigManager.save();
@@ -132,7 +148,7 @@ public class CameraTweaks implements ClientModInitializer {
 
     // maneja la lógica de apertura de la interfaz
     private void handleClickGUIKey(int key, boolean anyFocused) {
-        if (key != ClickGUISettingsFrame.guiSettings.getKey() || anyFocused) return;
+        if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused) return;
 
         if (mc.currentScreen != ClickGUI.INSTANCE) {
             prevScreen = mc.currentScreen;

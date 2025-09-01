@@ -2,20 +2,25 @@ package me.retucio.camtweaks.ui;
 
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.SubscribeEvent;
+import me.retucio.camtweaks.event.events.MouseClickEvent;
 import me.retucio.camtweaks.event.events.MouseScrollEvent;
 import me.retucio.camtweaks.event.events.camtweaks.SettingsFrameEvent;
 import me.retucio.camtweaks.module.Module;
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
+import me.retucio.camtweaks.ui.buttons.ListButton;
+import me.retucio.camtweaks.ui.buttons.SettingButton;
+import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.ModuleFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
+import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame.guiSettings;
+import static me.retucio.camtweaks.ui.frames.ClientSettingsFrame.guiSettings;
 
 // interfaz gráfica, se abre con el shift derecho por defecto. aquí se encuentran los módulos y sus ajustes
 public class ClickGUI extends Screen {
@@ -25,7 +30,7 @@ public class ClickGUI extends Screen {
 
     private final ModuleFrame modulesFrame = new ModuleFrame(20, 30, 100, 20);
     private final List<SettingsFrame> settingsFrames = new ArrayList<>();
-    private final ClickGUISettingsFrame guiSettingsFrame = new ClickGUISettingsFrame(200, 30, 100, 20);
+    private final ClientSettingsFrame guiSettingsFrame = new ClientSettingsFrame(200, 30, 100, 20);
 
     public ClickGUI() {
         super(Text.of("interfaz"));
@@ -77,12 +82,33 @@ public class ClickGUI extends Screen {
             sf.y += (int) (event.getVertical() * guiSettings.scrollSens.getValue());
     }
 
+    @SubscribeEvent
+    public void onMouseMiddleButton(MouseClickEvent event) {
+        // mover todos los marcos a un punto visible al presionar shift + la rueda del ratón
+        if (CameraTweaks.mc.currentScreen != this || event.getButton() != 2 || !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) return;
+
+        int h = CameraTweaks.mc.getWindow().getScaledHeight();
+        int minY = Math.min(modulesFrame.y, settingsFrames.stream().mapToInt(sf -> sf.y).min().orElse(modulesFrame.y));
+        int maxY = Math.max(modulesFrame.y + modulesFrame.h, settingsFrames.stream().mapToInt(sf -> sf.y + sf.h).max().orElse(modulesFrame.y + modulesFrame.h));
+        int correction = minY < 0 ? -minY + 4 : (maxY > h ? h - maxY - 4 : 0);
+        if (correction != 0) {
+            modulesFrame.y += correction;
+            settingsFrames.forEach(sf -> sf.y += correction);
+        }
+    }
+
     public void openSettingsFrame(Module module, int x, int y) {
         // abrir un marco donde se encuentran los ajustes del módulo deseado
         if (isSettingsFrameOpen(module)) return;  // permitir un solo marco de ajustes por módulo
         SettingsFrame frame = new SettingsFrame(module, x, y, 120, 20);
         settingsFrames.add(frame);
         CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Open(frame));
+    }
+
+    public void openListSettingsFrame(Module module, int x, int y) {
+        if (isSettingsFrameOpen(module)) return;
+        SettingsFrame frame = new SettingsFrame(module, x, y, 120, 18);
+        settingsFrames.add(frame);
     }
 
     // cerrar el marco de ajustes
@@ -104,6 +130,13 @@ public class ClickGUI extends Screen {
                 .anyMatch(sf -> sf.module.getName().equals(module.getName()));
     }
 
+    public void refreshListButtons() {
+        for (SettingsFrame frame : settingsFrames)
+            for (SettingButton button : frame.getButtons())
+                if (button instanceof ListButton<?> lb)
+                    lb.refreshDummy();
+    }
+
     // no pausar el juego cuando se abre la interfaz
     @Override
     public boolean shouldPause() {
@@ -114,7 +147,7 @@ public class ClickGUI extends Screen {
         return modulesFrame;
     }
 
-    public ClickGUISettingsFrame getGuiSettingsFrame() {
+    public ClientSettingsFrame getGuiSettingsFrame() {
         return guiSettingsFrame;
     }
 

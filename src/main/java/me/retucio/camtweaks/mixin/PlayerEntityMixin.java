@@ -22,7 +22,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @ModifyReturnValue(method = "getDisplayName", at = @At("RETURN"))
     private Text addHealthIndicator(Text original) {
         Nametags nametags = ModuleManager.INSTANCE.getModuleByClass(Nametags.class);
-        if (nametags.isEnabled() && !nametags.namePlayers.isEnabled()) return null;
         if (!nametags.isEnabled() || !nametags.health.isEnabled()) return original;
 
         float health = getHealth();
@@ -34,6 +33,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         else color = Formatting.DARK_GREEN;
 
         // me gustaría también añadir un modo en el que se renderizan los corazones directamente en la nametag, pero no sé cómo hacer para las imágenes :'(
+        // ahora que lo pienso en la snapshot más reciente han metido iconos que se pueden usar en texto, y uno de ellos es un corazón :D
         return original.copy().append(Text.literal(" [" + color + (nametags.healthMode.is(Nametags.HealthMode.HEARTS)
                 ?  String.format("%.2f", health / 2) : (int) health) + Formatting.RESET + "]"));
     }           // redondear a dos decimales

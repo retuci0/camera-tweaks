@@ -60,7 +60,7 @@ public class ModuleFrame {
         ctx.drawText(mc.textRenderer, title,
                 x + (w / 2) - (mc.textRenderer.getWidth(title) / 2),
                 y + ( h /2) - (mc.textRenderer.fontHeight / 2),
-                -1, false);
+                -1, true);
 
         // dibujar sus módulos solo si está extendido
         if (extended) {

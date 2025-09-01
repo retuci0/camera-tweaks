@@ -7,13 +7,15 @@ import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.settings.*;
 import me.retucio.camtweaks.ui.ClickGUI;
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
+import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 // se ocupa de guardar, cargar y aplicar ajustes
 // pues no me ha dado dolores de cabeza el coso este con los NPE de los cojones...
@@ -69,8 +71,8 @@ public class ConfigManager {
             }
         });
 
-        ClickGUISettingsFrame.guiSettings.setEnabled(true);
-        ClickGUISettingsFrame.guiSettings.getSettings().forEach(setting -> applySetting(ClickGUISettingsFrame.guiSettings, setting));
+        ClientSettingsFrame.guiSettings.setEnabled(true);
+        ClientSettingsFrame.guiSettings.getSettings().forEach(setting -> applySetting(ClientSettingsFrame.guiSettings, setting));
 
         CameraTweaks.LOGGER.info("módulos encendidos cargados");
         CameraTweaks.LOGGER.info("ajustes de módulos cargados");
@@ -90,6 +92,7 @@ public class ConfigManager {
         }
 
         CameraTweaks.LOGGER.info("posiciones de frames cargadas");
+        ClickGUI.INSTANCE.refreshListButtons();
     }
 
     public static ClientConfig getConfig() {
@@ -102,7 +105,7 @@ public class ConfigManager {
         save();
     }
 
-    public static void setSetting(Setting setting, Object value) {
+    public static void setSetting(AbstractSetting setting, Object value) {
         ensureConfig();
         config.settings.put(setting.getModule().getName() + ":" + setting.getName(), value);
         save();
@@ -120,7 +123,8 @@ public class ConfigManager {
         save();
     }
 
-    public static void applySetting(Module parent, Setting setting) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void applySetting(Module parent, AbstractSetting setting) {
         String id = parent.getName() + ":" + setting.getName();
         if (config.settings.containsKey(id)) {
             Object value = config.settings.get(id);
@@ -131,7 +135,17 @@ public class ConfigManager {
                 case NumberSetting n -> n.setValue((double) value);
                 case StringSetting s -> s.setValue((String) value);
                 case KeySetting k -> k.setKey(value instanceof Double val ? val.intValue() : (int) value);
-                default -> {}
+                case ListSetting l -> {
+                    if (value instanceof Map<?, ?> map) {
+                        Map<Object, Boolean> converted = new HashMap<>();
+                        for (Object option : l.getOptions()) {
+                            Object key = String.valueOf(option);
+                            Object bv = map.get(key);
+                            converted.put(option, bv instanceof Boolean b && b);
+                        }
+                        l.setValues(converted);
+                    }
+                } default -> {}
             }
         }
     }

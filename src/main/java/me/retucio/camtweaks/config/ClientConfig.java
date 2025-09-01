@@ -4,7 +4,6 @@ import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.camtweaks.*;
 import me.retucio.camtweaks.module.settings.*;
 import me.retucio.camtweaks.ui.ClickGUI;
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +36,10 @@ public class ClientConfig {
         ConfigManager.setModuleState(event.getModule());
     }
 
+    @SuppressWarnings("rawtypes")
     @SubscribeEvent
     public void onUpdateSetting(UpdateSettingEvent event) {
-        if (mc == null) return;
+        if (mc == null || !event.shouldSave()) return;
 
         // guardar ajustes con su respectivo tipo de valor, en formato "nombreMódulo:nombreAjuste"
         Object value = null;
@@ -49,6 +49,7 @@ public class ClientConfig {
             case KeySetting k: value = k.getKey(); break;
             case NumberSetting n: value = n.getValue(); break;
             case StringSetting s: value = s.getValue(); break;
+            case ListSetting l: value = l.getValues(); break;
             default: break;
         }
 

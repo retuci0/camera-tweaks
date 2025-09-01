@@ -1,0 +1,9 @@
+accessWidener   v2  named
+
+accessible class net/minecraft/client/font/TextRenderer$Drawer
+
+accessible field net/minecraft/client/particle/Particle alpha F
+accessible field net/minecraft/client/particle/BillboardParticle scale F
+accessible field net/minecraft/client/particle/Particle velocityMultiplier F
+accessible field net/minecraft/client/particle/Particle gravityStrength F
+accessible field net/minecraft/client/particle/Particle collidesWithWorld Z

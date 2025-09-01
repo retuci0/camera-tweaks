@@ -32,8 +32,7 @@ public class ToggleButton extends SettingButton {
             // quizás debería de utilizar .brighter() más, en vez de dar valores personalizados
 
         ctx.fill(x, y, x + w, y + height, color.getRGB());
-        ctx.drawTextWithShadow(parent.mc.textRenderer,
-                setting.getName(), x + 5, y + 3, -1);
+        ctx.drawText(parent.mc.textRenderer, setting.getName(), x + 5, y + 3, -1, true);
 
         // dibujar "tooltips" (cajas de texto) al pasar el puntero encima del botón, para mostrar su descripción
         if (isHovered((int) mouseX, (int) mouseY)) {

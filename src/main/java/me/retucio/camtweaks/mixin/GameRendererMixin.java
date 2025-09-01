@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.event.events.GetFOVEvent;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.module.modules.PerspectivePlus;
+import me.retucio.camtweaks.module.modules.NoRender;
 import me.retucio.camtweaks.module.modules.Zoom;
 import me.retucio.camtweaks.util.interfaces.IVec3d;
 import net.minecraft.client.MinecraftClient;
@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
@@ -36,6 +37,9 @@ public abstract class GameRendererMixin {
     @Unique
     Freecam freecam;
 
+    @Unique
+    NoRender noRender;
+
     @Shadow @Final
     private MinecraftClient client;
 
@@ -46,6 +50,7 @@ public abstract class GameRendererMixin {
     private void getModules(MinecraftClient client, HeldItemRenderer firstPersonHeldItemRenderer, BufferBuilderStorage buffers, CallbackInfo ci) {
         zoom = ModuleManager.INSTANCE.getModuleByClass(Zoom.class);;
         freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
+        noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
     }
 
     @ModifyReturnValue(method = "getFov", at = @At("RETURN"))
@@ -102,5 +107,10 @@ public abstract class GameRendererMixin {
         if ((zoom.isEnabled() && !zoom.showHands.isEnabled())
                 || (freecam.isEnabled() && !freecam.renderHands.isEnabled()))
             ci.cancel();
+    }
+
+    @ModifyVariable(method = "renderWorld", ordinal = 6, at = @At(value = "STORE"))
+    private float noRenderNauseaDistortion(float scaledNauseaEffectFactor) {
+        return (noRender.isEnabled() && !noRender.nauseaEffect.isEnabled()) ? 0 : scaledNauseaEffectFactor;
     }
 }

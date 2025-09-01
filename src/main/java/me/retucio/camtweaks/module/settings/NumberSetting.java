@@ -6,7 +6,7 @@ import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
 import java.util.function.Consumer;
 
 // ajuste numérico, es decir, que eliges un valor númerico entre el mínimo y el máximo disponibles
-public class NumberSetting extends Setting {
+public class NumberSetting extends AbstractSetting {
 
     private double value;
     private double defaultValue;
@@ -60,7 +60,7 @@ public class NumberSetting extends Setting {
         if (this.value == value) return;
         double clamped = clamp(value, min, max);
         this.value = Math.round(clamped / increment) * increment;
-        CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
+        fireUpdateEvent();
         if (updateListener != null) updateListener.accept(this.value);
     }
 
@@ -90,6 +90,6 @@ public class NumberSetting extends Setting {
 
     public void onUpdate(Consumer<Double> listener) {
         this.updateListener = listener;
-        CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
+        if (updateListener != null) updateListener.accept(value);
     }
 }

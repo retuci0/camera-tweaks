@@ -9,6 +9,7 @@ import net.minecraft.command.CommandSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
+import java.util.Objects;
 
 // registro de comandos
 public class CommandManager {
@@ -28,9 +29,12 @@ public class CommandManager {
 
     public static void registerCommands() {
         addCommand(new BindCommand());
+        addCommand(new CopyScreenshotCommand());
 //        addCommand(new EnderChestCommand());  no funciona D:
         addCommand(new PeekCommand());
         addCommand(new PrefixCommand());
+        addCommand(new PurgeCommand());
+        addCommand(new SaveScreenshotCommand());
         addCommand(new SendCommand());
         addCommand(new ToggleCommand());
 
@@ -44,17 +48,17 @@ public class CommandManager {
     }
 
     public static void dispatch(String message) throws CommandSyntaxException {
-        dispatcher.execute(message, mc.getNetworkHandler().getCommandSource());
+        dispatcher.execute(message, Objects.requireNonNull(mc.getNetworkHandler()).getCommandSource());
     }
 
     public static Command getCommandByName(String name) {
         for (Command command : commands) {
-            if (command.getName().equals(name))
-                return command;
+            if (command.getName().equals(name)) return command;
+
             for (String alias : command.getAliases())
-                if (alias.equals(name))
-                    return command;
+                if (alias.equals(name)) return command;
         }
+
         return null;
     }
 

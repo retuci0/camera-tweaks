@@ -29,7 +29,7 @@ public class TextButton extends SettingButton {
         ctx.fill(x, y, x + w, y + height, bgColor);
 
         String label = setting.getName() + ": " + (typing ? buffer + "_" : setting.getValue());
-        ctx.drawTextWithShadow(parent.mc.textRenderer, label, x + 5, y + 3, -1);
+        ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
 
         if (isHovered((int) mouseX, (int) mouseY)) {
             if (parent.mc.currentScreen != null)

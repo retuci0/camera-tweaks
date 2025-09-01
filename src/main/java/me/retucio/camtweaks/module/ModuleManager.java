@@ -22,16 +22,21 @@ public class ModuleManager {
         addModules();
     }
 
-    // por order alfabético y todo, flipas
+    // por orden alfabético y todo, flipas
     private void addModules() {
+        modules.add(new BlockOutline());
         modules.add(new BossbarStack());
         modules.add(new ChatPlus());
+        modules.add(new CritsPlus());
+        modules.add(new DamageOverlay());
         modules.add(new Freecam());
         modules.add(new Freelook());
         modules.add(new Fullbright());
         modules.add(new HandView());
-        modules.add(new PerspectivePlus());
         modules.add(new Nametags());
+        modules.add(new NoRender());
+        modules.add(new PerspectivePlus());
+        modules.add(new ScreenshotPlus());
         modules.add(new TimeChanger());
         modules.add(new Zoom());
 

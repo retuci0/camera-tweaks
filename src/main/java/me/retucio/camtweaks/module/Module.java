@@ -6,7 +6,7 @@ import me.retucio.camtweaks.event.events.camtweaks.ToggleModuleEvent;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.EnumSetting;
 import me.retucio.camtweaks.module.settings.KeySetting;
-import me.retucio.camtweaks.module.settings.Setting;
+import me.retucio.camtweaks.module.settings.AbstractSetting;
 import me.retucio.camtweaks.util.ChatUtil;
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
@@ -22,13 +22,14 @@ public class Module {
     private String name;
     private String description;
     private boolean enabled;
+    private boolean saveSettings = true;
 
     // dejar al usuario elegir si el módulo debería apagarse tras soltar su tecla asignada, o si la tecla debería alternar su estado
     protected EnumSetting<KeyModes> keyMode = new EnumSetting<>("modo de tecla", "cómo interpretar la tecla configurada", KeyModes.class, KeyModes.TOGGLE);
     protected KeySetting bind = new KeySetting("tecla", "tecla asignada al módulo, ESC para desactivar", GLFW.GLFW_KEY_UNKNOWN);
     protected BooleanSetting notify = new BooleanSetting("notificar", "notificar en el chat al activar / desactivar", true);
 
-    private final List<Setting> settings = new ArrayList<>();
+    private final List<AbstractSetting> settings = new ArrayList<>();
 
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -40,19 +41,19 @@ public class Module {
 
 
     // ajustes
-    public List<Setting> getSettings() {
+    public List<AbstractSetting> getSettings() {
         return settings;
     }
 
     @SuppressWarnings("unchecked")
-    public <S extends Setting> S addSetting(Setting setting) {
+    public <S extends AbstractSetting> S addSetting(AbstractSetting setting) {
         settings.add(setting);
         setting.setModule(this);
         return (S) setting;  // por convenciencia
     }
 
-    public void addSettings(Setting... settings) {
-        for (Setting setting : settings) addSetting(setting);
+    public void addSettings(AbstractSetting... settings) {
+        for (AbstractSetting setting : settings) addSetting(setting);
     }
 
 
@@ -113,6 +114,14 @@ public class Module {
 
     public boolean shouldToggleOnBindRelease() {
         return keyMode.is(KeyModes.HOLD);
+    }
+
+    public boolean shouldSaveSettings() {
+        return saveSettings;
+    }
+
+    public void shouldSaveSettings(boolean value) {
+        this.saveSettings = value;
     }
 
     public int getKey() {

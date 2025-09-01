@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.module.modules;
 
+import me.retucio.camtweaks.event.Stage;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.*;
 import me.retucio.camtweaks.module.Module;
@@ -24,6 +25,7 @@ import org.lwjgl.glfw.GLFW;
 /** continúa en:
  * @see me.retucio.camtweaks.mixin.CameraMixin
  * @see me.retucio.camtweaks.mixin.ChunkBorderDebugRendererMixin
+ * @see me.retucio.camtweaks.mixin.ClientPlayerInteractionManagerMixin
  * @see me.retucio.camtweaks.mixin.CompassStateMixin
  * @see me.retucio.camtweaks.mixin.EntityMixin
  * @see me.retucio.camtweaks.mixin.GameRendererMixin
@@ -63,7 +65,7 @@ public class Freecam extends Module {
     private float yaw, pitch;
 
     public Freecam() {
-        super("cámara libre", "perrmite a la cámara moverse independientemente del jugador. útil para explorar alrededores");
+        super("cámara libre", "permite a la cámara moverse independientemente del jugador. útil para explorar alrededores");
         assignKey(GLFW.GLFW_KEY_V);
         speedSetting.onUpdate(newSpeed -> speed = newSpeed);
     }
@@ -187,12 +189,13 @@ public class Freecam extends Module {
     @SubscribeEvent
     public void onPacketSend(PacketEvent.Send event) {
         if (!isEnabled() || !cancelActionPackets.isEnabled()) return;
+        if (event.getStage() != Stage.PRE) return;
 
-        Packet<?> p = event.getPacket();
-        if (p instanceof PlayerActionC2SPacket
-                || p instanceof PlayerInteractBlockC2SPacket
-                || p instanceof PlayerInteractItemC2SPacket
-                || p instanceof HandSwingC2SPacket) {
+        Packet<?> packet = event.getPacket();
+        if (packet instanceof PlayerActionC2SPacket
+                || packet instanceof PlayerInteractBlockC2SPacket
+                || packet instanceof PlayerInteractItemC2SPacket
+                || packet instanceof HandSwingC2SPacket) {
             event.cancel();
         }
     }
@@ -200,7 +203,7 @@ public class Freecam extends Module {
     @SubscribeEvent
     public void onKey(KeyEvent event) {
         if (mc.currentScreen != null) return;
-        if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return; // ?
+        if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
 
         boolean shouldCancel = true;
         if (mc.options.forwardKey.matchesKey(event.getKey(), event.getScancode())) {

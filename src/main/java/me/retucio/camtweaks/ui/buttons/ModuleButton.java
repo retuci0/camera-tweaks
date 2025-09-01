@@ -28,9 +28,10 @@ public class ModuleButton {
                 parent.x + parent.w - 2 , parent.y + height + offset,
                 determineColor(mouseX, mouseY));
 
-        ctx.drawTextWithShadow( // dibujar el nombre del módulo
+        ctx.drawText( // dibujar el nombre del módulo
                 parent.mc.textRenderer, module.getName(),
-                parent.x + 5, parent.y + offset + (height / 2) - (parent.mc.textRenderer.fontHeight / 2) + 2, -1);
+                parent.x + 5, parent.y + offset + (height / 2) - (parent.mc.textRenderer.fontHeight / 2) + 2,
+                -1, true);
 
         // dibujar "tooltips" (cajas de texto) al pasar el puntero encima del botón, para mostrar su descripción
         if (isHovered((int) mouseX, (int) mouseY)) {

@@ -40,3 +40,4 @@ replay_*.log
 *.jfr
 
 todo.txt
+test.java

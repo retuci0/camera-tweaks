@@ -12,7 +12,6 @@ import me.retucio.camtweaks.event.events.SendMessageEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
 import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.interfaces.IChatHudLine;
 import me.retucio.camtweaks.util.interfaces.IChatHudLineVisible;

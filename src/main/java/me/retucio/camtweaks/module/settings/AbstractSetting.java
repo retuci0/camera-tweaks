@@ -1,9 +1,11 @@
 package me.retucio.camtweaks.module.settings;
 
+import me.retucio.camtweaks.CameraTweaks;
+import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
 import me.retucio.camtweaks.module.Module;
 
 // base para los tipos de ajustes
-public class Setting {
+public abstract class AbstractSetting {
 
     private final String name;
     private final String description;
@@ -11,7 +13,7 @@ public class Setting {
 
     private Module module;
 
-    protected Setting(String name, String description) {
+    protected AbstractSetting(String name, String description) {
         this.name = name;
         this.description = description;
     }
@@ -38,5 +40,9 @@ public class Setting {
 
     public void setModule(Module module) {
         this.module = module;
+    }
+
+    public void fireUpdateEvent() {
+        CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this, module.shouldSaveSettings()));
     }
 }

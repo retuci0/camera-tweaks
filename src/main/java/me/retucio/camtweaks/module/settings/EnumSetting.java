@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 // ajuste que te deja elegir entre distintas opciones definidas, dentro de un Enum
-public class EnumSetting<E extends Enum<E>> extends Setting {
+public class EnumSetting<E extends Enum<E>> extends AbstractSetting {
 
-    private final Class<E> enumClass;
     private final List<E> values;
     private E defaultValue;
 
@@ -21,7 +20,6 @@ public class EnumSetting<E extends Enum<E>> extends Setting {
 
     public EnumSetting(String name, String description, Class<E> enumClass, E defaultValue) {
         super(name, description);
-        this.enumClass = enumClass;
         this.values = Arrays.asList(enumClass.getEnumConstants());
         this.defaultValue = defaultValue;
         this.value = defaultValue;
@@ -36,7 +34,7 @@ public class EnumSetting<E extends Enum<E>> extends Setting {
         if (this.value != value) {
             this.value = value;
             this.index = values.indexOf(value);
-            CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
+            fireUpdateEvent();
             if (updateListener != null) updateListener.accept(value);
         }
     }
@@ -87,5 +85,6 @@ public class EnumSetting<E extends Enum<E>> extends Setting {
 
     public void onUpdate(Consumer<E> listener) {
         this.updateListener = listener;
+        if (updateListener != null) updateListener.accept(value);
     }
 }

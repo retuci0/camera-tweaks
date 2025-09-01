@@ -3,7 +3,7 @@ package me.retucio.camtweaks.command.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.camtweaks.command.Command;
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
+import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.util.ChatUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
@@ -21,7 +21,7 @@ public class PrefixCommand extends Command {
         builder
             .then(argument("prefijo", StringArgumentType.word()).executes(ctx -> {
                 String prefix = ctx.getArgument("prefijo", String.class);
-                ClickGUISettingsFrame.guiSettings.commandPrefix.setValue(prefix);
+                ClientSettingsFrame.guiSettings.commandPrefix.setValue(prefix);
                 ChatUtil.info(Text.literal("prefijo cambiado a " + Formatting.AQUA + prefix));
                 return SUCCESS;
             }));

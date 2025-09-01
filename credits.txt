@@ -2,3 +2,4 @@ meteor client dev team
 oyvey client (1.21 port by mioclient)
 lennyboi (youtube)
 packbar by cattyn on github
+shotify mod

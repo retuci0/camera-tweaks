@@ -3,10 +3,9 @@ package me.retucio.camtweaks.module.settings;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
-public class StringSetting extends Setting {
+public class StringSetting extends AbstractSetting {
 
     private String value;
     private String defaultValue;
@@ -28,7 +27,7 @@ public class StringSetting extends Setting {
     public void setValue(String value) {
         if (this.value.equals(value)) return;
         this.value = value.length() > maxLength ? value.substring(0, maxLength) : value;
-        CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
+        fireUpdateEvent();
         if (updateListener != null) updateListener.accept(this.value);
     }
 
@@ -50,6 +49,6 @@ public class StringSetting extends Setting {
 
     public void onUpdate(Consumer<String> listener) {
         this.updateListener = listener;
-        CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
+        if (updateListener != null) updateListener.accept(value);
     }
 }

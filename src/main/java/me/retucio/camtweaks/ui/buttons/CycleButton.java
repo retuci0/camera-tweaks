@@ -33,7 +33,7 @@ public class CycleButton<E extends Enum<E>> extends SettingButton {
 
         // texto del botón: nombre + valor de texto del enum
         String label = setting.getName() + ": " + setting.getValue().toString();
-        ctx.drawTextWithShadow(parent.mc.textRenderer, label, x + 5, y + 3, -1);
+        ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
 
         // tooltip
         if (isHovered((int) mouseX, (int) mouseY)) {

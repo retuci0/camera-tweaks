@@ -39,7 +39,7 @@ public class SettingsFrame {
 
         // añadir el respectivo tipo de botón de cada ajuste a la lista de botones
         int offset = h;
-        for (Setting setting : module.getSettings()) {
+        for (AbstractSetting setting : module.getSettings()) {
             if (!setting.isVisible()) continue;
             switch (setting) {
                 case BooleanSetting b -> {
@@ -57,6 +57,9 @@ public class SettingsFrame {
                 } case StringSetting s -> {
                     addButton(new TextButton(s, this, offset));
                     offset += 18;
+                } case ListSetting l -> {
+                    addButton(new ListButton<>(l, this, offset));
+                    offset += 18;
                 } default -> {}
             }
         }
@@ -68,54 +71,57 @@ public class SettingsFrame {
         updateWidth();  // actualizar anchura del frame tras cada iteración
     }
 
-    @SuppressWarnings("rawtypes")
-    void updateWidth() {
-        // asegurarse de que todos los botones caben en el marco, haciendo que la anchura se ajuste al texto más largo
-        if (mc.textRenderer == null) return;
-
-        int maxWidth = mc.textRenderer.getWidth(title);
-        for (SettingButton button : settingButtons) {
-            String text = button.getSetting().getName();
-
-            switch (button) {
-                case SliderButton sliderButton -> text += ": " + sliderButton.df.format((sliderButton.getSetting()).getValue());
-                case CycleButton cycleButton -> text += ": " + cycleButton.getSetting().getValue();
-                case BindButton bindButton -> text += ": " + bindButton.getSetting().getKeyName();
-                case TextButton textButton -> text += ": " + textButton.getSetting().getValue();
-                default -> {}
-            }
-
-            int textWidth = mc.textRenderer.getWidth(text);
-            maxWidth = Math.max(maxWidth, textWidth);
-        }
-        this.w = maxWidth + 22;
-    }
-
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         updateWidth();
-        ctx.fill(x, y, x + w, y + h, module.isEnabled()
+
+        // cabezal
+        int centerX = x + w / 2;
+        int centerY = y + h / 2;
+
+        int titleWidth = mc.textRenderer.getWidth(title);
+        int titleX = centerX - titleWidth / 2;
+        int titleY = centerY - mc.textRenderer.fontHeight / 2;
+
+        int headerColor = module.isEnabled()
                 ? Colors.enabledToggleButtonColor.getRGB()
-                : Colors.disabledToggleButtonColor.getRGB());
+                : Colors.disabledToggleButtonColor.getRGB();
 
-        ctx.drawText(mc.textRenderer, title,
-                x + (w / 2) - (mc.textRenderer.getWidth(title) / 2),
-                y + (h / 2) - (mc.textRenderer.fontHeight / 2),
-                -1, false);
+        ctx.fill(x, y, x + w, y + h, headerColor);
+        ctx.drawText(mc.textRenderer, title, titleX, titleY, -1, true);
 
+        // descripción
         List<SettingButton> visibleButtons = settingButtons.stream()
                 .filter(sb -> sb.getSetting().isVisible())
                 .toList();
 
-        int currentY = y + h + 3;
-        ctx.fill(x, currentY - 2, x + w, currentY + visibleButtons.size() * h, Colors.frameBGColor);
+        List<String> descLines = wrapDescription(module.getDescription(), w - 8);
+        int lineSpacing = 2;
 
+        int descHeight = descLines.size() * mc.textRenderer.fontHeight + (descLines.size() - 1) * lineSpacing;
+        int descBoxTop = y + h + 5;
+        int descBoxBottom = descBoxTop + descHeight + 8;
+
+        int totalHeight = descHeight + 8 + h * visibleButtons.size() + 4;
+
+        ctx.fill(x, descBoxTop - 4, x + w, descBoxTop + totalHeight, Colors.frameBGColor);
+        ctx.fill(x + 4, descBoxTop, x + w - 4, descBoxBottom, Colors.settingButtonColor);
+
+        int firstLineY = descBoxTop + ((descBoxBottom - descBoxTop) - descHeight) / 2;
+        for (int i = 0; i < descLines.size(); i++) {
+            String line = descLines.get(i);
+            int lineX = centerX - mc.textRenderer.getWidth(line) / 2;
+            int lineY = firstLineY + i * (mc.textRenderer.fontHeight + lineSpacing);
+            ctx.drawText(mc.textRenderer, line, lineX, lineY, -1, true);
+        }
+
+        int startButtonY = firstLineY - descBoxTop + descBoxBottom;
         for (SettingButton sb : visibleButtons) {
             sb.setX(x + 4);
-            sb.setY(currentY);
+            sb.setY(startButtonY);
             sb.setW(w - 8);
-            sb.setH(h);
+            sb.setH(h - 6);
             sb.render(ctx, mouseX, mouseY, delta);
-            currentY += h;
+            startButtonY += h;
         }
     }
 
@@ -155,6 +161,49 @@ public class SettingsFrame {
     public boolean isHovered(double mouseX, double mouseY) {
         return mouseX > x && mouseX < x + w &&
                 mouseY > y && mouseY < y + h;
+    }
+
+    @SuppressWarnings("rawtypes")
+    void updateWidth() {
+        // asegurarse de que todos los botones caben en el marco, haciendo que la anchura se ajuste al texto más largo
+        if (mc.textRenderer == null) return;
+
+        int maxWidth = mc.textRenderer.getWidth(title);
+        for (SettingButton button : settingButtons) {
+            String text = button.getSetting().getName();
+
+            switch (button) {
+                case SliderButton sliderButton -> text += ": " + sliderButton.df.format((sliderButton.getSetting()).getValue());
+                case CycleButton cycleButton -> text += ": " + cycleButton.getSetting().getValue();
+                case BindButton bindButton -> text += ": " + bindButton.getSetting().getKeyName();
+                case TextButton textButton -> text += ": " + textButton.getSetting().getValue();
+                default -> {}
+            }
+
+            int textWidth = mc.textRenderer.getWidth(text);
+            maxWidth = Math.max(maxWidth, textWidth);
+        }
+        this.w = maxWidth + 22;
+    }
+
+    private List<String> wrapDescription(String text, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        if (mc.textRenderer == null) return lines;
+
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = line.isEmpty() ? word : line + " " + word;
+            if (mc.textRenderer.getWidth(testLine) > maxWidth - 8) { // padding of 4 each side
+                if (!line.isEmpty()) lines.add(line.toString());
+                line = new StringBuilder(word);
+            } else {
+                line = new StringBuilder(testLine);
+            }
+        }
+        if (!line.isEmpty()) lines.add(line.toString());
+        return lines;
     }
 
     public List<SettingButton> getButtons() {

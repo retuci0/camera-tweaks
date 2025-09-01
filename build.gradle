@@ -29,6 +29,10 @@ dependencies {
 	
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/camtweaks.accesswidener")
+}
+
 processResources {
 	inputs.property "version", project.version
 

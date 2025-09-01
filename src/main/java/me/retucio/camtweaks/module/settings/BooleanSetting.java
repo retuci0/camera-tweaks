@@ -6,7 +6,7 @@ import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
 import java.util.function.Consumer;
 
 // ajuste booleano, es decir, o se encuentra encencido o apagado (similar a un interruptor)
-public class BooleanSetting extends Setting {
+public class BooleanSetting extends AbstractSetting {
 
     private boolean defaultValue;
     private boolean enabled;
@@ -31,7 +31,7 @@ public class BooleanSetting extends Setting {
     public void setEnabled(boolean enabled) {
         if (this.enabled != enabled) {
             this.enabled = enabled;
-            CameraTweaks.EVENT_BUS.post(new UpdateSettingEvent(this));
+            fireUpdateEvent();
             if (updateListener != null) updateListener.accept(enabled);
         }
     }
@@ -50,5 +50,6 @@ public class BooleanSetting extends Setting {
 
     public void onUpdate(Consumer<Boolean> listener) {
         this.updateListener = listener;
+        if (updateListener != null) updateListener.accept(enabled);  // actualizar por primera vez
     }
 }

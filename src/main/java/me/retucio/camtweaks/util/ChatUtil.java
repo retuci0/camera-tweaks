@@ -1,6 +1,8 @@
 package me.retucio.camtweaks.util;
 
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
+import me.retucio.camtweaks.event.SubscribeEvent;
+import me.retucio.camtweaks.event.events.camtweaks.LoadModuleManagerEvent;
+import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -9,7 +11,13 @@ import net.minecraft.util.Formatting;
 public class ChatUtil {
 
     private static final MinecraftClient mc = MinecraftClient.getInstance();
-    private static String prefix = Formatting.GREEN + "[" + ClickGUISettingsFrame.guiSettings.chatName.getValue() + "] ";
+    private static String prefix = getDefaultPrefix();
+
+    @SubscribeEvent
+    public static void onLoadModuleManager(LoadModuleManagerEvent event) {
+        prefix = Formatting.GREEN + "[" + ClientSettingsFrame.guiSettings.chatName.getValue() + "] ";
+    }
+
 
     public static void addMessage(String text) {
         if (mc.inGameHud == null) return;
@@ -67,10 +75,15 @@ public class ChatUtil {
     }
 
     public static String getPrefixNoFormatting() {
-        return "[" + ClickGUISettingsFrame.guiSettings.chatName.getValue() + "] ";
+        return prefix.split(Formatting.GREEN.toString())[1];
+//        return "[" + ClickGUISettingsFrame.guiSettings.chatName.getValue() + "] ";
     }
 
     public static void updatePrefix(String newPrefix) {
         prefix = Formatting.GREEN + "[" + newPrefix + "] ";
+    }
+
+    public static String getDefaultPrefix() {
+        return Formatting.GREEN + "[smegma] ";
     }
 }

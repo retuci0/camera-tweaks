@@ -9,13 +9,13 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.util.List;
 
-public class ClickGUISettingsFrame extends SettingsFrame {
+public class ClientSettingsFrame extends SettingsFrame {
 
     public static final GUI guiSettings = new GUI();
     public boolean extended = false;
-    private String title = "ajustes de la interfaz -";
+    private String title = "ajustes del mod -";
 
-    public ClickGUISettingsFrame(int x, int y, int w, int h) {
+    public ClientSettingsFrame(int x, int y, int w, int h) {
         super(guiSettings, x, y, w, h);
     }
 
@@ -27,7 +27,7 @@ public class ClickGUISettingsFrame extends SettingsFrame {
         ctx.drawText(mc.textRenderer, title,
                 x + (w / 2) - (mc.textRenderer.getWidth(title) / 2),
                 y + (h / 2) - (mc.textRenderer.fontHeight / 2),
-                -1, false);
+                -1, true);
 
         List<SettingButton> visibleButtons = settingButtons.stream()
                 .filter(sb -> sb.getSetting().isVisible())
@@ -57,7 +57,7 @@ public class ClickGUISettingsFrame extends SettingsFrame {
                 dragY = (int) (mouseY - y);
             } else if (button == 1) {
                 extended = !extended;
-                title = extended ? "ajustes de la interfaz -" : "ajustes de la interfaz +";
+                title = extended ? "ajustes del mod -" : "ajustes del mod +";
                 CameraTweaks.EVENT_BUS.post(new GUISettingsFrameEvent.Extend());
             }
         }

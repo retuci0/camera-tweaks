@@ -5,11 +5,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.Fullbright;
-import me.retucio.camtweaks.module.modules.PerspectivePlus;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.profiler.Profiler;
 import org.spongepowered.asm.mixin.Final;
@@ -37,7 +35,12 @@ public abstract class LightmapTextureManagerMixin {
     @Inject(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.AFTER), cancellable = true)
     private void update(float tickProgress, CallbackInfo ci, @Local Profiler profiler) {
         if (fullbright.isEnabled() && fullbright.mode.is(Fullbright.Modes.GAMMA)) {
-            RenderSystem.getDevice().createCommandEncoder().clearColorTexture(glTexture, ColorHelper.getArgb(255, 255, 255, 255));
+            RenderSystem.getDevice().createCommandEncoder().clearColorTexture(glTexture, ColorHelper.getArgb(
+                    fullbright.alpha.getIntValue(),
+                    fullbright.red.getIntValue(),
+                    fullbright.green.getIntValue(),
+                    fullbright.blue.getIntValue()
+            ));
             profiler.pop();
             ci.cancel();
         }

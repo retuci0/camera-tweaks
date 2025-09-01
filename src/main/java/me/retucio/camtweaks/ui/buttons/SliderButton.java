@@ -3,7 +3,7 @@ package me.retucio.camtweaks.ui.buttons;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.KeyEvent;
 import me.retucio.camtweaks.module.settings.NumberSetting;
-import me.retucio.camtweaks.ui.frames.ClickGUISettingsFrame;
+import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
@@ -40,7 +40,7 @@ public class SliderButton extends SettingButton {
         ctx.fill(x, y, x + filled, y + height, Colors.sliderFillingColor);
 
         String label = setting.getName() + ": " + df.format(setting.getValue());
-        ctx.drawTextWithShadow(parent.mc.textRenderer, label, x + 5, y + 3, -1);
+        ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
 
         // lógica para el arrastre (arrastramiento?) del valor
         if (dragging) {
@@ -75,7 +75,7 @@ public class SliderButton extends SettingButton {
     @SubscribeEvent
     public void onKey(KeyEvent event) {
         // de no ser de esto, si se cierra la interfaz sin haber soltado el ratón  mientras se arrastraba el valor, al reabrir la interfaz se seguía arrastrando, aún habiendo soltado ya el clic
-        if (event.getKey() == GLFW.GLFW_KEY_ESCAPE || event.getKey() == ClickGUISettingsFrame.guiSettings.getKey()) dragging = false;
+        if (event.getKey() == GLFW.GLFW_KEY_ESCAPE || event.getKey() == ClientSettingsFrame.guiSettings.getKey()) dragging = false;
     }
 
     public NumberSetting getSetting() {
