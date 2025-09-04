@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.util;
 
+import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.camtweaks.LoadModuleManagerEvent;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
@@ -15,17 +16,16 @@ public class ChatUtil {
 
     @SubscribeEvent
     public static void onLoadModuleManager(LoadModuleManagerEvent event) {
-        prefix = Formatting.GREEN + "[" + ClientSettingsFrame.guiSettings.chatName.getValue() + "] ";
+        prefix = Colors.getFormatting(Colors.mainColor) + "[" + ClientSettingsFrame.guiSettings.chatName.getValue() + "] ";
     }
 
 
     public static void addMessage(String text) {
-        if (mc.inGameHud == null) return;
-        mc.inGameHud.getChatHud().addMessage(Text.of(text));
+        addMessage(Text.of(text));
     }
 
     public static void addMessage(Text text) {
-        if (mc.inGameHud == null) return;
+        if (mc.inGameHud == null || !CameraTweaks.INSTANCE.settingsApplied) return;
         mc.inGameHud.getChatHud().addMessage(text);
     }
 
@@ -34,31 +34,31 @@ public class ChatUtil {
     }
 
     public static void addMessageWithPrefix(Text text) {
-        addMessage(Text.literal(prefix + Formatting.RESET).append(text));
+        addMessage(Text.literal(getPrefix() + Formatting.RESET).append(text));
     }
 
     public static void info(String text) {
-        addMessage(Text.literal(prefix + Formatting.RESET + text));
+        addMessage(Text.literal(getPrefix() + Formatting.RESET + text));
     }
 
     public static void info(Text text) {
-        addMessage(Text.literal(prefix + Formatting.RESET).append(text));
+        addMessage(Text.literal(getPrefix() + Formatting.RESET).append(text));
     }
 
     public static void warn(String text) {
-        addMessage(Text.literal(prefix + Formatting.YELLOW + text));
+        addMessage(Text.literal(getPrefix() + Formatting.YELLOW + text));
     }
 
     public static void warn(Text text) {
-        addMessage(Text.literal(prefix + Formatting.YELLOW).append(text));
+        addMessage(Text.literal(getPrefix() + Formatting.YELLOW).append(text));
     }
 
     public static void error(String text) {
-        addMessage(Text.literal(prefix + Formatting.RED + text));
+        addMessage(Text.literal(getPrefix() + Formatting.RED + text));
     }
 
     public static void error(Text text) {
-        addMessage(Text.literal(prefix + Formatting.RED).append(text));
+        addMessage(Text.literal(getPrefix() + Formatting.RED).append(text));
     }
 
     public static void sendServerMessage(String text) {
@@ -74,16 +74,20 @@ public class ChatUtil {
         return prefix;
     }
 
-    public static String getPrefixNoFormatting() {
-        return prefix.split(Formatting.GREEN.toString())[1];
-//        return "[" + ClickGUISettingsFrame.guiSettings.chatName.getValue() + "] ";
+    public static String getJustPrefix() {
+        return ClientSettingsFrame.guiSettings.chatName.getValue();
     }
 
+    public static String getPrefixNoFormatting() {
+        return getPrefix().split(Colors.getFormatting(Colors.mainColor).toString())[1];
+    }
+
+
     public static void updatePrefix(String newPrefix) {
-        prefix = Formatting.GREEN + "[" + newPrefix + "] ";
+        prefix = Colors.getFormatting(Colors.mainColor) + "[" + newPrefix + "] ";
     }
 
     public static String getDefaultPrefix() {
-        return Formatting.GREEN + "[smegma] ";
+        return Colors.getFormatting(Colors.mainColor) + "[smegma] ";
     }
 }

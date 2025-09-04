@@ -8,6 +8,7 @@ import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
@@ -45,18 +46,24 @@ public class ListButton<T> extends SettingButton {
     @Override
     public void render(DrawContext ctx, double mouseX, double mouseY, float delta) {
         int bgColor = isHovered(mouseX, mouseY)
-                ? Colors.hoveredSettingButtonColor
-                : Colors.settingButtonColor;
+                ? Colors.buttonColor.brighter().getRGB()
+                : Colors.buttonColor.getRGB();
 
-        ctx.fill(x, y, x + w, y + height, bgColor);
+        ctx.fill(x, y, x + w, y + h, bgColor);
 
         String label = setting.getName() + " (" + countEnabled() + "/" + setting.getOptions().size() + ")";
         ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
     }
 
     @Override
+    public void drawTooltip(DrawContext ctx, double mouseX, double mouseY) {
+        if (isHovered(mouseX, mouseY))
+            ctx.drawTooltip(Text.of(setting.getDescription() + "( " + countEnabled() + " de " + setting.getOptions().size() + ")"), (int) mouseX, (int) mouseY);
+    }
+
+    @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isHovered(mouseX, mouseY)) {
+        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             // click izquierdo / derecho: abrir marco
             if (button <= 1 && !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
                 if (ClickGUI.INSTANCE.isSettingsFrameOpen(dummy)) {
@@ -106,5 +113,7 @@ public class ListButton<T> extends SettingButton {
     }
 
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {}
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        ClickGUI.INSTANCE.unselect(this);
+    }
 }

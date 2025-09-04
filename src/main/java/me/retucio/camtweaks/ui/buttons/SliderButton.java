@@ -3,6 +3,7 @@ package me.retucio.camtweaks.ui.buttons;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.KeyEvent;
 import me.retucio.camtweaks.module.settings.NumberSetting;
+import me.retucio.camtweaks.ui.ClickGUI;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
@@ -12,6 +13,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
@@ -32,12 +34,20 @@ public class SliderButton extends SettingButton {
 
     @Override
     public void render(DrawContext ctx, double mouseX, double mouseY, float delta) {
-        ctx.fill(x, y, x + w, y + height, Colors.moduleButtonColor);
+        Color bgColor = Colors.buttonColor;
+        Color fillingColor = Colors.mainColor;
 
-        // calcular cómo de llena tendría que estar el "slider"
+        if (isHovered(mouseX, mouseY)) {
+            bgColor = bgColor.brighter();
+            fillingColor = fillingColor.brighter();
+        }
+
+        ctx.fill(x, y, x + w, y + h, bgColor.getRGB());
+
+        // calcular cómo de lleno tendría que estar el "slider"
         double percent = (setting.getValue() - setting.getMin()) / (setting.getMax() - setting.getMin());
         int filled = (int) (percent * w);
-        ctx.fill(x, y, x + filled, y + height, Colors.sliderFillingColor);
+        ctx.fill(x, y, x + filled, y + h, fillingColor.getRGB());
 
         String label = setting.getName() + ": " + df.format(setting.getValue());
         ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
@@ -49,18 +59,11 @@ public class SliderButton extends SettingButton {
             newVal = Math.round(newVal / setting.getIncrement()) * setting.getIncrement();
             setting.setValue((float) newVal);
         }
-
-        // dibujar "tooltips" (cajas de texto) al pasar el puntero encima del botón, para mostrar su descripción
-        if (isHovered((int) mouseX, (int) mouseY)) {
-            Screen currentScreen = parent.mc.currentScreen;
-            if (currentScreen != null)
-                ctx.drawTooltip(Text.of(setting.getDescription()), (int) mouseX, (int) mouseY + 20);
-        }
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isHovered((int) mouseX, (int) mouseY)) {
+        if (isHovered((int) mouseX, (int) mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) dragging = true;  // arrastrar con el clic izquierdo
             else if (button == 1 && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) // restablecer al valor por defecto con shift izquerdo + clic derecho
                 setting.reset();
@@ -69,6 +72,7 @@ public class SliderButton extends SettingButton {
 
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
+        ClickGUI.INSTANCE.unselect(this);
         if (button == 0) dragging = false;
     }
 

@@ -24,11 +24,13 @@ public class ModuleManager {
 
     // por orden alfabético y todo, flipas
     private void addModules() {
+        modules.add(new AntiInvis());
         modules.add(new BlockOutline());
         modules.add(new BossbarStack());
         modules.add(new ChatPlus());
         modules.add(new CritsPlus());
         modules.add(new DamageOverlay());
+        modules.add(new FakePlayer());
         modules.add(new Freecam());
         modules.add(new Freelook());
         modules.add(new Fullbright());

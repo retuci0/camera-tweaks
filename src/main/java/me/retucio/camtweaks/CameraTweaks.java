@@ -34,6 +34,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
+import net.minecraft.client.gui.screen.TitleScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,7 +52,7 @@ public class CameraTweaks implements ClientModInitializer {
     public static MinecraftClient mc;
 
     private Screen prevScreen;
-    private boolean settingsApplied = false;
+    public boolean settingsApplied = false;
 
     @Override
     public void onInitializeClient() {
@@ -100,7 +101,7 @@ public class CameraTweaks implements ClientModInitializer {
     public void onKeyPress(int key, int action) {
         ModuleManager.INSTANCE.getEnabledModules().forEach(module -> module.onKey(key, action));
 
-        boolean anyFocused = isAnySettingButtonFocused();
+        boolean anyFocused = isAnySettingButtonFocused() || ClickGUI.INSTANCE.getSearchBar().isFocused();
         ClickGUI.INSTANCE.setAnyFocused(anyFocused);
 
         if (action == GLFW.GLFW_PRESS) {
@@ -150,10 +151,13 @@ public class CameraTweaks implements ClientModInitializer {
     private void handleClickGUIKey(int key, boolean anyFocused) {
         if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused) return;
 
-        if (mc.currentScreen != ClickGUI.INSTANCE) {
+        // al parecer esto hace que con la tecla de la interfaz puedas ir cambiando de splash text en la pantalla del título
+        // pero me ha hecho gracia así que así se queda
+        if (mc.currentScreen != ClickGUI.INSTANCE && !(mc.currentScreen instanceof TitleScreen)) {
             prevScreen = mc.currentScreen;
             mc.setScreen(ClickGUI.INSTANCE);
         } else {
+            ClickGUI.INSTANCE.close();
             mc.setScreen(prevScreen);
         }
     }

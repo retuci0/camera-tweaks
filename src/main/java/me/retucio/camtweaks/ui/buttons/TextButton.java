@@ -1,12 +1,15 @@
 package me.retucio.camtweaks.ui.buttons;
 
 import me.retucio.camtweaks.module.settings.StringSetting;
+import me.retucio.camtweaks.ui.ClickGUI;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
+
+import static me.retucio.camtweaks.CameraTweaks.mc;
 
 // botón para los ajustes que requieran introducir texto
 public class TextButton extends SettingButton {
@@ -23,23 +26,18 @@ public class TextButton extends SettingButton {
     @Override
     public void render(DrawContext ctx, double mouseX, double mouseY, float delta) {
         int bgColor = isHovered((int) mouseX, (int) mouseY)
-                ? Colors.hoveredSettingButtonColor
-                : Colors.settingButtonColor;
+                ? Colors.buttonColor.brighter().getRGB()
+                : Colors.buttonColor.getRGB();
 
-        ctx.fill(x, y, x + w, y + height, bgColor);
+        ctx.fill(x, y, x + w, y + h, bgColor);
 
         String label = setting.getName() + ": " + (typing ? buffer + "_" : setting.getValue());
         ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
-
-        if (isHovered((int) mouseX, (int) mouseY)) {
-            if (parent.mc.currentScreen != null)
-                ctx.drawTooltip(Text.of(setting.getDescription()), (int) mouseX, (int) mouseY + 20);
-        }
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isHovered((int) mouseX, (int) mouseY)) {
+        if (isHovered((int) mouseX, (int) mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) {
                 typing = true;
                 buffer.setLength(0);
@@ -51,6 +49,11 @@ public class TextButton extends SettingButton {
         } else {
             typing = false;
         }
+    }
+
+    @Override
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        ClickGUI.INSTANCE.unselect(this);
     }
 
     public void onKey(int key, int action) {
@@ -79,6 +82,7 @@ public class TextButton extends SettingButton {
     private void charTyped(char c) {
         if (!typing) return;
         buffer.append(c);
+        if (mc.textRenderer.getWidth(setting.getName() + ": " + buffer + "_") > w - 8) onBackspace();
     }
 
     public boolean isFocused() {
@@ -92,7 +96,4 @@ public class TextButton extends SettingButton {
     private void onBackspace() {
         if (!buffer.isEmpty()) buffer.deleteCharAt(buffer.length() - 1);
     }
-
-    @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {}
 }

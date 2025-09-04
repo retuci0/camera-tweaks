@@ -1,6 +1,7 @@
 package me.retucio.camtweaks.ui.buttons;
 
 import me.retucio.camtweaks.module.settings.EnumSetting;
+import me.retucio.camtweaks.ui.ClickGUI;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
@@ -26,16 +27,18 @@ public class CycleButton<E extends Enum<E>> extends SettingButton {
     @Override
     public void render(DrawContext ctx, double mouseX, double mouseY, float delta) {
         int bgColor = isHovered((int) mouseX, (int) mouseY)
-                ? Colors.hoveredSettingButtonColor
-                : Colors.settingButtonColor;
+                ? Colors.buttonColor.brighter().getRGB()
+                : Colors.buttonColor.getRGB();
 
-        ctx.fill(x, y, x + w, y + height, bgColor); // fondo del botón
+        ctx.fill(x, y, x + w, y + h, bgColor); // fondo del botón
 
         // texto del botón: nombre + valor de texto del enum
         String label = setting.getName() + ": " + setting.getValue().toString();
         ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
+    }
 
-        // tooltip
+    @Override
+    public void drawTooltip(DrawContext ctx, double mouseX, double mouseY) {
         if (isHovered((int) mouseX, (int) mouseY)) {
             Screen currentScreen = parent.mc.currentScreen;
             if (currentScreen != null) {
@@ -56,10 +59,9 @@ public class CycleButton<E extends Enum<E>> extends SettingButton {
         }
     }
 
-
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isHovered((int) mouseX, (int) mouseY)) {
+        if (isHovered((int) mouseX, (int) mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) {
                 setting.cycle();  // clic izquierdo -> ciclar
             } else if (button == 1) {
@@ -67,7 +69,7 @@ public class CycleButton<E extends Enum<E>> extends SettingButton {
                 if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
                     setting.reset();
                 else
-                    setting.cycleBackwards();  // simplemente clic derecho -> ciclar valores pero hacia atrás
+                    setting.cycleBackwards();  // solamente clic derecho -> ciclar valores pero hacia atrás
             }
         }
     }
@@ -77,5 +79,7 @@ public class CycleButton<E extends Enum<E>> extends SettingButton {
     }
 
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {}
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        ClickGUI.INSTANCE.unselect(this);
+    }
 }

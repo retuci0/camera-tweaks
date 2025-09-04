@@ -1,6 +1,7 @@
 package me.retucio.camtweaks.ui.buttons;
 
 import me.retucio.camtweaks.module.settings.KeySetting;
+import me.retucio.camtweaks.ui.ClickGUI;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
@@ -23,23 +24,17 @@ public class BindButton extends SettingButton {
     @Override
     public void render(DrawContext ctx, double mouseX, double mouseY, float delta) {
         int bgColor = isHovered((int) mouseX, (int) mouseY)
-                ? Colors.hoveredSettingButtonColor
-                : Colors.settingButtonColor;
+                ? Colors.buttonColor.brighter().getRGB()
+                : Colors.buttonColor.getRGB();
 
-        ctx.fill(x, y, x + w, y + height, bgColor);
+        ctx.fill(x, y, x + w, y + h, bgColor);
         String label = setting.getName() + ": " + (listening ? "..." : setting.getKeyName());
         ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
-
-        if (isHovered((int) mouseX, (int) mouseY)) {
-            Screen currentScreen = parent.mc.currentScreen;
-            if (currentScreen != null)
-                ctx.drawTooltip(Text.of(setting.getDescription()), (int) mouseX, (int) mouseY + 20);
-        }
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isHovered((int) mouseX, (int) mouseY)) {
+        if (isHovered((int) mouseX, (int) mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) listening = !listening;
             else if (button == 1 && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
                 setting.reset();
@@ -67,5 +62,7 @@ public class BindButton extends SettingButton {
     }
 
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {}
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        ClickGUI.INSTANCE.unselect(this);
+    }
 }

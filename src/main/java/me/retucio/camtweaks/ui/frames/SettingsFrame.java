@@ -13,6 +13,7 @@ import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +24,13 @@ public class SettingsFrame {
     public final Module module;
     final List<SettingButton> settingButtons = new ArrayList<>();
 
+    public List<SettingButton> visibleButtons = new ArrayList<>();
+
     public int x, y, w, h;
-    boolean dragging;
+    public int renderY;
     int dragX, dragY;
+    boolean dragging;
+    public int totalHeight = 0;
 
     public final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -63,7 +68,11 @@ public class SettingsFrame {
                 } default -> {}
             }
         }
-        title = "ajustes de " + module.getName() + " -";
+        title = "ajustes de " + module.getName();
+
+        visibleButtons = settingButtons.stream()
+                .filter(sb -> sb.getSetting().isVisible())
+                .toList();
     }
 
     public void addButton(SettingButton button) {
@@ -76,35 +85,42 @@ public class SettingsFrame {
 
         // cabezal
         int centerX = x + w / 2;
-        int centerY = y + h / 2;
-
-        int titleWidth = mc.textRenderer.getWidth(title);
-        int titleX = centerX - titleWidth / 2;
+        int centerY = renderY + h / 2;
+        int titleX = x + 8;
         int titleY = centerY - mc.textRenderer.fontHeight / 2;
 
         int headerColor = module.isEnabled()
                 ? Colors.enabledToggleButtonColor.getRGB()
                 : Colors.disabledToggleButtonColor.getRGB();
 
-        ctx.fill(x, y, x + w, y + h, headerColor);
+        int closeButtonColor = isCloseButtonHovered(mouseX, mouseY)
+                ? Color.RED.getRGB()
+                : -1;
+
+        if (!module.shouldSaveSettings()) headerColor = (int) module.getSettings().stream().filter(s -> ((BooleanSetting) s).isEnabled()).count() > 0
+                ? Colors.enabledToggleButtonColor.getRGB()
+                : Colors.disabledToggleButtonColor.getRGB();
+
+        ctx.fill(x, renderY, x + w, renderY + h, headerColor);
         ctx.drawText(mc.textRenderer, title, titleX, titleY, -1, true);
+        ctx.drawText(mc.textRenderer, "×", x + w - mc.textRenderer.getWidth("×") - 8, titleY, closeButtonColor, true);
 
         // descripción
-        List<SettingButton> visibleButtons = settingButtons.stream()
-                .filter(sb -> sb.getSetting().isVisible())
+        visibleButtons = settingButtons.stream()
+                .filter(sb -> sb.getSetting().isVisible() && sb.getSetting().isSearchMatch())
                 .toList();
 
         List<String> descLines = wrapDescription(module.getDescription(), w - 8);
         int lineSpacing = 2;
 
         int descHeight = descLines.size() * mc.textRenderer.fontHeight + (descLines.size() - 1) * lineSpacing;
-        int descBoxTop = y + h + 5;
+        int descBoxTop = renderY + h + 5;
         int descBoxBottom = descBoxTop + descHeight + 8;
 
-        int totalHeight = descHeight + 8 + h * visibleButtons.size() + 4;
+        totalHeight = descHeight + 8 + h * visibleButtons.size() + 4;
 
-        ctx.fill(x, descBoxTop - 4, x + w, descBoxTop + totalHeight, Colors.frameBGColor);
-        ctx.fill(x + 4, descBoxTop, x + w - 4, descBoxBottom, Colors.settingButtonColor);
+        ctx.fill(x, descBoxTop - 4, x + w, descBoxTop + totalHeight, Colors.frameBGColor.getRGB());
+        ctx.fill(x + 4, descBoxTop, x + w - 4, descBoxBottom, Colors.buttonColor.getRGB());
 
         int firstLineY = descBoxTop + ((descBoxBottom - descBoxTop) - descHeight) / 2;
         for (int i = 0; i < descLines.size(); i++) {
@@ -119,16 +135,24 @@ public class SettingsFrame {
             sb.setX(x + 4);
             sb.setY(startButtonY);
             sb.setW(w - 8);
-            sb.setH(h - 6);
+            sb.setH(h - h / 4);
             sb.render(ctx, mouseX, mouseY, delta);
             startButtonY += h;
         }
     }
 
+    public void drawTooltips(DrawContext ctx, double mouseX, double mouseY) {
+        for (SettingButton sb : visibleButtons)
+            sb.drawTooltip(ctx, mouseX, mouseY);
+    }
+
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isHovered(mouseX, mouseY)) {
-            if (button == 0) {
+        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+            if (isCloseButtonHovered(mouseX, mouseY)) {
+                ClickGUI.INSTANCE.closeSettingsFrame(this.module);
+                return;
+            } if (button == 0) {
                 dragging = true;
                 dragX = (int) (mouseX - x);
                 dragY = (int) (mouseY - y);
@@ -143,6 +167,7 @@ public class SettingsFrame {
     }
 
     public void mouseRelease(double mouseX, double mouseY, int button) {
+        ClickGUI.INSTANCE.unselect(this);
         if (button == 0) {
             dragging = false;
             CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Move(this));
@@ -160,7 +185,12 @@ public class SettingsFrame {
 
     public boolean isHovered(double mouseX, double mouseY) {
         return mouseX > x && mouseX < x + w &&
-                mouseY > y && mouseY < y + h;
+                mouseY > renderY && mouseY < renderY + h;
+    }
+
+    public boolean isCloseButtonHovered(double mouseX, double mouseY) {
+        return mouseX > x + w - mc.textRenderer.getWidth("×") - 12 && mouseX < x + w - 4
+                && mouseY > renderY + 4 && mouseY < renderY + h - 4;
     }
 
     @SuppressWarnings("rawtypes")
@@ -183,7 +213,7 @@ public class SettingsFrame {
             int textWidth = mc.textRenderer.getWidth(text);
             maxWidth = Math.max(maxWidth, textWidth);
         }
-        this.w = maxWidth + 22;
+        this.w = maxWidth + 30;
     }
 
     private List<String> wrapDescription(String text, int maxWidth) {
@@ -208,5 +238,9 @@ public class SettingsFrame {
 
     public List<SettingButton> getButtons() {
         return settingButtons;
+    }
+
+    public void updateRenderY(int scrollOffset) {
+        renderY = y - scrollOffset;
     }
 }

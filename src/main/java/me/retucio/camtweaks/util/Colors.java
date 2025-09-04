@@ -1,39 +1,76 @@
 package me.retucio.camtweaks.util;
 
+import net.minecraft.util.Formatting;
+
 import java.awt.*;
 
 import static me.retucio.camtweaks.ui.frames.ClientSettingsFrame.guiSettings;
 
 
-// clase para los colores, para no repetirme (regla DRY)
+// clase para los colores
 // si se ve especificado como color en algún lado "-1", significa blanco
 public class Colors {
 
-    public static int frameHeadRed = guiSettings.red.getIntValue();
-    public static int frameHeadGreen = guiSettings.green.getIntValue();
-    public static int frameHeadBlue = guiSettings.blue.getIntValue();
-    public static int frameHeadAlpha = guiSettings.alpha.getIntValue();
+    public static int red = guiSettings.red.getIntValue();
+    public static int green = guiSettings.green.getIntValue();
+    public static int blue = guiSettings.blue.getIntValue();
+    public static int alpha = guiSettings.alpha.getIntValue();
 
-    public static int frameHeadColor = new Color(
-            frameHeadRed,
-            frameHeadGreen,
-            frameHeadBlue,
-            frameHeadAlpha
-    ).getRGB();
+    public static Color mainColor;
+    public static Color frameBGColor = new Color(40, 40, 40, 75);
+    public static Color buttonColor = new Color(75, 75, 75, 100);
+    public static Color enabledToggleButtonColor;
+    public static Color disabledToggleButtonColor;
 
-    public static int frameBGColor = new Color(60, 60, 60, 70).getRGB();
+    static {
+        updateAllColors(new Color(red, green, blue, alpha));
+    }
 
-    public static int enabledHoveredModuleButtonColor = new Color(20, 20, 255, 180).getRGB();
-    public static int enabledModuleButtonColor = new Color(0, 0, 255, 180).getRGB();
-    public static int hoveredModuleButtonColor = new Color(30, 30, 30, 100).getRGB();
-    public static int moduleButtonColor = new Color(40, 40, 40, 75).getRGB();
+    public static void updateAllColors(Color color) {
+        mainColor = color;
+        enabledToggleButtonColor = mixWithMainColor(new Color(10, 150, 10), 0.8f);
+        disabledToggleButtonColor = mixWithMainColor(new Color(150, 10, 10), 0.8f);
 
-    public static int hoveredSettingButtonColor = new Color(30, 30, 30, 100).getRGB();
-    public static int settingButtonColor = new Color(40, 40, 40, 75).getRGB();
-    public static int sliderFillingColor = new Color(60, 120, 220, 180).getRGB();
+        ChatUtil.updatePrefix(ChatUtil.getJustPrefix());
+    }
 
-    // necesitan ser de tipo java.awt.Color para utilizar el método .brighter()
-    public static Color enabledToggleButtonColor = new Color(0, 180, 0, 180);
-    public static Color disabledToggleButtonColor = new Color(120, 30, 30, 150);
+    public static Color mixWithMainColor(Color color, float ratio) {
+        return mix(mainColor, color, ratio);
+    }
 
+    public static Color mix(Color c1, Color c2, float ratio) {
+        float r = c1.getRed() * (1 - ratio) + c2.getRed() * ratio;
+        float g = c1.getGreen() * (1 - ratio) + c2.getGreen() * ratio;
+        float b = c1.getBlue() * (1 - ratio) + c2.getBlue() * ratio;
+        return new Color((int) r, (int) g, (int) b, alpha);
+    }
+
+    public static Formatting getFormatting(Color color) {
+        return nearest(color);
+    }
+
+    public static Formatting nearest(Color input) {
+        Formatting nearest = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (Formatting formatting : Formatting.values()) {
+            if (formatting.getColorValue() == null) continue; // saltarse los modificadores
+
+            Color candidate = new Color(formatting.getColorValue());
+            double dist = colorDistance(input, candidate);
+
+            if (dist < minDistance) {
+                minDistance = dist;
+                nearest = formatting;
+            }
+        }
+        return nearest;
+    }
+
+    private static double colorDistance(Color c1, Color c2) {
+        int rDiff = c1.getRed() - c2.getRed();
+        int gDiff = c1.getGreen() - c2.getGreen();
+        int bDiff = c1.getBlue() - c2.getBlue();
+        return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;
+    }
 }

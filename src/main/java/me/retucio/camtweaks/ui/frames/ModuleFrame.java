@@ -4,10 +4,13 @@ import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.ModuleFrameEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
+import me.retucio.camtweaks.ui.ClickGUI;
 import me.retucio.camtweaks.ui.buttons.ModuleButton;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +18,12 @@ import java.util.List;
 // marco para los módulos
 public class ModuleFrame {
 
-    public int x, y, w, h, dragX, dragY;
+    public int x, y, w, h;
+    public int renderY;
+    public int dragX, dragY;
+    public int totalHeight = 0;
     public boolean dragging, extended;
-    public String title = "módulos -";
+    public final String title = "módulos";
 
     private final List<ModuleButton> moduleButtons = new ArrayList<>();
 
@@ -40,6 +46,10 @@ public class ModuleFrame {
         }
     }
 
+    public void updateRenderY(int scrollOffset) {
+        renderY = y - scrollOffset;
+    }
+
     void updateWidth() {
         // asegurarse de que todos los botones caben en el marco, haciendo que la anchura se ajuste al texto más largo
         if (mc.textRenderer == null) return;
@@ -55,61 +65,68 @@ public class ModuleFrame {
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         updateWidth();
-        ctx.fill(x, y, x + w, y + h, Colors.frameHeadColor); // cabeza del marco
+        ctx.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB()); // cabeza del marco
         // título del marco
-        ctx.drawText(mc.textRenderer, title,
-                x + (w / 2) - (mc.textRenderer.getWidth(title) / 2),
-                y + ( h /2) - (mc.textRenderer.fontHeight / 2),
+        ctx.drawText(mc.textRenderer, Text.literal(Formatting.BOLD + title),
+                x + 8,
+                renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
+                -1, true);
+
+        ctx.drawText(mc.textRenderer, extended ? "-" : "+",
+                x + w - mc.textRenderer.getWidth("+") - 8,  // '+' y '-' tienen la misma anchura, o sea que no importa cuál use
+                renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
                 -1, true);
 
         // dibujar sus módulos solo si está extendido
         if (extended) {
-            int totalHeight = moduleButtons.size() * h + 3;
-            ctx.fill( // fondo para los botones
-                    x, y + h + 1,
-                    x + w, y + h + totalHeight,
-                    Colors.frameBGColor);
+            totalHeight = moduleButtons.size() * h + 3;
+            ctx.fill(  // fondo para los botones
+                    x, renderY + h + 1,
+                    x + w, renderY + h + totalHeight,
+                    Colors.frameBGColor.getRGB());
 
             // dibujar los botones para cada módulo
             for (ModuleButton moduleButton : moduleButtons)
                 moduleButton.render(ctx, mouseX, mouseY, delta);
-        }
+        } else totalHeight = 0;
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
         // registrar clics
-        if (isHovered(mouseX, mouseY)) {
+        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) {  // clic izquierdo para arrastrarlo
                 dragging = true;
                 dragX = (int) (mouseX - x);
                 dragY = (int) (mouseY - y);
             } else if (button == 1) {  // clic derecho para extenderlo
                 extended = !extended;
-                title = extended ? "módulos -" : "módulos +";
                 CameraTweaks.EVENT_BUS.post(new ModuleFrameEvent.Extend());
             }
         }
 
         if (!extended) return;  // solo dejar clicar en los módulos si el marco está extendido
-        for (ModuleButton moduleButton : moduleButtons) {
-            if (moduleButton.isHovered((int) mouseX, (int) mouseY)) {
+        for (ModuleButton moduleButton : moduleButtons)
                 moduleButton.mouseClicked(mouseX, mouseY, button);
-                break;
-            }
-        }
     }
 
     // detectar cuándo se suelta el clic
     public void mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0 && dragging) {
+        ClickGUI.INSTANCE.unselect(this);
+        if (button == 0 && dragging)
             dragging = false;
+
+        for (ModuleButton moduleButton : moduleButtons) {
+            if (moduleButton.isHovered((int) mouseX, (int) mouseY))
+                moduleButton.mouseReleased(mouseX, mouseY, button);
         }
-        CameraTweaks.EVENT_BUS.post(new ModuleFrameEvent.Move());
+
+        if (isHovered(mouseX, mouseY))
+            CameraTweaks.EVENT_BUS.post(new ModuleFrameEvent.Move());
     }
 
     // verificar si el puntero del ratón se encuentra encima
     public boolean isHovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h;
+        return mouseX > x && mouseX < x + w && mouseY > renderY && mouseY < renderY + h;
     }
 
     // actualizar la posición al arrastrar el marco

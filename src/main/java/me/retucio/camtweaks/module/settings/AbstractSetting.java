@@ -9,7 +9,9 @@ public abstract class AbstractSetting {
 
     private final String name;
     private final String description;
+
     private boolean visible = true;
+    private boolean searchMatch = true;
 
     private Module module;
 
@@ -24,6 +26,14 @@ public abstract class AbstractSetting {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public boolean isSearchMatch() {
+        return searchMatch;
+    }
+
+    public void setSearchMatch(boolean searchMatch) {
+        this.searchMatch = searchMatch;
     }
 
     public String getName() {
