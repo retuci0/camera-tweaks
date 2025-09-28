@@ -6,6 +6,7 @@ import me.retucio.camtweaks.module.modules.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -35,12 +36,15 @@ public class ModuleManager {
         modules.add(new Freelook());
         modules.add(new Fullbright());
         modules.add(new HandView());
+        modules.add(new HUD());
         modules.add(new Nametags());
         modules.add(new NoRender());
         modules.add(new PerspectivePlus());
         modules.add(new ScreenshotPlus());
         modules.add(new TimeChanger());
         modules.add(new Zoom());
+
+        modules.sort(Comparator.comparing(module -> module.getName().toLowerCase()));
 
         // registrar los "listeners" necesarios
         for (Module module : getEnabledModules()) {

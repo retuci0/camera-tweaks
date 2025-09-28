@@ -10,12 +10,14 @@ mod para Minecraft Fabric 1.21.6 que añade algunas cosas QOL, mayormente relaci
 3. descargar el .jar
 4. moverlo a tu directorio de mods (probablemente `%appdata%/.minecraft/mods`)
 
-asegúrate de tener una version de Minecraft y Fabric compatibles con el mod
+asegúrate de tener una version de Minecraft y Fabric compatibles con el mod (MC 1.21.6; Fabric 0.128.2)
+es posible que hayan problemas al usarlo junto a otros mods, especialmente otros clientes, pues pueden conflictar
 
 ### para frikis de 200 de iq
 1. clona el respositorio (`git clone https://github.com/retuci0/camera-tweaks`)
-2. `gradlew build` para Windows o `chmod +x gradlew` + `./gradlew build` para Linux
-3. el resultado estará en `/build/libs` (el que no lleva "sources" en el nombre)
+2. entra al directorio del repositorio (`cd camera-tweaks`)
+3. `gradlew build` para Windows o `chmod +x gradlew` + `./gradlew build` para Linux (Mac es Linux)
+4. el resultado estará en `/build/libs/camtweaks-X.X.jar` (el que no lleva "sources" en el nombre)
 
 ## uso
 
@@ -48,6 +50,7 @@ algunos módulos tienen teclas asignadas por defecto, asígnales `ESC` para desa
 <img src="screenshots/chatplus.png" alt="chatplus y capturas en uso">
 <img src="screenshots/crits.png" alt="críticos">
 <img src="screenshots/fullbright.png" alt="fullbright en modo gamma cambiando el color de los shaders">
+<img src="screenshots/hud.png" alt="HUD">
 
 ## contibuciones
 

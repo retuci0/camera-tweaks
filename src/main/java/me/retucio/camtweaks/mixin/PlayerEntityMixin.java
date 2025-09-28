@@ -25,6 +25,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (!nametags.isEnabled() || !nametags.health.isEnabled()) return original;
 
         float health = getHealth();
+        float absorption = getAbsorptionAmount();
         Formatting color;
 
         if (health < 5) color = Formatting.RED;
@@ -34,7 +35,18 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
         // me gustaría también añadir un modo en el que se renderizan los corazones directamente en la nametag, pero no sé cómo hacer para las imágenes :'(
         // ahora que lo pienso en la snapshot más reciente han metido iconos que se pueden usar en texto, y uno de ellos es un corazón :D
-        return original.copy().append(Text.literal(" [" + color + (nametags.healthMode.is(Nametags.HealthMode.HEARTS)
-                ?  String.format("%.2f", health / 2) : (int) health) + Formatting.RESET + "]"));
-    }           // redondear a dos decimales
+        String text = " [" + color +
+                (nametags.healthMode.is(Nametags.HealthMode.HEARTS)
+                        ? String.format("%.2f", health / 2)  // redondear a dos decimales
+                        : (int) health) +
+                (absorption > 0  // tener absorción en cuenta
+                        ? Formatting.RESET + " + " + Formatting.GOLD +
+                        (nametags.healthMode.is(Nametags.HealthMode.HEARTS)
+                                ? String.format("%.2f", absorption / 2)
+                                : Integer.toString((int) absorption))
+                        : "") +
+                Formatting.RESET + "]";
+
+        return original.copy().append(text);
+    }
 }
