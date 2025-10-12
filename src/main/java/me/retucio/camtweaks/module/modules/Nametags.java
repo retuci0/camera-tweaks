@@ -14,8 +14,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.entity.EntityQueriable;
+import net.minecraft.world.entity.UniquelyIdentifiable;
 
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -44,6 +47,8 @@ public class Nametags extends Module {
     public EnumSetting<HealthMode> healthMode = addSetting(new EnumSetting<>("mostrar vida en", "de qué manera mostrar la vida", HealthMode.class, HealthMode.POINTS));
 
     public BooleanSetting countItems = addSetting(new BooleanSetting("contar items", "muestra cuánto de un item hay en un stack dropeado", true));
+    public ListSetting<Item> items = addSetting(new ListSetting<>("items", "te permite elegir cuáles items tienen su nombre visible",
+            Lists.itemList, Lists.allTrue(Lists.itemList), Lists.itemNames));
     public BooleanSetting showProjectileDamage = addSetting(new BooleanSetting("daño del proyectil", "muestra cuánto daño hace un proyectil en su nametag", true));
 
     public BooleanSetting distinguishBabies = addSetting(new BooleanSetting("distinguir bebés", "cambia el nametag cuando una entidad está en su fase bebé", false));
@@ -64,6 +69,10 @@ public class Nametags extends Module {
         entities.setDefaultValues(entities.getValues());
 
         health.onUpdate(v -> healthMode.setVisible(v));
+
+        entities.onUpdate(entities -> {
+            items.setVisible(entities.get(EntityType.ITEM));
+        });
     }
 
     // literalmente cómo lo calcula Minecraft
@@ -74,7 +83,7 @@ public class Nametags extends Module {
         double velocity = arrow.getVelocity().length();
         DamageSource damageSource = arrow.getDamageSources().arrow(arrow, arrow.getOwner());
 
-        if (arrow.getWeaponStack() != null && arrow.getWorld() instanceof ServerWorld world)
+        if (arrow.getWeaponStack() != null && arrow.getEntityWorld() instanceof ServerWorld world)
             initialDamage = EnchantmentHelper.getDamage(world, arrow.getWeaponStack(), mc.player, damageSource, (float) initialDamage);
 
         int finalDamage = MathHelper.ceil(MathHelper.clamp(velocity * initialDamage, 0, 2.147483647E9));
@@ -89,7 +98,7 @@ public class Nametags extends Module {
     @SuppressWarnings("deprecation")
     public String getOwnerName(LazyEntityReference<LivingEntity> owner) {
         // si el dueño está en línea
-        LivingEntity ownerEntity = owner.resolve(mc.world, LivingEntity.class);
+        LivingEntity ownerEntity = owner.resolve((EntityQueriable<? extends UniquelyIdentifiable>) mc.world, LivingEntity.class);
         if (ownerEntity instanceof PlayerEntity playerEntity) return playerEntity.getName().getString();
 
         // mirar si ya está en la caché

@@ -9,6 +9,10 @@ import me.retucio.camtweaks.module.settings.NumberSetting;
 import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
 import me.retucio.camtweaks.util.MiscUtil;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -44,6 +48,7 @@ public class Freecam extends Module {
     public BooleanSetting stayCrouching = addSetting(new BooleanSetting("mantenerse agachado", "mantener al jugador agachado tras entrar en el modo de cámara libre", false));
     public BooleanSetting staticView = addSetting(new BooleanSetting("visión estática", "desactiva ajustes que muevan la cámara", true));
     public BooleanSetting cancelActionPackets = addSetting(new BooleanSetting("cancelar paquetes", "evita flaggear el anticheat al interactuar con bloques / entidades", true));
+    public BooleanSetting blockOutlines = addSetting(new BooleanSetting("contorno de bloques", "mostrar el contorno de los bloques estando en el modo de cámara libre", true));
 
     public NumberSetting speedSetting = addSetting(new NumberSetting(
             "velocidad", "velocidad de movimiento de la cámara",
@@ -141,9 +146,9 @@ public class Freecam extends Module {
 
     @Override
     public void onTick() {
-        if (mc.cameraEntity == null || perspective == null) return;
+        if (mc.getCameraEntity() == null || perspective == null) return;
 
-        mc.cameraEntity.noClip = mc.cameraEntity.isInsideWall();
+        mc.getCameraEntity().noClip = mc.getCameraEntity().isInsideWall();
         if (!perspective.isFirstPerson()) mc.options.setPerspective(Perspective.FIRST_PERSON);
 
         Vec3d forward = Vec3d.fromPolar(0, yaw);
@@ -204,24 +209,25 @@ public class Freecam extends Module {
     public void onKey(KeyEvent event) {
         if (mc.currentScreen != null) return;
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
+        KeyInput key = new KeyInput(event.getKey(), event.getScancode(), 0);
 
         boolean shouldCancel = true;
-        if (mc.options.forwardKey.matchesKey(event.getKey(), event.getScancode())) {
+        if (mc.options.forwardKey.matchesKey(key)) {
             forward = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.forwardKey.setPressed(false);
-        } else if (mc.options.backKey.matchesKey(event.getKey(), event.getScancode())) {
+        } else if (mc.options.backKey.matchesKey(key)) {
             backward = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.backKey.setPressed(false);
-        } else if (mc.options.rightKey.matchesKey(event.getKey(), event.getScancode())) {
+        } else if (mc.options.rightKey.matchesKey(key)) {
             right = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.rightKey.setPressed(false);
-        } else if (mc.options.leftKey.matchesKey(event.getKey(), event.getScancode())) {
+        } else if (mc.options.leftKey.matchesKey(key)) {
             left = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.leftKey.setPressed(false);
-        } else if (mc.options.jumpKey.matchesKey(event.getKey(), event.getScancode())) {
+        } else if (mc.options.jumpKey.matchesKey(key)) {
             up = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.jumpKey.setPressed(false);
-        } else if (mc.options.sneakKey.matchesKey(event.getKey(), event.getScancode())) {
+        } else if (mc.options.sneakKey.matchesKey(key)) {
             down = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.sneakKey.setPressed(false);
         } else {
@@ -234,24 +240,25 @@ public class Freecam extends Module {
     @SubscribeEvent
     public void onMouseClick(MouseClickEvent event) {  // por si el restrasado del usuario usa el ratón para moverse
         if (mc.currentScreen != null) return;
+        Click click = new Click(0, 0, new MouseInput(event.getButton(), 0));
 
         boolean shouldCancel = true;
-        if (mc.options.forwardKey.matchesKey(event.getButton(), 0)) {
+        if (mc.options.forwardKey.matchesMouse(click)) {
             forward = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.forwardKey.setPressed(false);
-        } else if (mc.options.backKey.matchesKey(event.getButton(), 0)) {
+        } else if (mc.options.backKey.matchesMouse(click)) {
             backward = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.backKey.setPressed(false);
-        } else if (mc.options.rightKey.matchesKey(event.getButton(), 0)) {
+        } else if (mc.options.rightKey.matchesMouse(click)) {
             right = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.rightKey.setPressed(false);
-        } else if (mc.options.leftKey.matchesKey(event.getButton(), 0)) {
+        } else if (mc.options.leftKey.matchesMouse(click)) {
             left = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.leftKey.setPressed(false);
-        } else if (mc.options.jumpKey.matchesKey(event.getButton(), 0)) {
+        } else if (mc.options.jumpKey.matchesMouse(click)) {
             up = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.jumpKey.setPressed(false);
-        } else if (mc.options.sneakKey.matchesKey(event.getButton(), 0)) {
+        } else if (mc.options.sneakKey.matchesMouse(click)) {
             down = event.getAction() != GLFW.GLFW_RELEASE;
             mc.options.sneakKey.setPressed(false);
         } else {

@@ -24,12 +24,12 @@ public abstract class SkyRendererMixin {
     }
 
     @Inject(method = "renderSun", at = @At("HEAD"), cancellable = true)
-    private void onRenderSun(float alpha, VertexConsumerProvider vertexConsumers, MatrixStack matrices, CallbackInfo ci) {
+    private void onRenderSun(float alpha, MatrixStack matrices, CallbackInfo ci) {
         if (timeChanger.isEnabled() && !timeChanger.renderSun.isEnabled()) ci.cancel();
     }
 
     @Inject(method = "renderMoon", at = @At("HEAD"), cancellable = true)
-    private void onRenderMoon(int phase, float alpha, VertexConsumerProvider vertexConsumers, MatrixStack matrices, CallbackInfo ci) {
+    private void onRenderMoon(int phase, float alpha, MatrixStack matrixStack, CallbackInfo ci) {
         if (timeChanger.isEnabled() && !timeChanger.renderMoon.isEnabled()) ci.cancel();
     }
 

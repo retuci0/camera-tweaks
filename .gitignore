@@ -39,6 +39,10 @@ replay_*.log
 *.hprof
 *.jfr
 
+# otros
+
 todo.txt
 test.java
 cambios.md
+# no está terminado
+src/main/java/me/retucio/camtweaks/module/modules/TooltipsPlus.java

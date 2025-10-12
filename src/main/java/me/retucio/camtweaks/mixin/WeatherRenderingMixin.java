@@ -5,6 +5,7 @@ import me.retucio.camtweaks.module.modules.NoRender;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WeatherRendering;
+import net.minecraft.client.render.state.WeatherRenderState;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.ParticlesMode;
 import net.minecraft.util.math.Vec3d;
@@ -33,11 +34,11 @@ public abstract class WeatherRenderingMixin {
         if (noRender.isEnabled() && !noRender.rain.isEnabled()) ci.cancel();
     }
 
-    @Inject(method = "renderPrecipitation(Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/util/math/Vec3d;IFLjava/util/List;Ljava/util/List;)V", at = @At("HEAD"))
-    private void noRenderRainAndSnow(VertexConsumerProvider vertexConsumers, Vec3d pos, int range, float gradient, List<?> rainPieces, List<?> snowPieces, CallbackInfo ci) {
+    @Inject(method = "renderPrecipitation", at = @At("HEAD"))
+    private void noRenderRainAndSnow(VertexConsumerProvider vertexConsumers, Vec3d pos, WeatherRenderState weatherRenderState, CallbackInfo ci) {
         if (noRender.isEnabled()) {
-            if (!noRender.rain.isEnabled()) rainPieces.clear();
-            if (!noRender.snow.isEnabled()) snowPieces.clear();
+            if (!noRender.rain.isEnabled()) weatherRenderState.rainPieces.clear();
+            if (!noRender.snow.isEnabled()) weatherRenderState.snowPieces.clear();
         }
     }
 }

@@ -4,6 +4,7 @@ import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.MouseClickEvent;
 import me.retucio.camtweaks.event.events.MouseScrollEvent;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.input.MouseInput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,8 +16,8 @@ import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
 public abstract class MouseMixin {
 
     @Inject(method = "onMouseButton", at = @At("HEAD"), cancellable = true)
-    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        MouseClickEvent event = EVENT_BUS.post(new MouseClickEvent(action, button));
+    private void onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
+        MouseClickEvent event = EVENT_BUS.post(new MouseClickEvent(action, input.button()));
         if (event.isCancelled()) ci.cancel();
     }
 

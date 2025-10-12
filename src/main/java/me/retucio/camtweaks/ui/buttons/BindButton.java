@@ -2,13 +2,21 @@ package me.retucio.camtweaks.ui.buttons;
 
 import me.retucio.camtweaks.module.settings.KeySetting;
 import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
+import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
+
+import static me.retucio.camtweaks.CameraTweaks.mc;
 
 // botón para configurar la tecla asignada a un módulo. comienza a escuchar al hacerle clic
 public class BindButton extends SettingButton {
@@ -44,14 +52,28 @@ public class BindButton extends SettingButton {
     }
 
     public void onKey(int key, int action) {
-        if (listening && action == GLFW.GLFW_PRESS) {
-            if (key == GLFW.GLFW_KEY_ESCAPE)
-                setting.setKey(GLFW.GLFW_KEY_UNKNOWN);
-            else
-                setting.setKey(key);
-            listening = false;
+        if (!listening || action != GLFW.GLFW_PRESS) return;
+
+        if (key == GLFW.GLFW_KEY_ESCAPE) {
+            setting.setKey(GLFW.GLFW_KEY_UNKNOWN);
+        } else {
+            for (KeyBinding bind : mc.options.allKeys) {
+                boolean keyAlreadyBound = bind.matchesKey(new KeyInput(key, 0, 0));
+                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.isEnabled();
+
+                if (keyAlreadyBound && !allowMultiple) {
+                    ChatUtil.warn("esa tecla ya está cogida por "
+                            + Formatting.GREEN + "\"" + I18n.translate(bind.getId()) + "\"");
+                    listening = false;
+                    return;
+                }
+            }
+            setting.setKey(key);
         }
+
+        listening = false;
     }
+
 
     public boolean isFocused() {
         return listening;

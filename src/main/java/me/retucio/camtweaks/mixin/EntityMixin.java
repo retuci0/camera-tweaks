@@ -6,7 +6,6 @@ import me.retucio.camtweaks.module.modules.AntiInvis;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.Freelook;
 import me.retucio.camtweaks.module.modules.Nametags;
-import me.retucio.camtweaks.util.ChatUtil;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,7 +13,6 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -80,6 +78,7 @@ public abstract class EntityMixin {
     private boolean renderEntityNametags(boolean original) {
         if (!nametags.isEnabled()) return original;
         if ((Object) this instanceof PersistentProjectileEntity p && p.isOnGround()) return false;
+        if ((Object) this instanceof ItemEntity i && !nametags.items.isEnabled(i.getStack().getItem())) return false;
         return nametags.entities.isEnabled((this.getType()));
     }
 

@@ -18,6 +18,7 @@ import me.retucio.camtweaks.ui.widgets.SearchBarWidget;
 import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -93,35 +94,35 @@ public class ClickGUI extends Screen {
         return bottom + 20;  // padding
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        scrollBar.mouseClicked(mouseX, mouseY, button);
-        searchBar.mouseClicked(mouseX, mouseY, button);
+
+    public boolean mouseClicked(Click click, boolean doubled) {
+        scrollBar.mouseClicked(click.x(), click.y(), click.button());
+        searchBar.mouseClicked(click.x(), click.y(), click.button());
 
         // detectar clics sobre los marcos
-        modulesFrame.mouseClicked(mouseX, mouseY, button);
+        modulesFrame.mouseClicked(click.x(), click.y(), click.button());
         for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseClicked(mouseX, mouseY, button);
+            sf.mouseClicked(click.x(), click.y(), click.button());
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        scrollBar.mouseReleased(mouseX, mouseY, button);
-        searchBar.mouseReleased(mouseX, mouseY, button);
+    public boolean mouseReleased(Click click) {
+        scrollBar.mouseReleased(click.x(), click.y(), click.button());
+        searchBar.mouseReleased(click.x(), click.y(), click.button());
 
         // registrar cuándo se suelta el clic, en cada marco respectivamente
-        modulesFrame.mouseReleased(mouseX, mouseY, button);
+        modulesFrame.mouseReleased(click.x(), click.y(), click.button());
         for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseRelease(mouseX, mouseY, button);
-        return super.mouseReleased(mouseX, mouseY, button);
+            sf.mouseRelease(click.x(), click.y(), click.button());
+        return super.mouseReleased(click);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        scrollBar.mouseDragged(mouseY);
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+        scrollBar.mouseDragged(click.y());
+        return super.mouseDragged(click, deltaX, deltaY);
     }
 
     @SubscribeEvent

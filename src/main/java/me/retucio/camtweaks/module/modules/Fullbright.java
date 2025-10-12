@@ -39,6 +39,8 @@ public class Fullbright extends Module {
             green.setVisible(v);
             blue.setVisible(v);
             alpha.setVisible(v);
+
+            if (v) disableNightVision();
         });
     }
 

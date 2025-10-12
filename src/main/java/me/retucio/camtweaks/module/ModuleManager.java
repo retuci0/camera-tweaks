@@ -40,8 +40,10 @@ public class ModuleManager {
         modules.add(new Nametags());
         modules.add(new NoRender());
         modules.add(new PerspectivePlus());
+        modules.add(new PortalGUI());
         modules.add(new ScreenshotPlus());
         modules.add(new TimeChanger());
+//        modules.add(new TooltipsPlus());
         modules.add(new Zoom());
 
         modules.sort(Comparator.comparing(module -> module.getName().toLowerCase()));

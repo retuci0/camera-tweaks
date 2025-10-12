@@ -23,12 +23,26 @@ public class HUD extends Module {
     public EnumSetting<TimeFormat> timeFormat = addSetting(new EnumSetting<>("formato de la hora", "12h o 24h", TimeFormat.class, TimeFormat.TWENTY_FOUR_HOUR));
     public NumberSetting timezone = addSetting(new NumberSetting("zona horaria", "zona horaria en UTC+n", 1, -6, 6, 1));
 
+    // elementos
     public BooleanSetting coords = addSetting(new BooleanSetting("coordenadas", "mostrar coordenadas", true));
-    public StringSetting customText = addSetting(new StringSetting("texto custom", "marca de agua (dejar vacío para quitar)", "ESCROTO", 40));
-    public BooleanSetting fps = addSetting(new BooleanSetting("fps", "mostrar frames por segundo", true));
-    public BooleanSetting tps = addSetting(new BooleanSetting("tps", "mostrar tasa de ticks por segundo del server", true));
-    public BooleanSetting time = addSetting(new BooleanSetting("hora", "mostrar hora actual", true));
+    public NumberSetting coordsX = new NumberSetting("X de las coordenadas", ".", -1, -1, 1920, 1);
+    public NumberSetting coordsY = new NumberSetting("Y de las coordenadas", ".", -1, -1, 1080, 1);
 
+    public StringSetting customText = addSetting(new StringSetting("texto custom", "marca de agua (dejar vacío para quitar)", "", 40));
+    public NumberSetting customTextX = new NumberSetting("X de la marca de agua", ".", -1, -1, 1920, 1);
+    public NumberSetting customTextY = new NumberSetting("Y de la marca de agua", ".", -1, -1, 1080, 1);
+
+    public BooleanSetting fps = addSetting(new BooleanSetting("fps", "mostrar frames por segundo", true));
+    public NumberSetting fpsX = new NumberSetting("X de los fps", ".", -1, -1, 1920, 1);
+    public NumberSetting fpsY = new NumberSetting("Y de los fps", ".", -1, -1, 1080, 1);
+
+    public BooleanSetting tps = addSetting(new BooleanSetting("tps", "mostrar tasa de ticks por segundo del server", true));
+    public NumberSetting tpsX = new NumberSetting("X del tps", ".", -1, -1, 1920, 1);
+    public NumberSetting tpsY = new NumberSetting("Y del tps", ".", -1, -1, 1080, 1);
+
+    public BooleanSetting time = addSetting(new BooleanSetting("hora", "mostrar hora actual", true));
+    public NumberSetting timeX = new NumberSetting("X de la hora", ".", -1, -1, 1920, 1);
+    public NumberSetting timeY = new NumberSetting("Y de la hora", ".", -1, -1, 1080, 1);
     public HUD() {
         super("HUD", "superposición de la pantalla con info. adicional");
 

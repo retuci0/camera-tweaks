@@ -5,7 +5,9 @@ import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.Nametags;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +24,15 @@ public abstract class ItemEntityMixin {
         if (!nametags.isEnabled()) return original;
 
         int count = this.getStack().getCount();
-        if (nametags.countItems.isEnabled() && count > 1) return original.copy().append(" x" + count);
+        MutableText name = this.getStack().getCustomName() != null ? this.getStack().getCustomName().copyContentOnly() : original.copyContentOnly();
+
+        if (!name.equals(original)) name = name.formatted(Formatting.ITALIC);
+
+        if (nametags.countItems.isEnabled()) {
+            if (count > 1) return name.copy().append(" x" + count);
+            return name;
+        }
+
         return original;
     }
 }

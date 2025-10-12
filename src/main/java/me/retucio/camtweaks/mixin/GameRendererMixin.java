@@ -10,6 +10,7 @@ import me.retucio.camtweaks.util.interfaces.IVec3d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.entity.Entity;
 import org.joml.Matrix4f;
@@ -47,7 +48,7 @@ public abstract class GameRendererMixin {
     public abstract void updateCrosshairTarget(float tickDelta);
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void getModules(MinecraftClient client, HeldItemRenderer firstPersonHeldItemRenderer, BufferBuilderStorage buffers, CallbackInfo ci) {
+    private void getModules(MinecraftClient client, HeldItemRenderer firstPersonHeldItemRenderer, BufferBuilderStorage buffers, BlockRenderManager blockRenderManager, CallbackInfo ci) {
         zoom = ModuleManager.INSTANCE.getModuleByClass(Zoom.class);;
         freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
         noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
@@ -78,7 +79,7 @@ public abstract class GameRendererMixin {
             float lastYaw = cameraEntity.lastYaw;
             float lastPitch = cameraEntity.lastPitch;
 
-            ((IVec3d) cameraEntity.getPos()).smegma$set(pos.x, pos.y - cameraEntity.getEyeHeight(cameraEntity.getPose()), pos.z);
+            ((IVec3d) cameraEntity.getEntityPos()).smegma$set(pos.x, pos.y - cameraEntity.getEyeHeight(cameraEntity.getPose()), pos.z);
             cameraEntity.lastX = prevPos.x;
             cameraEntity.lastY = prevPos.y - cameraEntity.getEyeHeight(cameraEntity.getPose());
             cameraEntity.lastZ = prevPos.z;
@@ -91,7 +92,7 @@ public abstract class GameRendererMixin {
             updateCrosshairTarget(tickDelta);
             freecamDone = false;
 
-            ((IVec3d) cameraEntity.getPos()).smegma$set(x, y, z);
+            ((IVec3d) cameraEntity.getEntityPos()).smegma$set(x, y, z);
             cameraEntity.lastX = lastX;
             cameraEntity.lastY = lastY;
             cameraEntity.lastZ = lastZ;

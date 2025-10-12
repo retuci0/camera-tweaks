@@ -42,8 +42,6 @@ public class NoRender extends Module {
     public BooleanSetting blindnessEffect = addSetting(new BooleanSetting("ceguera", "renderizar miopía", false));
     public BooleanSetting darknessEffect = addSetting(new BooleanSetting("oscuridad", "renderizar miedo a la oscuridad", false));
     public BooleanSetting nightVisionEffect;
-    public NumberSetting potionParticleAlpha = addSetting(new NumberSetting("opacidad de burbujas", "opacidad de las partículas de pociones",
-            170, 0, 255, 1));
 
     public BooleanSetting scoreboard = addSetting(new BooleanSetting("marcador", "mostrar marcador a la derecha", false));
     public BooleanSetting titles = addSetting(new BooleanSetting("títulos", "mostrar títulos (del comando /title)", false));

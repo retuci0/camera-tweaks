@@ -8,6 +8,7 @@ import me.retucio.camtweaks.module.modules.HUD.TimeFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.math.Vec3d;
 
@@ -26,7 +27,13 @@ public class HUD {
     private static float estimatedTPS = 20f;
 
     public static void render(DrawContext ctx, RenderTickCounter tc) {
-        if (ModuleManager.INSTANCE == null || mc.player == null || mc.cameraEntity == null) return;
+        if (ModuleManager.INSTANCE == null
+                || mc.player == null
+                || mc.getCameraEntity() == null
+                || mc.currentScreen instanceof TitleScreen
+                || mc.options.hudHidden)
+            return;
+
         me.retucio.camtweaks.module.modules.HUD hud = ModuleManager.INSTANCE.getModuleByClass(me.retucio.camtweaks.module.modules.HUD.class);
 
         int width = mc.getWindow().getScaledWidth();
@@ -56,12 +63,12 @@ public class HUD {
                             freecam.getZ(tc.getDynamicDeltaTicks())
                     );
                 else
-                    coords = mc.player.getPos();
+                    coords = mc.player.getEntityPos();
 
                 String text = (int) coords.x + " " + (int) coords.y + " " + (int) coords.z;
                 ctx.drawText(mc.textRenderer, text,
-                        width - mc.textRenderer.getWidth(text) - 2,
-                        height - mc.textRenderer.fontHeight - 2,
+                        (hud.coordsX.getIntValue() == -1) ? width - mc.textRenderer.getWidth(text) - 2 : hud.coordsX.getIntValue(),
+                        (hud.coordsY.getIntValue() == -1) ? height - mc.textRenderer.fontHeight - 2 : hud.coordsY.getIntValue(),
                         color.getRGB(), shadow);
             }
 

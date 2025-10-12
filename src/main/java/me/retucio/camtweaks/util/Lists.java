@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.Item;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -18,9 +19,11 @@ public class Lists {
     public static final List<EntityType<?>> entityList = Registries.ENTITY_TYPE.stream().toList();
     public static Map<EntityType<?>, String> entityNames;
 
-
     public static final List<ParticleType<?>> particleList = Registries.PARTICLE_TYPE.stream().toList();
     public static Map<ParticleType<?>, String> particleNames;
+
+    public static final List<Item> itemList = Registries.ITEM.stream().toList();
+    public static Map<Item, String> itemNames;
 
     public static final List<Block> blockList = Registries.BLOCK.stream().toList();
 
@@ -32,6 +35,9 @@ public class Lists {
         // no hay traducciones para nombres de partículas, y paso de hacerlas yo
         particleNames = getMapOfLists(particleList,
                 particleList.stream().map(particle -> Registries.PARTICLE_TYPE.getId(particle).toShortTranslationKey()).toList());
+
+        itemNames = getMapOfLists(itemList,
+                itemList.stream().map(item -> I18n.translate(item.getTranslationKey())).toList());
     }
 
     public static <T> Map<T, Boolean> allTrue(List<T> options) {
