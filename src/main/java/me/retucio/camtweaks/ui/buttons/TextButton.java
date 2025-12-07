@@ -42,7 +42,7 @@ public class TextButton extends SettingButton {
                 typing = true;
                 buffer.setLength(0);
                 buffer.append(setting.getValue());  // precargar valor anterior
-            } else if (button == 1 && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+            } else if (button == 1 && mc.isShiftPressed()) {
                 typing = false;
                 setting.reset();
             }

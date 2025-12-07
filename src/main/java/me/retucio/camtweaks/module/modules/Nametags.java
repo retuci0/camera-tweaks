@@ -97,9 +97,11 @@ public class Nametags extends Module {
 
     @SuppressWarnings("deprecation")
     public String getOwnerName(LazyEntityReference<LivingEntity> owner) {
-        // si el dueño está en línea
-        LivingEntity ownerEntity = owner.resolve((EntityQueriable<? extends UniquelyIdentifiable>) mc.world, LivingEntity.class);
-        if (ownerEntity instanceof PlayerEntity playerEntity) return playerEntity.getName().getString();
+        // si el dueño está en línea (de manera segura)
+        if (mc.world instanceof EntityQueriable<?> queriableWorld) {
+            LivingEntity ownerEntity = owner.resolve(queriableWorld, LivingEntity.class);
+            if (ownerEntity instanceof PlayerEntity playerEntity) return playerEntity.getName().getString();
+        }
 
         // mirar si ya está en la caché
         UUID uuid = owner.getUuid();

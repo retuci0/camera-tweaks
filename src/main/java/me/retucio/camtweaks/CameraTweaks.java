@@ -16,7 +16,10 @@ import me.retucio.camtweaks.event.events.camtweaks.LoadModuleManagerEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
 
+import me.retucio.camtweaks.module.modules.HUD;
 import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.HudEditorScreen;
+import me.retucio.camtweaks.ui.HudRenderer;
 import me.retucio.camtweaks.ui.buttons.BindButton;
 import me.retucio.camtweaks.ui.buttons.SettingButton;
 import me.retucio.camtweaks.ui.buttons.TextButton;
@@ -64,6 +67,7 @@ public class CameraTweaks implements ClientModInitializer {
         EVENT_BUS.register(this);
         EVENT_BUS.register(MiscUtil.class);
         EVENT_BUS.register(ChatUtil.class);
+        EVENT_BUS.register(HudRenderer.class);
 
         Lists.init();
 
@@ -74,6 +78,7 @@ public class CameraTweaks implements ClientModInitializer {
         EVENT_BUS.post(new LoadCommandManagerEvent());
 
         ClickGUI.INSTANCE = new ClickGUI();
+        HudEditorScreen.INSTANCE = new HudEditorScreen();
         EVENT_BUS.post(new LoadClickGUIEvent());
 
         ConfigManager.load();
@@ -105,12 +110,15 @@ public class CameraTweaks implements ClientModInitializer {
         boolean anyFocused = isAnySettingButtonFocused() || ClickGUI.INSTANCE.getSearchBar().isFocused();
         ClickGUI.INSTANCE.setAnyFocused(anyFocused);
 
-        if (action == GLFW.GLFW_PRESS) {
+        if (action != GLFW.GLFW_RELEASE) {
             if (BindCommand.onKeyPress(key)) return;
+            if (action == GLFW.GLFW_PRESS) {
+                handleModuleToggle(key, anyFocused);
+                handleClickGUIKey(key, anyFocused);
+                handleHudEditorKey(key, anyFocused);
+            }
             handleSettingButtonsKey(key, action);
-            handleModuleToggle(key, anyFocused);
-            handleClickGUIKey(key, anyFocused);
-        } else if (action == GLFW.GLFW_RELEASE && !anyFocused) {
+        } else if (!anyFocused) {
             handleModuleRelease(key);
         }
     }
@@ -151,14 +159,29 @@ public class CameraTweaks implements ClientModInitializer {
     // maneja la lógica de apertura de la interfaz
     private void handleClickGUIKey(int key, boolean anyFocused) {
         if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused) return;
+        if (!(mc != null && mc.world != null && mc.player != null)) return;
 
         // al parecer esto hace que con la tecla de la interfaz puedas ir cambiando de splash text en la pantalla del título
         // pero me ha hecho gracia así que así se queda
-        if (mc.currentScreen != ClickGUI.INSTANCE && !(mc.currentScreen instanceof TitleScreen)) {
+        if (mc.currentScreen != ClickGUI.INSTANCE) {
             prevScreen = mc.currentScreen;
             mc.setScreen(ClickGUI.INSTANCE);
         } else {
             ClickGUI.INSTANCE.close();
+            mc.setScreen(prevScreen);
+        }
+    }
+
+    // manejar la lógica de apertura del editor de elementos del hud, con la misma lógica que handleClickGUIKey()
+    private void handleHudEditorKey(int key, boolean anyFocused) {
+        if (key != ModuleManager.INSTANCE.getModuleByClass(HUD.class).editorKey.getKey() || anyFocused) return;
+        if (!(mc != null && mc.world != null && mc.player != null)) return;
+
+        if (mc.currentScreen != HudEditorScreen.INSTANCE) {
+            prevScreen = mc.currentScreen;
+            mc.setScreen(HudEditorScreen.INSTANCE);
+        } else {
+            HudEditorScreen.INSTANCE.close();
             mc.setScreen(prevScreen);
         }
     }

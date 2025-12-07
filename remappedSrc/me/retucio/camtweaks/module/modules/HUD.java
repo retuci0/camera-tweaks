@@ -8,6 +8,8 @@ import me.retucio.camtweaks.module.settings.StringSetting;
 
 public class HUD extends Module {
 
+    public KeySetting editorKey = addSetting(new KeySetting(""))
+
     public NumberSetting red = addSetting(new NumberSetting("rojo", "cantidad de rojo", 255, 0, 255, 1));
     public NumberSetting green = addSetting(new NumberSetting("verde", "cantidad de verde", 255, 0, 255, 1));
     public NumberSetting blue = addSetting(new NumberSetting("azul", "cantidad de azul", 255, 0, 255, 1));

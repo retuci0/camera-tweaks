@@ -19,8 +19,14 @@ public class Colors {
     public static Color mainColor;
     public static Color frameBGColor = new Color(40, 40, 40, 75);
     public static Color buttonColor = new Color(75, 75, 75, 100);
+    public static Color hudEditorScreenBackgroundColor = new Color(0, 0, 0, 120);
+    public static Color instructionsTextColor = new Color(190, 190, 190, 255);
     public static Color enabledToggleButtonColor;
     public static Color disabledToggleButtonColor;
+    public static Color visibleHudElementColor;
+    public static Color disabledHudElementColor;
+    public static Color selectedHudElementOutlineColor;
+    public static Color unselectedHudElementOutlineColor;
 
     static {
         updateAllColors(new Color(red, green, blue, alpha));
@@ -30,6 +36,23 @@ public class Colors {
         mainColor = color;
         enabledToggleButtonColor = mixWithMainColor(new Color(10, 150, 10), 0.8f);
         disabledToggleButtonColor = mixWithMainColor(new Color(150, 10, 10), 0.8f);
+
+        selectedHudElementOutlineColor = color;
+        unselectedHudElementOutlineColor = color.darker().darker();
+
+        visibleHudElementColor = new Color(
+                enabledToggleButtonColor.getRed(),
+                enabledToggleButtonColor.getGreen(),
+                enabledToggleButtonColor.getBlue(),
+                enabledToggleButtonColor.getAlpha() / 2
+        );
+
+        disabledHudElementColor = new Color(
+                disabledToggleButtonColor.getRed(),
+                disabledToggleButtonColor.getGreen(),
+                disabledToggleButtonColor.getBlue(),
+                disabledToggleButtonColor.getAlpha() / 2
+        );
 
         ChatUtil.updatePrefix(ChatUtil.getJustPrefix());
     }

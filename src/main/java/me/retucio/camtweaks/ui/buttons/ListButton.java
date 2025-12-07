@@ -13,6 +13,8 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
+import static me.retucio.camtweaks.CameraTweaks.mc;
+
 public class ListButton<T> extends SettingButton {
 
     private final ListSetting<T> setting;
@@ -65,7 +67,7 @@ public class ListButton<T> extends SettingButton {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             // click izquierdo / derecho: abrir marco
-            if (button <= 1 && !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+            if (button <= 1 && !mc.isShiftPressed()) {
                 if (ClickGUI.INSTANCE.isSettingsFrameOpen(dummy)) {
                     ClickGUI.INSTANCE.closeSettingsFrame(dummy);
                     return;
@@ -74,7 +76,7 @@ public class ListButton<T> extends SettingButton {
                 rebuildDummy();
                 ClickGUI.INSTANCE.openListSettingsFrame(dummy, parent.x + 40, parent.y + 40);
             // shift + clic derecho: restablecer valores
-            } else if (button == 1 && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+            } else if (button == 1 && mc.isShiftPressed()) {
                 setting.reset();
                 refreshDummy();
             }

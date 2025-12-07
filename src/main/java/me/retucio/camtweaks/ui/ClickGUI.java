@@ -15,13 +15,14 @@ import me.retucio.camtweaks.ui.frames.ModuleFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.ui.widgets.ScrollBarWidget;
 import me.retucio.camtweaks.ui.widgets.SearchBarWidget;
-import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -248,8 +249,8 @@ public class ClickGUI extends Screen {
     }
 
     @Override
-    protected void applyBlur(DrawContext context) {
-        if (guiSettings.blur.isEnabled()) super.applyBlur(context);
+    protected void applyBlur(DrawContext ctx) {
+        if (guiSettings.blur.isEnabled()) super.applyBlur(ctx);
     }
 
 

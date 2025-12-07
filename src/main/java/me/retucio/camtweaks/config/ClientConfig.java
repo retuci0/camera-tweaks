@@ -26,10 +26,15 @@ public class ClientConfig {
     // nombre del frame -> FrameData (que contiene extended, x & y)
     public Map<String, FrameData> extendableFrames = new HashMap<>();
 
+    // id del elemento del hud -> posición (x, y)
+    public Map<String, int[]> hudPositions = new HashMap<>();
+
+    // id del elemento del hud -> true: visible / false: no visible
+    public Map<String, Boolean> hudVisibilities = new HashMap<>();
+
     public ClientConfig() {
         EVENT_BUS.register(this);
     }
-
 
     @SubscribeEvent
     public void onToggleModule(ToggleModuleEvent event) {

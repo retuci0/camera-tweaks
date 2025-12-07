@@ -44,7 +44,7 @@ public class BindButton extends SettingButton {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (isHovered((int) mouseX, (int) mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) listening = !listening;
-            else if (button == 1 && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+            else if (button == 1 && mc.isShiftPressed())
                 setting.reset();
         } else {
             listening = false;

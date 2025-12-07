@@ -1,6 +1,6 @@
 # jenny's mod 2 100% real
 
-mod para Minecraft Fabric 1.21.6 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
+mod para Minecraft Fabric 1.21.10 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
 
 ## instalación
 
@@ -10,8 +10,8 @@ mod para Minecraft Fabric 1.21.6 que añade algunas cosas QOL, mayormente relaci
 3. descargar el .jar
 4. moverlo a tu directorio de mods (probablemente `%appdata%/.minecraft/mods`)
 
-asegúrate de tener una version de Minecraft y Fabric compatibles con el mod (MC 1.21.6; Fabric 0.128.2)
-es posible que hayan problemas al usarlo junto a otros mods, especialmente otros clientes, pues pueden conflictar
+asegúrate de tener una version de Minecraft y Fabric compatibles con el mod (MC `1.21.10`; Fabric `0.138.3`)
+es posible que haya problemas al usarlo junto a otros mods, especialmente junto a otros clientes, pues pueden conflictar entre ellos.
 
 ### para frikis de 200 de iq
 1. clona el respositorio (`git clone https://github.com/retuci0/camera-tweaks`)
@@ -23,9 +23,11 @@ es posible que hayan problemas al usarlo junto a otros mods, especialmente otros
 
 `shift derecho` por defecto para abrir la interfaz
 
+`pág. arriba` por defecto para abrir el editor del hud
+
 `$` como prefijo por defecto para comandos (se autocompletan)
 
-algunos módulos tienen teclas asignadas por defecto, asígnales `ESC` para desactivar sus teclas
+algunos módulos tienen teclas asignadas por defecto, asígnales `ESC` para desactivar sus atajos de teclado
 
 ## interfaz
 
@@ -51,6 +53,7 @@ algunos módulos tienen teclas asignadas por defecto, asígnales `ESC` para desa
 <img src="screenshots/crits.png" alt="críticos">
 <img src="screenshots/fullbright.png" alt="fullbright en modo gamma cambiando el color de los shaders">
 <img src="screenshots/hud.png" alt="HUD">
+<img src="screenshots/hudeditor.png" alt="editor de HUD">
 
 ## contibuciones
 
@@ -59,3 +62,7 @@ sí por favor
 ## licencia
 
 no sé, haz lo que quieras con esto, es puta basura xd
+
+aunque estaría guay que acreditases
+
+pero bueno

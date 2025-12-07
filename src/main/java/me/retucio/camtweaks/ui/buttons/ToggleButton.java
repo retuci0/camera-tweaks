@@ -12,6 +12,8 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
+import static me.retucio.camtweaks.CameraTweaks.mc;
+
 // botón para los ajustes booleanos (funciona como un interruptor)
 public class ToggleButton extends SettingButton {
 
@@ -39,7 +41,7 @@ public class ToggleButton extends SettingButton {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (isHovered((int) mouseX, (int) mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) setting.toggle();  // clic izquierdo para alternar
-            else if (button == 1 && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))   // shift izquierdo + clic derecho para restablecer al valor por defecto
+            else if (button == 1 && mc.isShiftPressed())   // shift izquierdo + clic derecho para restablecer al valor por defecto
                 setting.reset();
         }
     }

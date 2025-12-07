@@ -14,6 +14,8 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.retucio.camtweaks.CameraTweaks.mc;
+
 // botón para los ajustes tipo EnumSetting (de modo)
 public class CycleButton<E extends Enum<E>> extends SettingButton {
 
@@ -42,7 +44,7 @@ public class CycleButton<E extends Enum<E>> extends SettingButton {
         if (isHovered((int) mouseX, (int) mouseY)) {
             Screen currentScreen = parent.mc.currentScreen;
             if (currentScreen != null) {
-                if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+                if (mc.isShiftPressed()) {
                     List<Text> lines = new ArrayList<>();
                     lines.add(Text.literal("modos disponibles:"));
                     for (Enum<?> val : setting.getValues()) {

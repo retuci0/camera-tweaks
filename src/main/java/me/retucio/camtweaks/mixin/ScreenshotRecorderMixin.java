@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import static me.retucio.camtweaks.CameraTweaks.mc;
+
 @Mixin(ScreenshotRecorder.class)
 public abstract class ScreenshotRecorderMixin {
 
@@ -35,7 +37,8 @@ public abstract class ScreenshotRecorderMixin {
 
         if (!screenshotPlus.isEnabled()) return;
 
-        screenshotPlus.sendScreenshotMessage();
+        // por los threads o lo que sea
+        mc.execute(screenshotPlus::sendScreenshotMessage);
 
         switch (screenshotPlus.defaultAction.getValue()) {
             case COPY -> screenshotPlus.copyScreenshot(nativeImage);

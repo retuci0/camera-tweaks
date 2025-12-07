@@ -5,7 +5,7 @@ import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.ChatPlus;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.NoRender;
-import me.retucio.camtweaks.ui.HUD;
+import me.retucio.camtweaks.ui.HudRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -66,7 +66,7 @@ public abstract class InGameHudMixin {
 
     @Inject(method = "render", at = @At("RETURN"))
     private void renderHUD(DrawContext ctx, RenderTickCounter tc, CallbackInfo ci) {
-        HUD.render(ctx, tc);
+        HudRenderer.render(ctx, tc);
     }
 
     @ModifyExpressionValue(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/Perspective;isFirstPerson()Z"))

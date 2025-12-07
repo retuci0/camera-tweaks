@@ -17,6 +17,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
+import static me.retucio.camtweaks.CameraTweaks.mc;
 
 // slider (barrita) para los ajustes numéricos
 public class SliderButton extends SettingButton {
@@ -65,7 +66,7 @@ public class SliderButton extends SettingButton {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (isHovered((int) mouseX, (int) mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) dragging = true;  // arrastrar con el clic izquierdo
-            else if (button == 1 && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) // restablecer al valor por defecto con shift izquerdo + clic derecho
+            else if (button == 1 && mc.isShiftPressed()) // restablecer al valor por defecto con shift izquerdo + clic derecho
                 setting.reset();
         }
     }
@@ -78,7 +79,7 @@ public class SliderButton extends SettingButton {
 
     @SubscribeEvent
     public void onKey(KeyEvent event) {
-        // de no ser de esto, si se cierra la interfaz sin haber soltado el ratón  mientras se arrastraba el valor, al reabrir la interfaz se seguía arrastrando, aún habiendo soltado ya el clic
+        // de no ser de esto, si se cierra la interfaz sin haber soltado el ratón mientras se arrastraba el valor, al reabrir la interfaz se seguía arrastrando, aún habiendo soltado ya el clic
         if (event.getKey() == GLFW.GLFW_KEY_ESCAPE || event.getKey() == ClientSettingsFrame.guiSettings.getKey()) dragging = false;
     }
 

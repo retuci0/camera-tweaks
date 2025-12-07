@@ -11,6 +11,7 @@
     "PlayerEntityMixin",
     "StringHelperMixin",
     "Vec3dMixin",
+    "YggdrasilUserApiServiceMixin",
     "accessor.StatusEffectInstanceAccessor"
   ],
   "injectors": {
@@ -53,6 +54,7 @@
     "ScreenshotRecorderMixin",
     "SkyRendererMixin",
     "StuckArrowsFeatureRendererMixin",
+    "TelemetryManagerMixin",
     "TextRendererDrawerMixin",
     "TextRendererMixin",
     "WeatherRenderingMixin",

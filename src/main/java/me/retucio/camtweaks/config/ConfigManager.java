@@ -114,7 +114,7 @@ public class ConfigManager {
     public static void setFramePosition(SettingsFrame frame) {
         ensureConfig();
         config.settingsFrames.put(frame.module.getName(), new int[]{frame.x, frame.y});
-        ConfigManager.save();
+        save();
     }
 
     public static void setExtendableFrame(String key, ClientConfig.FrameData data) {
@@ -122,6 +122,19 @@ public class ConfigManager {
         config.extendableFrames.put(key, data);
         save();
     }
+
+    public static void setHudPosition(String id, int x, int y) {
+        ensureConfig();
+        config.hudPositions.put(id, new int[]{x, y});
+        save();
+    }
+
+    public static void setHudVisibility(String id, Boolean visible) {
+        ensureConfig();
+        config.hudVisibilities.put(id, visible);
+        save();
+    }
+
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static void applySetting(Module parent, AbstractSetting setting) {

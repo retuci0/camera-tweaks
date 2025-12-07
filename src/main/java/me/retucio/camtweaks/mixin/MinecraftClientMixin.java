@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.OpenScreenEvent;
 import me.retucio.camtweaks.event.events.ShutdownEvent;
@@ -10,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
 
@@ -36,5 +38,10 @@ public abstract class MinecraftClientMixin {
     private void onOpenScreen(Screen screen, CallbackInfo ci) {
         OpenScreenEvent event = EVENT_BUS.post(new OpenScreenEvent(screen));
         if (event.isCancelled()) ci.cancel();
+    }
+
+    @Inject(method = "isTelemetryEnabledByApi", at = @At("RETURN"), cancellable = true)
+    private void disableMicropenisTelemetryShi(CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(false);
     }
 }

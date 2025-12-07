@@ -1,23 +1,19 @@
-# v1.4
+# v1.5
 
 ## novedades
 
-- actualización a la 1.21.10
+sigo vivo (creo)
 
 ### adiciones
 
-interfaz en portales: te permite interactuar con interfaces estando dentro de un bloque de portal del nether
+- editor de hud bastante básico pero por lo general funcional (`pág. arriba` por defecto). viene con muchos bugs, ojalá me caiga un rayo.
 
 ### arreglos / mejoras
 
-- ahora puedes elegir con qué items aparece el nametag, útil para poder distinguir unos items de otros
-- ahora F1 también oculta los elementos del HUD, y ya no se muestra en la pantalla de inicio
-- ahora los items con el nombre cambiado usarán este en sus nametags, y estarán en cursiva
-- ahora puedes elegir si el contorno de los bloques se renderiza en modo cámara libre
-- ya no se activarán / desactivarán módulos cuando la tecla F3 esté presionada, para evitar intervenir en combinaciones de teclas con F3
-- arreglado lo de la ceguera y la oscuridad de NoRender (en un principio)
-- si una tecla ya está cogida por otra acción, a menos que teclas multimódulos esté activado, se previene configurar esta tecla a un módulo
-- poco más la verdad
+- ya no salta un error al hacer una captura con los módulos `capturas de pantalla` y `chat plus` activos
+- ahora la telemetría (abuso de privacidad al usuario de microshit) está desactivado por huevos. si quieres activarlo te jodes.
+- ahora ya no puedes abrir interfaces del mod si no estás en un mundo
+- mejorada la seguridad de algunas operaciones
 
 ## problemas reconocidos
 
