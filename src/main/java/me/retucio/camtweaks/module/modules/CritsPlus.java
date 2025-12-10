@@ -23,7 +23,7 @@ public class CritsPlus extends Module {
     public NumberSetting multiplier;  // no sé dónde se calcula cuántas partículas aparecen :/
     public NumberSetting velocityMultipler = addSetting(new NumberSetting("dispersión", "multiplicador de la velocidad de dispersión", 1, 0, 10, 0.1));
     public NumberSetting gravity = addSetting(new NumberSetting("gravedad", "multiplicador de fuerza de gravedad", 1, 0, 10, 0.1));
-    public NumberSetting maxAge = addSetting(new NumberSetting("vida máxima", "cuánto persiste la partícula", 4, 0, 50, 1));
+    public NumberSetting maxAge = addSetting(new NumberSetting("vida máxima", "cuánto persiste la partícula", 10, 0, 50, 1));
     public BooleanSetting collide = addSetting(new BooleanSetting("colisionar", "colisionar con bloques", false));
 
     public CritsPlus() {

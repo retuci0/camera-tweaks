@@ -1,10 +1,9 @@
-package me.retucio.camtweaks.ui;
+package me.retucio.camtweaks.ui.screen;
 
 import me.retucio.camtweaks.config.ConfigManager;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.widgets.HudElement;
 import me.retucio.camtweaks.util.Colors;
-import me.retucio.camtweaks.util.KeyUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
@@ -16,7 +15,6 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

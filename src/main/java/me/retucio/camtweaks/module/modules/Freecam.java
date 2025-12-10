@@ -5,6 +5,7 @@ import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.*;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
+import me.retucio.camtweaks.module.settings.KeySetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
 import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
@@ -30,7 +31,6 @@ import org.lwjgl.glfw.GLFW;
  * @see me.retucio.camtweaks.mixin.CameraMixin
  * @see me.retucio.camtweaks.mixin.ChunkBorderDebugRendererMixin
  * @see me.retucio.camtweaks.mixin.ClientPlayerInteractionManagerMixin
- * @see me.retucio.camtweaks.mixin.CompassStateMixin
  * @see me.retucio.camtweaks.mixin.EntityMixin
  * @see me.retucio.camtweaks.mixin.GameRendererMixin
  * @see me.retucio.camtweaks.mixin.KeyInputMixin
@@ -53,12 +53,12 @@ public class Freecam extends Module {
     public NumberSetting speedSetting = addSetting(new NumberSetting(
             "velocidad", "velocidad de movimiento de la cámara",
             1, 0, 10, 0.2));
+
+    public KeySetting scrollKey = addSetting(new KeySetting("tecla del scroll", "tecla a mantener pulsada para cambiar velocidad con el scroll", GLFW.GLFW_KEY_LEFT_CONTROL));
     public NumberSetting scrollSens = addSetting(new NumberSetting(
             "sensibilidad del scroll", "sensibilidad de la rueda del ratón para modificar la velocidad, 0 para desactivar",
-            0, 0, 2, 0.1));
+            1, 0, 2, 0.1));
 
-
-    // rotate?
 
     private final Vector3d prevPos = new Vector3d();
     private float prevYaw, prevPitch;
@@ -270,7 +270,7 @@ public class Freecam extends Module {
 
     @SubscribeEvent
     private void onMouseScroll(MouseScrollEvent event) {
-        if (scrollSens.getValue() > 0 && mc.currentScreen == null) {
+        if (scrollSens.getValue() > 0 && mc.currentScreen == null && KeyUtil.isKeyDown(scrollKey.getKey())) {
             speed += event.getVertical() / 4 * (scrollSens.getValue() * speed);
             if (speed < 0.1) speed = 0.1;
             event.cancel();

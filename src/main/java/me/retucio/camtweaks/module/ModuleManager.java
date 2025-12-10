@@ -37,11 +37,13 @@ public class ModuleManager {
         modules.add(new Fullbright());
         modules.add(new HandView());
         modules.add(new HUD());
+        modules.add(new LogoutSpots());
         modules.add(new Nametags());
         modules.add(new NoRender());
         modules.add(new PerspectivePlus());
         modules.add(new PortalGUI());
         modules.add(new ScreenshotPlus());
+        modules.add(new ShulkerPeek());
         modules.add(new TimeChanger());
 //        modules.add(new TooltipsPlus());
         modules.add(new Zoom());

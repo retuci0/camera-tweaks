@@ -1,11 +1,10 @@
 package me.retucio.camtweaks.ui.buttons;
 
 import me.retucio.camtweaks.module.Module;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.ModuleFrame;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 // clase para el botón para cada módulo

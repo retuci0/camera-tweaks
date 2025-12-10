@@ -1,19 +1,21 @@
-# v1.5
+# v1.6
 
 ## novedades
 
-sigo vivo (creo)
+todo un sistema de renderizado skiddeado de https://github.com/mioclient/oyvey-ported/
 
 ### adiciones
 
-- editor de hud bastante básico pero por lo general funcional (`pág. arriba` por defecto). viene con muchos bugs, ojalá me caiga un rayo.
+- marca de agua en la pantalla de inicio porque molo un montón
+- prev. de shulkers: te permite previsualizar el contenido de cajas de shulker desde el inventario
+- puntos de desconexión: te muestra el punto donde un jugador se desconecta
 
 ### arreglos / mejoras
 
-- ya no salta un error al hacer una captura con los módulos `capturas de pantalla` y `chat plus` activos
-- ahora la telemetría (abuso de privacidad al usuario de microshit) está desactivado por huevos. si quieres activarlo te jodes.
-- ahora ya no puedes abrir interfaces del mod si no estás en un mundo
-- mejorada la seguridad de algunas operaciones
+- el scroll del freecam ahora requiere una tecla (para mayor comodidad)
+- ahora puedes ver tu propio nametag (nametags -> mostrar propio)
+- opción para desactivar hud en chat agregada
+- arreglos menores varios
 
 ## problemas reconocidos
 

@@ -2,18 +2,13 @@ package me.retucio.camtweaks.ui.widgets;
 
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.HUD;
-import me.retucio.camtweaks.ui.HudEditorScreen;
+import me.retucio.camtweaks.ui.screen.HudEditorScreen;
 import me.retucio.camtweaks.ui.HudRenderer;
 import me.retucio.camtweaks.util.Colors;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-
-import java.awt.*;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 
 public class HudElement {

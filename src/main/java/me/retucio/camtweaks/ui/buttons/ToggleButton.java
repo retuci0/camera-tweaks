@@ -1,14 +1,10 @@
 package me.retucio.camtweaks.ui.buttons;
 
 import me.retucio.camtweaks.module.settings.BooleanSetting;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
-import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 

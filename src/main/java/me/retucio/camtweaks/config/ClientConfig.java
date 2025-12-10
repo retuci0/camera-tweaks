@@ -3,7 +3,7 @@ package me.retucio.camtweaks.config;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.camtweaks.*;
 import me.retucio.camtweaks.module.settings.*;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,18 +1,15 @@
 package me.retucio.camtweaks.ui.buttons;
 
 import me.retucio.camtweaks.module.settings.KeySetting;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.Colors;
-import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 

@@ -17,8 +17,8 @@ import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
 
 import me.retucio.camtweaks.module.modules.HUD;
-import me.retucio.camtweaks.ui.ClickGUI;
-import me.retucio.camtweaks.ui.HudEditorScreen;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
+import me.retucio.camtweaks.ui.screen.HudEditorScreen;
 import me.retucio.camtweaks.ui.HudRenderer;
 import me.retucio.camtweaks.ui.buttons.BindButton;
 import me.retucio.camtweaks.ui.buttons.SettingButton;
@@ -34,10 +34,10 @@ import me.retucio.camtweaks.util.MiscUtil;
 
 import net.fabricmc.api.ClientModInitializer;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
-import net.minecraft.client.gui.screen.TitleScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,14 +48,27 @@ import org.lwjgl.glfw.GLFW;
 public class CameraTweaks implements ClientModInitializer {
 
     // cosas necesarias
-    public static final String MOD_ID = "camtweaks";
     public static final CameraTweaks INSTANCE = new CameraTweaks();
-    public static final Logger LOGGER = LogManager.getLogger(CameraTweaks.class);
     public static final EventBus EVENT_BUS = new EventBus();
+    public static final Logger LOGGER = LogManager.getLogger(CameraTweaks.class);
     public static MinecraftClient mc;
+
+    // id y versión
+    public static final String MOD_ID = "camtweaks";
+    public static final String MOD_VERSION;
+
+    static {
+        MOD_VERSION = FabricLoader.getInstance().getModContainer(MOD_ID)
+                .orElseThrow()
+                .getMetadata()
+                .getVersion()
+                .getFriendlyString();
+    }
+
 
     private Screen prevScreen;
     public boolean settingsApplied = false;
+
 
     @Override
     public void onInitializeClient() {

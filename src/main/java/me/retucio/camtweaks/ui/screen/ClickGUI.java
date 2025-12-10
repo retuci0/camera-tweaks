@@ -1,4 +1,4 @@
-package me.retucio.camtweaks.ui;
+package me.retucio.camtweaks.ui.screen;
 
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.SubscribeEvent;

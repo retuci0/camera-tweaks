@@ -1,6 +1,6 @@
 package me.retucio.camtweaks.ui.widgets;
 
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;

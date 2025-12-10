@@ -5,6 +5,7 @@ import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.StringSetting;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.UUID;
 
@@ -21,24 +22,28 @@ public class FakePlayer extends Module {
     @Override
     public void onEnable() {
         if (mc.world == null) return;
-
-        player = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.randomUUID(), name.getValue()));
-//        player.copyPositionAndRotation(mc.player);
-        player.copyFrom(mc.player);
-
-        mc.world.addEntity(player);
-
+        addPlayer(mc.player, name.getValue());
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
         if (mc.world == null || player == null) return;
+        removePlayer();
+        super.onDisable();
+    }
 
+    public OtherClientPlayerEntity addPlayer(PlayerEntity playerToCopy, String dummyName) {
+        player = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.randomUUID(), dummyName));
+        player.copyFrom(playerToCopy);
+        player.setCustomNameVisible(true);
+        mc.world.addEntity(player);
+        return player;
+    }
+
+    public void removePlayer() {
         player.setRemoved(Entity.RemovalReason.KILLED);
         player.onRemoved();
         player = null;
-
-        super.onDisable();
     }
 }

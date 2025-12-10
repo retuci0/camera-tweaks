@@ -1,6 +1,5 @@
 package me.retucio.camtweaks.ui;
 
-import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.config.ConfigManager;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.PacketEvent;
@@ -8,10 +7,12 @@ import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.HUD;
+import me.retucio.camtweaks.ui.screen.HudEditorScreen;
 import me.retucio.camtweaks.ui.widgets.HudElement;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.math.Vec3d;
@@ -131,6 +132,7 @@ public class HudRenderer {
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
         if (!hud.isEnabled()) return;
         if (mc.getDebugHud().shouldShowDebugHud() && !hud.showOnF3.isEnabled()) return;
+        if (mc.currentScreen instanceof ChatScreen && !hud.showOnChat.isEnabled()) return;
 
         initElements();
 

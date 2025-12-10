@@ -3,7 +3,7 @@ package me.retucio.camtweaks.ui.frames;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.GUISettingsFrameEvent;
 import me.retucio.camtweaks.module.modules.GUI;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.buttons.SettingButton;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.gui.DrawContext;

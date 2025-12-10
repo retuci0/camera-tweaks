@@ -46,5 +46,6 @@ test.java
 cambios.md
 # no está terminado
 src/main/java/me/retucio/camtweaks/module/modules/TooltipsPlus.java
-
+src/main/java/me/retucio/camtweaks/util/RenderUtil.java
+src/main/java/me/retucio/camtweaks/util/Layers.java
 remappedSrc/

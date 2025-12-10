@@ -2,12 +2,13 @@ package me.retucio.camtweaks.module.modules;
 
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.*;
+import me.retucio.camtweaks.ui.screen.HudEditorScreen;
 import org.lwjgl.glfw.GLFW;
 
 /** lógica del HUD manejada en:
  * @see me.retucio.camtweaks.ui.HudRenderer
  * @see me.retucio.camtweaks.ui.widgets.HudElement
- * @see me.retucio.camtweaks.ui.HudEditorScreen
+ * @see HudEditorScreen
  */
 
 public class HUD extends Module {
@@ -27,6 +28,8 @@ public class HUD extends Module {
 
     // ajustes
     public BooleanSetting showOnF3 = addSetting(new BooleanSetting("mostrar en F3", "renderizar HUD en el menú de debug", false));
+    public BooleanSetting showOnChat = addSetting(new BooleanSetting("mostrar en chat", "renderizar HUD en la pantalla del chat", false));
+
     public BooleanSetting shadow = addSetting(new BooleanSetting("sombra", "texto con sombra", true));
     public NumberSetting timezone = addSetting(new NumberSetting("zona horaria", "zona horaria en UTC+n", 1, -6, 6, 1));
     public EnumSetting<TimeFormat> timeFormat = addSetting(new EnumSetting<>("formato de la hora", "12h o 24h", TimeFormat.class, TimeFormat.TWENTY_FOUR_HOUR));
@@ -36,10 +39,10 @@ public class HUD extends Module {
         super("HUD", "superposición de la pantalla con info. adicional");
 
         rainbow.onUpdate(v -> {
+            rainbowSpeed.setVisible(v);
             red.setVisible(!v);
             green.setVisible(!v);
             blue.setVisible(!v);
-            rainbowSpeed.setVisible(v);
         });
     }
 

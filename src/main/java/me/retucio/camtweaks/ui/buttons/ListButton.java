@@ -3,13 +3,11 @@ package me.retucio.camtweaks.ui.buttons;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.ListSetting;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
-import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -60,7 +58,7 @@ public class ListButton<T> extends SettingButton {
     @Override
     public void drawTooltip(DrawContext ctx, double mouseX, double mouseY) {
         if (isHovered(mouseX, mouseY))
-            ctx.drawTooltip(Text.of(setting.getDescription() + "( " + countEnabled() + " de " + setting.getOptions().size() + ")"), (int) mouseX, (int) mouseY);
+            ctx.drawTooltip(Text.of(setting.getDescription() + " (" + countEnabled() + " de " + setting.getOptions().size() + ")"), (int) mouseX, (int) mouseY);
     }
 
     @Override

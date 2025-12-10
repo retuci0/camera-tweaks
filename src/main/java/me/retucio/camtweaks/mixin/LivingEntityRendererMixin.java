@@ -8,7 +8,6 @@ import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.Nametags;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -19,6 +18,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static me.retucio.camtweaks.CameraTweaks.mc;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
@@ -51,5 +53,15 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
     private boolean shouldRenderPlayerNametag(boolean original, @Local(argsOnly = true) T livingEntity) {
         if (nametags.isEnabled() && livingEntity instanceof PlayerEntity) return nametags.entities.isEnabled(EntityType.PLAYER) && original;
         return original;
+    }
+
+    @Inject(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At("RETURN"), cancellable = true)
+    private void renderSelfNametag(T livingEntity, double d, CallbackInfoReturnable<Boolean> cir) {
+        if (livingEntity instanceof PlayerEntity player) {
+            if (player == mc.player && nametags.showSelf.isEnabled()) {
+                cir.setReturnValue(true);
+                cir.cancel();
+            }
+        }
     }
 }

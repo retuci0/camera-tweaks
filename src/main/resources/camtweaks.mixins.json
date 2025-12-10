@@ -33,6 +33,7 @@
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
+    "ClientWorldMixin",
     "ClientWorldPropertiesMixin",
     "DamageParticleFactoryMixin",
     "DamageParticleMixin",
@@ -57,9 +58,11 @@
     "TelemetryManagerMixin",
     "TextRendererDrawerMixin",
     "TextRendererMixin",
+    "TitleScreenMixin",
     "WeatherRenderingMixin",
     "WorldRendererMixin",
     "accessor.ClientPlayNetworkHandlerAccessor",
+    "accessor.HandledScreenAccessor",
     "accessor.KeyBindingAccessor"
   ]
 }

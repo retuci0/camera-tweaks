@@ -4,7 +4,7 @@ import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.ModuleFrameEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.buttons.ModuleButton;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;

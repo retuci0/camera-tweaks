@@ -1,16 +1,25 @@
 package me.retucio.camtweaks.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import me.retucio.camtweaks.CameraTweaks;
+import me.retucio.camtweaks.event.events.RenderWorldEvent;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.BlockOutline;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.NoRender;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profiler;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,12 +30,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.awt.*;
 
+import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
+import static me.retucio.camtweaks.CameraTweaks.mc;
+
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererMixin {
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;method_74752(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;Z)V"), index = 2)
     private boolean renderSetupTerrainModifyArg(boolean spectator) {
         return ModuleManager.INSTANCE.getModuleByClass(Freecam.class).isEnabled() || spectator;
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    private void render(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci, @Local Profiler profiler) {
+        if (mc == null || mc.world == null) return;
+
+        MatrixStack matrices = new MatrixStack();
+        matrices.push();
+
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
+
+        profiler.push(CameraTweaks.MOD_ID + "-3d");
+        EVENT_BUS.post(new RenderWorldEvent(matrices, tickCounter, camera));
+
+        profiler.pop();
+        matrices.pop();
     }
 
     @Inject(method = "renderTargetBlockOutline", at = @At("HEAD"), cancellable = true)

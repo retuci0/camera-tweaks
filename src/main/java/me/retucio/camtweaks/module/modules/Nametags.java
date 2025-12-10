@@ -51,6 +51,7 @@ public class Nametags extends Module {
             Lists.itemList, Lists.allTrue(Lists.itemList), Lists.itemNames));
     public BooleanSetting showProjectileDamage = addSetting(new BooleanSetting("daño del proyectil", "muestra cuánto daño hace un proyectil en su nametag", true));
 
+    public BooleanSetting showSelf = addSetting(new BooleanSetting("mostrar propio", "mostrar nametag propio", false));
     public BooleanSetting distinguishBabies = addSetting(new BooleanSetting("distinguir bebés", "cambia el nametag cuando una entidad está en su fase bebé", false));
     public BooleanSetting petOwner = addSetting(new BooleanSetting("mostrar dueño", "muestra el dueño de una mascota (no funciona en servers no premium)", false));
 

@@ -4,7 +4,7 @@ import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.SettingsFrameEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.*;
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.buttons.*;
 import me.retucio.camtweaks.ui.buttons.SliderButton;
 import me.retucio.camtweaks.ui.buttons.TextButton;

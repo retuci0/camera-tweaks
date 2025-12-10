@@ -1,8 +1,7 @@
 package me.retucio.camtweaks.ui.widgets;
 
-import me.retucio.camtweaks.ui.ClickGUI;
+import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
-import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.MinecraftClient;
@@ -56,7 +55,7 @@ public class SearchBarWidget {
             ctx.drawHorizontalLine(x + 4, x + 16, renderY + 3 * i + 5, Color.LIGHT_GRAY.getRGB());
 
         // texto
-        Text label = Text.literal(focused ? buffer + "_" : (buffer.isEmpty() ? Formatting.ITALIC + "buscar..." : buffer.toString()));
+        Text label = Text.literal(focused ? buffer + "_" : (buffer.isEmpty() ? Formatting.ITALIC + "\uD83D\uDD0D buscar..." : buffer.toString()));
         ctx.drawText(mc.textRenderer, label,
                 x + 24, renderY + h / 2 - mc.textRenderer.fontHeight / 2,
                 (buffer.isEmpty() && !focused) ? Color.LIGHT_GRAY.getRGB() : -1, true);

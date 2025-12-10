@@ -1,20 +1,23 @@
 package me.retucio.camtweaks.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
 import me.retucio.camtweaks.event.events.GetFOVEvent;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.NoRender;
 import me.retucio.camtweaks.module.modules.Zoom;
 import me.retucio.camtweaks.util.interfaces.IVec3d;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.entity.Entity;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,8 +26,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
+
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {

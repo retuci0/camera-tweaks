@@ -1,5 +1,8 @@
-meteor client dev team
-oyvey client (1.21 port by mioclient)
-lennyboi (youtube)
-packbar by cattyn on github
-shotify mod
+Meteor Client: https://github.com/MeteorDevelopment/meteor-client  | https://meteorclient.com
+OyVey Port: https://github.com/mioclient/oyvey-ported/
+Lenny Boi: https://www.youtube.com/@lennyboi7195
+Shotify: https://modrinth.com/mod/shotify
+No Telemetry: https://modrinth.com/mod/no-telemetry
+
+probablemente más pero como tengo demencia se me olvida
+si quieres que te acredite mándame un mensaje en discord (username: retucio) y sin problemas :)
