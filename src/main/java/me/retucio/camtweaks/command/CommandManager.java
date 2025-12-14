@@ -31,6 +31,7 @@ public class CommandManager {
         addCommand(new BindCommand());
         addCommand(new CopyScreenshotCommand());
 //        addCommand(new EnderChestCommand());  no funciona D:
+        addCommand(new GarbageCleanerCommand());
         addCommand(new PeekCommand());
         addCommand(new PrefixCommand());
         addCommand(new PurgeCommand());

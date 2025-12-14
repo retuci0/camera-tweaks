@@ -1,14 +1,12 @@
 package me.retucio.camtweaks.module.modules;
 
 import me.retucio.camtweaks.event.SubscribeEvent;
-import me.retucio.camtweaks.event.events.KeyEvent;
 import me.retucio.camtweaks.event.events.RenderWorldEvent;
 import me.retucio.camtweaks.event.events.camtweaks.AddEntityEvent;
 import me.retucio.camtweaks.event.events.camtweaks.RemoveEntityEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
-import me.retucio.camtweaks.module.settings.KeySetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
 import me.retucio.camtweaks.util.render.RenderUtil;
 
@@ -19,7 +17,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
 import org.joml.*;
-import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.time.Instant;
@@ -32,8 +29,6 @@ import java.util.List;
 
 public class LogoutSpots extends Module {
 
-    public KeySetting clearBoxesKey = addSetting(new KeySetting("vaciar cajas", "tecla asignada a olvidar todas las cajas activas", GLFW.GLFW_KEY_UNKNOWN));
-
     public BooleanSetting filledBox = addSetting(new BooleanSetting("caja rellena", "rellenar caja", true));
     public BooleanSetting outlineBox = addSetting(new BooleanSetting("caja de esquinas", "contorno de caja", true));
 
@@ -42,7 +37,8 @@ public class LogoutSpots extends Module {
     public NumberSetting blue = addSetting(new NumberSetting("azul", "cantidad de azul", 255, 0, 255, 1));
     public NumberSetting alpha = addSetting(new NumberSetting("opacidad", "antitransparencia", 50, 0, 255, 1));
 
-    public NumberSetting lineWidth = addSetting(new NumberSetting("grosor", "grosor de las líneas a dibujar", 2, 1, 10, 0.5f));
+    public NumberSetting lineWidth = addSetting(new NumberSetting("grosor", "grosor de las líneas a dibujar",
+            2, 1, 10, 0.5f));
 
     private final List<LogoutBox> boxes = new ArrayList<>();
 
@@ -72,6 +68,7 @@ public class LogoutSpots extends Module {
     @SubscribeEvent
     public void onEntityRemoved(RemoveEntityEvent event) {
         if (event.getEntity() instanceof PlayerEntity player && player != mc.player) {
+            if (mc.world != null && mc.world.hasEntity(player)) return;  // asegurarse de que salirse de la distancia de renderizado no cuenta como "desconectarse"
             String playerName = player.getName().getString() + " (" + getLogoutTime(System.currentTimeMillis()) + ")";
 
             boxes.add(new LogoutBox(
@@ -86,16 +83,15 @@ public class LogoutSpots extends Module {
         boxes.removeIf(box -> event.getEntity().getUuid().equals(box.dummy.getUuid()));
     }
 
-    @SubscribeEvent
-    public void onKey(KeyEvent event) {
-        if (event.getKey() == clearBoxesKey.getKey()) {
-            boxes.forEach(box -> {
-                box.dummy.setRemoved(Entity.RemovalReason.KILLED);
-                box.dummy.onRemoved();
-            });
+    @Override
+    public void onDisable() {
+        boxes.forEach(box -> {
+            box.dummy.setRemoved(Entity.RemovalReason.KILLED);
+            box.dummy.onRemoved();
+        });
 
-            boxes.clear();
-        }
+        boxes.clear();
+        super.onDisable();
     }
 
     private String getLogoutTime(long logoutTimeMillis) {

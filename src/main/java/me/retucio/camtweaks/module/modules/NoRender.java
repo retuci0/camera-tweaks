@@ -32,8 +32,7 @@ public class NoRender extends Module {
 
     public BooleanSetting rain = addSetting(new BooleanSetting("lluvia", "l l u v i a", true));
     public BooleanSetting snow = addSetting(new BooleanSetting("nieve", "n i e v e", true));
-    public BooleanSetting dimensionFog = addSetting(new BooleanSetting("niebla de dimensión", "n i e b l a", true));
-    public BooleanSetting endFlashes;  // para cuando actualice
+    public BooleanSetting endFlashes = addSetting(new BooleanSetting("flashes del end", "renderizar los recientemente añadidos flashes en el end", true));
 
     public ListSetting<ParticleType<?>> particles = addSetting(new ListSetting<>("partículas", "lista de partículas que se renderizan",
             Lists.particleList, Lists.allTrue(Lists.particleList), Lists.particleNames));
@@ -41,7 +40,6 @@ public class NoRender extends Module {
     public BooleanSetting nauseaEffect = addSetting(new BooleanSetting("náusea", "renderizar borrachera", false));
     public BooleanSetting blindnessEffect = addSetting(new BooleanSetting("ceguera", "renderizar miopía", false));
     public BooleanSetting darknessEffect = addSetting(new BooleanSetting("oscuridad", "renderizar miedo a la oscuridad", false));
-    public BooleanSetting nightVisionEffect;
 
     public BooleanSetting scoreboard = addSetting(new BooleanSetting("marcador", "mostrar marcador a la derecha", false));
     public BooleanSetting titles = addSetting(new BooleanSetting("títulos", "mostrar títulos (del comando /title)", false));

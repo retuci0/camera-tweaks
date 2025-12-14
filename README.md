@@ -66,3 +66,21 @@ no sé, haz lo que quieras con esto, es puta basura xd
 aunque estaría guay que acreditases
 
 pero bueno
+
+## descargo de responsabilidad
+
+me importa una puta mierda lo que pase al usar este mod en servers donde es baneable y así.
+
+## mods recomendados
+
+> mods que recomiendo usar junto a este:
+
+- [fabric api (necesario)](https://modrinth.com/mod/fabric-api/): necesario para el mod
+- [sodium](https://modrinth.com/mod/sodium): mejora el rendimiento general del juego
+- [viafabricplus](https://modrinth.com/mod/viafabricplus): te permite conectarte a servidores que tengan una versión distinta a la de tu cliente
+- [xaero's world map](https://modrinth.com/mod/xaeros-world-map/) y [xaero's minimap](https://modrinth.com/mod/xaeros-minimap/): mapa chulo
+- [mod menu](https://modrinth.com/mod/modmenu): lista de los mods instalados, y sus ajustes
+- [iris](https://modrinth.com/mod/iris): shaders
+- [lambdynamiclights](https://modrinth.com/mod/lambdynamiclights): iluminación dinámica
+- [appleskin](https://modrinth.com/mod/appleskin/): información relacionada con la comida
+- [baritone (desactualizado)](https://github.com/cabaletta/baritone): google maps para juego de cubos

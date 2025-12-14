@@ -26,22 +26,30 @@ public class ModuleManager {
     // por orden alfabético y todo, flipas
     private void addModules() {
         modules.add(new AntiInvis());
+        modules.add(new AttributeSwapper());
+        modules.add(new AutoSign());
         modules.add(new BlockOutline());
         modules.add(new BossbarStack());
+        modules.add(new BungeecordSpoofer());
         modules.add(new ChatPlus());
+        modules.add(new ColoredSigns());
         modules.add(new CritsPlus());
         modules.add(new DamageOverlay());
         modules.add(new FakePlayer());
+        modules.add(new FastUse());
         modules.add(new Freecam());
         modules.add(new Freelook());
         modules.add(new Fullbright());
         modules.add(new HandView());
+        modules.add(new Headhitters());
         modules.add(new HUD());
         modules.add(new LogoutSpots());
         modules.add(new Nametags());
+        modules.add(new NoMiningInterruptions());
         modules.add(new NoRender());
         modules.add(new PerspectivePlus());
         modules.add(new PortalGUI());
+        modules.add(new Rotations());
         modules.add(new ScreenshotPlus());
         modules.add(new ShulkerPeek());
         modules.add(new TimeChanger());

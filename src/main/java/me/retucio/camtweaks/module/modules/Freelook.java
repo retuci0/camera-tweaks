@@ -22,7 +22,7 @@ public class Freelook extends Module {
             4, 0, 10, 0.1));
 
     public NumberSetting mouseSens = addSetting(new NumberSetting("sensibilidad del ratón", ".",
-            8, 0, 10, 0.1));
+            0.1, 0, 2, 0.05));
 
     private float yaw;
     private float pitch;

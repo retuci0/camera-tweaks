@@ -35,6 +35,7 @@ import me.retucio.camtweaks.util.MiscUtil;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
@@ -211,5 +212,9 @@ public class CameraTweaks implements ClientModInitializer {
     @SubscribeEvent
     public void onStop(ShutdownEvent event) {
         ConfigManager.save();
+    }
+
+    public static String getVersionName() {
+        return MOD_ID + "_v" + MOD_VERSION + "_" + SharedConstants.getGameVersion().name();
     }
 }

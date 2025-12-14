@@ -43,6 +43,7 @@ public class GUI extends Module {
     // ^^^ no sé de qué sirve porque está todo en minúsculas pero bueno
 
     public BooleanSetting blur = addSetting(new BooleanSetting("desenfoque", "desenfocar el fondo mientras la interfaz está abierta", true));
+    public StringSetting watermark = addSetting(new StringSetting("marca de agua", "marca de agua para interfaces (dejar vacío para desactivar)", CameraTweaks.getVersionName(), 40));
 
     public StringSetting commandPrefix = addSetting(new StringSetting("prefijo", "prefijo de los comandos", "$", 10));
     public StringSetting chatName = addSetting(new StringSetting("nombre", "qué nombre usar en notificaciones por el chat", "smegma", 20));

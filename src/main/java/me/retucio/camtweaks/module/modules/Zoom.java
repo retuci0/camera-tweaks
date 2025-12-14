@@ -26,7 +26,7 @@ public class Zoom extends Module {
             6, 1, 10, 0.1));
 
     public NumberSetting mouseSensMultiplier = addSetting(new NumberSetting("sensibilidad", "multiplicador de la sensibilidad del ratón",
-            0.7, 0.01, 1, 0.05));
+            0.4, 0, 1, 0.05));
 
     public BooleanSetting smoothCam = addSetting(new BooleanSetting("cámara cinemática", "usa la cámara cinemática mientras hagas zoom", false));
 

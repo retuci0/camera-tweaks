@@ -1,13 +1,19 @@
 package me.retucio.camtweaks.mixin;
 
+import com.ibm.icu.util.CodePointTrie;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.OpenScreenEvent;
 import me.retucio.camtweaks.event.events.ShutdownEvent;
 import me.retucio.camtweaks.event.events.TickEvent;
+import me.retucio.camtweaks.module.ModuleManager;
+import me.retucio.camtweaks.module.modules.FastUse;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,6 +23,9 @@ import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
+
+    @Shadow
+    private int itemUseCooldown;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTickPre(CallbackInfo ci) {
@@ -43,5 +52,12 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "isTelemetryEnabledByApi", at = @At("RETURN"), cancellable = true)
     private void disableMicropenisTelemetryShi(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(false);
+    }
+
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isItemEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z"))
+    private void modifyItemUseCooldown(CallbackInfo ci, @Local ItemStack stack) {
+        FastUse fastUse = ModuleManager.INSTANCE.getModuleByClass(FastUse.class);
+        if (!fastUse.isEnabled()) return;
+        itemUseCooldown = fastUse.getCooldown(stack);
     }
 }

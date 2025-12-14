@@ -1,8 +1,9 @@
-Meteor Client: https://github.com/MeteorDevelopment/meteor-client  | https://meteorclient.com
+Meteor Client: https://github.com/MeteorDevelopment/meteor-client  |  https://meteorclient.com
 OyVey Port: https://github.com/mioclient/oyvey-ported/
 Lenny Boi: https://www.youtube.com/@lennyboi7195
 Shotify: https://modrinth.com/mod/shotify
 No Telemetry: https://modrinth.com/mod/no-telemetry
+Trouser Streak: https://github.com/etianl/Trouser-Streak
 
 probablemente más pero como tengo demencia se me olvida
 si quieres que te acredite mándame un mensaje en discord (username: retucio) y sin problemas :)

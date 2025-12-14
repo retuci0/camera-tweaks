@@ -4,27 +4,40 @@ import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.KeyEvent;
 import me.retucio.camtweaks.mixin.accessor.HandledScreenAccessor;
 import me.retucio.camtweaks.module.Module;
+import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.KeySetting;
 import me.retucio.camtweaks.ui.screen.ShulkerPreviewScreen;
 
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.slot.Slot;
 
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.function.Consumer;
+
+
+/**
+ *
+ */
 
 public class ShulkerPeek extends Module {
 
     public KeySetting previewKey = addSetting(new KeySetting("tecla de previsualización", "tecla a mantener para previsualizar", GLFW.GLFW_KEY_LEFT_ALT));
+    public BooleanSetting showTooltips = addSetting(new BooleanSetting("mostrar tooltips", "añadir texto a los tooltips (cajas de texto) de los shulkers", true));
 
     public static final HashMap<Item, Color> SHULKER_COLORS = new HashMap<>();
 

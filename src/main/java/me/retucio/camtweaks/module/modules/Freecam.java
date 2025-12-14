@@ -13,7 +13,6 @@ import me.retucio.camtweaks.util.MiscUtil;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -22,6 +21,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
@@ -192,7 +192,7 @@ public class Freecam extends Module {
     }
 
     @SubscribeEvent
-    public void onPacketSend(PacketEvent.Send event) {
+    public void onSendPacket(PacketEvent.Send event) {
         if (!isEnabled() || !cancelActionPackets.isEnabled()) return;
         if (event.getStage() != Stage.PRE) return;
 
@@ -308,6 +308,28 @@ public class Freecam extends Module {
         prevPos.set(pos);
         prevYaw = yaw;
         prevPitch = pitch;
+    }
+
+    // los paquetes ya se cancelan, pero visualmente estos eventos se siguen dando
+
+    @SubscribeEvent
+    public void onBreakBlock(BreakBlockEvent event) {
+        if (cancelActionPackets.isEnabled()) event.cancel();
+    }
+
+    @SubscribeEvent
+    public void onPlaceBlock(PlaceBlockEvent event) {
+        if (cancelActionPackets.isEnabled()) event.cancel();
+    }
+
+    @SubscribeEvent
+    public void onInteractEntity(InteractEntityEvent event) {
+        if (cancelActionPackets.isEnabled()) event.cancel();
+    }
+
+    @SubscribeEvent
+    public void onAttack(AttackEntityEvent event) {
+        if (cancelActionPackets.isEnabled()) event.cancel();
     }
 
     public void changeLookDirection(double deltaX, double deltaY) {

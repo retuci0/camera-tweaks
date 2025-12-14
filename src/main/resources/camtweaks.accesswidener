@@ -7,6 +7,7 @@ accessible field net/minecraft/client/particle/BillboardParticle scale F
 accessible field net/minecraft/client/particle/Particle velocityMultiplier F
 accessible field net/minecraft/client/particle/Particle gravityStrength F
 accessible field net/minecraft/client/particle/Particle collidesWithWorld Z
+accessible field net/minecraft/entity/LivingEntity jumpingCooldown I
 
 accessible method net/minecraft/client/render/WorldRenderer method_74752 (Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;Z)V
 accessible method net/minecraft/client/render/GameRenderer getProjectionMatrix (F)Lorg/joml/Matrix4f;

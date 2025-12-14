@@ -1,11 +1,9 @@
 package me.retucio.camtweaks.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import me.retucio.camtweaks.event.events.ChangeRotationEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.AntiInvis;
-import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.module.modules.Freelook;
-import me.retucio.camtweaks.module.modules.Nametags;
+import me.retucio.camtweaks.module.modules.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
 import static me.retucio.camtweaks.CameraTweaks.mc;
 
 @Mixin(Entity.class)
@@ -32,6 +31,12 @@ public abstract class EntityMixin {
     @Shadow
     public abstract EntityType<?> getType();
 
+    @Shadow
+    private float yaw;
+
+    @Shadow
+    private float pitch;
+
     @Unique
     Freecam freecam;
 
@@ -41,12 +46,16 @@ public abstract class EntityMixin {
     @Unique
     Nametags nametags;
 
+    @Unique
+    Rotations rotations;
+
     @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("TAIL"))
     private void getModules(EntityType type, World world, CallbackInfo ci) {
         freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
         freelook = ModuleManager.INSTANCE.getModuleByClass(Freelook.class);
         nametags = ModuleManager.INSTANCE.getModuleByClass(Nametags.class);
+        rotations = ModuleManager.INSTANCE.getModuleByClass(Rotations.class);
     }
 
 
@@ -62,10 +71,10 @@ public abstract class EntityMixin {
             ci.cancel();
 
         } else if (freelook.isEnabled() && freelook.mode.is(Freelook.CameraMode.CAMERA)) {
-            freelook.setYaw(freelook.getYaw() + (float) (cursorDeltaX / freelook.mouseSens.getFloatValue()));
-            freelook.setPitch(freelook.getPitch() + (float) (cursorDeltaY / freelook.mouseSens.getFloatValue()));
+            freelook.setYaw(freelook.getYaw() + (float) (cursorDeltaX * freelook.mouseSens.getFloatValue()));
+            freelook.setPitch(freelook.getPitch() + (float) (cursorDeltaY * freelook.mouseSens.getFloatValue()));
 
-            if (Math.abs(freelook.getPitch()) > 90.0F) freelook.setPitch(freelook.getPitch() > 0 ? 90 : -90);
+            if (Math.abs(freelook.getPitch()) > 90) freelook.setPitch(freelook.getPitch() > 0 ? 90 : -90);
             ci.cancel();
         }
     }
@@ -112,6 +121,30 @@ public abstract class EntityMixin {
         if (!nametags.isEnabled() || !nametags.distinguishBabies.isEnabled()) return original;
         if ((Object) this instanceof LivingEntity entity && entity.isBaby()) return original.copy().append(" (baby)");
         return original;
+    }
+
+
+    // rotaciones
+
+    @Inject(method = "setRotation", at = @At("HEAD"), cancellable = true)
+    private void onRotation(float yaw, float pitch, CallbackInfo ci) {
+        if ((Object) this != mc.player) return;
+        ChangeRotationEvent event = EVENT_BUS.post(new ChangeRotationEvent(yaw, pitch));
+        if (event.isCancelled()) ci.cancel();
+    }
+
+    @Inject(method = "setYaw", at = @At("HEAD"), cancellable = true)
+    private void onChangeYaw(float yaw, CallbackInfo ci) {
+        if ((Object) this != mc.player) return;
+        ChangeRotationEvent event = EVENT_BUS.post(new ChangeRotationEvent(yaw, this.pitch));
+        if (event.isCancelled()) ci.cancel();
+    }
+
+    @Inject(method = "setPitch", at = @At("HEAD"), cancellable = true)
+    private void onChangePitch(float pitch, CallbackInfo ci) {
+        if ((Object) this != mc.player) return;
+        ChangeRotationEvent event = EVENT_BUS.post(new ChangeRotationEvent(this.yaw, pitch));
+        if (event.isCancelled()) ci.cancel();
     }
 
 

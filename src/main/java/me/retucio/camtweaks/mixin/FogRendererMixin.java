@@ -36,8 +36,7 @@ public abstract class FogRendererMixin {
         if ((className.equals("BlindnessEffectFogModifier") && !noRender.blindnessEffect.isEnabled())
                 || (className.equals("DarknessEffectFogModifier") && !noRender.darknessEffect.isEnabled())
                 || ((className.equals("LavaFogModifier") || className.equals("WaterFogModifier")
-                        || className.equals("PowederSnowFogModifier")) && !noRender.fluidOverlay.isEnabled())
-                || (className.equals("DimensionOrBossFogModifier") && !noRender.dimensionFog.isEnabled()))
+                        || className.equals("PowederSnowFogModifier")) && !noRender.fluidOverlay.isEnabled()))
             return false;
 
         return instance.shouldApply(cameraSubmersionType, entity);
