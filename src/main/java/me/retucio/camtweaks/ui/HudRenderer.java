@@ -10,6 +10,7 @@ import me.retucio.camtweaks.module.modules.HUD;
 import me.retucio.camtweaks.ui.screen.HudEditorScreen;
 import me.retucio.camtweaks.ui.widgets.HudElement;
 
+import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -95,12 +96,9 @@ public class HudRenderer {
     }
 
     public static Color getColor(HUD hud) {
-        if (hud.rainbow.isEnabled()) {
-            float speed = 10001 - hud.rainbowSpeed.getFloatValue();
-            float hue = (System.currentTimeMillis() % (int) speed) / speed;
-            Color rgb = Color.getHSBColor(hue, 1, 1);
-            return new Color(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), hud.alpha.getIntValue());
-        }
+        if (hud.rainbow.isEnabled())
+            return Colors.rainbowColor(hud.rainbowSpeed.getIntValue(), hud.alpha.getIntValue());
+
         return new Color(hud.red.getIntValue(), hud.green.getIntValue(), hud.blue.getIntValue(), hud.alpha.getIntValue());
     }
 
@@ -131,7 +129,7 @@ public class HudRenderer {
 
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
         if (!hud.isEnabled()) return;
-        if (mc.getDebugHud().shouldShowDebugHud() && !hud.showOnF3.isEnabled()) return;
+        if (mc.debugHudEntryList.isF3Enabled() && !hud.showOnF3.isEnabled()) return;
         if (mc.currentScreen instanceof ChatScreen && !hud.showOnChat.isEnabled()) return;
 
         initElements();

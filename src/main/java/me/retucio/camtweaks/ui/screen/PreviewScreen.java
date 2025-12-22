@@ -8,18 +8,19 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
-// https://github.com/kgriff0n/shulker-preview/blob/master/src/main/java/io/github/kgriff0n/screen/FakeShulkerScreen.java
-public class ShulkerPreviewScreen extends Screen {
+public class PreviewScreen extends Screen {
 
-    private static final Identifier TEXTURE = Identifier.of(CameraTweaks.MOD_ID, "textures/gui/shulker.png");
+    private static final Identifier TEXTURE = Identifier.of(CameraTweaks.MOD_ID, "textures/gui/preview.png");
 
     private int x, y;
     private final int bgWidth = 176;
@@ -29,13 +30,29 @@ public class ShulkerPreviewScreen extends Screen {
     private final Text title;
     private final List<ItemStack> inventory;
     private final Screen parent;
+    private final PreviewType type;
 
-    public ShulkerPreviewScreen(ItemStack shulker, Screen parent) {
+    private int focusedSlot;
+
+    public PreviewScreen(ItemStack shulker, Screen parent) {
         super(Text.literal("previsualización del shulker"));
         this.color = ShulkerPeek.SHULKER_COLORS.get(shulker.getItem());
         this.title = shulker.getName();
         this.inventory = shulker.get(DataComponentTypes.CONTAINER).stream().toList();
         this.parent = parent;
+        this.type = PreviewType.SHULKER;
+    }
+
+    public PreviewScreen(Inventory inventory, Screen parent) {
+        super(Text.literal("echest"));
+        this.color = Colors.PURPLE;
+        this.title = Text.of("echest");
+        this.inventory = new ArrayList<>();
+        this.parent = parent;
+        this.type = PreviewType.ECHEST;
+
+        for (int i = 0; i < inventory.size(); i++)
+            this.inventory.add(inventory.getStack(i));
     }
 
     @Override
@@ -54,6 +71,7 @@ public class ShulkerPreviewScreen extends Screen {
         int selectedSlot = getSlot(mouseX, mouseY);
         if (selectedSlot > -1 && selectedSlot < inventory.size() && !inventory.get(selectedSlot).isOf(Items.AIR))
             renderTooltip(ctx, inventory.get(selectedSlot), mouseX, mouseY);
+        focusedSlot = selectedSlot;
     }
 
     @Override
@@ -108,5 +126,26 @@ public class ShulkerPreviewScreen extends Screen {
     @Override
     public boolean shouldPause() {
         return false;
+    }
+
+    public PreviewType getType() {
+        return this.type;
+    }
+
+    public Screen getParent() {
+        return parent;
+    }
+
+    public int getFocusedSlot() {
+        return focusedSlot;
+    }
+
+    public List<ItemStack> getInventory() {
+        return inventory;
+    }
+
+    public enum PreviewType {
+        SHULKER,
+        ECHEST;
     }
 }

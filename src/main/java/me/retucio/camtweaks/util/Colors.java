@@ -2,7 +2,10 @@ package me.retucio.camtweaks.util;
 
 import net.minecraft.util.Formatting;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static me.retucio.camtweaks.ui.frames.ClientSettingsFrame.guiSettings;
 
@@ -28,8 +31,65 @@ public class Colors {
     public static Color selectedHudElementOutlineColor;
     public static Color unselectedHudElementOutlineColor;
 
+    public static Color RED = new Color(152, 36, 34);
+    public static Color ORANGE = new Color(241, 114, 15);
+    public static Color YELLOW = new Color(249, 196, 35);
+    public static Color LIME = new Color(110, 185, 24);
+    public static Color GREEN = new Color(83, 107, 29);
+    public static Color CYAN = new Color(22, 133, 144);
+    public static Color CELESTE = new Color(57, 177, 215);
+    public static Color BLUE = new Color(49, 52, 152);
+    public static Color PURPLE = new Color(113, 37, 166);
+    public static Color MAGENTA = new Color(183, 61, 172);
+    public static Color PINK = new Color(239, 135, 166);
+    public static Color LAVENDER = new Color(142, 108, 142);
+    public static Color WHITE = new Color(225, 230, 230);
+    public static Color SILVER = new Color(137, 137, 128);
+    public static Color GRAY = new Color(60, 65, 68);
+    public static Color BLACK = new Color(31, 31, 35);
+    public static Color BROWN = new Color(113, 70, 39);
+
     static {
         updateAllColors(new Color(red, green, blue, alpha));
+    }
+
+    public static int rainbowInt(int rainbowSpeed, int alpha) {
+        float speed = 10001 - rainbowSpeed;  // 10001 para evitar divisiones por cero
+        float hue = (System.currentTimeMillis() % (int) speed) / speed;
+        Color gamingProMax = Color.getHSBColor(hue, 1, 1);
+
+        return new Color(
+                gamingProMax.getRed(),
+                gamingProMax.getGreen(),
+                gamingProMax.getBlue(),
+                alpha
+        ).getRGB();
+    }
+
+    public static Color rainbowColor(int rainbowSpeed, int alpha) {
+        float speed = 10001 - rainbowSpeed;  // 10001 para evitar divisiones por cero
+        float hue = (System.currentTimeMillis() % (int) speed) / speed;
+        Color gamingProMax = Color.getHSBColor(hue, 1, 1);
+
+        return new Color(
+                gamingProMax.getRed(),
+                gamingProMax.getGreen(),
+                gamingProMax.getBlue(),
+                alpha
+        );
+    }
+
+    public static Color rainbowColor(int rainbowSpeed, int alpha, float saturation, float brightness) {
+        float speed = 10001 - rainbowSpeed;  // 10001 para evitar divisiones por cero
+        float hue = (System.currentTimeMillis() % (int) speed) / speed;
+        Color gamingProMax = Color.getHSBColor(hue, saturation, brightness);
+
+        return new Color(
+                gamingProMax.getRed(),
+                gamingProMax.getGreen(),
+                gamingProMax.getBlue(),
+                alpha
+        );
     }
 
     public static void updateAllColors(Color color) {

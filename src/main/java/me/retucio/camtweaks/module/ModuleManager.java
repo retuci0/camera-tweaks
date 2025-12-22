@@ -40,6 +40,7 @@ public class ModuleManager {
         modules.add(new Freecam());
         modules.add(new Freelook());
         modules.add(new Fullbright());
+        modules.add(new GlintPlus());
         modules.add(new HandView());
         modules.add(new Headhitters());
         modules.add(new HUD());
@@ -50,10 +51,11 @@ public class ModuleManager {
         modules.add(new PerspectivePlus());
         modules.add(new PortalGUI());
         modules.add(new Rotations());
+        modules.add(new RPackBypass());
         modules.add(new ScreenshotPlus());
         modules.add(new ShulkerPeek());
         modules.add(new TimeChanger());
-//        modules.add(new TooltipsPlus());
+        modules.add(new WarnLowDurability());
         modules.add(new Zoom());
 
         modules.sort(Comparator.comparing(module -> module.getName().toLowerCase()));

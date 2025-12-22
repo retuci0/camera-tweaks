@@ -11,12 +11,12 @@ import net.minecraft.util.Formatting;
 
 /** continúa en:
  * @see me.retucio.camtweaks.mixin.ClientPlayNetworkHandlerMixin
- * @see me.retucio.camtweaks.mixin.EntityEffectParticleEffectMixin
  * @see me.retucio.camtweaks.mixin.FogRendererMixin
  * @see me.retucio.camtweaks.mixin.GameRendererMixin
  * @see me.retucio.camtweaks.mixin.InGameHudMixin
  * @see me.retucio.camtweaks.mixin.InGameOverlayRendererMixin
  * @see me.retucio.camtweaks.mixin.ParticleManagerMixin
+ * @see me.retucio.camtweaks.mixin.StatusEffectFogModifierMixin
  * @see me.retucio.camtweaks.mixin.StuckArrowsFeatureRendererMixin
  * @see me.retucio.camtweaks.mixin.TextRendererDrawerMixin
  * @see me.retucio.camtweaks.mixin.WeatherRenderingMixin

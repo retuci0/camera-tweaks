@@ -3,6 +3,7 @@ package me.retucio.camtweaks.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.CritsPlus;
+import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.particle.BillboardParticle;
 import net.minecraft.client.particle.DamageParticle;
 import net.minecraft.client.particle.ParticleTextureSheet;
@@ -32,9 +33,7 @@ abstract class DamageParticleFactoryMixin {
         if (!crits.isEnabled()) return original;
 
         if (crits.rainbow.isEnabled()) {
-            float speed = 10001 - crits.rainbowSpeed.getFloatValue();
-            float hue = (System.currentTimeMillis() % (int) speed) / speed;
-            Color gamning = Color.getHSBColor(hue, 1, 1);
+            Color gamning = Colors.rainbowColor(crits.rainbowSpeed.getIntValue(), crits.alpha.getIntValue());
             original.setColor(
                     gamning.getRed() / 255f,
                     gamning.getGreen() / 255f,

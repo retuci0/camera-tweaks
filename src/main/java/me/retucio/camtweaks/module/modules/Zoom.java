@@ -38,18 +38,18 @@ public class Zoom extends Module {
 
     public Zoom() {
         super("zoom", "lupa");
-        super.keyMode.setValue(KeyModes.HOLD);
-        super.keyMode.setDefaultValue(KeyModes.HOLD);
-        super.notify.setEnabled(false);
-        super.notify.setDefaultValue(false);
         assignKey(GLFW.GLFW_KEY_F);
+
+        keyMode.setDefaultValue(KeyModes.HOLD);
+        keyMode.setValue(KeyModes.HOLD);
+
+        notify.setDefaultValue(false);
+        notify.setEnabled(false);
     }
 
     @Override
     public void onEnable() {
         if (mc.options == null) return;
-
-        CameraTweaks.EVENT_BUS.register(this);
 
         prevSmoothCam = mc.options.smoothCameraEnabled;
         prevMouseSens = mc.options.getMouseSensitivity().getValue();
@@ -58,18 +58,21 @@ public class Zoom extends Module {
         mc.options.hudHidden = !showHUD.isEnabled();
 
         value = defaultZoom.getValue();
+
+        super.onEnable();
     }
 
     @Override
     public void onDisable() {
         if (mc.options == null) return;
-        CameraTweaks.EVENT_BUS.unregister(this);
 
         mc.options.smoothCameraEnabled = prevSmoothCam;
         mc.options.getMouseSensitivity().setValue(prevMouseSens);
         mc.options.hudHidden = prevHUD;
 
         mc.worldRenderer.scheduleTerrainUpdate();
+
+        super.onDisable();
     }
 
     @Override

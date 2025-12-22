@@ -3,6 +3,7 @@ package me.retucio.camtweaks.mixin;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.command.CommandManager;
+import me.retucio.camtweaks.config.ConfigManager;
 import me.retucio.camtweaks.event.events.ClientClickEvent;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import net.minecraft.SharedConstants;
@@ -31,6 +32,7 @@ public class ScreenMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void renderWatermark(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        if (!ConfigManager.hasLoaded()) return;  // para evitar dibujar la marca de agua por defecto
         String watermark = ClientSettingsFrame.guiSettings.watermark.getValue();
         if (watermark == null || watermark.isEmpty()) return;
         context.drawText(mc.textRenderer, watermark,

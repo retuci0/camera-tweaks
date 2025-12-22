@@ -104,14 +104,18 @@ public class GUI extends Module {
         green.onUpdate(g -> applyRGBAColorUpdates());
         blue.onUpdate(b -> applyRGBAColorUpdates());
         alpha.onUpdate(a -> applyRGBAColorUpdates());
+
+        // muy mierdas la solución pero funciona
+        red.reset();
+        green.reset();
+        blue.reset();
+        alpha.reset();
     }
 
     @SubscribeEvent
     public void onTick(TickEvent.Post event) {
         if (rainbow.isEnabled()) {
-            float speed = (float) (rainbowSpeed.getMax() - rainbowSpeed.getValue());
-            float hue = (System.currentTimeMillis() % (long) speed) / speed;
-            Color color = Color.getHSBColor(hue, saturation.getFloatValue(), brightness.getFloatValue());
+            Color color = Colors.rainbowColor(rainbowSpeed.getIntValue(), alpha.getIntValue(), saturation.getFloatValue(), brightness.getFloatValue());
 
             Colors.red = color.getRed();
             Colors.green = color.getGreen();

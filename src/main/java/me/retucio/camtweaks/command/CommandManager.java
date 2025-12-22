@@ -2,10 +2,14 @@ package me.retucio.camtweaks.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.command.commands.*;
+import me.retucio.camtweaks.event.SubscribeEvent;
+import me.retucio.camtweaks.module.Module;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
@@ -30,7 +34,7 @@ public class CommandManager {
     public static void registerCommands() {
         addCommand(new BindCommand());
         addCommand(new CopyScreenshotCommand());
-//        addCommand(new EnderChestCommand());  no funciona D:
+        addCommand(new EnderChestCommand());
         addCommand(new GarbageCleanerCommand());
         addCommand(new PeekCommand());
         addCommand(new PrefixCommand());
@@ -40,6 +44,15 @@ public class CommandManager {
         addCommand(new ToggleCommand());
 
         commands.sort(Comparator.comparing(Command::getName));
+
+        for (Command command : commands) {
+            for (Method method : command.getClass().getDeclaredMethods()) {
+                if (method.isAnnotationPresent(SubscribeEvent.class)) {
+                    CameraTweaks.EVENT_BUS.register(command);
+                    break;
+                }
+            }
+        }
     }
 
     public static void addCommand(Command command) {

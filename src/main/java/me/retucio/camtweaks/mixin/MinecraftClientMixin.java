@@ -7,11 +7,13 @@ import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.OpenScreenEvent;
 import me.retucio.camtweaks.event.events.ShutdownEvent;
 import me.retucio.camtweaks.event.events.TickEvent;
+import me.retucio.camtweaks.event.events.UseItemEvent;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.FastUse;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
+import static me.retucio.camtweaks.CameraTweaks.mc;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
@@ -52,6 +55,13 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "isTelemetryEnabledByApi", at = @At("RETURN"), cancellable = true)
     private void disableMicropenisTelemetryShi(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(false);
+    }
+
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    private void onUseItem(CallbackInfo ci, @Local Hand hand) {
+        if (mc.player == null) return;
+        UseItemEvent event = EVENT_BUS.post(new UseItemEvent(mc.player.getStackInHand(hand), hand));
+        if (event.isCancelled()) ci.cancel();
     }
 
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isItemEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z"))

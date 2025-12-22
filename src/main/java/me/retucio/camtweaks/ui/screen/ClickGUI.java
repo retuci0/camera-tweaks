@@ -84,7 +84,27 @@ public class ClickGUI extends Screen {
 
         filterSearchResults();
 
+        renderBottomGradient(ctx, scrollOffset);
+
         super.render(ctx, mouseX, mouseY, delta);
+    }
+
+    // renderizar un gradiente negro leve en la parte inferior de la pantalla si el contenido excede el límite inferior de la pantalla, para indicarlo visualmente
+    private void renderBottomGradient(DrawContext ctx, int scrollOffset) {
+        int screenHeight = mc.getWindow().getScaledHeight();
+        int totalContentHeight = calculateContentHeight();
+
+        if (scrollOffset + screenHeight < totalContentHeight) {
+            int gradientHeight = 30;
+            int startY = screenHeight - gradientHeight;
+
+            for (int y = 0; y < gradientHeight; y++) {
+                float alpha = (float) y / gradientHeight;
+                int color = (int) (alpha * 0.7 * 255) << 24;
+
+                ctx.fill(0, startY + y, mc.getWindow().getScaledWidth(), startY + y + 1, color);
+            }
+        }
     }
 
     private int calculateContentHeight() {

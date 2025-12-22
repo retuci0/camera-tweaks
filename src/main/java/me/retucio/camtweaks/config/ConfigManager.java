@@ -23,6 +23,7 @@ public class ConfigManager {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File CONFIG_FILE = new File("camera_tweaks.json");
+    private static boolean loaded = false;
 
     private static ClientConfig config = null;
 
@@ -93,6 +94,8 @@ public class ConfigManager {
 
         CameraTweaks.LOGGER.info("posiciones de frames cargadas");
         ClickGUI.INSTANCE.refreshListButtons();
+
+        loaded = true;
     }
 
     public static ClientConfig getConfig() {
@@ -165,5 +168,9 @@ public class ConfigManager {
 
     private static void ensureConfig() {
         if (config == null) config = new ClientConfig();
+    }
+
+    public static boolean hasLoaded() {
+        return loaded;
     }
 }

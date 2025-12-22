@@ -8,6 +8,7 @@ import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.BlockOutline;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.NoRender;
+import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.state.WorldRenderState;
@@ -77,16 +78,7 @@ public abstract class WorldRendererMixin {
         if (!outline.isEnabled()) return ColorHelper.withAlpha(alpha, rgb);
 
         if (outline.rainbow.isEnabled()) {
-            float speed = 10001 - outline.rainbowSpeed.getFloatValue();  // 10001 para evitar divisiones por cero
-            float hue = (System.currentTimeMillis() % (int) speed) / speed;
-            Color gamingProMax = Color.getHSBColor(hue, 1, 1);
-
-            return new Color(
-                    gamingProMax.getRed(),
-                    gamingProMax.getGreen(),
-                    gamingProMax.getBlue(),
-                    outline.alpha.getIntValue()
-            ).getRGB();
+            return Colors.rainbowInt(outline.rainbowSpeed.getIntValue(), outline.alpha.getIntValue());
         } else {
             return new Color(
                     outline.red.getIntValue(),

@@ -77,6 +77,7 @@ public class CameraTweaks implements ClientModInitializer {
         System.setProperty("java.awt.headless", "false");
 
         mc = MinecraftClient.getInstance();
+        ConfigManager.load();
 
         EVENT_BUS.register(this);
         EVENT_BUS.register(MiscUtil.class);
@@ -95,8 +96,6 @@ public class CameraTweaks implements ClientModInitializer {
         HudEditorScreen.INSTANCE = new HudEditorScreen();
         EVENT_BUS.post(new LoadClickGUIEvent());
 
-        ConfigManager.load();
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             ConfigManager.save();
             EVENT_BUS.post(new ShutdownEvent());
@@ -105,14 +104,14 @@ public class CameraTweaks implements ClientModInitializer {
 
     // se ejecuta cada tick, es decir, 20 veces por segundo
     public void onTick() {
-        ModuleManager.INSTANCE.getEnabledModules().forEach(Module::onTick);
-
         if (!settingsApplied
                 && ConfigManager.getConfig() != null
-                && mc.player != null && mc.world != null) {
+                && !ConfigManager.hasLoaded()) {
             ConfigManager.applyConfig();
             settingsApplied = true;
         }
+
+        ModuleManager.INSTANCE.getEnabledModules().forEach(Module::onTick);
     }
 
 
@@ -173,7 +172,6 @@ public class CameraTweaks implements ClientModInitializer {
     // maneja la lógica de apertura de la interfaz
     private void handleClickGUIKey(int key, boolean anyFocused) {
         if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused) return;
-        if (!(mc != null && mc.world != null && mc.player != null)) return;
 
         // al parecer esto hace que con la tecla de la interfaz puedas ir cambiando de splash text en la pantalla del título
         // pero me ha hecho gracia así que así se queda
@@ -189,7 +187,6 @@ public class CameraTweaks implements ClientModInitializer {
     // manejar la lógica de apertura del editor de elementos del hud, con la misma lógica que handleClickGUIKey()
     private void handleHudEditorKey(int key, boolean anyFocused) {
         if (key != ModuleManager.INSTANCE.getModuleByClass(HUD.class).editorKey.getKey() || anyFocused) return;
-        if (!(mc != null && mc.world != null && mc.player != null)) return;
 
         if (mc.currentScreen != HudEditorScreen.INSTANCE) {
             prevScreen = mc.currentScreen;

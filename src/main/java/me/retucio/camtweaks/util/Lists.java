@@ -10,7 +10,11 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+
+import static me.retucio.camtweaks.util.Colors.*;
 
 import static me.retucio.camtweaks.CameraTweaks.mc;
 
@@ -27,6 +31,8 @@ public class Lists {
 
     public static final List<Block> blockList = Registries.BLOCK.stream().toList();
 
+    public static final List<Color> colorList = new ArrayList<>();
+
     public static void init() {
         // no consigo traducir el texto. a tomar por culo, se queda en inglés, si no entiendes pues a estudiar
         entityNames = getMapOfLists(entityList,
@@ -38,6 +44,8 @@ public class Lists {
 
         itemNames = getMapOfLists(itemList,
                 itemList.stream().map(item -> I18n.translate(item.getTranslationKey())).toList());
+
+        colorList.addAll(Arrays.asList(RED, ORANGE, YELLOW, LIME, GREEN, CYAN, CELESTE, BLUE, PURPLE, MAGENTA, PINK, LAVENDER, WHITE, SILVER, GRAY, BLACK, BROWN));
     }
 
     public static <T> Map<T, Boolean> allTrue(List<T> options) {
