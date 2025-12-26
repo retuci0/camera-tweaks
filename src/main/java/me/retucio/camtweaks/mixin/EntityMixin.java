@@ -25,29 +25,16 @@ import static me.retucio.camtweaks.CameraTweaks.mc;
 @Mixin(Entity.class)
 public abstract class EntityMixin {
 
-    @Shadow
-    public abstract Text getName();
+    @Shadow public abstract Text getName();
+    @Shadow public abstract EntityType<?> getType();
 
-    @Shadow
-    public abstract EntityType<?> getType();
+    @Shadow private float yaw;
+    @Shadow private float pitch;
 
-    @Shadow
-    private float yaw;
-
-    @Shadow
-    private float pitch;
-
-    @Unique
-    Freecam freecam;
-
-    @Unique
-    Freelook freelook;
-
-    @Unique
-    Nametags nametags;
-
-    @Unique
-    Rotations rotations;
+    @Unique Freecam freecam;
+    @Unique Freelook freelook;
+    @Unique Nametags nametags;
+    @Unique Rotations rotations;
 
     @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("TAIL"))

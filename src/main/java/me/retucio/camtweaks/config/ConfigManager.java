@@ -72,6 +72,11 @@ public class ConfigManager {
             }
         });
 
+        if (config.searchBarPosition != null && config.searchBarPosition.length == 2) {
+            ClickGUI.INSTANCE.getSearchBar().setX(config.searchBarPosition[0]);
+            ClickGUI.INSTANCE.getSearchBar().setY(config.searchBarPosition[1]);
+        }
+
         ClientSettingsFrame.guiSettings.setEnabled(true);
         ClientSettingsFrame.guiSettings.getSettings().forEach(setting -> applySetting(ClientSettingsFrame.guiSettings, setting));
 
@@ -138,6 +143,12 @@ public class ConfigManager {
         save();
     }
 
+    public static void setSearchBarPosition(int x, int y) {
+        ensureConfig();
+        config.searchBarPosition = new int[]{x, y};
+        save();
+    }
+
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static void applySetting(Module parent, AbstractSetting setting) {
@@ -161,7 +172,27 @@ public class ConfigManager {
                         }
                         l.setValues(converted);
                     }
-                } default -> {}
+                } case ColorSetting c -> {
+                    if (value instanceof Map<?, ?> map) {
+                        Number r = (Number) map.get("r");
+                        Number g = (Number) map.get("g");
+                        Number b = (Number) map.get("b");
+                        Number a = (Number) map.get("a");
+                        Boolean rainbow = (Boolean) map.get("rb");
+                        Number rainbowSpeed = (Number) map.get("rs");
+                        Number saturation = (Number) map.get("sat");
+                        Number brightness = (Number) map.get("bri");
+
+                        if (r != null && g != null && b != null && a != null)
+                            c.setRGB(r.intValue(), g.intValue(), b.intValue(), a.intValue());
+
+                        if (rainbow != null) c.setRainbow(rainbow);
+                        if (rainbowSpeed != null) c.setRainbowSpeed(rainbowSpeed.intValue());
+                        if (saturation != null) c.setSaturation(saturation.floatValue());
+                        if (brightness != null) c.setBrightness(brightness.floatValue());
+                    }
+                }
+                default -> {}
             }
         }
     }

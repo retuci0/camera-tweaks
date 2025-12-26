@@ -29,8 +29,7 @@ public class Freelook extends Module {
     private Perspective prevPerspective;
 
     public Freelook() {
-        super("perspectiva libre", "te permite mover la cámara de la perspectiva sin mover la del jugador, o vice versa");
-        assignKey(GLFW.GLFW_KEY_B);
+        super("perspectiva libre", "te permite mover la cámara de la perspectiva sin mover la del jugador, o vice versa", GLFW.GLFW_KEY_B);
 
         keyMode.setDefaultValue(KeyModes.HOLD);
         keyMode.setValue(KeyModes.HOLD);

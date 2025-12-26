@@ -45,7 +45,8 @@ public class PlayerArgumentType implements ArgumentType<PlayerEntity> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(mc.world.getPlayers().stream().map(abstractClientPlayerEntity -> abstractClientPlayerEntity.getName().getString()), builder);
+        return CommandSource.suggestMatching(mc.world.getPlayers().stream().map(
+                abstractClientPlayerEntity -> abstractClientPlayerEntity.getName().getString()), builder);
     }
 
     @Override

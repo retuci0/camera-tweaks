@@ -9,14 +9,14 @@ import net.minecraft.text.Text;
 public class GarbageCleanerCommand extends Command {
 
     public GarbageCleanerCommand() {
-        super("cleanram", "limpia la ram mediante el recolector de basura (gc)", "gc", "garbagecollect");
+        super("gc", "limpia la ram mediante el recolector de basura (gc)", "garbagecollect");
     }
 
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
             System.gc();
-            ChatUtil.info(Text.of("ram limpiada"));
+            ChatUtil.info(Text.of("basura recolectada"));
             return SUCCESS;
         });
     }

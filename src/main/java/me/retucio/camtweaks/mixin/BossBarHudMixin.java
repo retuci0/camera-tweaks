@@ -16,7 +16,7 @@ import java.util.Iterator;
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
 
 @Mixin(BossBarHud.class)
-public class BossBarHudMixin {
+public abstract class BossBarHudMixin {
 
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/Collection;iterator()Ljava/util/Iterator;"))
     public Iterator<ClientBossBar> modifyBossBarIterator(Iterator<ClientBossBar> original) {

@@ -4,6 +4,10 @@ import me.retucio.camtweaks.event.Event;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 
+
+/**
+ * @see me.retucio.camtweaks.mixin.MinecraftClientMixin#onUseItem
+ */
 public class UseItemEvent extends Event {
 
     private ItemStack stack;

@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
-import me.retucio.camtweaks.event.events.camtweaks.AddEntityEvent;
-import me.retucio.camtweaks.event.events.camtweaks.RemoveEntityEvent;
+import me.retucio.camtweaks.event.events.AddEntityEvent;
+import me.retucio.camtweaks.event.events.RemoveEntityEvent;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ public abstract class ClientWorldMixin {
     public abstract Entity getEntityById(int id);
 
     @Inject(method = "addEntity", at = @At("HEAD"))
-    private void onEntityAdded(Entity entity, CallbackInfo ci) {
+    private void onAddEntity(Entity entity, CallbackInfo ci) {
         if (entity != null) EVENT_BUS.post(new AddEntityEvent(entity));
     }
 

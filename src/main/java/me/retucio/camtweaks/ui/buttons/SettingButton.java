@@ -24,6 +24,7 @@ public abstract class SettingButton {
     public abstract void render(DrawContext ctx, double mouseX, double mouseY, float delta);
     public abstract void mouseClicked(double mouseX, double mouseY, int button);
     public abstract void mouseReleased(double mouseX, double mouseY, int button);
+    public abstract void mouseDragged(double mouseX, double mouseY);
 
     // dibujar "tooltips" (cajitas de texto bajo el puntero del ratón) con la descripción para asistir al usuario en el caso de que tenga down
     public void drawTooltip(DrawContext ctx, double mouseX, double mouseY) {

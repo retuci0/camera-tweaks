@@ -47,6 +47,9 @@ public class ToggleButton extends SettingButton {
         ClickGUI.INSTANCE.unselect(this);
     }
 
+    @Override
+    public void mouseDragged(double mouseX, double mouseY) {}
+
     public BooleanSetting getSetting() {
         return setting;
     }

@@ -6,12 +6,12 @@ import net.minecraft.text.Text;
 
 import java.util.Iterator;
 
+
 /**
  * @see me.retucio.camtweaks.mixin.BossBarHudMixin#modifyBossBarIterator
  * @see me.retucio.camtweaks.mixin.BossBarHudMixin#modifyBossBarName
  * @see me.retucio.camtweaks.mixin.BossBarHudMixin#modifySpacingConstant
  */
-
 public class RenderBossbarEvent {
 
     public static class BossText extends Event {

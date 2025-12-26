@@ -32,6 +32,9 @@ public class ClientConfig {
     // id del elemento del hud -> true: visible / false: no visible
     public Map<String, Boolean> hudVisibilities = new HashMap<>();
 
+    // posición de la barra de búsqueda (x, y)
+    public int[] searchBarPosition = new int[]{340, 16};
+
     public ClientConfig() {
         EVENT_BUS.register(this);
     }
@@ -55,6 +58,7 @@ public class ClientConfig {
             case NumberSetting n: value = n.getValue(); break;
             case StringSetting s: value = s.getValue(); break;
             case ListSetting l: value = l.getValues(); break;
+            case ColorSetting c: value = c.getConfigValue(); break;
             default: break;
         }
 

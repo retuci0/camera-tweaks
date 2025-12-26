@@ -2,6 +2,12 @@ package me.retucio.camtweaks.event.events;
 
 import me.retucio.camtweaks.event.Event;
 
+
+/**
+ * @see me.retucio.camtweaks.mixin.EntityMixin#onRotation
+ * @see me.retucio.camtweaks.mixin.EntityMixin#onChangeYaw
+ * @see me.retucio.camtweaks.mixin.EntityMixin#onChangePitch
+ */
 public class ChangeRotationEvent extends Event {
 
     private float yaw;

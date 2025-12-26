@@ -1,6 +1,5 @@
 package me.retucio.camtweaks.module.modules;
 
-import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.GetFOVEvent;
 import me.retucio.camtweaks.event.events.MouseScrollEvent;
@@ -37,8 +36,7 @@ public class Zoom extends Module {
     private double value;
 
     public Zoom() {
-        super("zoom", "lupa");
-        assignKey(GLFW.GLFW_KEY_F);
+        super("zoom", "lupa", GLFW.GLFW_KEY_F);
 
         keyMode.setDefaultValue(KeyModes.HOLD);
         keyMode.setValue(KeyModes.HOLD);

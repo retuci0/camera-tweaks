@@ -7,14 +7,20 @@ import me.retucio.camtweaks.event.events.MouseClickEvent;
 import me.retucio.camtweaks.event.events.MouseScrollEvent;
 import me.retucio.camtweaks.event.events.camtweaks.SettingsFrameEvent;
 import me.retucio.camtweaks.module.Module;
+import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.settings.AbstractSetting;
+import me.retucio.camtweaks.module.settings.ColorSetting;
+import me.retucio.camtweaks.ui.buttons.ColorButton;
 import me.retucio.camtweaks.ui.buttons.ListButton;
+import me.retucio.camtweaks.ui.buttons.ModuleButton;
 import me.retucio.camtweaks.ui.buttons.SettingButton;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.frames.ColorPickerFrame;
 import me.retucio.camtweaks.ui.frames.ModuleFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.ui.widgets.ScrollBarWidget;
 import me.retucio.camtweaks.ui.widgets.SearchBarWidget;
+import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
 
 import net.minecraft.client.MinecraftClient;
@@ -136,13 +142,15 @@ public class ClickGUI extends Screen {
         // registrar cuándo se suelta el clic, en cada marco respectivamente
         modulesFrame.mouseReleased(click.x(), click.y(), click.button());
         for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseRelease(click.x(), click.y(), click.button());
+            sf.mouseReleased(click.x(), click.y(), click.button());
         return super.mouseReleased(click);
     }
 
     @Override
     public boolean mouseDragged(Click click, double deltaX, double deltaY) {
         scrollBar.mouseDragged(click.y());
+        for (SettingsFrame sf : new ArrayList<>(settingsFrames))
+            sf.mouseDragged(click.x(), click.y());
         return super.mouseDragged(click, deltaX, deltaY);
     }
 
@@ -177,6 +185,25 @@ public class ClickGUI extends Screen {
         if (!guiSettings.searchBar.isEnabled()) return;
         String searchInput = searchBar.getSearchInput().trim();
         if (!guiSettings.matchCase.isEnabled()) searchInput = searchInput.toLowerCase();
+
+        for (ModuleButton mb : modulesFrame.getButtons()) {
+            Module module = mb.getModule();
+
+            if (searchInput.isEmpty()) {
+                module.setSearchMatch(true);
+                continue;
+            }
+
+            String name = module.getName();
+            String description = module.getDescription();
+
+            if (!guiSettings.matchCase.isEnabled()) {
+                name = name.toLowerCase();
+                description = description.toLowerCase();
+            }
+
+            module.setSearchMatch(name.contains(searchInput) || description.contains(searchInput));
+        }
 
         for (SettingsFrame sf : settingsFrames) {
             for (SettingButton sb : sf.getButtons()) {
@@ -219,7 +246,8 @@ public class ClickGUI extends Screen {
         // porque java.util.ConcurrentModificationException o algo no sé es lo único que se me ha ocurrido hacer
         List<SettingsFrame> toRemove = new ArrayList<>();
         for (SettingsFrame sf : settingsFrames) {
-            if (sf.module == module) {
+            if ((sf instanceof ColorPickerFrame cpf && cpf.dummyModule == module)  // para los selectores de colores
+                    || (!(sf instanceof ColorPickerFrame) && sf.module == module)) {    // lógica muy mierdas, lo sé, pero paso de hacerlo bien
                 CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Close(sf));
                 toRemove.add(sf);
                 unselect(sf);
@@ -234,8 +262,6 @@ public class ClickGUI extends Screen {
                 .anyMatch(sf -> sf.module.getName().equals(module.getName()));
     }
 
-
-
     public void refreshListButtons() {
         for (SettingsFrame frame : settingsFrames)
             for (SettingButton button : frame.getButtons())
@@ -243,13 +269,38 @@ public class ClickGUI extends Screen {
                     lb.refreshDummy();
     }
 
+    public boolean isColorPickerFrameOpen(ColorSetting setting) {
+        for (SettingsFrame sf : getSettingsFrames()) {
+            if (sf instanceof ColorPickerFrame cpf)
+                if (cpf.getColorSetting().equals(setting)) return true;
+        }
+        return false;
+    }
+
+    public void openColorPickerFrame(Module module, ColorSetting colorSetting, int x, int y) {
+        ColorPickerFrame frame = new ColorPickerFrame(module, colorSetting, x + 80, y + 5, 153, 20);
+        if (isColorPickerFrameOpen(frame.getColorSetting())) {
+            closeColorPickerFrame(frame.getColorSetting());
+            return;
+        };
+        settingsFrames.add(frame);
+    }
+
+    public void closeColorPickerFrame(ColorSetting setting) {
+        for (SettingsFrame sf : getSettingsFrames()) {
+            if (sf instanceof ColorPickerFrame cpf && cpf.getColorSetting().equals(setting)) {
+                settingsFrames.remove(cpf);
+                break;
+            }
+        }
+    }
 
     // métodos del súper
 
     @Override
     public void close() {  // evitar que al reabrir la interfaz sin previamente haber soltado el clic, se sigan arrastrando objetos
         modulesFrame.mouseReleased(0, 0, 0);
-        settingsFrames.forEach(sf -> sf.mouseRelease(0, 0, 0));
+        settingsFrames.forEach(sf -> sf.mouseReleased(0, 0, 0));
         scrollBar.mouseReleased(0, 0, 0);
         searchBar.mouseReleased(0, 0, 0);
 

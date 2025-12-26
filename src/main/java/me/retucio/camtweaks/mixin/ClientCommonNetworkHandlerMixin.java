@@ -36,7 +36,7 @@ public abstract class ClientCommonNetworkHandlerMixin {
     @Shadow @Final protected ServerInfo serverInfo;
     @Shadow @Final protected ClientConnection connection;
 
-    @Unique  // tardar 3 segundos porque algunos servers
+    @Unique  // tardar 3 segundos porque algunos servers detectar el tiempo entre que se acepta y se carga el pack
     private final Executor DELAYED_EXECUTOR = CompletableFuture.delayedExecutor(3L, TimeUnit.SECONDS);
 
     @Inject(method = "createConfirmServerResourcePackScreen", at = @At("TAIL"))

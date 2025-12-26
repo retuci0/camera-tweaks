@@ -1,13 +1,17 @@
-package me.retucio.camtweaks.event.events.camtweaks;
+package me.retucio.camtweaks.event.events;
 
 import me.retucio.camtweaks.event.Event;
 import net.minecraft.entity.Entity;
 
-public class RemoveEntityEvent extends Event {
+
+/**
+ * @see me.retucio.camtweaks.mixin.ClientWorldMixin#onAddEntity
+ */
+public class AddEntityEvent extends Event {
 
     private final Entity entity;
 
-    public RemoveEntityEvent(Entity entity) {
+    public AddEntityEvent(Entity entity) {
         this.entity = entity;
     }
 

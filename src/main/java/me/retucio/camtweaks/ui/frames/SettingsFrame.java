@@ -20,8 +20,8 @@ import java.util.List;
 // marco para los botones de los ajustes de cada módulo
 public class SettingsFrame {
 
-    private final String title;
-    public final Module module;
+    final String title;
+    public Module module;
     final List<SettingButton> settingButtons = new ArrayList<>();
 
     public List<SettingButton> visibleButtons = new ArrayList<>();
@@ -37,7 +37,13 @@ public class SettingsFrame {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public SettingsFrame(Module module, int x, int y, int w, int h) {
         this.module = module;
-        this.x = x;
+
+        // asegurarse de que no se sale de la pantalla
+        if (mc.getWindow() != null && x + w > mc.getWindow().getScaledWidth())
+            this.x = mc.getWindow().getScaledWidth() - w;
+        else
+            this.x = x;
+
         this.y = y;
         this.w = w;
         this.h = h;
@@ -45,7 +51,6 @@ public class SettingsFrame {
         // añadir el respectivo tipo de botón de cada ajuste a la lista de botones
         int offset = h;
         for (AbstractSetting setting : module.getSettings()) {
-            if (!setting.isVisible()) continue;
             switch (setting) {
                 case BooleanSetting b -> {
                     addButton(new ToggleButton(b, this, offset));
@@ -65,7 +70,11 @@ public class SettingsFrame {
                 } case ListSetting l -> {
                     addButton(new ListButton<>(l, this, offset));
                     offset += 18;
-                } default -> {}
+                } case ColorSetting c -> {
+                    addButton(new ColorButton(c, this, offset));
+                    offset += 18;
+                }
+                default -> {}
             }
         }
         title = "ajustes de " + module.getName();
@@ -105,11 +114,11 @@ public class SettingsFrame {
         ctx.drawText(mc.textRenderer, title, titleX, titleY, -1, true);
         ctx.drawText(mc.textRenderer, "×", x + w - mc.textRenderer.getWidth("×") - 8, titleY, closeButtonColor, true);
 
-        // descripción
         visibleButtons = settingButtons.stream()
                 .filter(sb -> sb.getSetting().isVisible() && sb.getSetting().isSearchMatch())
                 .toList();
 
+        // descripción
         List<String> descLines = wrapDescription(module.getDescription(), w - 8);
         int lineSpacing = 2;
 
@@ -161,19 +170,24 @@ public class SettingsFrame {
             }
         }
 
-        for (SettingButton sb : settingButtons)
-            if (sb.getSetting().isVisible())
-                sb.mouseClicked(mouseX, mouseY, button);
+        for (SettingButton sb : visibleButtons)
+            sb.mouseClicked(mouseX, mouseY, button);
     }
 
-    public void mouseRelease(double mouseX, double mouseY, int button) {
+    public void mouseReleased(double mouseX, double mouseY, int button) {
         ClickGUI.INSTANCE.unselect(this);
         if (button == 0) {
             dragging = false;
             CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Move(this));
         }
-        for (SettingButton sb : settingButtons)
-            if (sb.getSetting().isVisible()) sb.mouseReleased(mouseX, mouseY, button);
+
+        for (SettingButton sb : visibleButtons)
+            sb.mouseReleased(mouseX, mouseY, button);
+    }
+
+    public void mouseDragged(double mouseX, double mouseY) {
+        for (SettingButton sb : visibleButtons)
+            sb.mouseDragged(mouseX, mouseY);
     }
 
     public void updatePosition(double mouseX, double mouseY) {

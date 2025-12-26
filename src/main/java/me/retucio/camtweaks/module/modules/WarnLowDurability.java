@@ -1,7 +1,5 @@
 package me.retucio.camtweaks.module.modules;
 
-import me.retucio.camtweaks.event.SubscribeEvent;
-import me.retucio.camtweaks.event.events.DamageItemEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
@@ -11,7 +9,13 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
+// al parecer DamageItemEvent no se lanza si estás en un server de Paper, o sea que ahora se usa onTick()
 public class WarnLowDurability extends Module {
 
     public NumberSetting limitPercentage = addSetting(new NumberSetting("porcentaje", "porcentaje de durabilidad restante a la que se te avisa",
@@ -20,18 +24,21 @@ public class WarnLowDurability extends Module {
     public BooleanSetting message = addSetting(new BooleanSetting("mensaje", "enviar un mensaje para alertar al usuario", true));
     public BooleanSetting sound = addSetting(new BooleanSetting("sonido", "reproducir un sonido para alertar al usuario", true));
 
+    private final List<ItemStack> warned = new ArrayList<>();
+
     public WarnLowDurability() {
         super("aviso de baja dur.", "te avisa cuando la herramienta que sostengas sobrepase un límite de durabilidad");
     }
 
-    @SubscribeEvent
-    public void onDecreaseDurability(DamageItemEvent event) {
+    @Override
+    public void onTick() {
         if (mc.player == null || mc.world == null) return;
-        ItemStack stack = event.getStack();
+        ItemStack stack = mc.player.getStackInHand(Hand.MAIN_HAND);
+        if (warned.contains(stack)) return;
 
-        double percentage = 100 * (1 - ((double) stack.getDamage() / stack.getMaxDamage()));
+        float percentage = (1 - (float) stack.getDamage() / stack.getMaxDamage()) * 100;
+
         if (percentage <= limitPercentage.getValue()) {
-
             if (sound.isEnabled())
                 mc.world.playSound(mc.player, mc.player.getBlockPos(),
                         SoundEvents.BLOCK_BELL_USE, SoundCategory.AMBIENT, 1, 1);
@@ -42,8 +49,16 @@ public class WarnLowDurability extends Module {
                         + Formatting.GREEN + customName + Formatting.RESET
                         + " a " + Formatting.GOLD + ((int) percentage + "") + "%"
                         + Formatting.RESET + " de durabilidad");
-                mc.execute(() -> ChatUtil.warn(text));  // en mc.execute porque si lo llamo directamente, lo hago desde el thread del server que causa un error
+                ChatUtil.warn(text);
             }
+
+            warned.add(stack);
         }
+    }
+
+    @Override
+    public void onDisable() {
+        warned.clear();
+        super.onDisable();
     }
 }

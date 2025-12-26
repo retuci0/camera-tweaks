@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 public class ModuleArgumentType implements ArgumentType<Module> {
 
     public static final ModuleArgumentType INSTANCE = new ModuleArgumentType();
-    private static final DynamicCommandExceptionType unknownModuleE = new DynamicCommandExceptionType(
+    private static final DynamicCommandExceptionType UNKNOWN_MODULE = new DynamicCommandExceptionType(
             name -> Text.literal("módulo \"" + name + "\" no encontrado"));
 
     private static final Collection<String> examples = ModuleManager.INSTANCE.getModules()
@@ -29,7 +29,7 @@ public class ModuleArgumentType implements ArgumentType<Module> {
     public Module parse(StringReader reader) throws CommandSyntaxException {
         String argument = reader.readString().replace("_", " ");
         Module module = ModuleManager.INSTANCE.getModuleByName(argument);
-        if (module == null) throw unknownModuleE.create(argument);
+        if (module == null) throw UNKNOWN_MODULE.create(argument);
         return module;
     }
 

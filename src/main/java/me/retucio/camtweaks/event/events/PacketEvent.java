@@ -4,12 +4,12 @@ import me.retucio.camtweaks.event.Event;
 import me.retucio.camtweaks.event.Stage;
 import net.minecraft.network.packet.Packet;
 
+
 /**
  * @see me.retucio.camtweaks.mixin.ClientConnectionMixin#onSendPacketPre 
  * @see me.retucio.camtweaks.mixin.ClientConnectionMixin#onSendPacketPost 
  * @see me.retucio.camtweaks.mixin.ClientConnectionMixin#onReceivePacket
  */
-
 public class PacketEvent {
 
     public static class Send extends Event {

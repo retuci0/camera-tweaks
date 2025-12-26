@@ -15,7 +15,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
@@ -23,6 +25,7 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +34,11 @@ public class HudRenderer {
 
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
+    // tps
     private static float estimatedTPS = 20f;
-    private long lastPacketTime = 0;
+    private static final List<Float> tpsHistory = new ArrayList<>();
+    private long lastWorldTime = -1L;
+    private long lastRealTime = -1L;
 
     private static final Map<String, int[]> positions = ConfigManager.getConfig().hudPositions;
     private static final Map<String, Boolean> visibilities = ConfigManager.getConfig().hudVisibilities;
@@ -77,6 +83,11 @@ public class HudRenderer {
             drawSnappedText(ctx, getElementText("time", delta, hud), mx, my, getColor(hud).getRGB(), hud.shadow.isEnabled());
         });
 
+        // ping
+        addElement("ping", 2, 2 * (mc.textRenderer.fontHeight + 4), (ctx, mx, my, delta) -> {
+            drawSnappedText(ctx, getElementText("ping", delta, hud), mx, my, getColor(hud).getRGB(), hud.shadow.isEnabled());
+        });
+
         HudEditorScreen.INSTANCE.setElements(getElements());
     }
 
@@ -96,10 +107,7 @@ public class HudRenderer {
     }
 
     public static Color getColor(HUD hud) {
-        if (hud.rainbow.isEnabled())
-            return Colors.rainbowColor(hud.rainbowSpeed.getIntValue(), hud.alpha.getIntValue());
-
-        return new Color(hud.red.getIntValue(), hud.green.getIntValue(), hud.blue.getIntValue(), hud.alpha.getIntValue());
+        return hud.color.getColor();
     }
 
     public static void drawSnappedText(DrawContext ctx, String text, int x, int y, int color, boolean shadow) {
@@ -160,7 +168,7 @@ public class HudRenderer {
                 return "FPS: " + mc.getCurrentFps();
             }
             case "tps" -> {
-                return "TPS: " + estimatedTPS;
+                return String.format("TPS: %.1f", estimatedTPS);
             }
             case "customText" -> {
                 return ModuleManager.INSTANCE.getModuleByClass(HUD.class).customText.getValue();
@@ -173,25 +181,56 @@ public class HudRenderer {
                 DateTimeFormatter format = DateTimeFormatter.ofPattern(is24 ? "HH:mm" : "hh:mm a");
                 return now.format(format);
             }
+            case "ping" -> {
+                if (mc.getNetworkHandler() == null || mc.player == null) return "? ms";
+                if (mc.isInSingleplayer()) return "-1 ms";
+
+                PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid());
+                return playerListEntry != null ? playerListEntry.getLatency() + " ms" : "? ms";
+            }
             default -> { return id; }
         }
     }
 
     @SubscribeEvent
     public void onReceivePacket(PacketEvent.Receive event) {
-        long now = System.currentTimeMillis();
-        if (lastPacketTime > 0) {
-            float tps = 1000f / (now - lastPacketTime);
-            estimatedTPS = Math.min(20f, tps);
+        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket packet) {
+            long currentWorldTime = packet.time();
+            long currentRealTime = System.currentTimeMillis();
+
+            if (lastWorldTime != -1L && lastRealTime != -1L) {
+                long elapsedRealTime = currentRealTime - lastRealTime;
+                long elapsedWorldTicks = currentWorldTime - lastWorldTime;
+
+                if (elapsedRealTime > 0) {
+                    // TPS = (ticks passed) / (seconds passed)
+                    float tps = (float) elapsedWorldTicks / (elapsedRealTime / 1000.0f);
+
+                    // clampear
+                    tps = Math.max(0.1f, Math.min(20.0f, tps));
+
+                    // usar historial para suavizar resultados
+                    tpsHistory.add(tps);
+                    if (tpsHistory.size() > 10)
+                        tpsHistory.removeFirst();
+
+                    // calcular media de tps
+                    float sum = 0;
+                    for (float t : tpsHistory) sum += t;
+                    estimatedTPS = sum / tpsHistory.size();
+                }
+            }
+
+            lastWorldTime = currentWorldTime;
+            lastRealTime = currentRealTime;
         }
-        lastPacketTime = now;
     }
 
     /** para cuando se cambie el valor del texto custom */
     @SubscribeEvent
     public void onUpdateSetting(UpdateSettingEvent event) {
+        if (ModuleManager.INSTANCE == null) return;
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
-
         if (event.getSetting() == hud.customText) {
             if (customTextElement != null) {
                 int newX = mc.getWindow().getScaledWidth() / 2 - mc.textRenderer.getWidth(hud.customText.getValue()) / 2;

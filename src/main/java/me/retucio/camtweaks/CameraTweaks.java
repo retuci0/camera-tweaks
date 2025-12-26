@@ -80,9 +80,10 @@ public class CameraTweaks implements ClientModInitializer {
         ConfigManager.load();
 
         EVENT_BUS.register(this);
+        EVENT_BUS.register(new HudRenderer());
+
         EVENT_BUS.register(MiscUtil.class);
         EVENT_BUS.register(ChatUtil.class);
-        EVENT_BUS.register(HudRenderer.class);
 
         Lists.init();
 
@@ -186,7 +187,12 @@ public class CameraTweaks implements ClientModInitializer {
 
     // manejar la lógica de apertura del editor de elementos del hud, con la misma lógica que handleClickGUIKey()
     private void handleHudEditorKey(int key, boolean anyFocused) {
-        if (key != ModuleManager.INSTANCE.getModuleByClass(HUD.class).editorKey.getKey() || anyFocused) return;
+        HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+        if (key != hud.editorKey.getKey() || anyFocused) return;
+        if (!hud.isEnabled()) {
+            ChatUtil.warn("HUD está desactivado, lumbreras");
+            return;
+        }
 
         if (mc.currentScreen != HudEditorScreen.INSTANCE) {
             prevScreen = mc.currentScreen;

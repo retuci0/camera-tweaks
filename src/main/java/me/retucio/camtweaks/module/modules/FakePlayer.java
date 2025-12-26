@@ -33,10 +33,17 @@ public class FakePlayer extends Module {
         super.onDisable();
     }
 
+    // intento miserable de hacer que no colisione con jugadores
     public OtherClientPlayerEntity addPlayer(PlayerEntity playerToCopy, String dummyName) {
-        player = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.randomUUID(), dummyName));
+        player = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.randomUUID(), dummyName)) {
+            @Override public void onPlayerCollision(PlayerEntity player) {}
+        };
+
         player.copyFrom(playerToCopy);
         player.setCustomNameVisible(true);
+        player.noClip = true;
+        player.horizontalCollision = false;
+        player.verticalCollision = false;
         mc.world.addEntity(player);
         return player;
     }

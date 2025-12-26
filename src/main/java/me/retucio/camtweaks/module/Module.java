@@ -23,6 +23,7 @@ public class Module {
     private String description;
     private boolean enabled;
     private boolean saveSettings = true;
+    private boolean searchMatch = true;
 
     // dejar al usuario elegir si el módulo debería apagarse tras soltar su tecla asignada, o si la tecla debería alternar su estado
     protected EnumSetting<KeyModes> keyMode = new EnumSetting<>("modo de tecla", "cómo interpretar la tecla configurada", KeyModes.class, KeyModes.TOGGLE);
@@ -39,6 +40,13 @@ public class Module {
         addSettings(bind, keyMode, notify);
     }
 
+    public Module(String name, String description, int key) {
+        this.name = name;
+        this.description = description;
+        addSettings(bind, keyMode, notify);
+        this.bind.setDefaultKey(key);
+        this.bind.setKey(key);
+    }
 
     // ajustes
     public List<AbstractSetting> getSettings() {
@@ -49,7 +57,7 @@ public class Module {
     public <S extends AbstractSetting> S addSetting(AbstractSetting setting) {
         settings.add(setting);
         setting.setModule(this);
-        return (S) setting;  // por convenciencia
+        return (S) setting;  // por conveniencia
     }
 
     public void addSettings(AbstractSetting... settings) {
@@ -139,6 +147,14 @@ public class Module {
 
     public KeySetting getBind() {
         return bind;
+    }
+
+    public boolean isSearchMatch() {
+        return searchMatch;
+    }
+
+    public void setSearchMatch(boolean searchMatch) {
+        this.searchMatch = searchMatch;
     }
 
     public enum KeyModes {

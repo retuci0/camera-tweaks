@@ -3,6 +3,7 @@ package me.retucio.camtweaks.module.modules;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import me.retucio.camtweaks.module.Module;
+import me.retucio.camtweaks.module.settings.ColorSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -15,19 +16,13 @@ import java.awt.*;
 
 public class DamageOverlay extends Module {
 
-    public NumberSetting red = addSetting(new NumberSetting("rojo", "r o j o", 255, 0, 255, 1));
-    public NumberSetting green = addSetting(new NumberSetting("verde", "v e r d e", 0, 0, 255, 1));
-    public NumberSetting blue = addSetting(new NumberSetting("azul", "a z u l", 0, 0, 255, 1));
-    public NumberSetting alpha = addSetting(new NumberSetting("alpha", "o p a c i d a d", 77, 0, 255, 1));
+    public ColorSetting colorSetting = addSetting(new ColorSetting("color", "color", new Color(255, 0, 0, 77), false));
 
     private NativeImageBackedTexture texture = null;
 
     public DamageOverlay() {
         super("superposición de daño", "modifica el color en el que se renderiza la superposición de recibir daño");
-
-        NumberSetting[] settings = {red, green, blue, alpha};
-        for (NumberSetting setting : settings)
-            setting.onUpdate(v -> reloadOverlayIfReady());
+        colorSetting.onUpdate(v -> reloadOverlayIfReady());
     }
 
     @Override
@@ -42,6 +37,11 @@ public class DamageOverlay extends Module {
         super.onDisable();
     }
 
+    @Override
+    public void onTick() {
+        if (colorSetting.isRainbow()) reloadOverlayIfReady();
+    }
+
     private void reloadOverlayIfReady() {
         if (texture != null && texture.getImage() != null) reloadOverlay(texture);
     }
@@ -50,8 +50,13 @@ public class DamageOverlay extends Module {
     public void reloadOverlay(NativeImageBackedTexture texture) {
         if (this.texture == null) this.texture = texture;
 
-        int color = isEnabled() ?
-                new Color(red.getIntValue(), green.getIntValue(), blue.getIntValue(), 255 - alpha.getIntValue()).getRGB()
+        int color = isEnabled()
+                ? new Color(
+                        colorSetting.getR(),
+                        colorSetting.getG(),
+                        colorSetting.getB(),
+                        255 - colorSetting.getA()
+                ).getRGB()
                 : new Color(255, 0, 0, 178).getRGB();
 
         NativeImage image = texture.getImage();

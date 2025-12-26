@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
+import static me.retucio.camtweaks.CameraTweaks.mc;
 
 @Mixin(ClientConnection.class)
 public abstract class ClientConnectionMixin {
@@ -46,7 +47,7 @@ public abstract class ClientConnectionMixin {
 
     @Inject(method = "disconnect(Lnet/minecraft/network/DisconnectionInfo;)V", at = @At("HEAD"), cancellable = true)
     private void onDisconnect(DisconnectionInfo disconnectionInfo, CallbackInfo ci) {
-        DisconnectEvent event = EVENT_BUS.post(new DisconnectEvent());
+        DisconnectEvent event = EVENT_BUS.post(new DisconnectEvent(disconnectionInfo, mc.getCurrentServerEntry()));
         if (event.isCancelled()) ci.cancel();
     }
 }

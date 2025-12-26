@@ -1,29 +1,31 @@
-# v1.7
+# v1.9
 
 ## novedades
 
 
 ### adiciones
 
-- comando `$echest` (o `$ec` si eres un puto vago) para previsualizar los contenidos del enderchest en cualquier momento
-- se ha añadido un gradiente negro leve en la parte inferior del clickgui si el contenido excede los límites de la pantalla, para indicarlo visualmente
+- tipo de ajuste específico para colores (el selector está muy roto, ya lo arreglaré)
+- comando para espectar a jugadores o entidades (`$spec`)
 
 #### módulos nuevos:
 
-- aviso de baja durabilidad: te avisa cuando un ítem llega a cierto porcentaje de durabilidad
-- bypassear packs: te permite omitir packs de recursos forzados por el servidor, al establecer el modo en "preguntar" y seleccionar la opción "nuh uh"
-- destello de enchants.: modifica el color del destello de los items y armadura encantada
+- reconectar: añade un botón para reconectarse a un servidor tras ser desconectado
+- superposición de luz: te muestra en qué bloques pueden spawnear bichos
+- yunques con pluma: te permite utilizar tipografías distintas al renombrar items en un yunque (a falta de formato)
 
 ### arreglos / mejoras
 
-- ahora puedes volver a abrir el clickgui y el editor de hud en la pantalla de inicio
-- ya no se deja de renderizar el hud si algún modo de debug (chunks, hitboxes, etc.) está activado y "mostar en F3" está desactivado
-- ahora se pueden previsualizar enderchests igual que shulkers, desde el inventario (prev. de shulkers)
-- ahora el mod funciona al compilarlo tras clonarlo por github, ya que había gitignorado algunos archivos importantes jsajajs
-- arreglados los problemas del módulo zoom (creo)
-- arregladas las opciones de ceguera y oscuridad de norender
-- el color de la interfaz ya no es negro en el primer launch o cuando no se ha generado el archivo de config todavía
-- arreglado el problema donde se muestra la marca de agua por defecto en la pantalla de inicio si no se abre un mundo primero
+- aviso de baja dur. ya funciona en servers de paper
+- ahora puedes filtrar módulos también mediante la barra de búsqueda, además de que esta ahora funciona y tal
+- los ajustes cuya visibilidad dependía de otros ajustes ahora se muestran correctamente
+- ahora la posición de la barra de búsqueda es guardada en el config
+- ya no te sigues moviendo en el freecam al estar moviéndote, abrir una interfaz y soltar las teclas de movimiento
+- elemento del hud que muestra el ping en milisegundos (a veces no va)
+- ya no se dibujan los tooltips de ajustes del marco de ajustes del mod si no está extendido
+- el problema donde se restablecían las teclas a las de por defecto en módulos cuyas teclas ya estaban establecidas tras cada relaunch se ha solucionado
+- puntos de desconexión ahora funciona y todo (gracias Meteor)
+- alguna que otra cosilla más, supongo
 
 ## problemas reconocidos
 

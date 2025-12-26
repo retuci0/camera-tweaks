@@ -74,6 +74,9 @@ public class SliderButton extends SettingButton {
         if (button == 0) dragging = false;
     }
 
+    @Override
+    public void mouseDragged(double mouseX, double mouseY) {}
+
     @SubscribeEvent
     public void onKey(KeyEvent event) {
         // de no ser de esto, si se cierra la interfaz sin haber soltado el ratón mientras se arrastraba el valor, al reabrir la interfaz se seguía arrastrando, aún habiendo soltado ya el clic

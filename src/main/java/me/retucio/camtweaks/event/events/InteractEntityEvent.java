@@ -2,9 +2,12 @@ package me.retucio.camtweaks.event.events;
 
 import me.retucio.camtweaks.event.Event;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 
+
+/**
+ * @see me.retucio.camtweaks.mixin.ClientPlayerInteractionManagerMixin#onEntityInteract
+ */
 public class InteractEntityEvent extends Event {
 
     private final Entity entity;

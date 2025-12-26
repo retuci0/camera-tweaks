@@ -7,7 +7,6 @@ import net.minecraft.text.Text;
 /**
  * @see me.retucio.camtweaks.mixin.ChatHudMixin#onAddMessage
  */
-
 public class ReceiveMessageEvent extends Event {
 
     private Text text;

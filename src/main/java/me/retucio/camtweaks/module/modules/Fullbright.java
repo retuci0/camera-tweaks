@@ -2,12 +2,15 @@ package me.retucio.camtweaks.module.modules;
 
 import me.retucio.camtweaks.mixin.accessor.StatusEffectInstanceAccessor;
 import me.retucio.camtweaks.module.Module;
+import me.retucio.camtweaks.module.settings.ColorSetting;
 import me.retucio.camtweaks.module.settings.EnumSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.registry.Registries;
 import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
 
 /** continúa en:
  * @see me.retucio.camtweaks.mixin.LightmapTextureManagerMixin
@@ -17,28 +20,14 @@ public class Fullbright extends Module {
 
     public EnumSetting<Modes> mode = addSetting(new EnumSetting<>("modo", "qué modo de iluminación emplear (usar poción con shaders)", Modes.class, Modes.GAMMA));
 
-    public NumberSetting red = addSetting(new NumberSetting("rojo", "cantidad de rojo a aplicar",
-            255, 0, 255, 1));
-
-    public NumberSetting green = addSetting(new NumberSetting("verde", "cantidad de verde a aplicar",
-            255, 0, 255, 1));
-
-    public NumberSetting blue = addSetting(new NumberSetting("azul", "cantidad de azul a aplicar",
-            255, 0, 255, 1));
-
-    public NumberSetting alpha = addSetting(new NumberSetting("opacidad", "opacidad del shader",
-            255, 0, 255, 1));
+    public ColorSetting color = addSetting(new ColorSetting("filtro", "filtro de color", new Color(255, 255, 255, 255), false));
 
     public Fullbright() {
-        super("brilli brilli", "deshabilita la oscuridad (y aplica colores a los shaders)");
-        assignKey(GLFW.GLFW_KEY_K);
+        super("brilli brilli", "deshabilita la oscuridad (y aplica colores a los shaders)", GLFW.GLFW_KEY_K);
         mode.onUpdate(mode -> { if (mode != Modes.POTION) disableNightVision(); });
         mode.onUpdate(mode -> {
             boolean v = mode.equals(Modes.GAMMA);
-            red.setVisible(v);
-            green.setVisible(v);
-            blue.setVisible(v);
-            alpha.setVisible(v);
+            color.setVisible(v);
 
             if (v) disableNightVision();
         });

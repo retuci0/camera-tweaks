@@ -2,10 +2,10 @@ package me.retucio.camtweaks.event.events;
 
 import me.retucio.camtweaks.event.Event;
 
+
 /**
  * @see me.retucio.camtweaks.mixin.KeyboardMixin#onKeyPress
  */
-
 public class KeyEvent extends Event {
 
     private final int key, scancode, action;

@@ -9,6 +9,7 @@ import me.retucio.camtweaks.event.events.camtweaks.LoadCommandManagerEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
+import me.retucio.camtweaks.module.settings.ColorSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
 import me.retucio.camtweaks.module.settings.StringSetting;
 import me.retucio.camtweaks.util.ChatUtil;
@@ -20,18 +21,8 @@ import java.awt.*;
 // módulo no visible solo para los ajustes de la interfaz (y del cliente en general)
 public class GUI extends Module {
 
-    public BooleanSetting rainbow = addSetting(new BooleanSetting("gaming", "gaming", false));
-    public NumberSetting rainbowSpeed = addSetting(new NumberSetting("velocidad del gaming", "velocidad, del gaming.",
-            1000, 0, 10000, 2));
-    public NumberSetting saturation = addSetting(new NumberSetting("saturación del gaming", "saturación, del gaming",
-            1, 0, 1, 0.01));
-    public NumberSetting brightness = addSetting(new NumberSetting("brillo del gaming", "brillo, del gaming",
-            0.8, 0, 1, 0.01));
-
-    public NumberSetting red = addSetting(new NumberSetting("rojo", "cantidad de rojo en el RGB del marco", 70, 0, 255, 1));
-    public NumberSetting green = addSetting(new NumberSetting("verde", "cantidad de verde en el RGB del marco", 20, 0, 255, 1));
-    public NumberSetting blue = addSetting(new NumberSetting("azul", "cantidad de azul en el RGB del marco", 210, 0, 255, 1));
-    public NumberSetting alpha = addSetting(new NumberSetting("alpha", "opacidad del marco", 230, 0, 255, 1));
+    public ColorSetting color = addSetting(new ColorSetting("color", "color principal de la interfaz y el mod",
+            new Color(70, 20, 210, 230), false));
 
     // números negativos para deslizamiento inverso, 0 para desactivar
     public NumberSetting scrollSens = addSetting(new NumberSetting("sensibilidad del scroll", "qué tan sensible es la interfaz a la rueda del ratón",
@@ -50,24 +41,18 @@ public class GUI extends Module {
 
     public BooleanSetting multipleKeybinds = addSetting(new BooleanSetting("teclas multimódulo", "permitir asignar la misma tecla a más de un módulo", false));
 
-    private int prevRed, prevGreen, prevBlue;
-
     public GUI() {
-        super("interfaz", "ajustes de la interfaz, y otros misceláneos");
-        assignKey(GLFW.GLFW_KEY_RIGHT_SHIFT);
+        super("interfaz", "ajustes de la interfaz, y otros misceláneos", GLFW.GLFW_KEY_RIGHT_SHIFT);
 
-        // registrar aquí, porque no se añade a ModuleManager.modules. de lo contrario no podría detectar eventos
         CameraTweaks.EVENT_BUS.register(this);
-
         keyMode.setVisible(false);
         notify.setVisible(false);
-
         searchBar.onUpdate(v -> matchCase.setVisible(v));
     }
 
     @SubscribeEvent
     public void onLoadCommandManager(LoadCommandManagerEvent event) {
-        commandPrefix.onUpdate(prefix -> CommandManager.INSTANCE.setPrefix(prefix));
+        commandPrefix.onUpdate(CommandManager.INSTANCE::setPrefix);
         commandPrefix.setDefaultValue(CommandManager.INSTANCE.getPrefix());
 
         chatName.onUpdate(name -> {
@@ -76,69 +61,24 @@ public class GUI extends Module {
         });
     }
 
-    // lógica un poco prolija pero bueno
     @SubscribeEvent
     public void onLoadClickGUI(LoadClickGUIEvent event) {
-        rainbow.onUpdate(v -> {
-            if (v) {
-                prevRed = red.getIntValue();
-                prevGreen = green.getIntValue();
-                prevBlue = blue.getIntValue();
-            } else {
-                red.setValue(prevRed);
-                green.setValue(prevGreen);
-                blue.setValue(prevBlue);
-            }
-
-            rainbowSpeed.setVisible(v);
-            saturation.setVisible(v);
-            brightness.setVisible(v);
-            red.setVisible(!v);
-            green.setVisible(!v);
-            blue.setVisible(!v);
-
-            applyRGBAColorUpdates();
+        color.onUpdate(v -> {
+            Colors.red = color.getR();
+            Colors.green = color.getG();
+            Colors.blue = color.getB();
+            Colors.alpha = color.getA();
+            Colors.updateAllColors(new Color(Colors.red, Colors.green, Colors.blue, Colors.alpha));
         });
-
-        red.onUpdate(r -> applyRGBAColorUpdates());
-        green.onUpdate(g -> applyRGBAColorUpdates());
-        blue.onUpdate(b -> applyRGBAColorUpdates());
-        alpha.onUpdate(a -> applyRGBAColorUpdates());
-
-        // muy mierdas la solución pero funciona
-        red.reset();
-        green.reset();
-        blue.reset();
-        alpha.reset();
     }
 
     @SubscribeEvent
     public void onTick(TickEvent.Post event) {
-        if (rainbow.isEnabled()) {
-            Color color = Colors.rainbowColor(rainbowSpeed.getIntValue(), alpha.getIntValue(), saturation.getFloatValue(), brightness.getFloatValue());
-
-            Colors.red = color.getRed();
-            Colors.green = color.getGreen();
-            Colors.blue = color.getBlue();
-
-            updateColor();
+        if (color.isRainbow()) {
+            Colors.red = color.getR();
+            Colors.green = color.getG();
+            Colors.blue = color.getB();
+            Colors.updateAllColors(new Color(Colors.red, Colors.green, Colors.blue, Colors.alpha));
         }
-    }
-
-    private void applyRGBAColorUpdates() {
-        Colors.red = red.getIntValue();
-        Colors.green = green.getIntValue();
-        Colors.blue = blue.getIntValue();
-        Colors.alpha = alpha.getIntValue();
-        updateColor();
-    }
-
-    private void updateColor() {
-        Colors.updateAllColors(new Color(
-                Colors.red,
-                Colors.green,
-                Colors.blue,
-                Colors.alpha
-        ));
     }
 }

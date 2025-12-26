@@ -75,11 +75,17 @@ public class ClientSettingsFrame extends SettingsFrame {
     }
 
     @Override
-    public void mouseRelease(double mouseX, double mouseY, int button) {
+    public void mouseReleased(double mouseX, double mouseY, int button) {
         ClickGUI.INSTANCE.unselect(this);
         if (button == 0 && dragging)
             CameraTweaks.EVENT_BUS.post(new GUISettingsFrameEvent.Move());
 
-        super.mouseRelease(mouseX, mouseY, button);
+        super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void drawTooltips(DrawContext ctx, double mouseX, double mouseY) {
+        if (!extended) return;
+        super.drawTooltips(ctx, mouseX, mouseY);
     }
 }

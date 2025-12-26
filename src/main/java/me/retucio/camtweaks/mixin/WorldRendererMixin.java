@@ -77,15 +77,6 @@ public abstract class WorldRendererMixin {
         BlockOutline outline = ModuleManager.INSTANCE.getModuleByClass(BlockOutline.class);
         if (!outline.isEnabled()) return ColorHelper.withAlpha(alpha, rgb);
 
-        if (outline.rainbow.isEnabled()) {
-            return Colors.rainbowInt(outline.rainbowSpeed.getIntValue(), outline.alpha.getIntValue());
-        } else {
-            return new Color(
-                    outline.red.getIntValue(),
-                    outline.green.getIntValue(),
-                    outline.blue.getIntValue(),
-                    outline.alpha.getIntValue()
-            ).getRGB();
-        }
+        return outline.color.getRGB();
     }
 }

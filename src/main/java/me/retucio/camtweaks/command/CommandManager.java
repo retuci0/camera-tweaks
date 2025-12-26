@@ -41,6 +41,7 @@ public class CommandManager {
         addCommand(new PurgeCommand());
         addCommand(new SaveScreenshotCommand());
         addCommand(new SendCommand());
+        addCommand(new SpectateCommand());
         addCommand(new ToggleCommand());
 
         commands.sort(Comparator.comparing(Command::getName));

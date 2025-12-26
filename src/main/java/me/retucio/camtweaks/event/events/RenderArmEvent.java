@@ -4,10 +4,10 @@ import me.retucio.camtweaks.event.Event;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 
+
 /**
  * @see me.retucio.camtweaks.mixin.HeldItemRendererMixin#onRenderArm
  */
-
 public class RenderArmEvent extends Event {
 
     private MatrixStack matrices;

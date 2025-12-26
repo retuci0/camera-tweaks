@@ -116,4 +116,7 @@ public class ListButton<T> extends SettingButton {
     public void mouseReleased(double mouseX, double mouseY, int button) {
         ClickGUI.INSTANCE.unselect(this);
     }
+
+    @Override
+    public void mouseDragged(double mouseX, double mouseY) {}
 }

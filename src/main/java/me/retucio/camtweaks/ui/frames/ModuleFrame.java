@@ -56,7 +56,7 @@ public class ModuleFrame {
 
         int maxWidth = mc.textRenderer.getWidth(title);
         for (ModuleButton button : moduleButtons) {
-            String text = button.module.getName();
+            String text = button.getModule().getName();
             int textWidth = mc.textRenderer.getWidth(text);
             maxWidth = Math.max(maxWidth, textWidth);
         }
@@ -66,6 +66,7 @@ public class ModuleFrame {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         updateWidth();
         ctx.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB()); // cabeza del marco
+
         // título del marco
         ctx.drawText(mc.textRenderer, Text.literal(Formatting.BOLD + title),
                 x + 8,
@@ -77,18 +78,28 @@ public class ModuleFrame {
                 renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
                 -1, true);
 
+        List<ModuleButton> visibleButtons = moduleButtons.stream()
+                .filter(mb -> mb.getModule().isSearchMatch())
+                .toList();
+
         // dibujar sus módulos solo si está extendido
         if (extended) {
-            totalHeight = moduleButtons.size() * h + 3;
+            totalHeight = visibleButtons.size() * h + 3;
             ctx.fill(  // fondo para los botones
                     x, renderY + h + 1,
                     x + w, renderY + h + totalHeight,
                     Colors.frameBGColor.getRGB());
 
             // dibujar los botones para cada módulo
-            for (ModuleButton moduleButton : moduleButtons)
+            int buttonY =  renderY + h + 1;
+            for (ModuleButton moduleButton : visibleButtons) {
+                moduleButton.offset = buttonY - renderY;
                 moduleButton.render(ctx, mouseX, mouseY, delta);
-        } else totalHeight = 0;
+                buttonY += h;
+            }
+        } else {
+            totalHeight = 0;
+        }
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
@@ -105,8 +116,13 @@ public class ModuleFrame {
         }
 
         if (!extended) return;  // solo dejar clicar en los módulos si el marco está extendido
-        for (ModuleButton moduleButton : moduleButtons)
-                moduleButton.mouseClicked(mouseX, mouseY, button);
+
+        List<ModuleButton> visibleModuleButtons = moduleButtons.stream()
+                .filter(mb -> mb.getModule().isSearchMatch())
+                .toList();
+
+        for (ModuleButton moduleButton : visibleModuleButtons)
+            moduleButton.mouseClicked(mouseX, mouseY, button);
     }
 
     // detectar cuándo se suelta el clic
@@ -115,7 +131,11 @@ public class ModuleFrame {
         if (button == 0 && dragging)
             dragging = false;
 
-        for (ModuleButton moduleButton : moduleButtons) {
+        List<ModuleButton> visibleModuleButtons = moduleButtons.stream()
+                .filter(mb -> mb.getModule().isSearchMatch())
+                .toList();
+
+        for (ModuleButton moduleButton : visibleModuleButtons) {
             if (moduleButton.isHovered((int) mouseX, (int) mouseY))
                 moduleButton.mouseReleased(mouseX, mouseY, button);
         }
@@ -135,5 +155,9 @@ public class ModuleFrame {
             x = (int) (mouseX - dragX);
             y = (int) (mouseY - dragY);
         }
+    }
+
+    public List<ModuleButton> getButtons() {
+        return moduleButtons;
     }
 }

@@ -37,11 +37,7 @@ public class ScreenMixin {
         if (watermark == null || watermark.isEmpty()) return;
         context.drawText(mc.textRenderer, watermark,
                 mc.getWindow().getScaledWidth() - mc.textRenderer.getWidth(watermark) - 2, 2,
-                new Color((int) ClientSettingsFrame.guiSettings.red.getDefaultValue(),
-                        (int) ClientSettingsFrame.guiSettings.green.getDefaultValue(),
-                        (int) ClientSettingsFrame.guiSettings.blue.getDefaultValue(),
-                        (int) ClientSettingsFrame.guiSettings.alpha.getDefaultValue()
-                ).getRGB(), false
+                ClientSettingsFrame.guiSettings.color.getRGB(), false
         );
     }
 }

@@ -201,6 +201,10 @@ public class HudEditorScreen extends Screen {
                 list.add(Text.literal("hora"));
                 list.add(Text.literal("te muestra la hora y los minutos de la zona horaria escogida"));
             }
+            case "ping" -> {
+                list.add(Text.literal("ping"));
+                list.add(Text.literal("tiempo entre que se envía un paquete y este llega a su destino, en milisegundos"));
+            }
             default -> {
                 list.add(Text.literal(element.getId()));
                 list.add(Text.literal("."));

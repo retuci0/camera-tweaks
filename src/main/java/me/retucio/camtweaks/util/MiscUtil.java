@@ -7,10 +7,13 @@ import me.retucio.camtweaks.event.events.TickEvent;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.annotation.UsesSystemOut;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
@@ -58,6 +61,27 @@ public class MiscUtil {
         vector.y = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
         vector.z = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
         return vector;
+    }
+
+    public static Entity getEntityPlayerIsLookingAt() {
+        if (mc.player == null || mc.world == null) return null;
+
+        float reachDistance = (float) mc.player.getEntityInteractionRange();
+
+        Vec3d cameraPos = mc.player.getCameraPosVec(1.0F);
+        Vec3d rotation = mc.player.getRotationVec(1.0F);
+        Vec3d endPos = cameraPos.add(rotation.x * reachDistance, rotation.y * reachDistance, rotation.z * reachDistance);
+
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(
+                mc.player,
+                cameraPos,
+                endPos,
+                new Box(cameraPos, endPos),
+                entity -> !entity.isSpectator() && entity.canHit(),
+                reachDistance * reachDistance
+        );
+
+        return entityHitResult != null ? entityHitResult.getEntity() : null;
     }
 
     public static Inventory getEchestInv() {

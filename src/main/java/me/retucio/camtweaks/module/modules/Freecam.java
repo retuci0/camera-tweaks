@@ -21,7 +21,6 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
@@ -70,8 +69,7 @@ public class Freecam extends Module {
     private float yaw, pitch;
 
     public Freecam() {
-        super("cámara libre", "permite a la cámara moverse independientemente del jugador. útil para explorar alrededores");
-        assignKey(GLFW.GLFW_KEY_V);
+        super("cámara libre", "permite a la cámara moverse independientemente del jugador. útil para explorar alrededores", GLFW.GLFW_KEY_V);
         speedSetting.onUpdate(newSpeed -> speed = newSpeed);
     }
 
@@ -115,6 +113,7 @@ public class Freecam extends Module {
 
         unpress();
         if (reloadChunks.isEnabled()) mc.worldRenderer.reload();
+
         super.onEnable();
     }
 
@@ -207,7 +206,6 @@ public class Freecam extends Module {
 
     @SubscribeEvent
     public void onKey(KeyEvent event) {
-        if (mc.currentScreen != null) return;
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
         KeyInput key = new KeyInput(event.getKey(), event.getScancode(), 0);
 
@@ -239,7 +237,6 @@ public class Freecam extends Module {
 
     @SubscribeEvent
     public void onMouseClick(MouseClickEvent event) {  // por si el restrasado del usuario usa el ratón para moverse
-        if (mc.currentScreen != null) return;
         Click click = new Click(0, 0, new MouseInput(event.getButton(), 0));
 
         boolean shouldCancel = true;
@@ -305,6 +302,7 @@ public class Freecam extends Module {
     @SubscribeEvent
     public void onOpenScreen(OpenScreenEvent event) {
         unpress();
+        stopMoving();
         prevPos.set(pos);
         prevYaw = yaw;
         prevPitch = pitch;
@@ -349,6 +347,15 @@ public class Freecam extends Module {
         mc.options.leftKey.setPressed(false);
         mc.options.jumpKey.setPressed(false);
         mc.options.sneakKey.setPressed(false);
+    }
+
+    private void stopMoving() {
+        forward = false;
+        backward = false;
+        left = false;
+        right = false;
+        up = false;
+        down = false;
     }
 
 

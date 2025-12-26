@@ -61,6 +61,7 @@ public abstract class ChatHudMixin implements IChatHud {
         chatPlus = ModuleManager.INSTANCE.getModuleByClass(ChatPlus.class);
     }
 
+
     // métodos relacionados a las interfaces IChatHud, IChatHudLine, IChadHudLineVisible y IMessageHandler
 
     @Override
@@ -109,8 +110,8 @@ public abstract class ChatHudMixin implements IChatHud {
     }
 
 
-
     // modificar contenido del mensaje
+
     @Inject(at = @At("HEAD"), method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V", cancellable = true)
     private void onAddMessage(Text message, MessageSignatureData signatureData, MessageIndicator indicator, CallbackInfo ci) {
         if (skipOnAddMessage) return;

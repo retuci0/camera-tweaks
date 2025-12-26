@@ -46,6 +46,7 @@
     "ConfirmScreenMixin",
     "DamageParticleFactoryMixin",
     "DamageParticleMixin",
+    "DisconnectedScreenMixin",
     "EquipmentRendererMixin",
     "FogRendererMixin",
     "GameOptionsMixin",
@@ -75,6 +76,7 @@
     "WeatherRenderingMixin",
     "WorldRendererMixin",
     "accessor.AbstractSignEditScreenAccessor",
+    "accessor.AnvilScreenAccessor",
     "accessor.ClientPlayNetworkHandlerAccessor",
     "accessor.HandledScreenAccessor",
     "accessor.KeyBindingAccessor"

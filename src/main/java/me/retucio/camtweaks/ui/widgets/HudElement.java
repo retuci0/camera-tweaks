@@ -85,6 +85,12 @@ public class HudElement {
             return "4:20 PM";
         }
 
+        if ("ping".equals(id)) {
+            if (mc.getCurrentServerEntry() != null)
+                return HudRenderer.getElementText(id, delta, hud);
+            return "67 ms";
+        }
+
         return id;  // fallback: id del elemento
     }
 

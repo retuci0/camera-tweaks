@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 // clase para el botón para cada módulo
 public class ModuleButton {
 
-    public Module module;
+    private final Module module;
     public ModuleFrame parent;
     public int offset;
     public final int height = 18;
@@ -69,5 +69,9 @@ public class ModuleButton {
         if (module.isEnabled())
             return isHovered((int) mouseX, (int) mouseY) ? Colors.mainColor.brighter().getRGB() : Colors.mainColor.getRGB();
         return isHovered((int) mouseX, (int) mouseY) ? Colors.buttonColor.brighter().getRGB() : Colors.buttonColor.getRGB();
+    }
+
+    public Module getModule() {
+        return module;
     }
 }

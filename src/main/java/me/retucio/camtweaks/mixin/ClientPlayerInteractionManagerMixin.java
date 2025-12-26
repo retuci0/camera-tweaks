@@ -34,9 +34,9 @@ import static me.retucio.camtweaks.CameraTweaks.mc;
 @Mixin(ClientPlayerInteractionManager.class)
 public abstract class ClientPlayerInteractionManagerMixin {
 
-    @Shadow
-    @Final
+    @Shadow @Final
     private MinecraftClient client;
+
     @Unique
     Freecam freecam;
 
@@ -68,7 +68,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
 
     @Inject(method = "attackEntity", at = @At("HEAD"), cancellable = true)
     private void onAttackEntity(PlayerEntity player, Entity target, CallbackInfo ci) {
-        if (player != client.player) return;
+        if (mc.player != player) return;
         AttackEntityEvent event = EVENT_BUS.post(new AttackEntityEvent(target));
         if (event.isCancelled()) ci.cancel();
     }

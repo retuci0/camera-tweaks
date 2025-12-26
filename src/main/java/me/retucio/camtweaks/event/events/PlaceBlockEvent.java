@@ -1,10 +1,13 @@
 package me.retucio.camtweaks.event.events;
 
 import me.retucio.camtweaks.event.Event;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 
+
+/**
+ * @see me.retucio.camtweaks.mixin.ClientPlayerInteractionManagerMixin#onBlockPlace
+ */
 public class PlaceBlockEvent extends Event {
 
     private Hand hand;

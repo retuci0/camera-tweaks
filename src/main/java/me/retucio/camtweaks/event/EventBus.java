@@ -6,6 +6,7 @@ import java.util.*;
 
 // al llamar un evento, se guarda en el bus de eventos, de donde luego se puede detectar si ese evento ha sucedido
 public class EventBus {
+
     private final Map<Class<?>, List<ListenerMethod>> listeners = new HashMap<>();
 
     private record ListenerMethod(Object instance, Method method) {}

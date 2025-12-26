@@ -56,6 +56,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     @Redirect(method = "onEntityStatus", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;showFloatingItem(Lnet/minecraft/item/ItemStack;)V"))
     private void noRenderTotemPop(GameRenderer instance, ItemStack floatingItem) {
         NoRender noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
-        if (!noRender.isEnabled() || noRender.totemPop.isEnabled()) mc.gameRenderer.showFloatingItem(Items.TOTEM_OF_UNDYING.getDefaultStack());
+        if (!noRender.isEnabled() || noRender.totemPop.isEnabled())
+            mc.gameRenderer.showFloatingItem(floatingItem);
     }
 }

@@ -49,7 +49,7 @@ public class EnderChestCommand extends Command {
     }
 
     @SubscribeEvent
-    public void tickEvent(TickEvent.Post event) {
+    public void onTick(TickEvent.Post event) {
         if (shouldOpenEchest) {
             shouldOpenEchest = false;
             if (MiscUtil.getEchestInv() != null)

@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.ui.widgets;
 
+import me.retucio.camtweaks.config.ConfigManager;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.util.Colors;
@@ -80,7 +81,10 @@ public class SearchBarWidget {
     public void mouseReleased(double mouseX, double mouseY, int button) {
         if (!ClientSettingsFrame.guiSettings.searchBar.isEnabled()) return;
         ClickGUI.INSTANCE.unselect(this);
-        if (button == 0 && dragging) dragging = false;
+        if (button == 0 && dragging) {
+            dragging = false;
+            savePosition();
+        }
     }
 
     public void onKey(int key, int action) {
@@ -151,5 +155,27 @@ public class SearchBarWidget {
             x = (int) (mouseX - dragX);
             y = (int) (mouseY - dragY);
         }
+    }
+
+    public void savePosition() {
+        if (ConfigManager.getConfig() != null) {
+            ConfigManager.setSearchBarPosition(x, y);
+        }
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 }

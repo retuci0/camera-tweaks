@@ -43,10 +43,10 @@ public abstract class LightmapTextureManagerMixin {
     private void update(float tickProgress, CallbackInfo ci, @Local Profiler profiler) {
         if (fullbright.isEnabled() && fullbright.mode.is(Fullbright.Modes.GAMMA)) {
             RenderSystem.getDevice().createCommandEncoder().clearColorTexture(glTexture, ColorHelper.getArgb(
-                    fullbright.alpha.getIntValue(),
-                    fullbright.red.getIntValue(),
-                    fullbright.green.getIntValue(),
-                    fullbright.blue.getIntValue()
+                    fullbright.color.getA(),
+                    fullbright.color.getR(),
+                    fullbright.color.getG(),
+                    fullbright.color.getB()
             ));
             profiler.pop();
             ci.cancel();

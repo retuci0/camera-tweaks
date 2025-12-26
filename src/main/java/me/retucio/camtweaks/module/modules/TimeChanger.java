@@ -6,6 +6,7 @@ import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.EnumSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
+import me.retucio.camtweaks.util.ChatUtil;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 
 // continúa en ClientWorldPropertiesMixin, DimensionTypeMixin,
@@ -29,12 +30,14 @@ public class TimeChanger extends Module {
     public void onEnable() {
         if (mc.world == null) return;
         realTime = mc.world.getTime();
+        super.onEnable();
     }
 
     @Override
     public void onDisable() {
         if (mc.world == null) return;
         mc.world.getLevelProperties().setTimeOfDay(realTime);
+        super.onDisable();
     }
 
     @SubscribeEvent
@@ -55,7 +58,7 @@ public class TimeChanger extends Module {
         if (mc.world == null) return -1;
 
         return switch (moonPhase.getValue()) {
-            case DEFAULT -> (int) (mc.world.getLunarTime() / 24000L) % 8;
+            case DEFAULT -> -1;
             case FULL_MOON -> 0;
             case WANING_GIBBOUS -> 1;
             case LAST_QUARTER -> 2;

@@ -55,6 +55,9 @@ public class TextButton extends SettingButton {
         ClickGUI.INSTANCE.unselect(this);
     }
 
+    @Override
+    public void mouseDragged(double mouseX, double mouseY) {}
+
     public void onKey(int key, int action) {
         if (!typing || action == GLFW.GLFW_RELEASE) return;
 

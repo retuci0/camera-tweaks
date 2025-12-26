@@ -3,10 +3,8 @@ package me.retucio.camtweaks.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.CritsPlus;
-import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.particle.BillboardParticle;
 import net.minecraft.client.particle.DamageParticle;
-import net.minecraft.client.particle.ParticleTextureSheet;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -32,20 +30,13 @@ abstract class DamageParticleFactoryMixin {
         CritsPlus crits = ModuleManager.INSTANCE.getModuleByClass(CritsPlus.class);
         if (!crits.isEnabled()) return original;
 
-        if (crits.rainbow.isEnabled()) {
-            Color gamning = Colors.rainbowColor(crits.rainbowSpeed.getIntValue(), crits.alpha.getIntValue());
-            original.setColor(
-                    gamning.getRed() / 255f,
-                    gamning.getGreen() / 255f,
-                    gamning.getBlue() / 255f);
-        } else {
-            original.setColor(
-                    crits.red.getFloatValue() / 255f,
-                    crits.green.getFloatValue() / 255f,
-                    crits.blue.getFloatValue() / 255f);
-        }
+        original.setColor(
+                crits.color.getR() / 255f,
+                crits.color.getG() / 255f,
+                crits.color.getB() / 255f
+        );
 
-        original.alpha = crits.alpha.getFloatValue() / 255f;
+        original.alpha = crits.color.getA() / 255f;
         original.scale *= crits.scale.getFloatValue();
         original.velocityMultiplier *= crits.velocityMultipler.getFloatValue();
         original.gravityStrength *= crits.gravity.getFloatValue();
