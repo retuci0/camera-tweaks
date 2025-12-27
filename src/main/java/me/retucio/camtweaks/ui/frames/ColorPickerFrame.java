@@ -31,7 +31,7 @@ public class ColorPickerFrame extends SettingsFrame {
     private int alphaPickerX, alphaPickerY, alphaPickerWidth, alphaPickerHeight;
 
     // ajustes
-    NumberSetting redSetting, greenSetting, blueSetting, alphaSetting;
+    NumberSetting redSetting, greenSetting, blueSetting;
     BooleanSetting rainbowSetting;
     NumberSetting rainbowSpeedSetting;
     NumberSetting saturationSetting, brightnessSetting;
@@ -60,8 +60,6 @@ public class ColorPickerFrame extends SettingsFrame {
         greenSetting.setDefaultValue(colorSetting.getDefaultG());
         blueSetting = new NumberSetting("azul", "cantidad de azul", colorSetting.getB(), 0, 255, 1);
         blueSetting.setDefaultValue(colorSetting.getDefaultB());
-        alphaSetting = new NumberSetting("opacidad", "transparencia inversa", colorSetting.getA(), 0, 255, 1);
-        alphaSetting.setDefaultValue(colorSetting.getDefaultA());
 
         // ajustes de arcoíris
         rainbowSetting = new BooleanSetting("arcoíris", "gay.", colorSetting.isRainbow());
@@ -74,10 +72,19 @@ public class ColorPickerFrame extends SettingsFrame {
         brightnessSetting.setDefaultValue(colorSetting.getDefaultBrightness());
 
         // añadir ajustes y tal
-        dummyModule.addSettings(redSetting, greenSetting, blueSetting, alphaSetting, rainbowSetting, rainbowSpeedSetting, saturationSetting, brightnessSetting);
+        dummyModule.addSettings(redSetting, greenSetting, blueSetting, rainbowSpeedSetting, saturationSetting, brightnessSetting, rainbowSetting);
         for (AbstractSetting setting : dummyModule.getSettings()) {
             if (setting instanceof NumberSetting n) n.onUpdate(v -> updateColorFromSettings());
             if (setting instanceof BooleanSetting b) b.onUpdate(v -> updateColorFromSettings());
+            rainbowSetting.onUpdate(v -> {
+                updateColorFromSettings();
+                redSetting.setVisible(!v);
+                greenSetting.setVisible(!v);
+                blueSetting.setVisible(!v);
+                rainbowSpeedSetting.setVisible(v);
+                saturationSetting.setVisible(v);
+                brightnessSetting.setVisible(v);
+            });
         }
 
         settingButtons.clear();
@@ -112,6 +119,11 @@ public class ColorPickerFrame extends SettingsFrame {
         if (colorSetting == null) return;
         updateWidth();
 
+        // al parecer este era el problema :/
+        for (AbstractSetting setting : dummyModule.getSettings())
+            if (setting instanceof NumberSetting ns) ns.setLocked(
+                    pickingAlpha || pickingHue || pickingSaturationBrightness);
+
         currentColor = colorSetting.getColor();
 
         int padding = 5;
@@ -137,6 +149,7 @@ public class ColorPickerFrame extends SettingsFrame {
         int previewWidth = w - 2 * padding;
         int previewHeight = 30;
 
+        // dimensiones
         saturationBrightnessPickerX = x + padding;
         saturationBrightnessPickerY = previewY + previewHeight + padding;
         saturationBrightnessPickerWidth = w - 2 * padding - 20;
@@ -155,7 +168,7 @@ public class ColorPickerFrame extends SettingsFrame {
         int buttonAreaHeight = visibleButtons.size() * h;
 
         int bgX1 = x;
-        int bgY1 = y + h + 1;
+        int bgY1 = renderY + h + 1;
         int bgX2 = x + w;
         int bgY2 = bgY1 + previewHeight + saturationBrightnessPickerHeight + alphaPickerHeight
                 + buttonAreaHeight + (padding * 6) - 11;
@@ -183,6 +196,7 @@ public class ColorPickerFrame extends SettingsFrame {
         int hexWidth = mc.textRenderer.getWidth(hexText);
         ctx.drawText(mc.textRenderer, hexText, x + w / 2 - hexWidth / 2, previewY + previewHeight / 2 - mc.textRenderer.fontHeight / 2, -1, true);
 
+        // utilizar un gradiente combinado, para mejorar la optimización
         renderSaturationBrightnessGradient(ctx);
         DrawUtil.drawBorder(ctx, saturationBrightnessPickerX, saturationBrightnessPickerY,
                 saturationBrightnessPickerWidth, saturationBrightnessPickerHeight, -1);
@@ -200,7 +214,7 @@ public class ColorPickerFrame extends SettingsFrame {
         int indicatorY = saturationBrightnessPickerY + (int)((1 - hsb1[2]) * saturationBrightnessPickerHeight);
         DrawUtil.drawCircle(ctx, indicatorX, indicatorY, 3, -1);
 
-        // gradiente del "hue" - optimized
+        // gradiente del "hue" (no sé cómo se dice en castellano)
         for (int hy = 0; hy < huePickerHeight; hy += 2) {
             float hue = 1.0f - (hy / (float) huePickerHeight);
             Color hueColor = Color.getHSBColor(hue, 1.0f, 1.0f);
@@ -217,7 +231,7 @@ public class ColorPickerFrame extends SettingsFrame {
         }
 
         renderAlphaGradient(ctx);
-        DrawUtil.drawBorder(ctx, alphaPickerX, alphaPickerY, alphaPickerWidth, alphaPickerHeight + 2, -1);
+        DrawUtil.drawBorder(ctx, alphaPickerX, alphaPickerY, alphaPickerWidth, alphaPickerHeight, -1);
         int alphaIndicatorX = alphaPickerX + (int)((colorSetting.getA() / 255f) * alphaPickerWidth);
         DrawUtil.drawCircle(ctx, alphaIndicatorX, alphaPickerY + alphaPickerHeight / 2, 3, -1);
 
@@ -242,61 +256,38 @@ public class ColorPickerFrame extends SettingsFrame {
     }
 
     private void renderSaturationBrightnessGradient(DrawContext ctx) {
-        // dibujar en bloques en vez de píxeles
-        int blockSize = 4;  // 4x4 (TRAVESTI ESCOTE REFERENCIA?!?!?!?)
+        float hue;
+        if (colorSetting.isRainbow()) {
+            hue = (System.currentTimeMillis() % (colorSetting.getRainbowSpeed() * 1000L))
+                    / (float) (colorSetting.getRainbowSpeed() * 1000L);
+        } else {
+            float[] hsb = Color.RGBtoHSB(colorSetting.getR(), colorSetting.getG(), colorSetting.getB(), null);
+            hue = hsb[0];
+        }
 
-        for (int sx = 0; sx < saturationBrightnessPickerWidth; sx += blockSize) {
-            for (int sy = 0; sy < saturationBrightnessPickerHeight; sy += blockSize) {
-                int blockEndX = Math.min(sx + blockSize, saturationBrightnessPickerWidth);
-                int blockEndY = Math.min(sy + blockSize, saturationBrightnessPickerHeight);
+        // gradiente horizontal
+        for (int sx = 0; sx < saturationBrightnessPickerWidth; sx++) {
+            float saturation = sx / (float) saturationBrightnessPickerWidth;
+            Color colorAtX = Color.getHSBColor(hue, saturation, 1);
+            ctx.fill(saturationBrightnessPickerX + sx, saturationBrightnessPickerY,
+                    saturationBrightnessPickerX + sx + 1, saturationBrightnessPickerY + saturationBrightnessPickerHeight,
+                    colorAtX.getRGB());
+        }
 
-                float saturation = (sx + (float) blockSize / 2) / (float) saturationBrightnessPickerWidth;
-                float brightness = 1 - ((sy + (float) blockSize / 2) / (float) saturationBrightnessPickerHeight);
-
-                Color color;
-                if (colorSetting != null && colorSetting.isRainbow()) {
-                    color = Colors.rainbowColor(colorSetting.getRainbowSpeed(), colorSetting.getA(), colorSetting.getSaturation(), colorSetting.getBrightness());
-                } else {
-                    float[] hsb = Color.RGBtoHSB(currentColor.getRed(), currentColor.getGreen(), currentColor.getBlue(), null);
-                    color = Color.getHSBColor(hsb[0], saturation, brightness);
-                }
-
-                ctx.fill(saturationBrightnessPickerX + sx, saturationBrightnessPickerY + sy,
-                        saturationBrightnessPickerX + blockEndX, saturationBrightnessPickerY + blockEndY,
-                        (colorSetting != null ? colorSetting.getA() : 255) << 24 | color.getRGB());
-            }
+        // gradiente vertical
+        for (int sy = 0; sy < saturationBrightnessPickerHeight; sy++) {
+            float brightness = 1 - (sy / (float) saturationBrightnessPickerHeight);
+            int alpha = (int)(brightness * 255);
+            Color overlay = new Color(0, 0, 0, alpha);
+            ctx.fill(saturationBrightnessPickerX, saturationBrightnessPickerY + sy,
+                    saturationBrightnessPickerX + saturationBrightnessPickerWidth, saturationBrightnessPickerY + sy + 1,
+                    overlay.getRGB());
         }
     }
 
     private void renderAlphaGradient(DrawContext ctx) {
-        int checkerSize = 4;
-
         // dibujar casilleros alternando el tono de gris para el slider de la opacidad
-        for (int ax = 0; ax < alphaPickerWidth - 4; ax += checkerSize * 2) {
-            for (int ay = 0; ay < alphaPickerHeight; ay += checkerSize * 2) {
-                ctx.fill(alphaPickerX + ax, alphaPickerY + ay,
-                        alphaPickerX + ax + checkerSize, alphaPickerY + ay + checkerSize, 0xFF333333);
-
-                if (ax + checkerSize < alphaPickerWidth - 4 && ay + checkerSize < alphaPickerHeight) {
-                    ctx.fill(alphaPickerX + ax + checkerSize, alphaPickerY + ay + checkerSize,
-                            alphaPickerX + ax + checkerSize * 2, alphaPickerY + ay + checkerSize * 2, 0xFF333333);
-                }
-            }
-        }
-
-        for (int ax = checkerSize; ax < alphaPickerWidth - 4; ax += checkerSize * 2) {
-            for (int ay = 0; ay < alphaPickerHeight; ay += checkerSize * 2) {
-                ctx.fill(alphaPickerX + ax, alphaPickerY + ay,
-                        alphaPickerX + ax + checkerSize, alphaPickerY + ay + checkerSize, 0xFF666666);
-            }
-        }
-
-        for (int ax = 0; ax < alphaPickerWidth - 4; ax += checkerSize * 2) {
-            for (int ay = checkerSize; ay < alphaPickerHeight; ay += checkerSize * 2) {
-                ctx.fill(alphaPickerX + ax, alphaPickerY + ay,
-                        alphaPickerX + ax + checkerSize, alphaPickerY + ay + checkerSize, 0xFF666666);
-            }
-        }
+        DrawUtil.drawCheckerBoard(ctx, alphaPickerX + 1, alphaPickerY, alphaPickerWidth, alphaPickerHeight, 3, 0xFF333333, 0xFF666666);
 
         if (colorSetting != null) {
             int alphaWidth = (int)(alphaPickerWidth * (colorSetting.getA() / 255f));
@@ -311,7 +302,7 @@ public class ColorPickerFrame extends SettingsFrame {
 
                 int stripEndX = Math.min(ax + stripWidth, alphaWidth);
                 ctx.fill(alphaPickerX + ax, alphaPickerY,
-                        alphaPickerX + stripEndX, alphaPickerY + alphaPickerHeight + 2, overlayColor.getRGB());
+                        alphaPickerX + stripEndX, alphaPickerY + alphaPickerHeight, overlayColor.getRGB());
             }
         }
     }
@@ -452,7 +443,6 @@ public class ColorPickerFrame extends SettingsFrame {
             alpha = Math.max(0, Math.min(255, alpha));
 
             colorSetting.setA(alpha);
-            alphaSetting.setValue(alpha);
         }
     }
 
@@ -467,7 +457,7 @@ public class ColorPickerFrame extends SettingsFrame {
         red = redSetting.getIntValue();
         green = greenSetting.getIntValue();
         blue = blueSetting.getIntValue();
-        alpha = alphaSetting.getIntValue();
+        alpha = colorSetting.getA();
         rainbow = rainbowSetting.isEnabled();
         rainbowSpeed = rainbowSpeedSetting.getIntValue();
         saturation = saturationSetting.getFloatValue();

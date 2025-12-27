@@ -10,6 +10,7 @@ public class NumberSetting extends AbstractSetting {
 
     private double value;
     private double defaultValue;
+    private boolean locked;
 
     private final double min;
     private final double max;
@@ -33,6 +34,7 @@ public class NumberSetting extends AbstractSetting {
 
     // como decía, el valor crece o decrece por el "increment" definido
     public void increment(boolean positive) {
+        if (locked) return;
         if (positive) value += increment;
         else value -= increment;
         value = clamp(value, min, max);
@@ -57,7 +59,7 @@ public class NumberSetting extends AbstractSetting {
     }
 
     public void setValue(double value) {
-        if (this.value == value) return;
+        if (this.value == value || this.locked) return;
         double clamped = clamp(value, min, max);
         this.value = Math.round(clamped / increment) * increment;
         fireUpdateEvent();
@@ -86,6 +88,14 @@ public class NumberSetting extends AbstractSetting {
 
     public double getIncrement() {
         return increment;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     public void onUpdate(Consumer<Double> listener) {
