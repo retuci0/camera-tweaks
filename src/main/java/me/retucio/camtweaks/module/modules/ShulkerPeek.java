@@ -10,6 +10,7 @@ import me.retucio.camtweaks.ui.screen.PreviewScreen;
 import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.Colors;
 
+import me.retucio.camtweaks.util.InventoryUtil;
 import me.retucio.camtweaks.util.MiscUtil;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.gui.screen.Screen;
@@ -94,11 +95,11 @@ public class ShulkerPeek extends Module {
         } else return;
 
         if (stack.getItem() == Items.ENDER_CHEST) {
-            if (MiscUtil.getEchestInv() == null) {
+            if (InventoryUtil.getEchestInv() == null) {
                 ChatUtil.warn("abre un enderchest primero");
                 return;
             }
-            mc.setScreen(new PreviewScreen(MiscUtil.getEchestInv(), mc.currentScreen));
+            mc.setScreen(new PreviewScreen(InventoryUtil.getEchestInv(), mc.currentScreen));
             return;
         }
 

@@ -1,12 +1,9 @@
 package me.retucio.camtweaks.module.settings;
 
-import me.retucio.camtweaks.CameraTweaks;
-import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
-
 import java.util.function.Consumer;
 
 // ajuste numérico, es decir, que eliges un valor númerico entre el mínimo y el máximo disponibles
-public class NumberSetting extends AbstractSetting {
+public class NumberSetting extends Setting {
 
     private double value;
     private double defaultValue;

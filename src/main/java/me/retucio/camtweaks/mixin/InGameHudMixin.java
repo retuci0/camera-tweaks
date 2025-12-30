@@ -5,7 +5,7 @@ import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.ChatPlus;
 import me.retucio.camtweaks.module.modules.Freecam;
 import me.retucio.camtweaks.module.modules.NoRender;
-import me.retucio.camtweaks.ui.HudRenderer;
+import me.retucio.camtweaks.ui.hud.HudRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;

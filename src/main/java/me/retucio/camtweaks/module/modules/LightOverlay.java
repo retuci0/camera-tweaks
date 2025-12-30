@@ -50,6 +50,7 @@ public class LightOverlay extends Module {
         }
 
         for (BlockPos block : blocks) {
+            if (mc.world.getBlockState(block).isAir() || !mc.world.getBlockState(block.up()).isAir()) continue;
             if (!mc.world.isTopSolid(block, mc.player) || !mc.world.getBlockState(block).isOpaque()) continue;
             int light = mc.world.getLightLevel(LightType.BLOCK, block.up());
 

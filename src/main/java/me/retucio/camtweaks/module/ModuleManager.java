@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.module;
 
+import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.EventBus;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.module.modules.*;
@@ -16,10 +17,8 @@ public class ModuleManager {
     public static ModuleManager INSTANCE;
 
     private final List<Module> modules = new ArrayList<>();
-    private final EventBus eventBus;
 
-    public ModuleManager(EventBus bus) {
-        this.eventBus = bus;
+    public ModuleManager() {
         addModules();
     }
 
@@ -29,8 +28,10 @@ public class ModuleManager {
         modules.add(new AnvilFont());
         modules.add(new AttributeSwapper());
         modules.add(new AutoSign());
+        modules.add(new BlockESP());
         modules.add(new BlockOutline());
         modules.add(new BossbarStack());
+        modules.add(new BreakingProgress());
         modules.add(new BungeecordSpoofer());
         modules.add(new ChatPlus());
         modules.add(new ColoredSigns());
@@ -45,19 +46,24 @@ public class ModuleManager {
         modules.add(new HandView());
         modules.add(new Headhitters());
         modules.add(new HUD());
+        modules.add(new InventoryPlus());
         modules.add(new LightOverlay());
         modules.add(new LogoutSpots());
         modules.add(new Nametags());
         modules.add(new NoMiningInterruptions());
         modules.add(new NoRender());
+        modules.add(new Offhand());
+        modules.add(new PacketDelay());
         modules.add(new PerspectivePlus());
         modules.add(new PortalGUI());
+        modules.add(new Racist());
         modules.add(new Reconnect());
         modules.add(new Rotations());
         modules.add(new RPackBypass());
         modules.add(new ScreenshotPlus());
         modules.add(new ShulkerPeek());
         modules.add(new TimeChanger());
+        modules.add(new UIMove());
         modules.add(new WarnLowDurability());
         modules.add(new Zoom());
 
@@ -67,7 +73,7 @@ public class ModuleManager {
         for (Module module : getEnabledModules()) {
             for (Method method : module.getClass().getDeclaredMethods()) {
                 if (method.isAnnotationPresent(SubscribeEvent.class)) {
-                    eventBus.register(module);
+                    CameraTweaks.EVENT_BUS.register(module);
                     break;
                 }
             }

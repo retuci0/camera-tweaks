@@ -1,13 +1,20 @@
 package me.retucio.camtweaks.util;
 
+import com.ibm.icu.impl.locale.XCldrStub;
 import net.minecraft.block.Block;
-import net.minecraft.client.particle.Particle;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.sound.Sound;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
+import net.minecraft.network.packet.PacketType;
 import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.resource.featuretoggle.FeatureFlag;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -30,22 +37,48 @@ public class Lists {
     public static Map<Item, String> itemNames;
 
     public static final List<Block> blockList = Registries.BLOCK.stream().toList();
+    public static Map<Block, String> blockNames;
+
+    public static final List<SoundEvent> soundList = Registries.SOUND_EVENT.stream().toList();
+    public static Map<SoundEvent, String> soundNames;
+
+    public static final List<ScreenHandlerType<?>> screenList = Registries.SCREEN_HANDLER.stream().toList();
+    public static Map<ScreenHandlerType<?>, String> screenNames;
 
     public static final List<Color> colorList = new ArrayList<>();
 
+    // intentar traducir nombres y fallar miserablemente
     public static void init() {
-        // no consigo traducir el texto. a tomar por culo, se queda en inglés, si no entiendes pues a estudiar
         entityNames = getMapOfLists(entityList,
-                entityList.stream().map(entity -> I18n.translate(entity.getTranslationKey())).toList());
+                entityList.stream().map(entity -> Text.translatable(entity.getTranslationKey()).getString()).toList());
 
-        // no hay traducciones para nombres de partículas, y paso de hacerlas yo
         particleNames = getMapOfLists(particleList,
-                particleList.stream().map(particle -> Registries.PARTICLE_TYPE.getId(particle).toShortTranslationKey()).toList());
+                particleList.stream().map(particle -> Text.translatable(
+                        Registries.PARTICLE_TYPE.getId(particle).toShortTranslationKey()).getString()
+                ).toList());
 
         itemNames = getMapOfLists(itemList,
-                itemList.stream().map(item -> I18n.translate(item.getTranslationKey())).toList());
+                itemList.stream().map(item -> Text.translatable(
+                        item.getTranslationKey()).getString()
+                ).toList());
 
-        colorList.addAll(Arrays.asList(RED, ORANGE, YELLOW, LIME, GREEN, CYAN, CELESTE, BLUE, PURPLE, MAGENTA, PINK, LAVENDER, WHITE, SILVER, GRAY, BLACK, BROWN));
+        blockNames = getMapOfLists(blockList,
+                blockList.stream().map(block -> Text.translatable(
+                        block.getTranslationKey()).getString()
+                ).toList());
+
+        soundNames = getMapOfLists(soundList,
+                soundList.stream().map(sound -> Text.translatable(
+                        sound.id().toShortTranslationKey()).getString()
+                ).toList());
+
+        screenNames = getMapOfLists(screenList,
+                screenList.stream().map(screen -> Text.translatable(
+                        Registries.SCREEN_HANDLER.getId(screen).toShortTranslationKey()).getString()
+                ).toList());
+
+        colorList.addAll(Arrays.asList(
+                RED, ORANGE, YELLOW, LIME, GREEN, CYAN, CELESTE, BLUE, PURPLE, MAGENTA, PINK, LAVENDER, WHITE, SILVER, GRAY, BLACK, BROWN));
     }
 
     public static <T> Map<T, Boolean> allTrue(List<T> options) {

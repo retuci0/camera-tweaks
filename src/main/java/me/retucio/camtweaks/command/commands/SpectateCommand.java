@@ -5,6 +5,7 @@ import me.retucio.camtweaks.command.Command;
 import me.retucio.camtweaks.command.args.EntityArgumentType;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.KeyEvent;
+import me.retucio.camtweaks.util.EntityUtil;
 import me.retucio.camtweaks.util.MiscUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
@@ -21,7 +22,7 @@ public class SpectateCommand extends Command {
         builder
                 .executes(ctx -> {  // If no argument, use the entity player is looking at
                     mc.execute(() -> {
-                        Entity target = MiscUtil.getEntityPlayerIsLookingAt();
+                        Entity target = EntityUtil.getEntityPlayerIsLookingAt();
                         if (target != null)
                             mc.setCameraEntity(target);
                     });

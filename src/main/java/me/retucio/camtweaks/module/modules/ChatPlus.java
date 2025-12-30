@@ -68,7 +68,7 @@ public class ChatPlus extends Module {
     private SimpleDateFormat dateFormat;
 
     private static final Pattern loggerRegex = Pattern.compile("\\n(\\n|\\s)+\\n");
-    private static final Pattern usernameRegex = Pattern.compile("^(?:<[0-9]{2}:[0-9]{2}>\\s)?<(.*?)>.*");
+    private static final Pattern usernameRegex = Pattern.compile("^(?:\\[[0-9]{2}:[0-9]{2}\\]\\s*)?(?:<([^<>\\s]+)>|([^<>\\s]+)).*");
     private static final Pattern timestampRegex = Pattern.compile("^<\\d{1,2}:\\d{1,2}>");
     private static final Pattern coordRegex = Pattern.compile("(?<x>-?\\d{3,}(?:\\.\\d*)?)(?:\\s+(?<y>-?\\d{1,3}(?:\\.\\d*)?))?\\s+(?<z>-?\\d{3,}(?:\\.\\d*)?)");
 
@@ -96,7 +96,7 @@ public class ChatPlus extends Module {
 
         // agregar sellos de tiempo a los mensajes
         if (timestamps.isEnabled()) {
-            Text timestamp = Text.literal("<" + dateFormat.format(new Date()) + "> ").formatted(Formatting.GRAY);
+            Text timestamp = Text.literal("[" + dateFormat.format(new Date()) + "] ").formatted(Formatting.GRAY);
             message = Text.empty().append(timestamp).append(message);
         }
 
@@ -178,6 +178,8 @@ public class ChatPlus extends Module {
 
             if (usernameMatcher.matches()) {
                 String username = usernameMatcher.group(1);
+                if (username == null)
+                    username = usernameMatcher.group(2);
 
                 PlayerListEntry entry = mc.getNetworkHandler().getPlayerListEntry(username);
                 if (entry != null) sender = entry.getProfile();

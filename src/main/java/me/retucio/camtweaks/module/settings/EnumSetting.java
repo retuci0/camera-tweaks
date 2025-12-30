@@ -1,14 +1,11 @@
 package me.retucio.camtweaks.module.settings;
 
-import me.retucio.camtweaks.CameraTweaks;
-import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
 // ajuste que te deja elegir entre distintas opciones definidas, dentro de un Enum
-public class EnumSetting<E extends Enum<E>> extends AbstractSetting {
+public class EnumSetting<E extends Enum<E>> extends Setting {
 
     private final List<E> values;
     private E defaultValue;

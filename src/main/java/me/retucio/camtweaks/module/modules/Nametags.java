@@ -8,6 +8,7 @@ import me.retucio.camtweaks.module.settings.EnumSetting;
 import me.retucio.camtweaks.module.settings.ListSetting;
 import me.retucio.camtweaks.util.Lists;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LazyEntityReference;
 import net.minecraft.entity.LivingEntity;
@@ -24,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,8 +41,9 @@ import java.util.concurrent.Executors;
 
 public class Nametags extends Module {
 
+    Map<EntityType<?>, Boolean> defaultEntities = Lists.allFalse(Lists.entityList);
     public ListSetting<EntityType<?>> entities = addSetting(new ListSetting<>("entidades", "entidades cuyo nametag será visible",
-            Lists.entityList, Lists.allFalse(Lists.entityList), Lists.entityNames));
+            Lists.entityList, defaultEntities, Lists.entityNames));
 
     public BooleanSetting alwaysVisible = addSetting(new BooleanSetting("siempre mostrar nametags", "mostrar nametag cuando el jugador está agachado o es invisible", false));
     public BooleanSetting health = addSetting(new BooleanSetting("mostrar vida", "muestra la vida de una entidad en su nametag", true));
@@ -62,17 +65,22 @@ public class Nametags extends Module {
         super("nametags", "modifica la manera en la que se renderizan los nametags");
 
         // entidades activadas por defecto
-        entities.setEnabled(EntityType.PLAYER, true);
-        entities.setEnabled(EntityType.ITEM, true);
-        entities.setEnabled(EntityType.ARROW, true);
-        entities.setEnabled(EntityType.SPECTRAL_ARROW, true);
-        entities.setEnabled(EntityType.TRIDENT, true);
-        entities.setDefaultValues(entities.getValues());
+        defaultEntities.replace(EntityType.PLAYER, true);
+        defaultEntities.replace(EntityType.ITEM, true);
+        defaultEntities.replace(EntityType.ARROW, true);
+        defaultEntities.replace(EntityType.SPECTRAL_ARROW, true);
+        defaultEntities.replace(EntityType.TRIDENT, true);
+        entities.setDefaultValues(defaultEntities);
 
         health.onUpdate(v -> healthMode.setVisible(v));
 
         entities.onUpdate(entities -> {
             items.setVisible(entities.get(EntityType.ITEM));
+
+            boolean anyProjectile = entities.get(EntityType.TRIDENT)
+                    || entities.get(EntityType.ARROW)
+                    || entities.get(EntityType.SPECTRAL_ARROW);
+            showProjectileDamage.setVisible(anyProjectile);
         });
     }
 

@@ -2,14 +2,17 @@ package me.retucio.camtweaks.module.modules;
 
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.*;
-import me.retucio.camtweaks.ui.screen.HudEditorScreen;
+import me.retucio.camtweaks.ui.hud.CoordsElement;
+import me.retucio.camtweaks.ui.hud.HudElement;
+import me.retucio.camtweaks.ui.hud.HudRenderer;
+import me.retucio.camtweaks.ui.hud.HudEditorScreen;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
 /** lógica del HUD manejada en:
- * @see me.retucio.camtweaks.ui.HudRenderer
- * @see me.retucio.camtweaks.ui.widgets.HudElement
+ * @see HudRenderer
+ * @see HudElement
  * @see HudEditorScreen
  */
 
@@ -28,6 +31,7 @@ public class HUD extends Module {
     public NumberSetting timezone = addSetting(new NumberSetting("zona horaria", "zona horaria en UTC+n", 1, -6, 6, 1));
     public EnumSetting<TimeFormat> timeFormat = addSetting(new EnumSetting<>("formato de la hora", "12h o 24h", TimeFormat.class, TimeFormat.TWENTY_FOUR_HOUR));
     public StringSetting customText = addSetting(new StringSetting("texto custom", "marca de agua (dejar vacío para quitar)", "adolf jitler inshtagram feishbuc twiter", 40));
+    public EnumSetting<CoordsMode> coordsMode = addSetting(new EnumSetting<>("modo de coordenadas", "qué coordenadas mostrar", CoordsMode.class, CoordsMode.OVERWORLD));
 
     public HUD() {
         super("HUD", "superposición de la pantalla con info. adicional");
@@ -39,6 +43,16 @@ public class HUD extends Module {
 
         final String name;
         TimeFormat(String name) { this.name = name; }
+        @Override public String toString() { return name; }
+    }
+
+    public enum CoordsMode {
+        OVERWORLD("superficie"),
+        NETHER("nether"),
+        BOTH("ambas");
+
+        private final String name;
+        CoordsMode(String name) { this.name = name; }
         @Override public String toString() { return name; }
     }
 }

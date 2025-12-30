@@ -21,6 +21,11 @@ public class KeyUtil {
         ) != GLFW.GLFW_RELEASE;
     }
 
+    public static boolean isShiftDown() {
+        return isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)
+                || isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
+    }
+
     public static String getKeyName(int key) {
         if (key == GLFW.GLFW_KEY_UNKNOWN) return "ninguna";
 

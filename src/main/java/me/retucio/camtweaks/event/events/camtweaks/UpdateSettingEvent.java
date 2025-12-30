@@ -1,20 +1,20 @@
 package me.retucio.camtweaks.event.events.camtweaks;
 
 import me.retucio.camtweaks.event.Event;
-import me.retucio.camtweaks.module.settings.AbstractSetting;
+import me.retucio.camtweaks.module.settings.Setting;
 
 // se genera cada que se cambia el valor de un ajuste
 public class UpdateSettingEvent extends Event {
 
-    private final AbstractSetting setting;
+    private final Setting setting;
     private boolean shouldSave;
 
-    public UpdateSettingEvent(AbstractSetting setting, boolean shouldSave) {
+    public UpdateSettingEvent(Setting setting, boolean shouldSave) {
         this.setting = setting;
         this.shouldSave = shouldSave;
     }
 
-    public AbstractSetting getSetting() {
+    public Setting getSetting() {
         return setting;
     }
 

@@ -1,6 +1,6 @@
 package me.retucio.camtweaks.ui.buttons;
 
-import me.retucio.camtweaks.module.settings.AbstractSetting;
+import me.retucio.camtweaks.module.settings.Setting;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import net.minecraft.client.gui.DrawContext;
@@ -9,13 +9,13 @@ import net.minecraft.text.Text;
 // clase base para los botones de los ajustes
 public abstract class SettingButton {
 
-    protected final AbstractSetting setting;
+    protected final Setting setting;
     protected final SettingsFrame parent;
     protected int offset;
 
     protected int x, y, w, h;
 
-    public SettingButton(AbstractSetting setting, SettingsFrame parent, int offset) {
+    public SettingButton(Setting setting, SettingsFrame parent, int offset) {
         this.setting = setting;
         this.parent = parent;
         this.offset = offset;
@@ -42,7 +42,7 @@ public abstract class SettingButton {
                mouseY > y && mouseY < y + h;
     }
 
-    public AbstractSetting getSetting() {
+    public Setting getSetting() {
         return setting;
     }
 

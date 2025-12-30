@@ -50,7 +50,7 @@ public class SettingsFrame {
 
         // añadir el respectivo tipo de botón de cada ajuste a la lista de botones
         int offset = h;
-        for (AbstractSetting setting : module.getSettings()) {
+        for (Setting setting : module.getSettings()) {
             switch (setting) {
                 case BooleanSetting b -> {
                     addButton(new ToggleButton(b, this, offset));
@@ -72,6 +72,9 @@ public class SettingsFrame {
                     offset += 18;
                 } case ColorSetting c -> {
                     addButton(new ColorButton(c, this, offset));
+                    offset += 18;
+                } case OptionSetting o -> {
+                    addButton(new ChooseButton<>(o, this, offset));
                     offset += 18;
                 }
                 default -> {}

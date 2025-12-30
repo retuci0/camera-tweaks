@@ -57,8 +57,9 @@ public class ClientConfig {
             case KeySetting k: value = k.getKey(); break;
             case NumberSetting n: value = n.getValue(); break;
             case StringSetting s: value = s.getValue(); break;
-            case ListSetting l: value = l.getValues(); break;
+            case ListSetting l: value = l.getConfigValues(); break;
             case ColorSetting c: value = c.getConfigValue(); break;
+            case OptionSetting o: value = o.getIndex(); break;
             default: break;
         }
 

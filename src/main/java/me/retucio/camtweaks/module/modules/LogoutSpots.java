@@ -9,6 +9,8 @@ import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.ColorSetting;
 import me.retucio.camtweaks.module.settings.EnumSetting;
+import me.retucio.camtweaks.module.settings.NumberSetting;
+import me.retucio.camtweaks.util.MiscUtil;
 import me.retucio.camtweaks.util.render.RenderUtil;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
@@ -33,6 +35,7 @@ public class LogoutSpots extends Module {
 
     public BooleanSetting outlines = addSetting(new BooleanSetting("contorno", "renderizar contorno de la caja (lados)", true));
     public ColorSetting outlineColor = addSetting(new ColorSetting("color del contorno", "Color de las líneas", new Color(255, 0, 0, 230), false));
+    public NumberSetting lineWidth = addSetting(new NumberSetting("grosor de línea", "grosor de las líneas del contorno", 1.5, 0.5, 5, 0.1));
 
     public BooleanSetting filling = addSetting(new BooleanSetting("relleno", "renderizar relleno de la caja (caras)", true));
     public ColorSetting fillingColor = addSetting(new ColorSetting("color del relleno", "Color de los lados", new Color(230, 0, 0, 55), false));
@@ -40,8 +43,6 @@ public class LogoutSpots extends Module {
     public BooleanSetting fullHeight = addSetting(new BooleanSetting("hitbox completa", "renderizar la caja completa de la hitbox, o solo marcar la posición", true));
 
     public BooleanSetting dummy = addSetting(new BooleanSetting("monigote", "spawnear un monigote para marcar la posición", true));
-    public EnumSetting<Nametags.HealthMode> healthMode = addSetting(new EnumSetting<>("formato de vida", "en qué formato mostrar la vida del jugador",
-            Nametags.HealthMode.class, Nametags.HealthMode.POINTS));
 
     private final List<LogoutEntry> players = new ArrayList<>();
     private final List<PlayerListEntry> lastPlayerList = new ArrayList<>();
@@ -65,7 +66,6 @@ public class LogoutSpots extends Module {
 
         dummy.onUpdate(v -> {
             if (!v) removeDummies();
-            healthMode.setVisible(v);
         });
     }
 
@@ -215,7 +215,6 @@ public class LogoutSpots extends Module {
 
         public final UUID uuid;
         public final String name;
-        public final int health;
         public final String logoutTime;
 
         public final String dummyName;
@@ -234,45 +233,25 @@ public class LogoutSpots extends Module {
 
             this.uuid = player.getUuid();
             this.name = player.getName().getString();
-            this.health = Math.round(player.getHealth() + player.getAbsorptionAmount());
-            this.logoutTime = getLogoutTime();
+            this.logoutTime = MiscUtil.getCurrentFormattedTime();
 
-            String healthText = healthMode.is(Nametags.HealthMode.HEARTS)
-                    ? String.format("%.2f", (float) health / 2)
-                    : health + "hp";
-
-            this.dummyName = name + " [" + healthText + "] (" + logoutTime + ")";
+            this.dummyName = name + " (" + logoutTime + ")";
             this.dummy = ModuleManager.INSTANCE.getModuleByClass(FakePlayer.class).addPlayer(player, dummyName);
 
             this.dummy.updatePositionAndAngles(x + halfWidth, y, z + halfWidth,
                     player.getYaw(), player.getPitch());
         }
 
-        private String getLogoutTime() {
-            try {
-                HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
-                Instant instant = Instant.now();
-                ZoneOffset offset = ZoneOffset.ofHours(hud.timezone.getIntValue());
-                LocalTime logoutTime = LocalTime.from(instant.atOffset(offset));
-
-                boolean is24 = hud.timeFormat.is(HUD.TimeFormat.TWENTY_FOUR_HOUR);
-                DateTimeFormatter format = DateTimeFormatter.ofPattern(is24 ? "HH:mm" : "hh:mm a");
-                return logoutTime.format(format);
-            } catch (Exception e) {
-                return "??:??";
-            }
-        }
-
         public void renderBox(MatrixStack matrices) {
             if (fullHeight.isEnabled()) {
                 if (outlines.isEnabled())
-                    RenderUtil.drawOutlineBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), outlineColor.getColor(), 1.5);
+                    RenderUtil.drawOutlineBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), outlineColor.getColor(), lineWidth.getFloatValue());
                 if (filling.isEnabled())
                     RenderUtil.drawFilledBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), fillingColor.getColor());
             } else {
                 if (outlines.isEnabled()) {
                     Box bottomBox = new Box(x, y, z, x + xWidth, y + 0.01, z + zWidth);
-                    RenderUtil.drawOutlineBox(matrices, bottomBox, outlineColor.getColor(), 1.5);
+                    RenderUtil.drawOutlineBox(matrices, bottomBox, outlineColor.getColor(), lineWidth.getFloatValue());
                 }
                 if (filling.isEnabled()) {
                     RenderUtil.drawBlockFaceFilled(matrices,

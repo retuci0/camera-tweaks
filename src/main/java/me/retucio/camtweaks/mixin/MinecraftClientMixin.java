@@ -4,6 +4,7 @@ import com.ibm.icu.util.CodePointTrie;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.camtweaks.CameraTweaks;
+import me.retucio.camtweaks.event.JoinWorldEvent;
 import me.retucio.camtweaks.event.events.OpenScreenEvent;
 import me.retucio.camtweaks.event.events.ShutdownEvent;
 import me.retucio.camtweaks.event.events.TickEvent;
@@ -12,6 +13,7 @@ import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.modules.FastUse;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
@@ -69,5 +71,11 @@ public abstract class MinecraftClientMixin {
         FastUse fastUse = ModuleManager.INSTANCE.getModuleByClass(FastUse.class);
         if (!fastUse.isEnabled()) return;
         itemUseCooldown = fastUse.getCooldown(stack);
+    }
+
+    @Inject(method = "joinWorld", at = @At("HEAD"), cancellable = true)
+    private void onJoinWorld(ClientWorld world, CallbackInfo ci) {
+        JoinWorldEvent event = EVENT_BUS.post(new JoinWorldEvent(world));
+        if (event.isCancelled()) ci.cancel();
     }
 }

@@ -18,27 +18,30 @@ import me.retucio.camtweaks.module.ModuleManager;
 
 import me.retucio.camtweaks.module.modules.HUD;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.ui.screen.HudEditorScreen;
-import me.retucio.camtweaks.ui.HudRenderer;
+import me.retucio.camtweaks.ui.hud.HudEditorScreen;
+import me.retucio.camtweaks.ui.hud.HudRenderer;
 import me.retucio.camtweaks.ui.buttons.BindButton;
 import me.retucio.camtweaks.ui.buttons.SettingButton;
 import me.retucio.camtweaks.ui.buttons.TextButton;
 import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 
-import me.retucio.camtweaks.util.ChatUtil;
-import me.retucio.camtweaks.util.KeyUtil;
-import me.retucio.camtweaks.util.Lists;
-import me.retucio.camtweaks.util.MiscUtil;
+import me.retucio.camtweaks.util.*;
 
 
+import me.retucio.camtweaks.util.render.DrawUtil;
+import me.retucio.camtweaks.util.render.RenderUtil;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 
+import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
+import net.minecraft.client.gui.screen.ingame.AnvilScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -68,7 +71,7 @@ public class CameraTweaks implements ClientModInitializer {
 
 
     private Screen prevScreen;
-    public boolean settingsApplied = false;
+    public static boolean settingsApplied = false;
 
 
     @Override
@@ -80,14 +83,20 @@ public class CameraTweaks implements ClientModInitializer {
         ConfigManager.load();
 
         EVENT_BUS.register(this);
+
         EVENT_BUS.register(new HudRenderer());
 
-        EVENT_BUS.register(MiscUtil.class);
         EVENT_BUS.register(ChatUtil.class);
+        EVENT_BUS.register(DrawUtil.class);
+        EVENT_BUS.register(EntityUtil.class);
+        EVENT_BUS.register(InventoryUtil.class);
+        EVENT_BUS.register(MiscUtil.class);
+        EVENT_BUS.register(NetworkUtil.class);
+        EVENT_BUS.register(RenderUtil.class);
 
         Lists.init();
 
-        ModuleManager.INSTANCE = new ModuleManager(EVENT_BUS);
+        ModuleManager.INSTANCE = new ModuleManager();
         EVENT_BUS.post(new LoadModuleManagerEvent());
 
         CommandManager.INSTANCE = new CommandManager();
@@ -172,7 +181,8 @@ public class CameraTweaks implements ClientModInitializer {
 
     // maneja la lógica de apertura de la interfaz
     private void handleClickGUIKey(int key, boolean anyFocused) {
-        if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused) return;
+        if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused || isOnTypingScreen())
+            return;
 
         // al parecer esto hace que con la tecla de la interfaz puedas ir cambiando de splash text en la pantalla del título
         // pero me ha hecho gracia así que así se queda
@@ -188,13 +198,13 @@ public class CameraTweaks implements ClientModInitializer {
     // manejar la lógica de apertura del editor de elementos del hud, con la misma lógica que handleClickGUIKey()
     private void handleHudEditorKey(int key, boolean anyFocused) {
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
-        if (key != hud.editorKey.getKey() || anyFocused) return;
-        if (!hud.isEnabled()) {
-            ChatUtil.warn("HUD está desactivado, lumbreras");
-            return;
-        }
+        if (key != hud.editorKey.getKey() || anyFocused || isOnTypingScreen()) return;
 
         if (mc.currentScreen != HudEditorScreen.INSTANCE) {
+            if (!hud.isEnabled()) {
+                ChatUtil.warn("HUD está desactivado, lumbreras");
+                return;
+            }
             prevScreen = mc.currentScreen;
             mc.setScreen(HudEditorScreen.INSTANCE);
         } else {
@@ -210,6 +220,13 @@ public class CameraTweaks implements ClientModInitializer {
         for (Module module : ModuleManager.INSTANCE.getEnabledModules())
             if (module.shouldToggleOnBindRelease() && key == module.getKey())
                 module.setEnabled(false);
+    }
+
+    private boolean isOnTypingScreen() {
+                return mc.currentScreen instanceof ChatScreen
+                || mc.currentScreen instanceof AnvilScreen
+                || mc.currentScreen instanceof AbstractSignEditScreen
+                || mc.currentScreen instanceof AbstractCommandBlockScreen;
     }
 
     @SubscribeEvent

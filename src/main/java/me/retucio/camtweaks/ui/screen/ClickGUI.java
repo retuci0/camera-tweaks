@@ -7,10 +7,8 @@ import me.retucio.camtweaks.event.events.MouseClickEvent;
 import me.retucio.camtweaks.event.events.MouseScrollEvent;
 import me.retucio.camtweaks.event.events.camtweaks.SettingsFrameEvent;
 import me.retucio.camtweaks.module.Module;
-import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.settings.AbstractSetting;
+import me.retucio.camtweaks.module.settings.Setting;
 import me.retucio.camtweaks.module.settings.ColorSetting;
-import me.retucio.camtweaks.ui.buttons.ColorButton;
 import me.retucio.camtweaks.ui.buttons.ListButton;
 import me.retucio.camtweaks.ui.buttons.ModuleButton;
 import me.retucio.camtweaks.ui.buttons.SettingButton;
@@ -20,7 +18,6 @@ import me.retucio.camtweaks.ui.frames.ModuleFrame;
 import me.retucio.camtweaks.ui.frames.SettingsFrame;
 import me.retucio.camtweaks.ui.widgets.ScrollBarWidget;
 import me.retucio.camtweaks.ui.widgets.SearchBarWidget;
-import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.KeyUtil;
 
 import net.minecraft.client.MinecraftClient;
@@ -207,7 +204,7 @@ public class ClickGUI extends Screen {
 
         for (SettingsFrame sf : settingsFrames) {
             for (SettingButton sb : sf.getButtons()) {
-                AbstractSetting setting = sb.getSetting();
+                Setting setting = sb.getSetting();
 
                 if (searchInput.isEmpty()) {
                     setting.setSearchMatch(true);

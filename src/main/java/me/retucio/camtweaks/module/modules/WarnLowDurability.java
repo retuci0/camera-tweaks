@@ -3,9 +3,12 @@ package me.retucio.camtweaks.module.modules;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
+import me.retucio.camtweaks.module.settings.OptionSetting;
 import me.retucio.camtweaks.util.ChatUtil;
+import me.retucio.camtweaks.util.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -15,19 +18,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-// al parecer DamageItemEvent no se lanza si estás en un server de Paper, o sea que ahora se usa onTick()
 public class WarnLowDurability extends Module {
 
     public NumberSetting limitPercentage = addSetting(new NumberSetting("porcentaje", "porcentaje de durabilidad restante a la que se te avisa",
             5, 1, 100, 1));
 
-    public BooleanSetting message = addSetting(new BooleanSetting("mensaje", "enviar un mensaje para alertar al usuario", true));
-    public BooleanSetting sound = addSetting(new BooleanSetting("sonido", "reproducir un sonido para alertar al usuario", true));
+    public BooleanSetting message = addSetting(new BooleanSetting("enviar mensaje", "enviar un mensaje para alertar al usuario", true));
+
+    public BooleanSetting playSound = addSetting(new BooleanSetting("reproducir sonido", "reproducir un sonido para alertar al usuario", true));
+    public OptionSetting<SoundEvent> sound = addSetting(new OptionSetting<>("sonido", "qué sonido reproducir",
+            Lists.soundList, SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), Lists.soundNames));
+    public NumberSetting volume = addSetting(new NumberSetting("volumen", "volumen del sonido", 70, 0, 125, 1));
+    public NumberSetting pitch = addSetting(new NumberSetting("frecuencia", "altura del sonido", 70, 0, 125, 1));
 
     private final List<ItemStack> warned = new ArrayList<>();
 
     public WarnLowDurability() {
         super("aviso de baja dur.", "te avisa cuando la herramienta que sostengas sobrepase un límite de durabilidad");
+
+        playSound.onUpdate(v -> {
+            sound.setVisible(v);
+            volume.setVisible(v);
+            pitch.setVisible(v);
+        });
     }
 
     @Override
@@ -39,9 +52,13 @@ public class WarnLowDurability extends Module {
         float percentage = (1 - (float) stack.getDamage() / stack.getMaxDamage()) * 100;
 
         if (percentage <= limitPercentage.getValue()) {
-            if (sound.isEnabled())
+            if (playSound.isEnabled())
                 mc.world.playSound(mc.player, mc.player.getBlockPos(),
-                        SoundEvents.BLOCK_BELL_USE, SoundCategory.AMBIENT, 1, 1);
+                        sound.getValue(),
+                        SoundCategory.AMBIENT,
+                        toExponential(volume),
+                        toExponential(pitch)
+                );
 
             if (message.isEnabled()) {
                 String customName = stack.getCustomName() == null ? "" : " \"" + stack.getCustomName().getString() + "\"";
@@ -60,5 +77,16 @@ public class WarnLowDurability extends Module {
     public void onDisable() {
         warned.clear();
         super.onDisable();
+    }
+
+    // el sistema decibélico es un sistema logarítmico
+    private float toExponential(NumberSetting setting) {
+        double linear = setting.getValue();
+
+        double normalized = linear / (setting.getMax() - setting.getMax() / 4);
+        double exponential = Math.pow(normalized, 3);
+
+        if (exponential < 0.01) exponential = 0;
+        return (float) exponential;
     }
 }

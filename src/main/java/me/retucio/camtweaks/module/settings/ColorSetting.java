@@ -2,14 +2,13 @@ package me.retucio.camtweaks.module.settings;
 
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class ColorSetting extends AbstractSetting {
+public class ColorSetting extends Setting {
 
     private Color color;
     private Consumer<Color> updateListener;

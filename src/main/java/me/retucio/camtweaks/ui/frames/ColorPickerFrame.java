@@ -1,13 +1,12 @@
 package me.retucio.camtweaks.ui.frames;
 
 import me.retucio.camtweaks.module.Module;
-import me.retucio.camtweaks.module.settings.AbstractSetting;
+import me.retucio.camtweaks.module.settings.Setting;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.ColorSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
 import me.retucio.camtweaks.ui.buttons.*;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.util.ChatUtil;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.render.DrawUtil;
 import net.minecraft.client.gui.DrawContext;
@@ -73,7 +72,7 @@ public class ColorPickerFrame extends SettingsFrame {
 
         // añadir ajustes y tal
         dummyModule.addSettings(redSetting, greenSetting, blueSetting, rainbowSpeedSetting, saturationSetting, brightnessSetting, rainbowSetting);
-        for (AbstractSetting setting : dummyModule.getSettings()) {
+        for (Setting setting : dummyModule.getSettings()) {
             if (setting instanceof NumberSetting n) n.onUpdate(v -> updateColorFromSettings());
             if (setting instanceof BooleanSetting b) b.onUpdate(v -> updateColorFromSettings());
             rainbowSetting.onUpdate(v -> {
@@ -120,7 +119,7 @@ public class ColorPickerFrame extends SettingsFrame {
         updateWidth();
 
         // al parecer este era el problema :/
-        for (AbstractSetting setting : dummyModule.getSettings())
+        for (Setting setting : dummyModule.getSettings())
             if (setting instanceof NumberSetting ns) ns.setLocked(
                     pickingAlpha || pickingHue || pickingSaturationBrightness);
 
@@ -473,7 +472,7 @@ public class ColorPickerFrame extends SettingsFrame {
     private void updateSettingsFromColor() {
         if (colorSetting == null) return;
 
-        for (AbstractSetting setting : dummyModule.getSettings()) {
+        for (Setting setting : dummyModule.getSettings()) {
             switch (setting.getName()) {
                 case "rojo" -> ((NumberSetting) setting).setValue(colorSetting.getR());
                 case "verde" -> ((NumberSetting) setting).setValue(colorSetting.getG());

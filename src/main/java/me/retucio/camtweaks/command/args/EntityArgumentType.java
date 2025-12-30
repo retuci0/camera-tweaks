@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import me.retucio.camtweaks.util.MiscUtil;
+import me.retucio.camtweaks.util.EntityUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -190,7 +190,7 @@ public class EntityArgumentType implements ArgumentType<Entity> {
         builder.suggest("@r");
         builder.suggest("@s");
 
-        Entity lookingAt = MiscUtil.getEntityPlayerIsLookingAt();
+        Entity lookingAt = EntityUtil.getEntityPlayerIsLookingAt();
         if (lookingAt != null)
             builder.suggest(lookingAt.getUuid().toString());
 

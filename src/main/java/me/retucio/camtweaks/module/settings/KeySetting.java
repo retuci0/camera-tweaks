@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Consumer;
 
-public class KeySetting extends AbstractSetting {
+public class KeySetting extends Setting {
 
     private int key;
     private int defaultKey;

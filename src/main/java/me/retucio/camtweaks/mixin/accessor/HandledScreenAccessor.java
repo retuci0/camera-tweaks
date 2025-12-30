@@ -10,4 +10,7 @@ public interface HandledScreenAccessor {
 
     @Accessor("focusedSlot")
     Slot getFocusedSlot();
+
+    @Accessor("doubleClicking")
+    void setDoubleClicking(boolean doubleClicking);
 }

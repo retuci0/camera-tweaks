@@ -1,12 +1,9 @@
 package me.retucio.camtweaks.module.settings;
 
-import me.retucio.camtweaks.CameraTweaks;
-import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
-
 import java.util.function.Consumer;
 
 // ajuste booleano, es decir, o se encuentra encencido o apagado (similar a un interruptor)
-public class BooleanSetting extends AbstractSetting {
+public class BooleanSetting extends Setting {
 
     private boolean defaultValue;
     private boolean enabled;

@@ -25,7 +25,7 @@ public class ChatUtil {
     }
 
     public static void addMessage(Text text) {
-        if (mc.inGameHud == null || !CameraTweaks.INSTANCE.settingsApplied) return;
+        if (mc.inGameHud == null || !CameraTweaks.settingsApplied) return;
         mc.inGameHud.getChatHud().addMessage(text);
     }
 

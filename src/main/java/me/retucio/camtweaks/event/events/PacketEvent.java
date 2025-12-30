@@ -1,12 +1,14 @@
 package me.retucio.camtweaks.event.events;
 
+import io.netty.channel.ChannelFutureListener;
 import me.retucio.camtweaks.event.Event;
 import me.retucio.camtweaks.event.Stage;
 import net.minecraft.network.packet.Packet;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 /**
- * @see me.retucio.camtweaks.mixin.ClientConnectionMixin#onSendPacketPre 
+ * @see me.retucio.camtweaks.mixin.ClientConnectionMixin#onSendPacketPre
  * @see me.retucio.camtweaks.mixin.ClientConnectionMixin#onSendPacketPost 
  * @see me.retucio.camtweaks.mixin.ClientConnectionMixin#onReceivePacket
  */

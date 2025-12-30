@@ -5,7 +5,7 @@ import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
 import me.retucio.camtweaks.module.Module;
 
 // base para los tipos de ajustes
-public abstract class AbstractSetting {
+public abstract class Setting {
 
     private final String name;
     private final String description;
@@ -15,7 +15,7 @@ public abstract class AbstractSetting {
 
     private Module module;
 
-    protected AbstractSetting(String name, String description) {
+    protected Setting(String name, String description) {
         this.name = name;
         this.description = description;
     }

@@ -2,14 +2,15 @@ package me.retucio.camtweaks.util.render;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.retucio.camtweaks.util.ChatUtil;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.state.OutlineRenderState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 
 import java.awt.*;
 
@@ -19,16 +20,77 @@ public class RenderUtil {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final Tessellator tesselator = Tessellator.getInstance();
 
-    public static void drawBlockOutline(MatrixStack matrices, BlockPos pos, Color color, double lineWidth) {
-        Box box = new Box(pos.getX(), pos.getY(), pos.getZ(),
-                pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
-        drawOutlineBox(matrices, box, color, lineWidth);
+
+    // líneas
+
+    public static void drawHorizontalLine(MatrixStack matrices, float x1, float x2, float y, Color color) {
+        if (x2 < x1) {
+            float i = x1;
+            x1 = x2;
+            x2 = i;
+        }
+
+        drawFilledRect(matrices, x1, y, x2 + 1, y + 1, color);
     }
 
-    public static void drawBlockFilled(MatrixStack matrices, BlockPos pos, Color color) {
-        Box box = new Box(pos.getX(), pos.getY(), pos.getZ(),
-                pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
-        drawFilledBox(matrices, box, color);
+    public static void drawVerticalLine(MatrixStack matrices, float x, float y1, float y2, Color color) {
+        if (y2 < y1) {
+            float i = y1;
+            y1 = y2;
+            y2 = i;
+        }
+
+        drawFilledRect(matrices, x, y1 + 1, x + 1, y2, color);
+    }
+
+    public static void drawHorizontalLine(MatrixStack matrices, float x1, float x2, float y, Color color, float width) {
+        if (x2 < x1) {
+            float i = x1;
+            x1 = x2;
+            x2 = i;
+        }
+
+        drawFilledRect(matrices, x1, y, x2 + width, y + width, color);
+    }
+
+    public static void drawVerticalLine(MatrixStack matrices, float x, float y1, float y2, Color color, float width) {
+        if (y2 < y1) {
+            float i = y1;
+            y1 = y2;
+            y2 = i;
+        }
+
+        drawFilledRect(matrices, x, y1 + width, x + width, y2, color);
+    }
+
+
+    // caras
+
+    public static void drawFilledRect(MatrixStack matrices, float x, float y, float width, float height, Color color) {
+        float r = color.getRed() / 255f;
+        float g = color.getGreen() / 255f;
+        float b = color.getBlue() / 255f;
+        float a = color.getAlpha() / 255f;
+
+        matrices.push();
+        matrices.translate(0, 0, 0);
+
+        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        buffer.vertex(matrices.peek().getPositionMatrix(), x, y + height, 0).color(r, g, b, a);
+        buffer.vertex(matrices.peek().getPositionMatrix(), x + width, y + height, 0).color(r, g, b, a);
+        buffer.vertex(matrices.peek().getPositionMatrix(), x + width, y, 0).color(r, g, b, a);
+        buffer.vertex(matrices.peek().getPositionMatrix(), x, y, 0).color(r, g, b, a);
+
+        Layers.getGlobalQuads().draw(buffer.end());
+        matrices.pop();
+    }
+
+    public static void drawRectOutlines(MatrixStack stack, float x1, float y1, float x2, float y2, Color color, float width) {
+        drawHorizontalLine(stack, x1, x2, y1, color, width);
+        drawVerticalLine(stack, x2, y1, y2, color, width);
+        drawHorizontalLine(stack, x1, x2, y2, color, width);
+        drawVerticalLine(stack, x1, y1, y2, color, width);
     }
 
     // expand es para evitar z-fighting
@@ -107,71 +169,10 @@ public class RenderUtil {
         Layers.getGlobalQuads().draw(buffer.end());
     }
 
-    public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end, Color color, float width) {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
 
-        float x1 = (float) (start.x - cameraPos.x);
-        float y1 = (float) (start.y - cameraPos.y);
-        float z1 = (float) (start.z - cameraPos.z);
-        float x2 = (float) (end.x - cameraPos.x);
-        float y2 = (float) (end.y - cameraPos.y);
-        float z2 = (float) (end.z - cameraPos.z);
+    // cajas
 
-        float r = color.getRed() / 255f;
-        float g = color.getGreen() / 255f;
-        float b = color.getBlue() / 255f;
-        float a = color.getAlpha() / 255f;
-
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
-
-        buffer.vertex(matrices.peek().getPositionMatrix(), x1, y1, z1).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x2, y2, z2).color(r, g, b, a);
-
-        Layers.getGlobalLines(width).draw(buffer.end());
-    }
-
-    public static void drawOutlineRect(MatrixStack matrices, float x, float y, float w, float h, Color color, int linewidth) {
-        float r = color.getRed() / 255f;
-        float g = color.getGreen() / 255f;
-        float b = color.getBlue() / 255f;
-        float a = color.getAlpha() / 255f;
-
-        matrices.push();
-        matrices.translate(0, 0, 0);
-
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
-
-        buffer.vertex(matrices.peek().getPositionMatrix(), x, y, 0).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x + w, y, 0).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x + w, y + h, 0).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x, y + h, 0).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x, y, 0).color(r, g, b, a);
-
-        Layers.getGlobalLines(linewidth).draw(buffer.end());
-        matrices.pop();
-    }
-
-    public static void drawFilledRect(MatrixStack matrices, float x, float y, float width, float height, Color color) {
-        float r = color.getRed() / 255f;
-        float g = color.getGreen() / 255f;
-        float b = color.getBlue() / 255f;
-        float a = color.getAlpha() / 255f;
-
-        matrices.push();
-        matrices.translate(0, 0, 0);
-
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        buffer.vertex(matrices.peek().getPositionMatrix(), x, y + height, 0).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x + width, y + height, 0).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x + width, y, 0).color(r, g, b, a);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x, y, 0).color(r, g, b, a);
-
-        Layers.getGlobalQuads().draw(buffer.end());
-        matrices.pop();
-    }
-
-    public static void drawOutlineBox(MatrixStack matrices, Box box, Color color, double lineWidth) {
+    public static void drawOutlineBox(MatrixStack matrices, Box box, Color color, float lineWidth) {
         float r = color.getRed() / 255f;
         float g = color.getGreen() / 255f;
         float b = color.getBlue() / 255f;
@@ -234,5 +235,49 @@ public class RenderUtil {
         buffer.vertex(matrices.peek().getPositionMatrix(), minX, maxY, minZ).color(color.getRGB());
 
         Layers.getGlobalQuads().draw(buffer.end());
+    }
+
+
+    // formas custom
+
+    public static void drawVoxelShapeOutline(MatrixStack matrices, VoxelShape voxelShape, BlockPos pos, Color color, float lineWidth) {
+        if (voxelShape.isEmpty()) return;
+
+        voxelShape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
+            Box box = new Box(
+                    pos.getX() + minX, pos.getY() + minY, pos.getZ() + minZ,
+                    pos.getX() + maxX, pos.getY() + maxY, pos.getZ() + maxZ
+            );
+
+            drawOutlineBox(matrices, box, color, lineWidth);
+        });
+    }
+
+    public static void drawVoxelShapeFilled(MatrixStack matrices, VoxelShape voxelShape, BlockPos pos, Color color) {
+        if (voxelShape.isEmpty()) return;
+
+        voxelShape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
+            Box box = new Box(
+                    pos.getX() + minX, pos.getY() + minY, pos.getZ() + minZ,
+                    pos.getX() + maxX, pos.getY() + maxY, pos.getZ() + maxZ
+            );
+
+            drawFilledBox(matrices, box, color);
+        });
+    }
+
+
+    // bloques
+
+    public static void drawBlockOutline(MatrixStack matrices, BlockPos pos, Color color, float lineWidth) {
+        Box box = new Box(pos.getX(), pos.getY(), pos.getZ(),
+                pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+        drawOutlineBox(matrices, box, color, lineWidth);
+    }
+
+    public static void drawBlockFilled(MatrixStack matrices, BlockPos pos, Color color) {
+        Box box = new Box(pos.getX(), pos.getY(), pos.getZ(),
+                pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+        drawFilledBox(matrices, box, color);
     }
 }
