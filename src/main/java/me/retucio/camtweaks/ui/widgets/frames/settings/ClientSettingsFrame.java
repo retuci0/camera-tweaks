@@ -1,10 +1,11 @@
-package me.retucio.camtweaks.ui.frames;
+package me.retucio.camtweaks.ui.widgets.frames.settings;
 
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.GUISettingsFrameEvent;
 import me.retucio.camtweaks.module.modules.GUI;
+import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.ui.buttons.SettingButton;
+import me.retucio.camtweaks.ui.widgets.buttons.SettingButton;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.gui.DrawContext;
 
@@ -14,10 +15,10 @@ public class ClientSettingsFrame extends SettingsFrame {
 
     public static final GUI guiSettings = new GUI();
     public boolean extended = false;
-    private final String title = "ajustes del mod";
 
     public ClientSettingsFrame(int x, int y, int w, int h) {
         super(guiSettings, x, y, w, h);
+        title = "ajustes del mod";
     }
 
     @Override
@@ -35,7 +36,7 @@ public class ClientSettingsFrame extends SettingsFrame {
                 renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
                 -1, true);
 
-        List<SettingButton> visibleButtons = settingButtons.stream()
+        List<SettingButton<?>> visibleButtons = buttons.stream()
                 .filter(sb -> sb.getSetting().isVisible() && sb.getSetting().isSearchMatch())
                 .toList();
 
@@ -44,7 +45,7 @@ public class ClientSettingsFrame extends SettingsFrame {
             totalHeight = visibleButtons.size() * h;
             ctx.fill(x, currentY - 2, x + w, currentY + totalHeight, Colors.frameBGColor.getRGB());
 
-            for (SettingButton sb : visibleButtons) {
+            for (SettingButton<?> sb : visibleButtons) {
                 sb.setX(x + 4);
                 sb.setY(currentY);
                 sb.setW(w - 8);
@@ -57,12 +58,12 @@ public class ClientSettingsFrame extends SettingsFrame {
     }
 
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public void mouseClicked(int mouseX, int mouseY, int button) {
         if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (button == 0) {
                 dragging = true;
-                dragX = (int) (mouseX - x);
-                dragY = (int) (mouseY - y);
+                dragX = mouseX - x;
+                dragY = mouseY - y;
             } else if (button == 1) {
                 extended = !extended;
                 CameraTweaks.EVENT_BUS.post(new GUISettingsFrameEvent.Extend());
@@ -70,12 +71,12 @@ public class ClientSettingsFrame extends SettingsFrame {
         }
 
         if (!extended) return;  // solo dejar clicar en los módulos si el marco está extendido
-        for (SettingButton settingButton : settingButtons)
+        for (SettingButton<?> settingButton : buttons)
             settingButton.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    public void mouseReleased(int mouseX, int mouseY, int button) {
         ClickGUI.INSTANCE.unselect(this);
         if (button == 0 && dragging)
             CameraTweaks.EVENT_BUS.post(new GUISettingsFrameEvent.Move());
@@ -84,7 +85,7 @@ public class ClientSettingsFrame extends SettingsFrame {
     }
 
     @Override
-    public void drawTooltips(DrawContext ctx, double mouseX, double mouseY) {
+    public void drawTooltips(DrawContext ctx, int mouseX, int mouseY) {
         if (!extended) return;
         super.drawTooltips(ctx, mouseX, mouseY);
     }

@@ -1,12 +1,10 @@
 package me.retucio.camtweaks.mixin;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.command.CommandManager;
 import me.retucio.camtweaks.config.ConfigManager;
 import me.retucio.camtweaks.event.events.ClientClickEvent;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
-import net.minecraft.SharedConstants;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -16,9 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.awt.*;
-
-import static me.retucio.camtweaks.CameraTweaks.getVersionName;
 import static me.retucio.camtweaks.CameraTweaks.mc;
 
 @Mixin(Screen.class)

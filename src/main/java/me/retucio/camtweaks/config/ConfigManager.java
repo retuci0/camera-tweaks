@@ -6,10 +6,10 @@ import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.ModuleManager;
 import me.retucio.camtweaks.module.settings.*;
-import me.retucio.camtweaks.ui.frames.ModuleFrame;
+import me.retucio.camtweaks.ui.widgets.frames.ModuleFrame;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
-import me.retucio.camtweaks.ui.frames.SettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
 
 import java.io.File;
 import java.io.FileReader;
@@ -100,7 +100,7 @@ public class ConfigManager {
 
     public static void setFramePosition(SettingsFrame frame) {
         ensureConfig();
-        config.settingsFrames.put(frame.module.getName(), new int[] {frame.x, frame.y});
+        config.settingsFrames.put(frame.module.getName(), new int[] {frame.getX(), frame.getY()});
         save();
     }
 
@@ -203,8 +203,8 @@ public class ConfigManager {
     private static void applyExtendableFrame(ModuleFrame frame) {
         ClientConfig.FrameData frameData = config.extendableFrames.get("M");
         if (frameData != null) {
-            frame.x = frameData.x();
-            frame.y = frameData.y();
+            frame.setX(frameData.x());
+            frame.setY(frameData.y());
             frame.extended = frameData.extended();
         }
     }
@@ -212,8 +212,8 @@ public class ConfigManager {
     private static void applyExtendableFrame(ClientSettingsFrame frame) {
         ClientConfig.FrameData frameData = config.extendableFrames.get("S");
         if (frameData != null) {
-            frame.x = frameData.x();
-            frame.y = frameData.y();
+            frame.setX(frameData.x());
+            frame.setY(frameData.y());
             frame.extended = frameData.extended();
         }
     }

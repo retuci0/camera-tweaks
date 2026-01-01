@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.event.events.camtweaks;
 
 import me.retucio.camtweaks.event.Event;
-import me.retucio.camtweaks.ui.frames.SettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
 
 // se genera cada que se interactúa con un marco de ajustes de un módulo
 public class SettingsFrameEvent {

@@ -4,7 +4,7 @@ import net.minecraft.util.Formatting;
 
 import java.awt.Color;
 
-import static me.retucio.camtweaks.ui.frames.ClientSettingsFrame.guiSettings;
+import static me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame.guiSettings;
 
 
 // clase para los colores

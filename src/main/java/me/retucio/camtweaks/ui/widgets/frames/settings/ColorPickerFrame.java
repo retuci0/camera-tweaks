@@ -1,11 +1,14 @@
-package me.retucio.camtweaks.ui.frames;
+package me.retucio.camtweaks.ui.widgets.frames.settings;
 
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.Setting;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.ColorSetting;
 import me.retucio.camtweaks.module.settings.NumberSetting;
-import me.retucio.camtweaks.ui.buttons.*;
+import me.retucio.camtweaks.ui.widgets.buttons.*;
+import me.retucio.camtweaks.ui.widgets.buttons.settings.SliderButton;
+import me.retucio.camtweaks.ui.widgets.buttons.settings.ToggleButton;
+import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.render.DrawUtil;
@@ -86,7 +89,7 @@ public class ColorPickerFrame extends SettingsFrame {
             });
         }
 
-        settingButtons.clear();
+        buttons.clear();
 
         Module originalModule = this.module;
         this.module = dummyModule;
@@ -238,11 +241,11 @@ public class ColorPickerFrame extends SettingsFrame {
 
         // botones de ajustes
         int startButtonY = alphaPickerY + alphaPickerHeight + padding;
-        visibleButtons = settingButtons.stream()
+        visibleButtons = buttons.stream()
                 .filter(sb -> sb.getSetting().isVisible() && sb.getSetting().isSearchMatch())
                 .toList();
 
-        for (SettingButton sb : visibleButtons) {
+        for (SettingButton<?> sb : visibleButtons) {
             sb.setX(x + 4);
             sb.setY(startButtonY);
             sb.setW(w - 8);
@@ -310,7 +313,7 @@ public class ColorPickerFrame extends SettingsFrame {
     // DETECCIÓN DE INPUTS
 
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public void mouseClicked(int mouseX, int mouseY, int button) {
         if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (isCloseButtonHovered(mouseX, mouseY)) {
                 ClickGUI.INSTANCE.closeSettingsFrame(this.dummyModule);
@@ -344,13 +347,13 @@ public class ColorPickerFrame extends SettingsFrame {
             updateColorFromPicker((int) mouseX, (int) mouseY);
         }
 
-        for (SettingButton sb : visibleButtons)
+        for (SettingButton<?> sb : visibleButtons)
             sb.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
-        ClickGUI.INSTANCE.unselect(this);
+    public void mouseReleased(int mouseX, int mouseY, int button) {
+        super.mouseReleased(mouseX, mouseY, button);
         if (button == 0) {  // soltar todo
             dragging = false;
             pickingHue = false;
@@ -358,16 +361,16 @@ public class ColorPickerFrame extends SettingsFrame {
             pickingAlpha = false;
         }
 
-        for (SettingButton sb : visibleButtons)
+        for (SettingButton<?> sb : visibleButtons)
             sb.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
-    public void mouseDragged(double mouseX, double mouseY) {
+    public void mouseDragged(int mouseX, int mouseY) {
         if (pickingHue || pickingSaturationBrightness || pickingAlpha)
             updateColorFromPicker((int) mouseX, (int) mouseY);
 
-        for (SettingButton sb : visibleButtons)
+        for (SettingButton<?> sb : visibleButtons)
             sb.mouseDragged(mouseX, mouseY);
     }
 

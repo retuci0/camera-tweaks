@@ -1,14 +1,14 @@
-package me.retucio.camtweaks.ui.widgets;
+package me.retucio.camtweaks.ui.widgets.misc;
 
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.Widget;
 import me.retucio.camtweaks.util.Colors;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-public class ScrollBarWidget {
+public class ScrollBarWidget extends Widget {
 
     private boolean dragging;
     private int dragY, scrollStart;
@@ -16,11 +16,13 @@ public class ScrollBarWidget {
 
     private int contentHeight, windowHeight;
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    public ScrollBarWidget() {
+        // las coordenadas no importan porque está estático
+        super(0, 0, 0, 0);
+    }
 
-    public ScrollBarWidget() {}
-
-    public void render(DrawContext ctx, double mouseX, double mouseY) {
+    @Override
+    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         if (contentHeight <= windowHeight || !ClientSettingsFrame.guiSettings.scrollBar.isEnabled()) return;
 
         int trackX1 = mc.getWindow().getScaledWidth() - 10;
@@ -40,33 +42,37 @@ public class ScrollBarWidget {
         ctx.fill(trackX1 + 1, thumbY + 1, trackX2 - 1, thumbY + thumbHeight - 1, thumbColor.getRGB());
     }
 
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int button) {
         if (button != 0 || !ClientSettingsFrame.guiSettings.scrollBar.isEnabled()) return;
         if (isThumbHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             dragging = true;
-            dragY = (int) mouseY;
+            dragY = mouseY;
             scrollStart = scrollOffset;
         }
     }
 
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    @Override
+    public void mouseReleased(int mouseX, int mouseY, int button) {
         ClickGUI.INSTANCE.unselect(this);
         dragging = false;
     }
 
-    public void mouseDragged(double mouseY) {
+    @Override
+    public void mouseDragged(int mouseX, int mouseY) {
         if (!dragging || !ClientSettingsFrame.guiSettings.scrollBar.isEnabled()) return;
 
         int thumbHeight = getThumbHeight();
         int trackHeight = windowHeight - thumbHeight;
 
         float ratio = (float) (contentHeight - windowHeight) / trackHeight;
-        int deltaY = (int) mouseY - dragY;
+        int deltaY = mouseY - dragY;
         scrollOffset = scrollStart + (int) (deltaY * ratio);
         clampOffset();
     }
 
-    public void onMouseScroll(double amount) {
+    @Override
+    public void mouseScrolled(double amount) {
         if (contentHeight <= windowHeight) return;
         scrollOffset -= (int) amount * 20;
         clampOffset();

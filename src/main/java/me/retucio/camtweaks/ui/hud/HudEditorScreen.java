@@ -1,9 +1,7 @@
 package me.retucio.camtweaks.ui.hud;
 
 import me.retucio.camtweaks.config.ConfigManager;
-import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.HUD;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;

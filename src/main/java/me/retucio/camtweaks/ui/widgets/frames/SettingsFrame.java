@@ -1,97 +1,45 @@
-package me.retucio.camtweaks.ui.frames;
+package me.retucio.camtweaks.ui.widgets.frames;
 
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.SettingsFrameEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.*;
+import me.retucio.camtweaks.ui.widgets.buttons.settings.*;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.ui.buttons.*;
-import me.retucio.camtweaks.ui.buttons.SliderButton;
-import me.retucio.camtweaks.ui.buttons.TextButton;
-import me.retucio.camtweaks.ui.buttons.ToggleButton;
+import me.retucio.camtweaks.ui.widgets.buttons.*;
+import me.retucio.camtweaks.ui.widgets.Frame;
 import me.retucio.camtweaks.util.Colors;
-import net.minecraft.client.MinecraftClient;
+
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 // marco para los botones de los ajustes de cada módulo
-public class SettingsFrame {
+public class SettingsFrame extends Frame<SettingButton<? extends Setting>> {
 
-    final String title;
     public Module module;
-    final List<SettingButton> settingButtons = new ArrayList<>();
 
-    public List<SettingButton> visibleButtons = new ArrayList<>();
-
-    public int x, y, w, h;
-    public int renderY;
-    int dragX, dragY;
-    boolean dragging;
-    public int totalHeight = 0;
-
-    public final MinecraftClient mc = MinecraftClient.getInstance();
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public SettingsFrame(Module module, int x, int y, int w, int h) {
+        super("ajustes de " + module.getName(), x, y, w, h);
         this.module = module;
 
         // asegurarse de que no se sale de la pantalla
-        if (mc.getWindow() != null && x + w > mc.getWindow().getScaledWidth())
-            this.x = mc.getWindow().getScaledWidth() - w;
-        else
-            this.x = x;
-
-        this.y = y;
-        this.w = w;
-        this.h = h;
-
-        // añadir el respectivo tipo de botón de cada ajuste a la lista de botones
-        int offset = h;
-        for (Setting setting : module.getSettings()) {
-            switch (setting) {
-                case BooleanSetting b -> {
-                    addButton(new ToggleButton(b, this, offset));
-                    offset += 18;
-                } case NumberSetting n -> {
-                    addButton(new SliderButton(n, this, offset));
-                    offset += 18;
-                } case EnumSetting e -> {
-                    addButton(new CycleButton<>(e, this, offset));
-                    offset += 18;
-                } case KeySetting k -> {
-                    addButton(new BindButton(k, this, offset));
-                    offset += 18;
-                } case StringSetting s -> {
-                    addButton(new TextButton(s, this, offset));
-                    offset += 18;
-                } case ListSetting l -> {
-                    addButton(new ListButton<>(l, this, offset));
-                    offset += 18;
-                } case ColorSetting c -> {
-                    addButton(new ColorButton(c, this, offset));
-                    offset += 18;
-                } case OptionSetting o -> {
-                    addButton(new ChooseButton<>(o, this, offset));
-                    offset += 18;
-                }
-                default -> {}
-            }
+        if (mc.getWindow() != null) {
+            this.x = Math.clamp(this.x, 0, mc.getWindow().getScaledWidth() - w);
+            this.y = Math.clamp(this.y, 0, mc.getWindow().getScaledHeight() - totalHeight - h);
         }
-        title = "ajustes de " + module.getName();
 
-        visibleButtons = settingButtons.stream()
+        addButtons();
+
+        visibleButtons = buttons.stream()
                 .filter(sb -> sb.getSetting().isVisible())
                 .toList();
     }
 
-    public void addButton(SettingButton button) {
-        settingButtons.add(button);
-        updateWidth();  // actualizar anchura del frame tras cada iteración
-    }
-
+    @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         updateWidth();
 
@@ -117,7 +65,7 @@ public class SettingsFrame {
         ctx.drawText(mc.textRenderer, title, titleX, titleY, -1, true);
         ctx.drawText(mc.textRenderer, "×", x + w - mc.textRenderer.getWidth("×") - 8, titleY, closeButtonColor, true);
 
-        visibleButtons = settingButtons.stream()
+        visibleButtons = buttons.stream()
                 .filter(sb -> sb.getSetting().isVisible() && sb.getSetting().isSearchMatch())
                 .toList();
 
@@ -143,7 +91,7 @@ public class SettingsFrame {
         }
 
         int startButtonY = firstLineY - descBoxTop + descBoxBottom;
-        for (SettingButton sb : visibleButtons) {
+        for (SettingButton<?> sb : visibleButtons) {
             sb.setX(x + 4);
             sb.setY(startButtonY);
             sb.setW(w - 8);
@@ -153,75 +101,64 @@ public class SettingsFrame {
         }
     }
 
-    public void drawTooltips(DrawContext ctx, double mouseX, double mouseY) {
-        for (SettingButton sb : visibleButtons)
+    @Override
+    public void drawTooltips(DrawContext ctx, int mouseX, int mouseY) {
+        for (SettingButton<?> sb : visibleButtons)
             sb.drawTooltip(ctx, mouseX, mouseY);
     }
 
-
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int button) {
         if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             if (isCloseButtonHovered(mouseX, mouseY)) {
                 ClickGUI.INSTANCE.closeSettingsFrame(this.module);
                 return;
             } if (button == 0) {
                 dragging = true;
-                dragX = (int) (mouseX - x);
-                dragY = (int) (mouseY - y);
+                dragX = mouseX - x;
+                dragY = mouseY - y;
             } else if (button == 1) {
                 ClickGUI.INSTANCE.closeSettingsFrame(module);
             }
         }
 
-        for (SettingButton sb : visibleButtons)
+        for (SettingButton<?> sb : visibleButtons)
             sb.mouseClicked(mouseX, mouseY, button);
     }
 
-    public void mouseReleased(double mouseX, double mouseY, int button) {
-        ClickGUI.INSTANCE.unselect(this);
+    @Override
+    public void mouseReleased(int mouseX, int mouseY, int button) {
+        super.mouseReleased(mouseX, mouseY, button);
         if (button == 0) {
             dragging = false;
             CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Move(this));
         }
 
-        for (SettingButton sb : visibleButtons)
+        for (SettingButton<?> sb : visibleButtons)
             sb.mouseReleased(mouseX, mouseY, button);
     }
 
-    public void mouseDragged(double mouseX, double mouseY) {
-        for (SettingButton sb : visibleButtons)
+    @Override
+    public void mouseDragged(int mouseX, int mouseY) {
+        for (SettingButton<?> sb : visibleButtons)
             sb.mouseDragged(mouseX, mouseY);
     }
 
-    public void updatePosition(double mouseX, double mouseY) {
-        if (dragging) {
-            x = (int) (mouseX - dragX);
-            y = (int) (mouseY - dragY);
-        }
-    }
+    @Override
+    public void onKey(int key, int action) {}
 
-    public boolean isHovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + w &&
-                mouseY > renderY && mouseY < renderY + h;
-    }
-
-    public boolean isCloseButtonHovered(double mouseX, double mouseY) {
-        return mouseX > x + w - mc.textRenderer.getWidth("×") - 12 && mouseX < x + w - 4
-                && mouseY > renderY + 4 && mouseY < renderY + h - 4;
-    }
-
-    @SuppressWarnings("rawtypes")
-    void updateWidth() {
+    @Override
+    public void updateWidth() {
         // asegurarse de que todos los botones caben en el marco, haciendo que la anchura se ajuste al texto más largo
         if (mc.textRenderer == null) return;
 
         int maxWidth = mc.textRenderer.getWidth(title);
-        for (SettingButton button : settingButtons) {
+        for (SettingButton<?> button : buttons) {
             String text = button.getSetting().getName();
 
             switch (button) {
                 case SliderButton sliderButton -> text += ": " + sliderButton.df.format((sliderButton.getSetting()).getValue());
-                case CycleButton cycleButton -> text += ": " + cycleButton.getSetting().getValue();
+                case CycleButton<?> cycleButton -> text += ": " + cycleButton.getSetting().getValue();
                 case BindButton bindButton -> text += ": " + bindButton.getSetting().getKeyName();
                 case TextButton textButton -> text += ": " + textButton.getSetting().getValue();
                 default -> {}
@@ -232,6 +169,14 @@ public class SettingsFrame {
         }
         this.w = maxWidth + 30;
     }
+
+    public void updatePosition(double mouseX, double mouseY) {
+        if (dragging) {
+            x = (int) (mouseX - dragX);
+            y = (int) (mouseY - dragY);
+        }
+    }
+
 
     private List<String> wrapDescription(String text, int maxWidth) {
         List<String> lines = new ArrayList<>();
@@ -253,11 +198,56 @@ public class SettingsFrame {
         return lines;
     }
 
-    public List<SettingButton> getButtons() {
-        return settingButtons;
+    private void addButtons() {
+        int offset = h;
+
+        for (Setting setting : module.getSettings()) {
+            switch (setting) {
+                case BooleanSetting b -> {
+                    addButton(new ToggleButton(b, this, offset));
+                    offset += 18;
+                }
+                case NumberSetting n -> {
+                    addButton(new SliderButton(n, this, offset));
+                    offset += 18;
+                }
+                case EnumSetting<?> e -> {
+                    addButton(new CycleButton<>(e, this, offset));
+                    offset += 18;
+                }
+                case KeySetting k -> {
+                    addButton(new BindButton(k, this, offset));
+                    offset += 18;
+                }
+                case StringSetting s -> {
+                    addButton(new TextButton(s, this, offset));
+                    offset += 18;
+                }
+                case ListSetting<?> l -> {
+                    addButton(new ListButton<>(l, this, offset));
+                    offset += 18;
+                }
+                case ColorSetting c -> {
+                    addButton(new ColorButton(c, this, offset));
+                    offset += 18;
+                }
+                case OptionSetting<?> o -> {
+                    addButton(new ChooseButton<>(o, this, offset));
+                    offset += 18;
+                }
+                default -> {
+                }
+            }
+        }
     }
 
-    public void updateRenderY(int scrollOffset) {
-        renderY = y - scrollOffset;
+    public void addButton(SettingButton<?> button) {
+        buttons.add(button);
+        updateWidth();  // actualizar anchura del frame tras cada iteración
+    }
+
+    protected boolean isCloseButtonHovered(double mouseX, double mouseY) {
+        return mouseX > x + w - mc.textRenderer.getWidth("×") - 12 && mouseX < x + w - 4
+                && mouseY > renderY + 4 && mouseY < renderY + h - 4;
     }
 }

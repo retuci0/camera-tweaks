@@ -1,21 +1,22 @@
-package me.retucio.camtweaks.ui.buttons;
+package me.retucio.camtweaks.ui.widgets.buttons.settings;
 
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.ListSetting;
+import me.retucio.camtweaks.ui.widgets.buttons.SettingButton;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.ui.frames.SettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
 import me.retucio.camtweaks.util.Colors;
+import me.retucio.camtweaks.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.util.*;
 
-import static me.retucio.camtweaks.CameraTweaks.mc;
 
-public class ListButton<T> extends SettingButton {
+// botón para los ajustes de selección múltiple
+public class ListButton<T> extends SettingButton<ListSetting<T>> {
 
-    private final ListSetting<T> setting;
     private final Module dummy;
 
     private final Map<T, BooleanSetting> optionButtons = new HashMap<>();
@@ -31,50 +32,49 @@ public class ListButton<T> extends SettingButton {
         };
 
         // ocultar cosas innecesarias
-        dummy.getBind().setVisible(false);
-        dummy.getSettings().stream()
-                .filter(s -> s.getName().equalsIgnoreCase("modo de tecla"))
-                .findFirst()
-                .ifPresent(s -> s.setVisible(false));
-        dummy.getSettings().stream()
-                .filter(s -> s.getName().equalsIgnoreCase("notificar"))
-                .findFirst()
-                .ifPresent(s -> s.setVisible(false));
+        dummy.getSettings().get(0).setVisible(false);
+        dummy.getSettings().get(1).setVisible(false);
+        dummy.getSettings().get(2).setVisible(false);
         dummy.shouldSaveSettings(false);
     }
 
     @Override
-    public void render(DrawContext ctx, double mouseX, double mouseY, float delta) {
+    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        // fondo
         int bgColor = isHovered(mouseX, mouseY)
                 ? Colors.buttonColor.brighter().getRGB()
                 : Colors.buttonColor.getRGB();
-
         ctx.fill(x, y, x + w, y + h, bgColor);
 
+        // texto: nombre + número de opciones seleccionadas / total de opciones
         String label = setting.getName() + " (" + countEnabled() + "/" + setting.getOptions().size() + ")";
-        ctx.drawText(parent.mc.textRenderer, label, x + 5, y + 3, -1, true);
+        ctx.drawText(mc.textRenderer, label, x + 5, y + 3, -1, true);
     }
 
     @Override
-    public void drawTooltip(DrawContext ctx, double mouseX, double mouseY) {
+    public void drawTooltip(DrawContext ctx, int mouseX, int mouseY) {
         if (isHovered(mouseX, mouseY))
-            ctx.drawTooltip(Text.of(setting.getDescription() + " (" + countEnabled() + " de " + setting.getOptions().size() + ")"), (int) mouseX, (int) mouseY);
+            ctx.drawTooltip(Text.of(
+                    setting.getDescription()
+                            + " (" + countEnabled() + " de "
+                            + setting.getOptions().size() + ")"),
+                    mouseX, mouseY);
     }
 
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public void mouseClicked(int mouseX, int mouseY, int button) {
         if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
-            // click izquierdo / derecho: abrir marco
-            if (button <= 1 && !mc.isShiftPressed()) {
+            // clic izquierdo / derecho: abrir marco
+            if (button <= 1 && !KeyUtil.isShiftDown()) {
                 if (ClickGUI.INSTANCE.isSettingsFrameOpen(dummy)) {
                     ClickGUI.INSTANCE.closeSettingsFrame(dummy);
                     return;
                 }
 
                 rebuildDummy();
-                ClickGUI.INSTANCE.openListSettingsFrame(dummy, parent.x + 40, parent.y + 40);
+                ClickGUI.INSTANCE.openListSettingsFrame(dummy, parent.getX() + 40, parent.getY() + 40);
             // shift + clic derecho: restablecer valores
-            } else if (button == 1 && mc.isShiftPressed()) {
+            } else if (button == 1 && KeyUtil.isShiftDown()) {
                 setting.reset();
                 refreshDummy();
             }
@@ -107,16 +107,4 @@ public class ListButton<T> extends SettingButton {
     private int countEnabled() {
         return (int) setting.getOptions().stream().filter(setting::isEnabled).count();
     }
-
-    public ListSetting<T> getSetting() {
-        return setting;
-    }
-
-    @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
-        ClickGUI.INSTANCE.unselect(this);
-    }
-
-    @Override
-    public void mouseDragged(double mouseX, double mouseY) {}
 }

@@ -20,12 +20,13 @@ import me.retucio.camtweaks.module.modules.HUD;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.hud.HudEditorScreen;
 import me.retucio.camtweaks.ui.hud.HudRenderer;
-import me.retucio.camtweaks.ui.buttons.BindButton;
-import me.retucio.camtweaks.ui.buttons.SettingButton;
-import me.retucio.camtweaks.ui.buttons.TextButton;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
-import me.retucio.camtweaks.ui.frames.SettingsFrame;
+import me.retucio.camtweaks.ui.widgets.buttons.settings.BindButton;
+import me.retucio.camtweaks.ui.widgets.buttons.SettingButton;
+import me.retucio.camtweaks.ui.widgets.buttons.settings.TextButton;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
 
+import me.retucio.camtweaks.ui.widgets.Button;
 import me.retucio.camtweaks.util.*;
 
 
@@ -84,7 +85,7 @@ public class CameraTweaks implements ClientModInitializer {
 
         EVENT_BUS.register(this);
 
-        EVENT_BUS.register(new HudRenderer());
+        EVENT_BUS.register(HudRenderer.class);
 
         EVENT_BUS.register(ChatUtil.class);
         EVENT_BUS.register(DrawUtil.class);
@@ -149,7 +150,7 @@ public class CameraTweaks implements ClientModInitializer {
     // verifica si algún botón de ajustes está escuchando
     private boolean isAnySettingButtonFocused() {
         for (SettingsFrame sf : ClickGUI.INSTANCE.getSettingsFrames())
-            for (SettingButton sb : sf.getButtons())
+            for (Button sb : sf.getButtons())
                 if ((sb instanceof BindButton b && b.isFocused()) || (sb instanceof TextButton t && t.isFocused()))
                     return true;
         return false;
@@ -173,8 +174,8 @@ public class CameraTweaks implements ClientModInitializer {
     private void handleSettingButtonsKey(int key, int action) {
         for (SettingsFrame sf : ClickGUI.INSTANCE.getSettingsFrames()) {
             for (SettingButton sb : sf.getButtons()) {
-                if (sb instanceof BindButton b) b.onKey(key, action);
-                else if (sb instanceof TextButton t) t.onKey(key, action);
+                if (sb instanceof BindButton bb) bb.onKey(key, action);
+                if (sb instanceof TextButton tb) tb.onKey(key, action);
             }
         }
     }

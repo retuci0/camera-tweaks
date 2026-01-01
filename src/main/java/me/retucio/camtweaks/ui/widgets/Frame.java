@@ -1,63 +1,51 @@
 package me.retucio.camtweaks.ui.widgets;
 
-import me.retucio.camtweaks.ui.screen.ClickGUI;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Frame {
+public abstract class Frame<B extends Button> extends Widget  {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    protected String title;
 
-    public final String title;
-    private final List<Button> buttons = new ArrayList<>();
-    private List<Button> visibleButtons = new ArrayList<>();
+    protected final List<B> buttons = new ArrayList<>();
+    protected List<B> visibleButtons = new ArrayList<>();
 
-    private int x, y, w, h;
-    private int renderY;
-    private int dragX, dragY;
-    private boolean dragging;
-    public int totalHeight = 0;
+    protected int renderY;
+    protected int totalHeight = 0;
+
+    protected int dragX, dragY;
+    protected boolean dragging;
 
     public Frame(String title, int x, int y, int w, int h) {
+        super(x, y, w, h);
         this.title = title;
-
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
     }
-
-    public abstract void render(DrawContext ctx, int mouseX, int mouseY, float delta);
 
     public void drawTooltips(DrawContext ctx, int mouseX, int mouseY) {
         for (Button button : visibleButtons) button.drawTooltip(ctx, mouseX, mouseY);
     }
 
-    public abstract void mouseClicked(int mouseX, int mouseY, int button);
-    public abstract void mouseDragged(int mouseX, int mouseY);
-    public void mouseReleased(int mouseX, int mouseY, int button) {
-        ClickGUI.INSTANCE.unselect(this);
-    }
+    protected abstract void updateWidth();
 
-    public abstract void updateWidth();
-
-    public List<Button> getButtons() {
-        return buttons;
-    }
-
-    public List<Button> getVisibleButtons() {
-        return visibleButtons;
-    }
-
-    public boolean isHovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + w && mouseY > renderY && mouseY < renderY + h;
+    @Override
+    // verificar si el puntero del ratón se encuentra encima
+    public boolean isHovered(int mouseX, int mouseY) {
+        return mouseX > x && mouseX < x + w
+                && mouseY > renderY && mouseY < renderY + h;
     }
 
     public void updateRenderY(int scrollOffset) {
         renderY = y - scrollOffset;
     }
 
+    public List<B> getButtons() { return buttons; }
+    public List<B> getVisibleButtons() { return visibleButtons; }
+
+    public int getRenderY() { return renderY; }
+    public void setRenderY(int renderY) { this.renderY = renderY; }
+
+    public int getTotalHeight() { return totalHeight; }
+    public void setTotalHeight(int totalHeight) { this.totalHeight = totalHeight; }
 }

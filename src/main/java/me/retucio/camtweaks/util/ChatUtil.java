@@ -3,7 +3,7 @@ package me.retucio.camtweaks.util;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.camtweaks.LoadModuleManagerEvent;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;

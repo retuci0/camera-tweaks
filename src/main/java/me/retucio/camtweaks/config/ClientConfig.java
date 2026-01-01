@@ -80,39 +80,39 @@ public class ClientConfig {
 
     @SubscribeEvent
     public void onMoveSettingsFrame(SettingsFrameEvent.Move event) {
-        settingsFrames.replace(event.getFrame().module.getName(), new int[]{event.getFrame().x, event.getFrame().y});
+        settingsFrames.replace(event.getFrame().module.getName(), new int[]{event.getFrame().getX(), event.getFrame().getY()});
         ConfigManager.save();
     }
 
     @SubscribeEvent
     public void onExtendModuleFrame(ModuleFrameEvent.Extend event) {
         extendableFrames.put("M", new FrameData(
-                ClickGUI.INSTANCE.getModulesFrame().x,
-                ClickGUI.INSTANCE.getModulesFrame().y,
+                ClickGUI.INSTANCE.getModulesFrame().getX(),
+                ClickGUI.INSTANCE.getModulesFrame().getY(),
                 ClickGUI.INSTANCE.getModulesFrame().extended));
     }
 
     @SubscribeEvent
     public void onMoveModuleFrame(ModuleFrameEvent.Move event) {
         extendableFrames.replace("M", new FrameData(
-                ClickGUI.INSTANCE.getModulesFrame().x,
-                ClickGUI.INSTANCE.getModulesFrame().y,
+                ClickGUI.INSTANCE.getModulesFrame().getX(),
+                ClickGUI.INSTANCE.getModulesFrame().getY(),
                 ClickGUI.INSTANCE.getModulesFrame().extended));
     }
 
     @SubscribeEvent
     public void onExtendGUISettingsFrame(GUISettingsFrameEvent.Extend event) {
         extendableFrames.put("S", new FrameData(
-                ClickGUI.INSTANCE.getGuiSettingsFrame().x,
-                ClickGUI.INSTANCE.getGuiSettingsFrame().y,
+                ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),
+                ClickGUI.INSTANCE.getGuiSettingsFrame().getY(),
                 ClickGUI.INSTANCE.getGuiSettingsFrame().extended));
     }
 
     @SubscribeEvent
     public void onMoveGUISettingsFrame(GUISettingsFrameEvent.Move event) {
         extendableFrames.replace("S", new FrameData(
-                ClickGUI.INSTANCE.getGuiSettingsFrame().x,
-                ClickGUI.INSTANCE.getGuiSettingsFrame().y,
+                ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),
+                ClickGUI.INSTANCE.getGuiSettingsFrame().getY(),
                 ClickGUI.INSTANCE.getGuiSettingsFrame().extended));
     }
 

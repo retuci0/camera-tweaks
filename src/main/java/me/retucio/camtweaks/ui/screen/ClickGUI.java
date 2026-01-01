@@ -9,15 +9,18 @@ import me.retucio.camtweaks.event.events.camtweaks.SettingsFrameEvent;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.Setting;
 import me.retucio.camtweaks.module.settings.ColorSetting;
-import me.retucio.camtweaks.ui.buttons.ListButton;
-import me.retucio.camtweaks.ui.buttons.ModuleButton;
-import me.retucio.camtweaks.ui.buttons.SettingButton;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
-import me.retucio.camtweaks.ui.frames.ColorPickerFrame;
-import me.retucio.camtweaks.ui.frames.ModuleFrame;
-import me.retucio.camtweaks.ui.frames.SettingsFrame;
-import me.retucio.camtweaks.ui.widgets.ScrollBarWidget;
-import me.retucio.camtweaks.ui.widgets.SearchBarWidget;
+import me.retucio.camtweaks.ui.widgets.buttons.settings.ListButton;
+import me.retucio.camtweaks.ui.widgets.buttons.ModuleButton;
+import me.retucio.camtweaks.ui.widgets.buttons.SettingButton;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ColorPickerFrame;
+import me.retucio.camtweaks.ui.widgets.frames.ModuleFrame;
+import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
+import me.retucio.camtweaks.ui.widgets.Button;
+import me.retucio.camtweaks.ui.widgets.Frame;
+import me.retucio.camtweaks.ui.widgets.Widget;
+import me.retucio.camtweaks.ui.widgets.misc.ScrollBarWidget;
+import me.retucio.camtweaks.ui.widgets.misc.SearchBarWidget;
 import me.retucio.camtweaks.util.KeyUtil;
 
 import net.minecraft.client.MinecraftClient;
@@ -29,16 +32,19 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static me.retucio.camtweaks.ui.frames.ClientSettingsFrame.guiSettings;
+import static me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame.guiSettings;
 
 // interfaz gráfica, se abre con el shift derecho por defecto. aquí se encuentran los módulos y sus ajustes
 public class ClickGUI extends Screen {
 
+    private final MinecraftClient mc = MinecraftClient.getInstance();
     public static ClickGUI INSTANCE;
+
     private boolean anyFocused;
-    private Object selected = null;
+    private Widget selected = null;
 
     private final ModuleFrame modulesFrame = new ModuleFrame(20, 30, 100, 20);
     private final List<SettingsFrame> settingsFrames = new ArrayList<>();
@@ -46,8 +52,7 @@ public class ClickGUI extends Screen {
 
     private final ScrollBarWidget scrollBar = new ScrollBarWidget();
     private final SearchBarWidget searchBar = new SearchBarWidget(340, 16, 300, 20);
-
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final List<Widget> miscWidgets = Arrays.asList(scrollBar, searchBar);
 
     public ClickGUI() {
         super(Text.of("interfaz"));
@@ -59,7 +64,7 @@ public class ClickGUI extends Screen {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         scrollBar.setWindowHeight(mc.getWindow().getScaledHeight());
         scrollBar.setContentHeight(calculateContentHeight());
-        scrollBar.render(ctx, mouseX, mouseY);
+        scrollBar.render(ctx, mouseX, mouseY, delta);
 
         int scrollOffset = scrollBar.getScrollOffset();
 
@@ -111,43 +116,52 @@ public class ClickGUI extends Screen {
     }
 
     private int calculateContentHeight() {
-        int bottom = modulesFrame.y + modulesFrame.h + modulesFrame.totalHeight;
+        int bottom = modulesFrame.getY() + modulesFrame.getH() + modulesFrame.getTotalHeight();
         for (SettingsFrame frame : settingsFrames)
-            bottom = Math.max(bottom, frame.y + frame.h + frame.totalHeight);
+            bottom = Math.max(bottom, frame.getY() + frame.getH() + frame.getTotalHeight());
 
         return bottom + 20;  // padding
     }
 
 
     public boolean mouseClicked(Click click, boolean doubled) {
-        scrollBar.mouseClicked(click.x(), click.y(), click.button());
-        searchBar.mouseClicked(click.x(), click.y(), click.button());
+        miscWidgets.forEach(w -> w.mouseClicked(
+                (int) click.x(),
+                (int) click.y(),
+                click.button()));
 
         // detectar clics sobre los marcos
-        modulesFrame.mouseClicked(click.x(), click.y(), click.button());
+        modulesFrame.mouseClicked((int) click.x(), (int) click.y(), click.button());
         for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseClicked(click.x(), click.y(), click.button());
+            sf.mouseClicked((int) click.x(), (int) click.y(), click.button());
 
         return super.mouseClicked(click, doubled);
     }
 
     @Override
     public boolean mouseReleased(Click click) {
-        scrollBar.mouseReleased(click.x(), click.y(), click.button());
-        searchBar.mouseReleased(click.x(), click.y(), click.button());
+        miscWidgets.forEach(w -> w.mouseReleased(
+                (int) click.x(),
+                (int) click.y(),
+                click.button()));
 
         // registrar cuándo se suelta el clic, en cada marco respectivamente
-        modulesFrame.mouseReleased(click.x(), click.y(), click.button());
+        modulesFrame.mouseReleased((int) click.x(), (int) click.y(), click.button());
         for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseReleased(click.x(), click.y(), click.button());
+            sf.mouseReleased((int) click.x(), (int) click.y(), click.button());
+
         return super.mouseReleased(click);
     }
 
     @Override
     public boolean mouseDragged(Click click, double deltaX, double deltaY) {
-        scrollBar.mouseDragged(click.y());
+        miscWidgets.forEach(w -> w.mouseDragged(
+                (int) click.x(),
+                (int) click.y()));
+
         for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseDragged(click.x(), click.y());
+            sf.mouseDragged((int) click.x(), (int) click.y());
+
         return super.mouseDragged(click, deltaX, deltaY);
     }
 
@@ -158,8 +172,8 @@ public class ClickGUI extends Screen {
 
     @SubscribeEvent
     public void onMouseScroll(MouseScrollEvent event) {
-        // subir y bajar la pantalla con la rueda del ratón
-        scrollBar.onMouseScroll(event.getVertical() * guiSettings.scrollSens.getValue());
+        miscWidgets.forEach(w -> w.mouseScrolled(
+                event.getVertical() * guiSettings.scrollSens.getValue()));
     }
 
     @SubscribeEvent
@@ -168,13 +182,13 @@ public class ClickGUI extends Screen {
         if (CameraTweaks.mc.currentScreen != this || event.getButton() != 2 || !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) return;
 
         int h = CameraTweaks.mc.getWindow().getScaledHeight();
-        int minY = Math.min(modulesFrame.y, settingsFrames.stream().mapToInt(sf -> sf.y).min().orElse(modulesFrame.y));
-        int maxY = Math.max(modulesFrame.y + modulesFrame.h, settingsFrames.stream().mapToInt(sf -> sf.y + sf.h).max().orElse(modulesFrame.y + modulesFrame.h));
+        int minY = Math.min(modulesFrame.getY(), settingsFrames.stream().mapToInt(Frame::getY).min().orElse(modulesFrame.getY()));
+        int maxY = Math.max(modulesFrame.getY() + modulesFrame.getH(), settingsFrames.stream().mapToInt(sf -> sf.getY() + sf.getH()).max().orElse(modulesFrame.getY() + modulesFrame.getH()));
         int correction = minY < 0 ? -minY + 4 : (maxY > h ? h - maxY - 4 : 0);
 
         if (correction != 0) {
-            modulesFrame.y += correction;
-            settingsFrames.forEach(sf -> sf.y += correction);
+            modulesFrame.setY(modulesFrame.getY() + correction);
+            settingsFrames.forEach(sf -> sf.setY(sf.getY() + correction));
         }
     }
 
@@ -183,7 +197,8 @@ public class ClickGUI extends Screen {
         String searchInput = searchBar.getSearchInput().trim();
         if (!guiSettings.matchCase.isEnabled()) searchInput = searchInput.toLowerCase();
 
-        for (ModuleButton mb : modulesFrame.getButtons()) {
+        for (Button b : modulesFrame.getButtons()) {
+            if (!(b instanceof ModuleButton mb)) return;
             Module module = mb.getModule();
 
             if (searchInput.isEmpty()) {
@@ -203,7 +218,8 @@ public class ClickGUI extends Screen {
         }
 
         for (SettingsFrame sf : settingsFrames) {
-            for (SettingButton sb : sf.getButtons()) {
+            for (Button b : sf.getButtons()) {
+                if (!(b instanceof SettingButton<?> sb)) return;
                 Setting setting = sb.getSetting();
 
                 if (searchInput.isEmpty()) {
@@ -224,17 +240,18 @@ public class ClickGUI extends Screen {
         }
     }
 
+    // abrir un marco donde se encuentran los ajustes del módulo deseado
     public void openSettingsFrame(Module module, int x, int y) {
-        // abrir un marco donde se encuentran los ajustes del módulo deseado
         if (isSettingsFrameOpen(module)) return;  // permitir un solo marco de ajustes por módulo
         SettingsFrame frame = new SettingsFrame(module, x, y, 120, 20);
         settingsFrames.add(frame);
         CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Open(frame));
     }
 
-    public void openListSettingsFrame(Module module, int x, int y) {
-        if (isSettingsFrameOpen(module)) return;
-        SettingsFrame frame = new SettingsFrame(module, x, y, 120, 18);
+    // abrir un marco de ajustes específicamente para ajustes de selección múltiple
+    public void openListSettingsFrame(Module dummy, int x, int y) {
+        if (isSettingsFrameOpen(dummy)) return;
+        SettingsFrame frame = new SettingsFrame(dummy, x, y, 120, 18);
         settingsFrames.add(frame);
     }
 
@@ -244,12 +261,13 @@ public class ClickGUI extends Screen {
         List<SettingsFrame> toRemove = new ArrayList<>();
         for (SettingsFrame sf : settingsFrames) {
             if ((sf instanceof ColorPickerFrame cpf && cpf.dummyModule == module)  // para los selectores de colores
-                    || (!(sf instanceof ColorPickerFrame) && sf.module == module)) {    // lógica muy mierdas, lo sé, pero paso de hacerlo bien
-                CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Close(sf));
+                    || (!(sf instanceof ColorPickerFrame) && sf.module == module)) { // lógica muy mierdas, lo sé, pero paso de hacerlo bien
                 toRemove.add(sf);
+                CameraTweaks.EVENT_BUS.post(new SettingsFrameEvent.Close(sf));
                 unselect(sf);
             }
         }
+
         settingsFrames.removeAll(toRemove);
     }
 
@@ -257,13 +275,6 @@ public class ClickGUI extends Screen {
     public boolean isSettingsFrameOpen(Module module) {
         return settingsFrames.stream()
                 .anyMatch(sf -> sf.module.getName().equals(module.getName()));
-    }
-
-    public void refreshListButtons() {
-        for (SettingsFrame frame : settingsFrames)
-            for (SettingButton button : frame.getButtons())
-                if (button instanceof ListButton<?> lb)
-                    lb.refreshDummy();
     }
 
     public boolean isColorPickerFrameOpen(ColorSetting setting) {
@@ -279,7 +290,7 @@ public class ClickGUI extends Screen {
         if (isColorPickerFrameOpen(frame.getColorSetting())) {
             closeColorPickerFrame(frame.getColorSetting());
             return;
-        };
+        }
         settingsFrames.add(frame);
     }
 
@@ -291,6 +302,14 @@ public class ClickGUI extends Screen {
             }
         }
     }
+
+    public void refreshListButtons() {
+        for (SettingsFrame frame : settingsFrames)
+            for (Button button : frame.getButtons())
+                if (button instanceof ListButton<?> lb)
+                    lb.refreshDummy();
+    }
+
 
     // métodos del súper
 
@@ -332,6 +351,8 @@ public class ClickGUI extends Screen {
         return guiSettingsFrame;
     }
 
+    public List<Widget> getMiscWidgets() { return miscWidgets; }
+
     public List<SettingsFrame> getSettingsFrames() {
         return settingsFrames;
     }
@@ -347,27 +368,27 @@ public class ClickGUI extends Screen {
 
     // selección de widgets
 
-    public Object getSelected() {
+    public Widget getSelected() {
         return selected;
     }
 
-    public void setSelected(Object object) {
-        this.selected = object;
+    public void setSelected(Widget widget) {
+        this.selected = widget;
     }
 
-    public boolean canSelect(Object object) {
-        return getSelected() == null || getSelected() == object;
+    public boolean canSelect(Widget widget) {
+        return getSelected() == null || getSelected() == widget;
     }
 
-    public boolean trySelect(Object object) {
-        if (canSelect(object)) {
-            setSelected(object);
+    public boolean trySelect(Widget widget) {
+        if (canSelect(widget)) {
+            setSelected(widget);
             return true;
         }
         return false;
     }
 
-    public void unselect(Object object) {
-        if (selected == object) setSelected(null);
+    public void unselect(Widget widget) {
+        if (selected == widget) setSelected(null);
     }
 }

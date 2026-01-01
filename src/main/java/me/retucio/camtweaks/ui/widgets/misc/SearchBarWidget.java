@@ -1,11 +1,11 @@
-package me.retucio.camtweaks.ui.widgets;
+package me.retucio.camtweaks.ui.widgets.misc;
 
 import me.retucio.camtweaks.config.ConfigManager;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
-import me.retucio.camtweaks.ui.frames.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.camtweaks.ui.widgets.Widget;
 import me.retucio.camtweaks.util.Colors;
 import me.retucio.camtweaks.util.KeyUtil;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -13,28 +13,22 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
 
-public class SearchBarWidget {
+public class SearchBarWidget extends Widget {
 
     private boolean dragging;
     private int dragX, dragY;
 
-    private int x, y;
-    private final int w, h;
     private int renderY;
 
     private boolean focused;
     private final StringBuilder buffer = new StringBuilder();
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
-
     public SearchBarWidget(int x, int y, int w, int h) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+        super(x, y, w, h);
     }
 
-    public void render(DrawContext ctx, double mouseX, double mouseY, float delta) {
+    @Override
+    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         if (!ClientSettingsFrame.guiSettings.searchBar.isEnabled()) return;
 
         Color textFieldColor = isTextFieldHovered(mouseX, mouseY)
@@ -66,7 +60,8 @@ public class SearchBarWidget {
                 isClearButtonHovered(mouseX, mouseY) ? Color.RED.getRGB() : -1, true);
     }
 
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int button) {
         if (button != 0 || !ClientSettingsFrame.guiSettings.searchBar.isEnabled()) return;
         if (isHandleHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             dragging = true;
@@ -78,7 +73,8 @@ public class SearchBarWidget {
         focused = isTextFieldHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this);
     }
 
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    @Override
+    public void mouseReleased(int mouseX, int mouseY, int button) {
         if (!ClientSettingsFrame.guiSettings.searchBar.isEnabled()) return;
         ClickGUI.INSTANCE.unselect(this);
         if (button == 0 && dragging) {
@@ -87,6 +83,12 @@ public class SearchBarWidget {
         }
     }
 
+    @Override
+    public void mouseDragged(int mouseX, int mouseY) {
+
+    }
+
+    @Override
     public void onKey(int key, int action) {
         if (!ClientSettingsFrame.guiSettings.searchBar.isEnabled()) return;
         if (!focused || action == GLFW.GLFW_RELEASE) return;
@@ -161,21 +163,5 @@ public class SearchBarWidget {
         if (ConfigManager.getConfig() != null) {
             ConfigManager.setSearchBarPosition(x, y);
         }
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
     }
 }

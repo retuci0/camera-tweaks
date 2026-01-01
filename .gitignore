@@ -44,5 +44,3 @@ replay_*.log
 todo.txt
 cambios.md
 remappedSrc/
-src/main/java/me/retucio/camtweaks/ui/widgets/Frame.java
-src/main/java/me/retucio/camtweaks/ui/widgets/Button.java
