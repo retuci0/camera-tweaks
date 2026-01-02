@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Reconnect;
+import me.retucio.camtweaks.module.modules.network.Reconnect;
 
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;

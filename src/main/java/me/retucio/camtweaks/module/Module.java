@@ -23,6 +23,8 @@ public class Module {
     // atributos
     private String name;
     private String description;
+    private Category category;
+
     private boolean enabled;
     private boolean saveSettings = true;
     private boolean searchMatch = true;
@@ -36,20 +38,23 @@ public class Module {
 
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
-    public Module(String name, String description) {
+    public Module(String name, String description, Category category) {
         this.name = name;
         this.description = description;
+        this.category =  category;
         addSettings(bind, keyMode, notify);
     }
 
-    public Module(String name, String description, int key) {
+    public Module(String name, String description, Category category, int key) {
         this.name = name;
         this.description = description;
+        this.category = category;
         addSettings(bind, keyMode, notify);
         this.bind.setDefaultKey(key);
 
         // puto marcos
-        if (ConfigManager.getConfig().settings.get(this.getName() + ":" + bind.getName()) == null)
+        if (ConfigManager.getConfig().settings
+                .get(this.getName() + ":" + bind.getName()) == null)
             this.bind.setKey(key);
     }
 
@@ -113,6 +118,14 @@ public class Module {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public boolean isEnabled() {

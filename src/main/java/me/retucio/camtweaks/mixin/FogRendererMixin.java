@@ -3,7 +3,7 @@ package me.retucio.camtweaks.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.NoRender;
+import me.retucio.camtweaks.module.modules.render.NoRender;
 import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.fog.FogModifier;
@@ -28,7 +28,7 @@ public abstract class FogRendererMixin {
         noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
     }
 
-    @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/fog/FogModifier;shouldApply(Lnet/minecraft/block/enums/CameraSubmersionType;Lnet/minecraft/entity/Entity;)Z"))
+    @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/fog/FogModifier;shouldApply(Lnet/minecraft/block/enums/CameraSubmersionType;Lnet/minecraft/entity/Entity;)Z"))
     private boolean noRenderFogs(FogModifier instance, CameraSubmersionType cameraSubmersionType, Entity entity) {
         if (!noRender.isEnabled()) return instance.shouldApply(cameraSubmersionType, entity);
         String className = instance.getClass().getSimpleName();

@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Freecam;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.util.PlayerInput;

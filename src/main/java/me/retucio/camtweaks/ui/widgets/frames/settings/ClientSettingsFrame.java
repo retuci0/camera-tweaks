@@ -2,7 +2,7 @@ package me.retucio.camtweaks.ui.widgets.frames.settings;
 
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.camtweaks.GUISettingsFrameEvent;
-import me.retucio.camtweaks.module.modules.GUI;
+import me.retucio.camtweaks.module.modules.client.GUI;
 import me.retucio.camtweaks.ui.widgets.frames.SettingsFrame;
 import me.retucio.camtweaks.ui.screen.ClickGUI;
 import me.retucio.camtweaks.ui.widgets.buttons.SettingButton;

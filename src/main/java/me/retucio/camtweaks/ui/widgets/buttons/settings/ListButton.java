@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.ui.widgets.buttons.settings;
 
+import me.retucio.camtweaks.module.Category;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.ListSetting;
@@ -26,7 +27,7 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
         this.setting = setting;
 
         // crear un módulo "dummy" (falso), que se le añade cada entrada en la lista como un BooleanSetting
-        dummy = new Module(setting.getName(), setting.getDescription()) {
+        dummy = new Module(setting.getName(), setting.getDescription(), Category.CLIENT) {
             @Override public void onEnable() {}
             @Override public void onDisable() {}
         };

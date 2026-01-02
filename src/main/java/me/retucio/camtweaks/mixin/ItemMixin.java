@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.ShulkerPeek;
+import me.retucio.camtweaks.module.modules.misc.ShulkerPeek;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.BlockItem;

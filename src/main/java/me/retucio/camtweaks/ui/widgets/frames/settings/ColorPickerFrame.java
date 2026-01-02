@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.ui.widgets.frames.settings;
 
+import me.retucio.camtweaks.module.Category;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.Setting;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
@@ -46,7 +47,7 @@ public class ColorPickerFrame extends SettingsFrame {
         this.colorSetting = colorSetting;
         this.currentColor = colorSetting.getColor();
 
-        dummyModule = new Module("selector de colores", "elige colores") {
+        dummyModule = new Module("selector de colores", "elige colores", Category.CLIENT) {
             @Override public void onEnable() {}
             @Override public void onDisable() {}
         };

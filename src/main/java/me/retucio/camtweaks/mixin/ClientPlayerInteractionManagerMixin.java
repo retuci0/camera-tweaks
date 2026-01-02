@@ -1,14 +1,11 @@
 package me.retucio.camtweaks.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.camtweaks.event.events.AttackEntityEvent;
 import me.retucio.camtweaks.event.events.BreakBlockEvent;
 import me.retucio.camtweaks.event.events.InteractEntityEvent;
 import me.retucio.camtweaks.event.events.PlaceBlockEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.util.ChatUtil;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;

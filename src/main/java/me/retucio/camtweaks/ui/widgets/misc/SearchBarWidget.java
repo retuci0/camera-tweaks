@@ -84,11 +84,6 @@ public class SearchBarWidget extends Widget {
     }
 
     @Override
-    public void mouseDragged(int mouseX, int mouseY) {
-
-    }
-
-    @Override
     public void onKey(int key, int action) {
         if (!ClientSettingsFrame.guiSettings.searchBar.isEnabled()) return;
         if (!focused || action == GLFW.GLFW_RELEASE) return;
@@ -99,6 +94,7 @@ public class SearchBarWidget extends Widget {
                 buffer.setLength(0);
                 focused = false;
             }
+            case GLFW.GLFW_KEY_SPACE -> charTyped(' ');
             case GLFW.GLFW_KEY_BACKSPACE -> onBackspace();
             default -> {
                 String c = KeyUtil.getKeyName(key);

@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.BungeecordSpoofer;
+import me.retucio.camtweaks.module.modules.network.BungeecordSpoofer;
 import net.minecraft.network.packet.c2s.handshake.ConnectionIntent;
 import net.minecraft.network.packet.c2s.handshake.HandshakeC2SPacket;
 import org.spongepowered.asm.mixin.*;

@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.NoRender;
+import me.retucio.camtweaks.module.modules.render.NoRender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;

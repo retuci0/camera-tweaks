@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.NoRender;
+import me.retucio.camtweaks.module.modules.render.NoRender;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WeatherRendering;
@@ -14,8 +14,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 
 @Mixin(WeatherRendering.class)
@@ -30,7 +28,7 @@ public abstract class WeatherRenderingMixin {
     }
 
     @Inject(method = "addParticlesAndSound", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;addParticleClient(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"), cancellable = true)
-    private void noRainParticles(ClientWorld world, Camera camera, int ticks, ParticlesMode particlesMode, CallbackInfo ci) {
+    private void noRainParticles(ClientWorld world, Camera camera, int ticks, ParticlesMode particlesMode, int weatherRadius, CallbackInfo ci) {
         if (noRender.isEnabled() && !noRender.rain.isEnabled()) ci.cancel();
     }
 

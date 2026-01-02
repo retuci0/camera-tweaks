@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.RPackBypass;
+import me.retucio.camtweaks.module.modules.network.RPackBypass;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.resource.server.ServerResourcePackManager;
 import org.spongepowered.asm.mixin.Mixin;

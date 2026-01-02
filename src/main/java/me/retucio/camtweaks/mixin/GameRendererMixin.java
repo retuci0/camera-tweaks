@@ -1,13 +1,11 @@
 package me.retucio.camtweaks.mixin;
 
 
-import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.camtweaks.event.events.GetFOVEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.module.modules.NoMiningInterruptions;
-import me.retucio.camtweaks.module.modules.NoRender;
-import me.retucio.camtweaks.module.modules.Zoom;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
+import me.retucio.camtweaks.module.modules.render.NoRender;
+import me.retucio.camtweaks.module.modules.camera.Zoom;
 import me.retucio.camtweaks.util.interfaces.IVec3d;
 
 import net.minecraft.client.MinecraftClient;
@@ -17,8 +15,6 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.entity.Entity;
 
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 
@@ -122,16 +118,5 @@ public abstract class GameRendererMixin {
     @ModifyVariable(method = "renderWorld", ordinal = 6, at = @At(value = "STORE"))
     private float noRenderNauseaDistortion(float scaledNauseaEffectFactor) {
         return (noRender.isEnabled() && !noRender.nauseaEffect.isEnabled()) ? 0 : scaledNauseaEffectFactor;
-    }
-
-    @ModifyReturnValue(method = "findCrosshairTarget", at = @At("RETURN"))
-    private HitResult onTargetEntity(HitResult original, @Local HitResult hitResult) {
-        NoMiningInterruptions nmi = ModuleManager.INSTANCE.getModuleByClass(NoMiningInterruptions.class);
-
-        Entity entity = original instanceof EntityHitResult result ? result.getEntity() : null;
-        if (nmi.shouldIgnoreEntity(entity) && hitResult.getType() == HitResult.Type.BLOCK)
-            return hitResult;
-
-        return original;
     }
 }

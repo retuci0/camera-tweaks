@@ -1,5 +1,6 @@
 package me.retucio.camtweaks.ui.widgets.buttons.settings;
 
+import me.retucio.camtweaks.module.Category;
 import me.retucio.camtweaks.module.Module;
 import me.retucio.camtweaks.module.settings.BooleanSetting;
 import me.retucio.camtweaks.module.settings.OptionSetting;
@@ -25,7 +26,7 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
         this.setting = setting;
 
         // crear un módulo "dummy" (falso)
-        dummy = new Module(setting.getName(), setting.getDescription()) {
+        dummy = new Module(setting.getName(), setting.getDescription(), Category.CLIENT) {
             @Override public void onEnable() {}
             @Override public void onDisable() {}
         };

@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.ui.screen;
 
 import me.retucio.camtweaks.CameraTweaks;
-import me.retucio.camtweaks.module.modules.ShulkerPeek;
+import me.retucio.camtweaks.module.modules.misc.ShulkerPeek;
 import me.retucio.camtweaks.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.gl.RenderPipelines;

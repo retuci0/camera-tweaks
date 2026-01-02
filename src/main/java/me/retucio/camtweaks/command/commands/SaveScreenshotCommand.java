@@ -3,7 +3,7 @@ package me.retucio.camtweaks.command.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.camtweaks.command.Command;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.ScreenshotPlus;
+import me.retucio.camtweaks.module.modules.misc.ScreenshotPlus;
 import me.retucio.camtweaks.util.ChatUtil;
 import net.minecraft.command.CommandSource;
 

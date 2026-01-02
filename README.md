@@ -54,6 +54,7 @@ algunos módulos tienen teclas asignadas por defecto, asígnales `ESC` para desa
 <img src="screenshots/fullbright.png" alt="fullbright en modo gamma cambiando el color de los shaders">
 <img src="screenshots/hud.png" alt="HUD">
 <img src="screenshots/hudeditor.png" alt="editor de HUD">
+<img src="screenshots/colorpicker.png" alt="selector de colores">
 
 ## contibuciones
 

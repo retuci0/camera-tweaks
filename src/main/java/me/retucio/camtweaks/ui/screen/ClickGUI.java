@@ -23,6 +23,7 @@ import me.retucio.camtweaks.ui.widgets.misc.ScrollBarWidget;
 import me.retucio.camtweaks.ui.widgets.misc.SearchBarWidget;
 import me.retucio.camtweaks.util.KeyUtil;
 
+import me.retucio.camtweaks.util.MiscUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
@@ -206,15 +207,20 @@ public class ClickGUI extends Screen {
                 continue;
             }
 
-            String name = module.getName();
-            String description = module.getDescription();
+            String name = MiscUtil.removeAccentMarks(module.getName());
+            String description = MiscUtil.removeAccentMarks(module.getDescription());
+            String category = MiscUtil.removeAccentMarks(module.getCategory().toString());
 
             if (!guiSettings.matchCase.isEnabled()) {
                 name = name.toLowerCase();
                 description = description.toLowerCase();
+                category = category.toLowerCase();
             }
 
-            module.setSearchMatch(name.contains(searchInput) || description.contains(searchInput));
+            module.setSearchMatch(
+                    name.contains(searchInput)
+                    || description.contains(searchInput)
+                    || category.contains(searchInput));
         }
 
         for (SettingsFrame sf : settingsFrames) {

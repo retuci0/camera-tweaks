@@ -1,9 +1,8 @@
 package me.retucio.camtweaks.ui.hud;
 
-import me.retucio.camtweaks.event.events.PacketEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.module.modules.HUD;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
+import me.retucio.camtweaks.module.modules.client.HUD;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 

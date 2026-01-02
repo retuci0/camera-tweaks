@@ -4,15 +4,13 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.event.events.RenderHeldItemEvent;
 import me.retucio.camtweaks.event.events.RenderArmEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.HandView;
+import me.retucio.camtweaks.module.modules.player.HandView;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -50,7 +48,7 @@ public abstract class HeldItemRendererMixin {
     protected abstract boolean shouldSkipHandAnimationOnSwap(ItemStack from, ItemStack to);
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void getModules(MinecraftClient client, EntityRenderManager entityRenderDispatcher, ItemRenderer itemRenderer, ItemModelManager itemModelManager, CallbackInfo ci) {
+    private void getModules(MinecraftClient client, EntityRenderManager entityRenderDispatcher, ItemModelManager itemModelManager, CallbackInfo ci) {
         handView = ModuleManager.INSTANCE.getModuleByClass(HandView.class);
     }
 

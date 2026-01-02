@@ -2,7 +2,7 @@ package me.retucio.camtweaks.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Nametags;
+import me.retucio.camtweaks.module.modules.render.Nametags;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;

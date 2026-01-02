@@ -1,7 +1,5 @@
 package me.retucio.camtweaks.mixin;
 
-import com.ibm.icu.util.CodePointTrie;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.JoinWorldEvent;
@@ -10,7 +8,7 @@ import me.retucio.camtweaks.event.events.ShutdownEvent;
 import me.retucio.camtweaks.event.events.TickEvent;
 import me.retucio.camtweaks.event.events.UseItemEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.FastUse;
+import me.retucio.camtweaks.module.modules.player.FastUse;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;

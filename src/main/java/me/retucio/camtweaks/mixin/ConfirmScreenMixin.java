@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.RPackBypass;
+import me.retucio.camtweaks.module.modules.network.RPackBypass;
 import me.retucio.camtweaks.util.interfaces.IConfirmScreen;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;

@@ -5,19 +5,15 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import me.retucio.camtweaks.CameraTweaks;
 import me.retucio.camtweaks.event.events.RenderWorldEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.BlockOutline;
-import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.module.modules.NoRender;
-import me.retucio.camtweaks.util.Colors;
-import net.minecraft.client.MinecraftClient;
+import me.retucio.camtweaks.module.modules.render.BlockOutline;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
+import me.retucio.camtweaks.module.modules.render.NoRender;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -29,15 +25,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.awt.*;
-
 import static me.retucio.camtweaks.CameraTweaks.EVENT_BUS;
 import static me.retucio.camtweaks.CameraTweaks.mc;
 
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererMixin {
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;method_74752(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;Z)V"), index = 2)
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;updateCamera(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;Z)V"), index = 2)
     private boolean renderSetupTerrainModifyArg(boolean spectator) {
         return ModuleManager.INSTANCE.getModuleByClass(Freecam.class).isEnabled() || spectator;
     }
@@ -72,10 +66,10 @@ public abstract class WorldRendererMixin {
         if (!noRender.blindnessEffect.isEnabled() || !noRender.darknessEffect.isEnabled()) cir.setReturnValue(null);
     }
 
-    @Redirect(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/ColorHelper;withAlpha(II)I"))
-    private int modifyBlockOutlineColor(int alpha, int rgb) {
+    @Redirect(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/ColorHelper;toAlpha(I)I"))
+    private int modifyBlockOutlineColor(int alpha) {
         BlockOutline outline = ModuleManager.INSTANCE.getModuleByClass(BlockOutline.class);
-        if (!outline.isEnabled()) return ColorHelper.withAlpha(alpha, rgb);
+        if (!outline.isEnabled()) return ColorHelper.toAlpha(alpha);
 
         return outline.color.getRGB();
     }

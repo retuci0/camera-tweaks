@@ -1,9 +1,15 @@
 package me.retucio.camtweaks.module;
 
 import me.retucio.camtweaks.CameraTweaks;
-import me.retucio.camtweaks.event.EventBus;
 import me.retucio.camtweaks.event.SubscribeEvent;
-import me.retucio.camtweaks.module.modules.*;
+import me.retucio.camtweaks.module.modules.camera.*;
+import me.retucio.camtweaks.module.modules.client.HUD;
+import me.retucio.camtweaks.module.modules.misc.*;
+import me.retucio.camtweaks.module.modules.network.*;
+import me.retucio.camtweaks.module.modules.player.*;
+import me.retucio.camtweaks.module.modules.render.*;
+import me.retucio.camtweaks.module.modules.render.CritsPlus;
+import me.retucio.camtweaks.module.modules.world.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -60,6 +66,7 @@ public class ModuleManager {
         modules.add(new Reconnect());
         modules.add(new Rotations());
         modules.add(new RPackBypass());
+        modules.add(new SafeWalk());
         modules.add(new ScreenshotPlus());
         modules.add(new ShulkerPeek());
         modules.add(new TimeChanger());

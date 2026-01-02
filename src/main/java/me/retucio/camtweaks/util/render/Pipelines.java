@@ -6,14 +6,8 @@ import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.retucio.camtweaks.CameraTweaks;
 import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-
-import java.util.OptionalDouble;
-import java.util.function.Function;
 
 
 public class Pipelines {
@@ -34,19 +28,4 @@ public class Pipelines {
             .withDepthWrite(false)
             .withCull(false)
             .build();
-
-    static final Function<Double, RenderLayer> GLOBAL_LINES_LAYER = Util.memoize(lineWidth -> {
-        RenderPhase.LineWidth lineState = new RenderPhase.LineWidth(OptionalDouble.of(lineWidth));
-        RenderLayer.MultiPhaseParameters compositeState = RenderLayer.MultiPhaseParameters.builder()
-                .lineWidth(lineState)
-                .build(false);
-        return RenderLayer.of("global_lines", RenderLayer.DEFAULT_BUFFER_SIZE, GLOBAL_LINES_PIPELINE, compositeState);
-    });
-
-
-
-
-    public static RenderLayer getGlobalLinesLayer(double lineWidth) {
-        return GLOBAL_LINES_LAYER.apply(lineWidth);
-    }
 }

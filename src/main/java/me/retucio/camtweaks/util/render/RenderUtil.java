@@ -95,7 +95,7 @@ public class RenderUtil {
 
     // expand es para evitar z-fighting
     public static void drawBlockFaceFilled(MatrixStack matrices, BlockPos pos, Direction face, Color color, float expand) {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
 
         float minX = (float) (pos.getX() - cameraPos.x);
         float minY = (float) (pos.getY() - cameraPos.y);
@@ -173,28 +173,27 @@ public class RenderUtil {
     // cajas
 
     public static void drawOutlineBox(MatrixStack matrices, Box box, Color color, float lineWidth) {
-        float r = color.getRed() / 255f;
-        float g = color.getGreen() / 255f;
-        float b = color.getBlue() / 255f;
-        float a = color.getAlpha() / 255f;
+        Camera camera = mc.gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getCameraPos();
 
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-        float minX = (float) (box.minX - cameraPos.x);
-        float minY = (float) (box.minY - cameraPos.y);
-        float minZ = (float) (box.minZ - cameraPos.z);
-        float maxX = (float) (box.maxX - cameraPos.x);
-        float maxY = (float) (box.maxY - cameraPos.y);
-        float maxZ = (float) (box.maxZ - cameraPos.z);
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(1 / camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(1 / (camera.getYaw() + 180f)));
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL);
-
-        VertexRendering.drawBox(matrices.peek(), buffer, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a);
-
-        Layers.getGlobalLines(lineWidth).draw(buffer.end());
+        VertexRendering.drawOutline(
+                matrices,
+                mc.getBufferBuilders()
+                        .getEntityVertexConsumers()
+                        .getBuffer(RenderLayers.lines()),
+                VoxelShapes.cuboid(box),
+                -cameraPos.x,
+                -cameraPos.y,
+                -cameraPos.z,
+                color.getRGB(),
+                lineWidth);
     }
 
     public static void drawFilledBox(MatrixStack matrices, Box box, Color color) {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
         float minX = (float) (box.minX - cameraPos.x);
         float minY = (float) (box.minY - cameraPos.y);
         float minZ = (float) (box.minZ - cameraPos.z);

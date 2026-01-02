@@ -3,7 +3,7 @@ package me.retucio.camtweaks.ui.hud.elements;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.camtweaks.UpdateSettingEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.HUD;
+import me.retucio.camtweaks.module.modules.client.HUD;
 import me.retucio.camtweaks.ui.hud.HudElement;
 import net.minecraft.text.Text;
 

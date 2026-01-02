@@ -1,6 +1,6 @@
 package me.retucio.camtweaks.ui.hud;
 
-import me.retucio.camtweaks.module.modules.HUD;
+import me.retucio.camtweaks.module.modules.client.HUD;
 import me.retucio.camtweaks.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

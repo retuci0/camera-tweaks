@@ -2,7 +2,7 @@ package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.event.events.PerspectiveChangeEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Freecam;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.Perspective;
 import org.spongepowered.asm.mixin.Mixin;

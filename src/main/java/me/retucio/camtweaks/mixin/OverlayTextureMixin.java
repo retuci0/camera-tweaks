@@ -1,7 +1,7 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.DamageOverlay;
+import me.retucio.camtweaks.module.modules.render.DamageOverlay;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import org.spongepowered.asm.mixin.Final;

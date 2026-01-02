@@ -2,7 +2,7 @@ package me.retucio.camtweaks.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.NoRender;
+import me.retucio.camtweaks.module.modules.render.NoRender;
 import net.minecraft.client.render.entity.feature.StuckArrowsFeatureRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

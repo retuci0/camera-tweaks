@@ -3,7 +3,7 @@ package me.retucio.camtweaks.util;
 import me.retucio.camtweaks.event.SubscribeEvent;
 import me.retucio.camtweaks.event.events.TickEvent;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.HUD;
+import me.retucio.camtweaks.module.modules.client.HUD;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
@@ -50,6 +50,20 @@ public class MiscUtil {
         } catch (Exception e) {
             return "??:??";
         }
+    }
+
+    public static String removeAccentMarks(String text) {
+        return text
+                .replace("Á", "A")
+                .replace("É", "E")
+                .replace("Í", "I")
+                .replace("Ó", "O")
+                .replace("Ú", "U")
+                .replace("á", "a")
+                .replace("é", "e")
+                .replace("í", "i")
+                .replace("ó", "o")
+                .replace("ú", "u");
     }
 
 }

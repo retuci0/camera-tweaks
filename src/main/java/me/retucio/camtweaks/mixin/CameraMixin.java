@@ -1,12 +1,12 @@
 package me.retucio.camtweaks.mixin;
 
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.Freelook;
-import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.module.modules.PerspectivePlus;
+import me.retucio.camtweaks.module.modules.camera.Freelook;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
+import me.retucio.camtweaks.module.modules.camera.PerspectivePlus;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -44,7 +44,7 @@ public abstract class CameraMixin {
     }
 
     @Inject(method = "update", at = @At("HEAD"))
-    private void onUpdateHead(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
+    private void onUpdateHead(World area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
         this.tickDelta = tickDelta;
     }
 
@@ -67,7 +67,7 @@ public abstract class CameraMixin {
     // cámara libre
 
     @Inject(method = "update", at = @At("TAIL"))
-    private void onUpdateTail(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
+    private void onUpdateTail(World area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickProgress, CallbackInfo ci) {
         if (freecam.isEnabled())
             this.thirdPerson = true;
     }

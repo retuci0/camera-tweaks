@@ -2,9 +2,9 @@ package me.retucio.camtweaks.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.ChatPlus;
-import me.retucio.camtweaks.module.modules.Freecam;
-import me.retucio.camtweaks.module.modules.NoRender;
+import me.retucio.camtweaks.module.modules.misc.ChatPlus;
+import me.retucio.camtweaks.module.modules.camera.Freecam;
+import me.retucio.camtweaks.module.modules.render.NoRender;
 import me.retucio.camtweaks.ui.hud.HudRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

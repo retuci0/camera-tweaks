@@ -2,7 +2,7 @@ package me.retucio.camtweaks.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.camtweaks.module.ModuleManager;
-import me.retucio.camtweaks.module.modules.NoRender;
+import me.retucio.camtweaks.module.modules.render.NoRender;
 import net.minecraft.client.render.fog.StatusEffectFogModifier;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;

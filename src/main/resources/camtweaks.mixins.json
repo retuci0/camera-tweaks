@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ClientConnectionMixin",
-    "DimensionTypeMixin",
     "EntityMixin",
     "HandshakeC2SPacketMixin",
     "ItemEntityMixin",
