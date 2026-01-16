@@ -50,7 +50,7 @@ public class Zoom extends Module {
         keyMode.setValue(KeyModes.HOLD);
 
         notify.setDefaultValue(false);
-        notify.setEnabled(false);
+        notify.setValue(false);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class Zoom extends Module {
         prevMouseSens = mc.options.getMouseSensitivity().getValue();
         prevFov = mc.options.getFov().getValue();
         prevHUD = mc.options.hudHidden;
-        mc.options.hudHidden = !showHUD.isEnabled();
+        mc.options.hudHidden = !showHUD.getValue();
 
         value = defaultZoom.getValue();
 
@@ -83,14 +83,14 @@ public class Zoom extends Module {
 
     @Override
     public void onTick() {
-        mc.options.smoothCameraEnabled = smoothCam.isEnabled();
-        if (!smoothCam.isEnabled())
+        mc.options.smoothCameraEnabled = smoothCam.getValue();
+        if (!smoothCam.getValue())
             mc.options.getMouseSensitivity().setValue(prevMouseSens * mouseSensMultiplier.getValue());
     }
 
     @SubscribeEvent
     private void onMouseScroll(MouseScrollEvent event) {
-        boolean key = scrollKey.getKey() == GLFW.GLFW_KEY_UNKNOWN || KeyUtil.isKeyDown(scrollKey.getKey());
+        boolean key = scrollKey.getValue() == GLFW.GLFW_KEY_UNKNOWN || KeyUtil.isKeyDown(scrollKey.getValue());
         if (isEnabled() && scrollSens.getValue() > 0 && key) {
             value += event.getVertical() * 0.25 * (scrollSens.getValue() * value);
             if (value < 1) value = 1;

@@ -7,35 +7,23 @@ import java.util.List;
 import java.util.function.Consumer;
 
 // ajuste que te deja elegir entre distintas opciones definidas, dentro de un Enum
-public class EnumSetting<E extends Enum<E>> extends Setting {
+public class EnumSetting<E extends Enum<E>> extends Setting<E> {
 
     private final List<E> values;
-    private E defaultValue;
-
-    private E value;
     private int index;
 
-    private Consumer<E> updateListener;
-
     public EnumSetting(String name, String description, Class<E> enumClass, E defaultValue) {
-        super(name, description);
+        super(name, description, defaultValue);
         this.values = Arrays.asList(enumClass.getEnumConstants());
-        this.defaultValue = defaultValue;
-        this.value = defaultValue;
         this.index = values.indexOf(defaultValue);
-    }
-
-    public E getValue() {
-        return value;
     }
 
     public void setValue(E value) {
         if (this.value != value) {
-            this.value = value;
             this.index = values.indexOf(value);
-            fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(value);
         }
+
+        super.setValue(value);
     }
 
     public List<E> getValues() {
@@ -68,22 +56,5 @@ public class EnumSetting<E extends Enum<E>> extends Setting {
             setIndex(index - 1);
         else
             setIndex(values.size() - 1);
-    }
-
-    public void setDefaultValue(E value) {
-        defaultValue = value;
-    }
-
-    public E getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void reset() {
-        setValue(defaultValue);
-    }
-
-    public void onUpdate(Consumer<E> listener) {
-        this.updateListener = listener;
-        if (updateListener != null) updateListener.accept(value);
     }
 }

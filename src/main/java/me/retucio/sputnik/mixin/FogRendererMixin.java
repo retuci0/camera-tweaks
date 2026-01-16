@@ -33,10 +33,10 @@ public abstract class FogRendererMixin {
         if (!noRender.isEnabled()) return instance.shouldApply(cameraSubmersionType, entity);
         String className = instance.getClass().getSimpleName();
 
-        if ((className.equals("BlindnessEffectFogModifier") && !noRender.blindnessEffect.isEnabled())
-                || (className.equals("DarknessEffectFogModifier") && !noRender.darknessEffect.isEnabled())
+        if ((className.equals("BlindnessEffectFogModifier") && !noRender.blindnessEffect.getValue())
+                || (className.equals("DarknessEffectFogModifier") && !noRender.darknessEffect.getValue())
                 || ((className.equals("LavaFogModifier") || className.equals("WaterFogModifier")
-                        || className.equals("PowederSnowFogModifier")) && !noRender.fluidOverlay.isEnabled()))
+                        || className.equals("PowederSnowFogModifier")) && !noRender.fluidOverlay.getValue()))
             return false;
 
         return instance.shouldApply(cameraSubmersionType, entity);
@@ -44,7 +44,7 @@ public abstract class FogRendererMixin {
 
     @ModifyReturnValue(method = "getFogColor", at = @At("RETURN"))
     private Vector4f modifyLavaFog(Vector4f original, Camera camera) {
-        if (noRender.isEnabled() && !noRender.fluidOverlay.isEnabled() &&
+        if (noRender.isEnabled() && !noRender.fluidOverlay.getValue() &&
                 (camera.getSubmersionType() == CameraSubmersionType.LAVA
                         || camera.getSubmersionType() == CameraSubmersionType.WATER))
             return new Vector4f(original.x, original.y, original.z, 0f);
@@ -54,6 +54,6 @@ public abstract class FogRendererMixin {
 
     @ModifyExpressionValue(method = "getFogColor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getUnderwaterVisibility()F"))
     private float noRenderUnderwaterFog(float original) {
-        return (noRender.isEnabled() && !noRender.fluidOverlay.isEnabled()) ? 0 : original;
+        return (noRender.isEnabled() && !noRender.fluidOverlay.getValue()) ? 0 : original;
     }
 }

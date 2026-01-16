@@ -2,6 +2,7 @@ package me.retucio.sputnik.module;
 
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.SubscribeEvent;
+import me.retucio.sputnik.module.modules.client.DiscordRPC;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.module.modules.camera.*;
 import me.retucio.sputnik.module.modules.misc.*;
@@ -45,6 +46,7 @@ public class ModuleManager {
         modules.add(new ColoredSigns());
         modules.add(new CritsPlus());
         modules.add(new DamageOverlay());
+        modules.add(new DiscordRPC());
         modules.add(new ElytraBounce());
         modules.add(new FakePlayer());
         modules.add(new FastUse());
@@ -56,6 +58,7 @@ public class ModuleManager {
         modules.add(new HandView());
         modules.add(new Headhitters());
         modules.add(new HUD());
+        modules.add(new InfiniteElytra());
         modules.add(new InventoryPlus());
         modules.add(new LightOverlay());
         modules.add(new LogoutSpots());
@@ -76,12 +79,13 @@ public class ModuleManager {
         modules.add(new ScreenshotPlus());
         modules.add(new ShulkerPeek());
         modules.add(new Step());
+        modules.add(new StrongholdTriangulator());
         modules.add(new TimeChanger());
         modules.add(new UIMove());
         modules.add(new WarnLowDurability());
         modules.add(new Zoom());
 
-        modules.sort(Comparator.comparing(module -> module.getName().toLowerCase()));
+        modules.sort(Comparator.comparing(module -> MiscUtil.removeAccentMarks(module.getName().toLowerCase())));
 
         // registrar los "listeners" necesarios
         for (Module module : getEnabledModules()) {

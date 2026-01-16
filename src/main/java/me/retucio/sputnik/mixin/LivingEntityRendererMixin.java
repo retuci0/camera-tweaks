@@ -40,12 +40,12 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
 
     @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSneaky()Z"))
     private boolean renderSneakingPlayerNametags(boolean original) {
-        return (nametags.isEnabled() && nametags.alwaysVisible.isEnabled()) || original;
+        return (nametags.isEnabled() && nametags.alwaysVisible.getValue()) || original;
     }
 
     @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z"))
     private boolean renderInvisPlayerNametags(boolean original) {
-        if (nametags.isEnabled() && nametags.alwaysVisible.isEnabled()) return false;
+        if (nametags.isEnabled() && nametags.alwaysVisible.getValue()) return false;
         else return original;
     }
 
@@ -58,7 +58,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
     @Inject(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At("RETURN"), cancellable = true)
     private void renderSelfNametag(T livingEntity, double d, CallbackInfoReturnable<Boolean> cir) {
         if (livingEntity instanceof PlayerEntity player) {
-            if (player == mc.player && nametags.showSelf.isEnabled()) {
+            if (player == mc.player && nametags.showSelf.getValue()) {
                 cir.setReturnValue(true);
                 cir.cancel();
             }

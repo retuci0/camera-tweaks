@@ -24,7 +24,7 @@ public class AttributeSwapper extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || !swap.isEnabled()) return;
+        if (mc.player == null || !swap.getValue()) return;
         if (delay < swapDelay.getIntValue()) delay++;
         if (delay >= swapDelay.getIntValue() && prevSlot != -1) {
             mc.player.getInventory().setSelectedSlot(prevSlot);

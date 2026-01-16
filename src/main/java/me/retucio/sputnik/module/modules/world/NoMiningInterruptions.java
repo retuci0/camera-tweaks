@@ -25,7 +25,7 @@ public class NoMiningInterruptions extends Module {
         if (entity == null || !isEnabled() || mc.player == null) return false;
 
         boolean pickaxe = true;
-        if (withPickaxeOnly.isEnabled())
+        if (withPickaxeOnly.getValue())
             pickaxe = (mc.player.getMainHandStack().isIn(ItemTags.PICKAXES)
                     || mc.player.getOffHandStack().isIn(ItemTags.PICKAXES));
 

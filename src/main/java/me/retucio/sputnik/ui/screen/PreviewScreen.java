@@ -120,7 +120,7 @@ public class PreviewScreen extends Screen {
 
     @Override
     public void applyBlur(DrawContext ctx) {
-        if (ClientSettingsFrame.guiSettings.blur.isEnabled()) super.applyBlur(ctx);
+        if (ClientSettingsFrame.guiSettings.blur.getValue()) super.applyBlur(ctx);
     }
 
     @Override

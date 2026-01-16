@@ -57,7 +57,7 @@ public class PerspectivePlus extends Module {
         if (mc.options.getPerspective() == net.minecraft.client.option.Perspective.FIRST_PERSON
             || mc.currentScreen != null || scrollSens.getValue() <= 0) return;
 
-        if (KeyUtil.isKeyDown(scrollKey.getKey())) {
+        if (KeyUtil.isKeyDown(scrollKey.getValue())) {
             distance -= event.getVertical() / 4 * (scrollSens.getValue() * distance);
             event.cancel();
         }

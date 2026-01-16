@@ -17,8 +17,8 @@ public abstract class TextHudElement extends HudElement {
     @Override
     public void renderInGame(DrawContext ctx, float delta, HUD hud) {
         String text = getText(delta, hud);
-        int color = hud != null ? hud.color.getColor().getRGB() : -1;
-        boolean shadow = hud != null && hud.shadow.isEnabled();
+        int color = hud != null ? hud.color.getValue().getRGB() : -1;
+        boolean shadow = hud != null && hud.shadow.getValue();
         HudRenderer.drawSnappedText(ctx, text, x, y, color, shadow);
     }
 
@@ -30,8 +30,8 @@ public abstract class TextHudElement extends HudElement {
 
         drawEditorBackground(ctx);
 
-        int color = hud != null ? hud.color.getColor().getRGB() : -1;
-        boolean shadow = hud != null && hud.shadow.isEnabled();
+        int color = hud != null ? hud.color.getValue().getRGB() : -1;
+        boolean shadow = hud != null && hud.shadow.getValue();
         HudRenderer.drawSnappedText(ctx, previewText, x, y, color, shadow);
     }
 

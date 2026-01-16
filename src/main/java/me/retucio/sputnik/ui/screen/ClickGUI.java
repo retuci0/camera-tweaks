@@ -6,6 +6,7 @@ import me.retucio.sputnik.event.events.KeyEvent;
 import me.retucio.sputnik.event.events.MouseClickEvent;
 import me.retucio.sputnik.event.events.MouseScrollEvent;
 import me.retucio.sputnik.event.events.sputnik.SettingsFrameEvent;
+import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.Setting;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
@@ -48,12 +49,14 @@ public class ClickGUI extends Screen {
     private boolean anyFocused;
     private Widget selected = null;
 
+    private Category categoryFilter = Category.ALL;
+
     private final ModuleFrame modulesFrame = new ModuleFrame(20, 30, 100, 20);
     private final List<SettingsFrame> settingsFrames = new ArrayList<>();
     private final ClientSettingsFrame guiSettingsFrame = new ClientSettingsFrame(200, 30, 100, 20);
 
     private final ScrollBarWidget scrollBar = new ScrollBarWidget();
-    private final SearchBarWidget searchBar = new SearchBarWidget(340, 16, 300, 20);
+    private final SearchBarWidget searchBar = new SearchBarWidget(340, 16, 320, 20);
     private final List<Widget> miscWidgets = Arrays.asList(scrollBar, searchBar);
 
     public ClickGUI() {
@@ -125,12 +128,13 @@ public class ClickGUI extends Screen {
         return bottom + 20;  // padding
     }
 
-
+    @Override
     public boolean mouseClicked(Click click, boolean doubled) {
         miscWidgets.forEach(w -> w.mouseClicked(
                 (int) click.x(),
                 (int) click.y(),
-                click.button()));
+                click.button()
+        ));
 
         // detectar clics sobre los marcos
         modulesFrame.mouseClicked((int) click.x(), (int) click.y(), click.button());
@@ -195,16 +199,21 @@ public class ClickGUI extends Screen {
     }
 
     public void filterSearchResults() {
-        if (!guiSettings.searchBar.isEnabled()) return;
+        if (!guiSettings.searchBar.getValue()) return;
         String searchInput = searchBar.getSearchInput().trim();
-        if (!guiSettings.matchCase.isEnabled()) searchInput = searchInput.toLowerCase();
+        if (!guiSettings.matchCase.getValue()) searchInput = searchInput.toLowerCase();
 
         for (Button b : modulesFrame.getButtons()) {
             if (!(b instanceof ModuleButton mb)) return;
             Module module = mb.getModule();
 
-            if (searchInput.isEmpty()) {
+            if (getCategoryFilter() != Category.ALL) {
+                module.setSearchMatch(getCategoryFilter() == module.getCategory());
+            } else {
                 module.setSearchMatch(true);
+            }
+
+            if (searchInput.isEmpty()) {
                 continue;
             }
 
@@ -212,7 +221,7 @@ public class ClickGUI extends Screen {
             String description = MiscUtil.removeAccentMarks(module.getDescription());
             String category = MiscUtil.removeAccentMarks(module.getCategory().toString());
 
-            if (!guiSettings.matchCase.isEnabled()) {
+            if (!guiSettings.matchCase.getValue()) {
                 name = name.toLowerCase();
                 description = description.toLowerCase();
                 category = category.toLowerCase();
@@ -227,7 +236,7 @@ public class ClickGUI extends Screen {
         for (SettingsFrame sf : settingsFrames) {
             for (Button b : sf.getButtons()) {
                 if (!(b instanceof SettingButton<?> sb)) return;
-                Setting setting = sb.getSetting();
+                Setting<?> setting = sb.getSetting();
 
                 if (searchInput.isEmpty()) {
                     setting.setSearchMatch(true);
@@ -238,7 +247,7 @@ public class ClickGUI extends Screen {
                 String description = MiscUtil.removeAccentMarks(setting.getDescription());
                 String sgName = MiscUtil.removeAccentMarks(setting.getSg().getName());
 
-                if (!guiSettings.matchCase.isEnabled()) {
+                if (!guiSettings.matchCase.getValue()) {
                     name = name.toLowerCase();
                     description = description.toLowerCase();
                     sgName = sgName.toLowerCase();
@@ -333,6 +342,13 @@ public class ClickGUI extends Screen {
                     lb.refreshDummy();
     }
 
+    public void setCategoryFilter(Category category) {
+        this.categoryFilter = category;
+    }
+
+    public Category getCategoryFilter() {
+        return categoryFilter;
+    }
 
     // métodos del súper
 
@@ -360,7 +376,7 @@ public class ClickGUI extends Screen {
 
     @Override
     protected void applyBlur(DrawContext ctx) {
-        if (guiSettings.blur.isEnabled()) super.applyBlur(ctx);
+        if (guiSettings.blur.getValue()) super.applyBlur(ctx);
     }
 
 

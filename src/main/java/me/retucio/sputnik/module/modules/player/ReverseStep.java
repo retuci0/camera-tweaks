@@ -4,7 +4,6 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import me.retucio.sputnik.util.ChatUtil;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -44,11 +43,11 @@ public class ReverseStep extends Module {
         if (mc.player == null || mc.world == null) return;
 
         if (!mc.player.isOnGround()) {
-            if (jumping.isEnabled()) return;
+            if (jumping.getValue()) return;
         }
 
         if ((mc.player.isTouchingWater() || mc.player.isInLava())) {
-            if (disableInWater.isEnabled()) return;
+            if (disableInWater.getValue()) return;
         }
 
         double dropHeight = getHeight();

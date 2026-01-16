@@ -19,7 +19,7 @@ import java.util.List;
 
 
 // marco para los botones de los ajustes de cada módulo
-public class SettingsFrame extends Frame<SettingButton<? extends Setting>> {
+public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
 
     private Module module;
     protected List<SettingGroup> settingGroups;
@@ -295,7 +295,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting>> {
         int offset = h;
 
         for (SettingGroup group : settingGroups) {
-            for (Setting setting : group) {
+            for (Setting<?> setting : group) {
                 SettingButton<?> button = createSettingButton(setting, offset);
                 if (button != null) {
                     addButton(button);
@@ -305,7 +305,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting>> {
         }
     }
 
-    private SettingButton<?> createSettingButton(Setting setting, int offset) {
+    private SettingButton<?> createSettingButton(Setting<?> setting, int offset) {
         return switch (setting) {
             case BooleanSetting b -> new ToggleButton(b, this, offset);
             case NumberSetting n -> new SliderButton(n, this, offset);
@@ -320,7 +320,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting>> {
     }
 
     protected boolean hasVisibleSettingsInGroup(SettingGroup group) {
-        for (Setting setting : group) {
+        for (Setting<?> setting : group) {
             if (setting.isVisible()) {
                 return true;
             }
@@ -331,7 +331,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting>> {
     private List<SettingButton<?>> getButtonsForGroup(SettingGroup group) {
         List<SettingButton<?>> groupButtons = new ArrayList<>();
         for (SettingButton<?> button : buttons) {
-            for (Setting setting : group) {
+            for (Setting<?> setting : group) {
                 if (setting == button.getSetting()) {
                     groupButtons.add(button);
                     break;

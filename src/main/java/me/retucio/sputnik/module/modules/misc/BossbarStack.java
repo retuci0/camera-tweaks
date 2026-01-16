@@ -4,16 +4,11 @@ import me.retucio.sputnik.event.events.RenderBossbarEvent;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
-import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
-import me.retucio.sputnik.module.setting.settings.ColorSetting;
-import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -50,16 +45,16 @@ public class BossbarStack extends Module {
 
     @SubscribeEvent
     private void onRenderBossText(RenderBossbarEvent.BossText event) {
-        if (hideNames.isEnabled()) {
+        if (hideNames.getValue()) {
             event.setName(Text.empty());
             return;
-        } else if (bossBarMap.isEmpty() || !stackBars.isEnabled()) return;
+        } else if (bossBarMap.isEmpty() || !stackBars.getValue()) return;
 
         ClientBossBar bar = event.getBossBar();
         Integer amount = bossBarMap.get(bar);
         bossBarMap.remove(bar);
 
-        if (amount != null && !hideNames.isEnabled())
+        if (amount != null && !hideNames.getValue())
             event.setName(event.getName().copy().append(" x" + amount));
     }
 
@@ -70,7 +65,7 @@ public class BossbarStack extends Module {
 
     @SubscribeEvent
     private void onRenderBossBars(RenderBossbarEvent.BossIterator event) {
-        if (stackBars.isEnabled()) {
+        if (stackBars.getValue()) {
             HashMap<String, ClientBossBar> chosenBarMap = new HashMap<>();
             event.getIterator().forEachRemaining(bar -> {
                 String name = bar.getName().getString();

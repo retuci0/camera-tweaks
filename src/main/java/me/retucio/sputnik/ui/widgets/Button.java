@@ -23,4 +23,8 @@ public abstract class Button extends Widget {
     public void setOffset(int offset) {
         this.offset = offset;
     }
+
+    public Frame<?> getParent() {
+        return parent;
+    }
 }

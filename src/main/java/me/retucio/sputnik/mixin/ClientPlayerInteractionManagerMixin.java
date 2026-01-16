@@ -18,8 +18,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -78,7 +76,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
     @Inject(method = "updateBlockBreakingProgress", at = @At(value = "FIELD", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;blockBreakingCooldown:I"))
     private void modifyBlockBreakingCooldown(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         FastUse fastUse = ModuleManager.INSTANCE.getModuleByClass(FastUse.class);
-        if (!fastUse.isEnabled() || !fastUse.mining.isEnabled()) return;
+        if (!fastUse.isEnabled() || !fastUse.mining.getValue()) return;
         blockBreakingCooldown = fastUse.miningCooldown.getIntValue();
     }
 }

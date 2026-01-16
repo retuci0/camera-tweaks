@@ -24,17 +24,17 @@ public abstract class TextRendererDrawerMixin {
 
     @Redirect(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Style;isBold()Z"))
     private boolean noRenderBold(Style style) {
-        return !(noRender.isEnabled() && !noRender.bold.isEnabled()) && style.isBold();
+        return !(noRender.isEnabled() && !noRender.bold.getValue()) && style.isBold();
     }
 
     @Redirect(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Style;isUnderlined()Z"))
     private boolean noRenderUnderlined(Style style) {
-        return !(noRender.isEnabled() && !noRender.underlined.isEnabled()) && style.isUnderlined();
+        return !(noRender.isEnabled() && !noRender.underlined.getValue()) && style.isUnderlined();
     }
 
     @Redirect(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Style;isStrikethrough()Z"))
     private boolean noRenderStrikethrough(Style style) {
-        return !(noRender.isEnabled() && !noRender.strikethrough.isEnabled()) && style.isStrikethrough();
+        return !(noRender.isEnabled() && !noRender.strikethrough.getValue()) && style.isStrikethrough();
     }
 
     @ModifyArg(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer$Drawer;getRenderColor(Lnet/minecraft/text/TextColor;)I"))

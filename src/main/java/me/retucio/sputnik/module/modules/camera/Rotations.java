@@ -29,14 +29,14 @@ public class Rotations extends Module {
         mc.player.setYaw(yaw.getFloatValue());
         mc.player.setPitch(pitch.getFloatValue());
 
-        if (serverSide.isEnabled())
+        if (serverSide.getValue())
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
                     yaw.getFloatValue(), pitch.getFloatValue(), mc.player.isOnGround(), mc.player.horizontalCollision));
     }
 
     @SubscribeEvent
     public void onChangeRotation(ChangeRotationEvent event) {
-        if (smooth.isEnabled()
+        if (smooth.getValue()
                 && (event.getYaw() != yaw.getFloatValue() || event.getPitch() != pitch.getFloatValue())){
             event.cancel();
     }}

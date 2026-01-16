@@ -57,12 +57,12 @@ public class BindButton extends SettingButton<KeySetting> {
         if (!listening || action != GLFW.GLFW_PRESS) return;
 
         if (key == GLFW.GLFW_KEY_ESCAPE) {
-            setting.setKey(GLFW.GLFW_KEY_UNKNOWN);
+            setting.setValue(GLFW.GLFW_KEY_UNKNOWN);
         } else {
             for (KeyBinding bind : mc.options.allKeys) {
                 // no permitir usar la misma tecla para varias acciones, si el ajuste para esto está activado
                 boolean keyAlreadyBound = bind.matchesKey(new KeyInput(key, 0, 0));
-                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.isEnabled();
+                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
 
                 if (keyAlreadyBound && !allowMultiple) {
                     ChatUtil.warn("esa tecla ya está cogida por "
@@ -71,7 +71,7 @@ public class BindButton extends SettingButton<KeySetting> {
                     return;
                 }
             }
-            setting.setKey(key);
+            setting.setValue(key);
         }
 
         listening = false;

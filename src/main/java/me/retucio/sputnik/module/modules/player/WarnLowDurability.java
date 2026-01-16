@@ -60,7 +60,7 @@ public class WarnLowDurability extends Module {
         float percentage = (1 - (float) stack.getDamage() / stack.getMaxDamage()) * 100;
 
         if (percentage <= limitPercentage.getValue() && percentage < prevPercentage) {
-            if (playSound.isEnabled())
+            if (playSound.getValue())
                 mc.world.playSound(mc.player, mc.player.getBlockPos(),
                         sound.getValue(),
                         SoundCategory.AMBIENT,
@@ -68,7 +68,7 @@ public class WarnLowDurability extends Module {
                         toExponential(pitch)
                 );
 
-            if (message.isEnabled()) {
+            if (message.getValue()) {
                 String customName = stack.getCustomName() == null ? "" : " \"" + stack.getCustomName().getString() + "\"";
                 Text text = Text.literal(Formatting.AQUA + stack.getItemName().getString()
                         + Formatting.GREEN + customName + Formatting.RESET

@@ -73,7 +73,7 @@ public class Nametags extends Module {
         defaultEntities.replace(EntityType.ARROW, true);
         defaultEntities.replace(EntityType.SPECTRAL_ARROW, true);
         defaultEntities.replace(EntityType.TRIDENT, true);
-        entities.setDefaultValues(defaultEntities);
+        entities.setDefaultValue(defaultEntities);
 
         health.onUpdate(v -> healthMode.setVisible(v));
 

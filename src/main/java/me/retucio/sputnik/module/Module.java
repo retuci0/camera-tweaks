@@ -16,7 +16,6 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 // clase base para los módulos
 public class Module {
@@ -53,12 +52,12 @@ public class Module {
         this.description = description;
         this.category = category;
         sgGeneral.addAll(bind, keyMode, notify);
-        this.bind.setDefaultKey(key);
+        this.bind.setDefaultValue(key);
 
         // puto marcos
         if (ConfigManager.getConfig().settings
                 .get(this.getName() + ":" + bind.getName()) == null)
-            this.bind.setKey(key);
+            this.bind.setValue(key);
     }
 
 
@@ -83,8 +82,12 @@ public class Module {
         return null;
     }
 
-    public List<Setting> getSettings() {
-        List<Setting> settings = new ArrayList<>();
+    public SettingGroup getSgGeneral() {
+        return sgGeneral;
+    }
+
+    public List<Setting<?>> getSettings() {
+        List<Setting<?>> settings = new ArrayList<>();
         sgs.forEach(sg -> sg.forEach(settings::add));
         return settings;
     }
@@ -99,7 +102,7 @@ public class Module {
     }
 
     public void onEnable() {
-        if (notify.isEnabled()) ChatUtil.info(getName() + " fue activado");
+        if (notify.getValue()) ChatUtil.info(getName() + " fue activado");
         for (Method method : getClass().getDeclaredMethods())
             if (method.isAnnotationPresent(SubscribeEvent.class)) {
                 Sputnik.EVENT_BUS.register(this);
@@ -109,7 +112,7 @@ public class Module {
     }
 
     public void onDisable() {
-        if (notify.isEnabled()) ChatUtil.info(getName() + " fue desactivado");
+        if (notify.getValue()) ChatUtil.info(getName() + " fue desactivado");
         if (Sputnik.EVENT_BUS.isRegistered(this))
             Sputnik.EVENT_BUS.unregister(this);
         Sputnik.EVENT_BUS.post(new ToggleModuleEvent(this));
@@ -165,16 +168,16 @@ public class Module {
     }
 
     public int getKey() {
-        return bind.getKey();
+        return bind.getValue();
     }
 
     public void setKey(int key) {
-        bind.setKey(key);
+        bind.setValue(key);
     }
 
     public void assignKey(int key) {
-        bind.setDefaultKey(key);
-        bind.setKey(key);
+        bind.setDefaultValue(key);
+        bind.setValue(key);
     }
 
     public KeySetting getBind() {

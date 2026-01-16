@@ -4,7 +4,6 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
-import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.render.GlintRenderLayer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
@@ -45,19 +44,19 @@ public class GlintPlus extends Module {
 
     public RenderLayer getGlint() {
         int color = getColor();
-        if (!isEnabled() || !items.isEnabled()) return RenderLayers.glint();
+        if (!isEnabled() || !items.getValue()) return RenderLayers.glint();
         return GlintRenderLayer.glintColor.get(color);
     }
 
     public RenderLayer getEntityGlint() {
         int color = getColor();
-        if (!isEnabled() || !items.isEnabled()) return RenderLayers.entityGlint();
+        if (!isEnabled() || !items.getValue()) return RenderLayers.entityGlint();
         return GlintRenderLayer.entityGlintColor.get(color);
     }
 
     public RenderLayer getArmorEntityGlint() {
         int color = getColor();
-        if (!isEnabled() || !armor.isEnabled()) return RenderLayers.armorEntityGlint();
+        if (!isEnabled() || !armor.getValue()) return RenderLayers.armorEntityGlint();
         return GlintRenderLayer.armorEntityGlintColor.get(color);
     }
 

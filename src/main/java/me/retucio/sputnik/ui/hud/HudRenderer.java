@@ -75,7 +75,7 @@ public class HudRenderer {
 
 
     public static Color getColor(HUD hud) {
-        return hud.color.getColor();
+        return hud.color.getValue();
     }
 
     public static void drawSnappedText(DrawContext ctx, String text, int x, int y, int color, boolean shadow) {
@@ -97,8 +97,8 @@ public class HudRenderer {
 
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
         if (!hud.isEnabled()) return;
-        if (mc.debugHudEntryList.isF3Enabled() && !hud.showOnF3.isEnabled()) return;
-        if (mc.currentScreen instanceof ChatScreen && !hud.showOnChat.isEnabled()) return;
+        if (mc.debugHudEntryList.isF3Enabled() && !hud.showOnF3.getValue()) return;
+        if (mc.currentScreen instanceof ChatScreen && !hud.showOnChat.getValue()) return;
 
         init();
 

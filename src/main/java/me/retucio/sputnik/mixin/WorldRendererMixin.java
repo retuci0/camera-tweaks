@@ -1,6 +1,5 @@
 package me.retucio.sputnik.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import me.retucio.sputnik.Sputnik;
@@ -13,7 +12,6 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.profiler.Profiler;
 import org.joml.Matrix4f;
@@ -22,8 +20,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.lang.annotation.Target;
 
 import static me.retucio.sputnik.Sputnik.EVENT_BUS;
 import static me.retucio.sputnik.Sputnik.mc;
@@ -56,14 +52,14 @@ public abstract class WorldRendererMixin {
     @Inject(method = "renderTargetBlockOutline", at = @At("HEAD"), cancellable = true)
     private void noRenderBlockOutlinesFreecam(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, boolean renderBlockOutline, WorldRenderState renderStates, CallbackInfo ci) {
         Freecam freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
-        if (freecam.isEnabled() && !freecam.blockOutlines.isEnabled()) ci.cancel();
+        if (freecam.isEnabled() && !freecam.blockOutlines.getValue()) ci.cancel();
     }
 
     @Inject(method = "hasBlindnessOrDarkness(Lnet/minecraft/client/render/Camera;)Z", at = @At("HEAD"), cancellable = true)
     private void hasBlindnessOrDarkness(Camera camera, CallbackInfoReturnable<Boolean> cir) {
         NoRender noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
         if (!noRender.isEnabled()) return;
-        if (!noRender.blindnessEffect.isEnabled() || !noRender.darknessEffect.isEnabled()) cir.setReturnValue(null);
+        if (!noRender.blindnessEffect.getValue() || !noRender.darknessEffect.getValue()) cir.setReturnValue(null);
     }
 
 

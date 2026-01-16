@@ -24,7 +24,7 @@ public class ToggleButton extends SettingButton<BooleanSetting> {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         // fondo
-        Color color = setting.isEnabled()
+        Color color = setting.getValue()
                 ? Colors.enabledToggleButtonColor
                 : Colors.disabledToggleButtonColor;
 

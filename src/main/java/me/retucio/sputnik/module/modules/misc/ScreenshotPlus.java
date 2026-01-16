@@ -52,10 +52,10 @@ public class ScreenshotPlus extends Module {
 
     public void sendScreenshotMessage() {
         MutableText baseText = Text.literal("captura de pantalla tomada\n");
-        if (saveButton.isEnabled() && !defaultAction.is(ScreenshotActions.SAVE)) baseText.append(getSaveButton().append(" "));
-        if (copyButton.isEnabled()) baseText.append(getCopyButton().append(" "));
-        if (openButton.isEnabled() && defaultAction.is(ScreenshotActions.SAVE)) baseText.append(getOpenButton().append(" "));
-        if (discardButton.isEnabled() && !defaultAction.is(ScreenshotActions.NONE)) baseText.append(getDiscardButton().append(" "));
+        if (saveButton.getValue() && !defaultAction.is(ScreenshotActions.SAVE)) baseText.append(getSaveButton().append(" "));
+        if (copyButton.getValue()) baseText.append(getCopyButton().append(" "));
+        if (openButton.getValue() && defaultAction.is(ScreenshotActions.SAVE)) baseText.append(getOpenButton().append(" "));
+        if (discardButton.getValue() && !defaultAction.is(ScreenshotActions.NONE)) baseText.append(getDiscardButton().append(" "));
         ChatUtil.info(baseText);
     }
 

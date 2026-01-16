@@ -176,8 +176,8 @@ public class BlockESP extends Module {
             }
 
             // renderizado
-            if (outlines.isEnabled()) {
-                Color color = outlineColor.getColor();
+            if (outlines.getValue()) {
+                Color color = outlineColor.getValue();
                 RenderUtil.drawVoxelShapeOutline(
                         event.getMatrices(),
                         shape,
@@ -187,8 +187,8 @@ public class BlockESP extends Module {
                         false);
             }
 
-            if (fillings.isEnabled()) {
-                Color color = fillingColor.getColor();
+            if (fillings.getValue()) {
+                Color color = fillingColor.getValue();
                 RenderUtil.drawVoxelShapeFilled(
                         event.getMatrices(),
                         shape,
@@ -222,7 +222,7 @@ public class BlockESP extends Module {
         lastRadius = currentRadius;
 
         // multithreading
-        if (asyncSearch.isEnabled()) {
+        if (asyncSearch.getValue()) {
             if (isSearching) return;
 
             isSearching = true;

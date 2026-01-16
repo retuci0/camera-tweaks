@@ -19,6 +19,6 @@ public abstract class ChatScreenMixin {
     @Inject(method = "init", at = @At(value = "RETURN"))
     private void onInit(CallbackInfo info) {
         ChatPlus chatPlus = ModuleManager.INSTANCE.getModuleByClass(ChatPlus.class);
-        if (chatPlus.isEnabled() && chatPlus.noCharLimit.isEnabled()) chatField.setMaxLength(Integer.MAX_VALUE);
+        if (chatPlus.isEnabled() && chatPlus.noCharLimit.getValue()) chatField.setMaxLength(Integer.MAX_VALUE);
     }
 }

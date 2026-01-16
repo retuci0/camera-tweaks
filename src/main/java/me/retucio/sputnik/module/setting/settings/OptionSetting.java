@@ -6,38 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class OptionSetting<T> extends Setting {
+public class OptionSetting<T> extends Setting<T> {
 
     private final List<T> options;
     private Map<T, String> displayNames;
-    private T option;
-    private final T defaultOption;
-
-    private Consumer<T> updateListener;
 
     public OptionSetting(String name, String description, List<T> options, T defaultOption) {
-        super(name, description);
+        super(name, description, defaultOption);
         this.options = options;
-        this.option = defaultOption;
-        this.defaultOption = defaultOption;
     }
 
     public OptionSetting(String name, String description, List<T> options, T defaultOption, Map<T, String> displayNames) {
-        super(name, description);
+        super(name, description, defaultOption);
         this.options = options;
-        this.option = defaultOption;
-        this.defaultOption = defaultOption;
         this.displayNames = displayNames;
     }
 
-    public T getValue() {
-        return option;
-    }
-
     public void setValue(T option) {
-        if (options.contains(option)) this.option = option;
-        fireUpdateEvent();
-        if (updateListener != null) updateListener.accept(option);
+        if (options.contains(option)) super.setValue(option);
     }
 
     public void setValueByName(String name) {
@@ -62,10 +48,6 @@ public class OptionSetting<T> extends Setting {
         return options.get(index);
     }
 
-    public T getDefaultValue() {
-        return defaultOption;
-    }
-
     public int getSize() {
         return options.size();
     }
@@ -73,7 +55,7 @@ public class OptionSetting<T> extends Setting {
     public int getIndex() {
         int index = 0;
         for (T option : options) {
-            if (this.option == option) break;
+            if (this.value == option) break;
             index += 1;
         }
         return index;
@@ -96,15 +78,6 @@ public class OptionSetting<T> extends Setting {
         return index;
     }
 
-    public void reset() {
-        setValue(defaultOption);
-    }
-
-    public void onUpdate(Consumer<T> listener) {
-        this.updateListener = listener;
-        if (updateListener != null) updateListener.accept(option);
-    }
-
     public Map<T, String> getDisplayNames() {
         return displayNames;
     }
@@ -115,6 +88,6 @@ public class OptionSetting<T> extends Setting {
     }
 
     public String getDisplayName() {
-        return getDisplayName(option);
+        return getDisplayName(value);
     }
 }

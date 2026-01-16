@@ -7,16 +7,12 @@ import net.minecraft.text.Text;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
-public class ColorSetting extends Setting {
-
-    private Color color;
-    private Consumer<Color> updateListener;
+public class ColorSetting extends Setting<Color> {
 
     private Color defaultColor;
-    private boolean defaultRainbow;
-    private int defaultRainbowSpeed;
+    private final boolean defaultRainbow;
+    private final int defaultRainbowSpeed;
 
     private int r, g, b, a;
 
@@ -26,8 +22,7 @@ public class ColorSetting extends Setting {
     private float brightness;
 
     public ColorSetting(String name, String description, Color defaultColor, boolean rainbow) {
-        super(name, description);
-        this.color = this.defaultColor = defaultColor;
+        super(name, description, defaultColor);
 
         this.r = defaultColor.getRed();
         this.g = defaultColor.getGreen();
@@ -43,13 +38,8 @@ public class ColorSetting extends Setting {
         this.brightness = 1f;
     }
 
-    public Color getColor() {
-        if (rainbow) return Colors.rainbowColor(rainbowSpeed, a, saturation, brightness);
-        return color;
-    }
-
     public int getR() {
-        return getColor().getRed();
+        return getValue().getRed();
     }
 
     public void setR(int r) {
@@ -57,12 +47,12 @@ public class ColorSetting extends Setting {
             this.r = Math.clamp(r, 0, 255);
             updateColorFromRGB();
             fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(color);
+            if (updateListener != null) updateListener.accept(value);
         }
     }
 
     public int getG() {
-        return getColor().getGreen();
+        return getValue().getGreen();
     }
 
     public void setG(int g) {
@@ -70,12 +60,12 @@ public class ColorSetting extends Setting {
             this.g = Math.clamp(g, 0, 255);
             updateColorFromRGB();
             fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(color);
+            if (updateListener != null) updateListener.accept(value);
         }
     }
 
     public int getB() {
-        return getColor().getBlue();
+        return getValue().getBlue();
     }
 
     public void setB(int b) {
@@ -83,7 +73,7 @@ public class ColorSetting extends Setting {
             this.b = Math.clamp(b, 0, 255);
             updateColorFromRGB();
             fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(color);
+            if (updateListener != null) updateListener.accept(value);
         }
     }
 
@@ -96,24 +86,31 @@ public class ColorSetting extends Setting {
             this.a = Math.clamp(a, 0, 255);
             updateColorFromRGB();
             fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(color);
+            if (updateListener != null) updateListener.accept(value);
         }
     }
 
     private void updateColorFromRGB() {
-        this.color = new Color(r, g, b, a);
+        this.value = new Color(r, g, b, a);
     }
 
-    public void setColor(Color color) {
-        if (!this.color.equals(color)) {
-            this.color = color;
-            this.r = color.getRed();
-            this.g = color.getGreen();
-            this.b = color.getBlue();
-            this.a = color.getAlpha();
-            fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(color);
+    @Override
+    public Color getValue() {
+        if (rainbow) return Colors.rainbowColor(rainbowSpeed, a, saturation, brightness);
+        return super.getValue();
+    }
+
+    @Override
+    public void setValue(Color value) {
+        if (!this.value.equals(value)) {
+            this.value = value;
+            this.r = value.getRed();
+            this.g = value.getGreen();
+            this.b = value.getBlue();
+            this.a = value.getAlpha();
         }
+
+        super.setValue(value);
     }
 
     public void setRGB(int r, int g, int b) {
@@ -143,7 +140,7 @@ public class ColorSetting extends Setting {
         if (changed) {
             updateColorFromRGB();
             fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(color);
+            if (updateListener != null) updateListener.accept(value);
         }
     }
 
@@ -155,7 +152,7 @@ public class ColorSetting extends Setting {
         if (this.rainbow != rainbow) {
             this.rainbow = rainbow;
             fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(getColor());
+            if (updateListener != null) updateListener.accept(getValue());
         }
     }
 
@@ -167,7 +164,7 @@ public class ColorSetting extends Setting {
         if (this.rainbowSpeed != rainbowSpeed) {
             this.rainbowSpeed = rainbowSpeed;
             fireUpdateEvent();
-            if (updateListener != null && rainbow) updateListener.accept(getColor());
+            if (updateListener != null && rainbow) updateListener.accept(getValue());
         }
     }
 
@@ -179,7 +176,7 @@ public class ColorSetting extends Setting {
         if (this.saturation != saturation) {
             this.saturation = Math.clamp(saturation, 0f, 1f);
             fireUpdateEvent();
-            if (updateListener != null && rainbow) updateListener.accept(getColor());
+            if (updateListener != null && rainbow) updateListener.accept(getValue());
         }
     }
 
@@ -191,7 +188,7 @@ public class ColorSetting extends Setting {
         if (this.brightness != brightness) {
             this.brightness = Math.clamp(brightness, 0f, 1f);
             fireUpdateEvent();
-            if (updateListener != null && rainbow) updateListener.accept(getColor());
+            if (updateListener != null && rainbow) updateListener.accept(getValue());
         }
     }
 
@@ -236,16 +233,15 @@ public class ColorSetting extends Setting {
     }
 
     public int getRGB() {
-        return getColor().getRGB();
+        return getValue().getRGB();
     }
 
     public Text getTooltipText() {
         if (rainbow) return Text.literal("arcoíris");
-        return Text.literal(Colors.getFormatting(color) + Colors.ARGBtoHex(a, r, g, b));
+        return Text.literal(Colors.getFormatting(value) + Colors.ARGBtoHex(a, r, g, b));
     }
 
     public void reset() {
-        this.color = defaultColor;
         this.r = defaultColor.getRed();
         this.g = defaultColor.getGreen();
         this.b = defaultColor.getBlue();
@@ -254,13 +250,7 @@ public class ColorSetting extends Setting {
         this.rainbowSpeed = 2;
         this.saturation = 1f;
         this.brightness = 1f;
-        fireUpdateEvent();
-        if (updateListener != null) updateListener.accept(color);
-    }
-
-    public void onUpdate(Consumer<Color> listener) {
-        this.updateListener = listener;
-        if (updateListener != null) updateListener.accept(getColor());
+        super.reset();
     }
 
     public Map<String, ?> getConfigValue() {

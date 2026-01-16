@@ -13,6 +13,6 @@ public abstract class TextRendererMixin {
     @ModifyExpressionValue(method = "getGlyph", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Style;isObfuscated()Z"))
     private boolean noRenderMTS(boolean original) {
         NoRender noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
-        return (!noRender.isEnabled() || noRender.scrambledText.isEnabled()) && original;
+        return (!noRender.isEnabled() || noRender.scrambledText.getValue()) && original;
     }
 }

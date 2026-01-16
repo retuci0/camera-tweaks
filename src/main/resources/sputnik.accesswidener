@@ -18,12 +18,16 @@ accessible method net/minecraft/client/font/FontManager getStorageInternal (Lnet
 accessible method net/minecraft/entity/Entity setFlag (IZ)V
 accessible method net/minecraft/entity/player/PlayerEntity canGlide ()Z
 
+accessible class net/minecraft/client/particle/ParticleSpriteManager$SpriteAwareFactory
+accessible class net/minecraft/client/particle/ParticleSpriteManager$SimpleSpriteProvider
 accessible field net/minecraft/client/particle/BillboardParticle alpha F
 accessible field net/minecraft/client/particle/BillboardParticle scale F
 accessible field net/minecraft/client/particle/Particle velocityMultiplier F
 accessible field net/minecraft/client/particle/Particle gravityStrength F
 accessible field net/minecraft/client/particle/Particle collidesWithWorld Z
+
 accessible field net/minecraft/entity/LivingEntity jumpingCooldown I
+accessible method net/minecraft/entity/LivingEntity calcGlidingVelocity (Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;
 
 accessible method net/minecraft/client/render/RenderLayer <init> (Ljava/lang/String;Lnet/minecraft/client/render/RenderSetup;)V
 accessible field net/minecraft/client/render/WorldRenderer worldRenderState Lnet/minecraft/client/render/state/WorldRenderState;
@@ -31,3 +35,4 @@ accessible method net/minecraft/client/render/GameRenderer getProjectionMatrix (
 
 accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
 accessible method net/minecraft/client/Keyboard onKey (JILnet/minecraft/client/input/KeyInput;)V
+

@@ -4,20 +4,29 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.events.sputnik.UpdateSettingEvent;
 import me.retucio.sputnik.module.Module;
 
+import java.util.function.Consumer;
+
 // base para los tipos de ajustes
-public abstract class Setting {
+public abstract class Setting<T> {
 
-    private final String name;
-    private final String description;
+    protected final String name;
+    protected final String description;
 
-    private boolean visible = true;
-    private boolean searchMatch = true;
+    protected T value;
+    protected T defaultValue;
 
-    private SettingGroup sg;
+    protected Consumer<T> updateListener;
 
-    protected Setting(String name, String description) {
+    protected boolean visible = true;
+    protected boolean searchMatch = true;
+
+    protected SettingGroup sg;
+
+    protected Setting(String name, String description, T defaultValue) {
         this.name = name;
         this.description = description;
+        this.value = defaultValue;
+        this.defaultValue = defaultValue;
     }
 
     public boolean isVisible() {
@@ -44,6 +53,35 @@ public abstract class Setting {
         return description;
     }
 
+    public T getValue() {
+        return value;
+    }
+
+    public void setValue(T value) {
+        if (this.value != value) {
+            this.value = value;
+
+            fireUpdateEvent();
+            if (updateListener != null) {
+                updateListener.accept(value);
+            }
+        }
+    }
+
+    public T getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(T value) {
+        if (this.defaultValue != value) {
+            this.defaultValue = value;
+        }
+    }
+
+    public void reset() {
+        setValue(defaultValue);
+    }
+
     public SettingGroup getSg() {
         return sg;
     }
@@ -52,13 +90,17 @@ public abstract class Setting {
         this.sg = sg;
     }
 
+    public Module getModule() {
+        return this.sg.getModule();
+    }
+
     public void fireUpdateEvent() {
         Sputnik.EVENT_BUS.post(
-                new UpdateSettingEvent(
-                        this,
-                        sg.getModule()
-                                .shouldSaveSettings()
-                )
-        );
+                new UpdateSettingEvent(this, getModule().shouldSaveSettings()));
+    }
+
+    public void onUpdate(Consumer<T> listener) {
+        this.updateListener = listener;
+        if (updateListener != null) updateListener.accept(value);  // actualizar por primera vez
     }
 }

@@ -5,7 +5,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.ModuleArgumentType;
-import me.retucio.sputnik.module.setting.Setting;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import net.minecraft.command.CommandSource;

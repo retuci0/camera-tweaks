@@ -39,7 +39,7 @@ public class Freelook extends Module {
         keyMode.setValue(KeyModes.HOLD);
 
         notify.setDefaultValue(false);
-        notify.setEnabled(false);
+        notify.setValue(false);
     }
 
     @Override

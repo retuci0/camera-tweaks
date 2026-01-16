@@ -50,15 +50,15 @@ public class InventoryPlus extends Module {
 
         int rowOffset = InventoryUtil.getRowOffset(screen);
 
-        if (KeyUtil.isKeyDown(row1key.getKey())) {
+        if (KeyUtil.isKeyDown(row1key.getValue())) {
             event.cancel();
             swapWithRow(screen, containerSlot, hotbarKeyIndex, rowOffset);
         }
-        else if (KeyUtil.isKeyDown(row2key.getKey())) {
+        else if (KeyUtil.isKeyDown(row2key.getValue())) {
             event.cancel();
             swapWithRow(screen, containerSlot, hotbarKeyIndex, rowOffset + 9);
         }
-        else if (KeyUtil.isKeyDown(row3key.getKey())) {
+        else if (KeyUtil.isKeyDown(row3key.getValue())) {
             event.cancel();
             swapWithRow(screen, containerSlot, hotbarKeyIndex, rowOffset + 18);
         }

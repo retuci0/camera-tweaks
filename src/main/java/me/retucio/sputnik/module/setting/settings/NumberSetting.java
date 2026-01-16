@@ -5,20 +5,16 @@ import me.retucio.sputnik.module.setting.Setting;
 import java.util.function.Consumer;
 
 // ajuste numérico, es decir, que eliges un valor númerico entre el mínimo y el máximo disponibles
-public class NumberSetting extends Setting {
-
-    private double value;
-    private double defaultValue;
-    private boolean locked;
+public class NumberSetting extends Setting<Double> {
 
     private final double min;
     private final double max;
     private final double increment;  // el "increment" es el salto que hay entre valores disponibles
 
-    private Consumer<Double> updateListener;
+    private boolean locked;
 
     public NumberSetting(String name, String description, double defaultValue, double min, double max, double increment) {
-        super(name, description);
+        super(name, description, defaultValue);
         this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.min = min;
@@ -41,40 +37,31 @@ public class NumberSetting extends Setting {
     }
 
 
-    public double getValue() {
-        return value;
-    }
-
     public float getFloatValue() {
-        return (float) value;  // en "float" por conveniencia
+        return value.floatValue();  // en "float" por conveniencia
     }
 
     public int getIntValue() {
-        return (int) value;  // en "int" (número entero) por conveniencia
+        return value.intValue();  // en "int" (número entero) por conveniencia
     }
 
     public long getLongValue() {
-        return (long) value;  // lo mismo para "longs"
+        return value.longValue();  // lo mismo para "longs"
+    }
+
+    public long getShortValue() {
+        return value.shortValue();
+    }
+
+    public long getByteValue() {
+        return value.byteValue();
     }
 
     public void setValue(double value) {
         if (this.value == value || this.locked) return;
         double clamped = clamp(value, min, max);
-        this.value = Math.round(clamped / increment) * increment;
-        fireUpdateEvent();
-        if (updateListener != null) updateListener.accept(this.value);
-    }
-
-    public double getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(double value) {
-        defaultValue = value;
-    }
-
-    public void reset() {
-        setValue(defaultValue);
+        value = Math.round(clamped / increment) * increment;
+        super.setValue(value);
     }
 
     public double getMin() {
@@ -95,10 +82,5 @@ public class NumberSetting extends Setting {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
-    }
-
-    public void onUpdate(Consumer<Double> listener) {
-        this.updateListener = listener;
-        if (updateListener != null) updateListener.accept(value);
     }
 }

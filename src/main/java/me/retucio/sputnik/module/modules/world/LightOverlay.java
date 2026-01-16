@@ -162,7 +162,7 @@ public class LightOverlay extends Module {
             // color
             Color color;
             if (light == 0) {
-                color = darknessColor.getColor();
+                color = darknessColor.getValue();
             } else {
                 float ratio = light / 15.0f;
                 color = new Color(
@@ -174,7 +174,7 @@ public class LightOverlay extends Module {
             }
 
             // renderizar
-            boolean shouldCull = !(onWater.isEnabled() && aboveState.isOf(Blocks.WATER) && dontCullWater.isEnabled());
+            boolean shouldCull = !(onWater.getValue() && aboveState.isOf(Blocks.WATER) && dontCullWater.getValue());
             RenderUtil.drawBlockFaceFilled(event.getMatrices(), block, Direction.UP, color, 0.001f, shouldCull);
         }
     }
@@ -193,7 +193,7 @@ public class LightOverlay extends Module {
                 (lastPlayerPos != null &&
                         playerPos.getSquaredDistance(lastPlayerPos) > (movementThreshold.getValue() * movementThreshold.getValue()));
 
-        if (!needsUpdate && incrementalUpdates.isEnabled() && incrementalLayer >= 0) {
+        if (!needsUpdate && incrementalUpdates.getValue() && incrementalLayer >= 0) {
             // actualización incremental de una sola capa
             performIncrementalUpdate(playerPos, currentRadius, currentYRadius);
             return;
@@ -210,7 +210,7 @@ public class LightOverlay extends Module {
         incrementalLayer = 0;
 
         // búsqueda
-        if (asyncSearch.isEnabled()) {
+        if (asyncSearch.getValue()) {
             if (isSearching) return;
 
             isSearching = true;
@@ -324,7 +324,7 @@ public class LightOverlay extends Module {
         Block aboveBlock = aboveState.getBlock();
 
         if (aboveState.isAir()) return true;
-        if (aboveBlock == Blocks.WATER && onWater.isEnabled()) return true;
+        if (aboveBlock == Blocks.WATER && onWater.getValue()) return true;
         if (aboveBlock instanceof PlantBlock) return true;
 
         if (aboveBlock instanceof SlabBlock ||

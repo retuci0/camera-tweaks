@@ -41,7 +41,7 @@ abstract class DamageParticleFactoryMixin {
         original.velocityMultiplier *= crits.velocityMultipler.getFloatValue();
         original.gravityStrength *= crits.gravity.getFloatValue();
         original.setMaxAge(crits.maxAge.getIntValue());
-        original.collidesWithWorld = crits.collide.isEnabled();
+        original.collidesWithWorld = crits.collide.getValue();
 
         return original;
     }

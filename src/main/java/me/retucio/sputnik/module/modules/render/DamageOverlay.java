@@ -5,6 +5,7 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 
+import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 
@@ -16,7 +17,12 @@ import java.awt.*;
 
 public class DamageOverlay extends Module {
 
-    public ColorSetting colorSetting = sgGeneral.add(new ColorSetting("color", "color", new Color(255, 0, 0, 77), false));
+    public ColorSetting colorSetting = sgGeneral.add(new ColorSetting(
+            "color",
+            "color",
+            Colors.mainColor,
+            false
+    ));
 
     private NativeImageBackedTexture texture = null;
 

@@ -13,6 +13,6 @@ public abstract class StringHelperMixin {
     @ModifyArg(method = "truncateChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/StringHelper;truncate(Ljava/lang/String;IZ)Ljava/lang/String;"), index = 1)
     private static int onTruncate(int maxLength) {
         ChatPlus chatPlus = ModuleManager.INSTANCE.getModuleByClass(ChatPlus.class);
-        return ((chatPlus.isEnabled() && chatPlus.noCharLimit.isEnabled()) ? Integer.MAX_VALUE : maxLength);
+        return ((chatPlus.isEnabled() && chatPlus.noCharLimit.getValue()) ? Integer.MAX_VALUE : maxLength);
     }
 }

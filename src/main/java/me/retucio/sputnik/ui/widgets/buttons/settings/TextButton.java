@@ -56,6 +56,12 @@ public class TextButton extends SettingButton<StringSetting> {
     public void onKey(int key, int action) {
         if (!typing || action == GLFW.GLFW_RELEASE) return;
 
+        // pegar con ctrl + v
+        if (key == GLFW.GLFW_KEY_V && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL)) {
+            buffer.append(mc.keyboard.getClipboard());
+            return;
+        }
+
         switch (key) {  // casos para teclas especiales como enter, escape o borrar
             case GLFW.GLFW_KEY_ENTER -> {
                 setting.setValue(buffer.toString());

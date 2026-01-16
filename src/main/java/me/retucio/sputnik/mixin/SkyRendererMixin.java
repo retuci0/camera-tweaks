@@ -26,13 +26,13 @@ public abstract class SkyRendererMixin {
 
     @Inject(method = "renderSun", at = @At("HEAD"), cancellable = true)
     private void onRenderSun(float alpha, MatrixStack matrices, CallbackInfo ci) {
-        if (timeChanger.isEnabled() && !timeChanger.renderSun.isEnabled()) ci.cancel();
+        if (timeChanger.isEnabled() && !timeChanger.renderSun.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderMoon", at = @At("HEAD"), cancellable = true)
     private void onRenderMoon(MoonPhase moonPhase, float alpha, MatrixStack matrices, CallbackInfo ci) {
         if (!timeChanger.isEnabled()) return;
-        if (!timeChanger.renderMoon.isEnabled()) ci.cancel();
+        if (!timeChanger.renderMoon.getValue()) ci.cancel();
     }
 
     @ModifyArg(method = "renderCelestialBodies", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/SkyRendering;renderMoon(Lnet/minecraft/world/MoonPhase;FLnet/minecraft/client/util/math/MatrixStack;)V"))
@@ -45,12 +45,12 @@ public abstract class SkyRendererMixin {
 
     @Inject(method = "renderStars", at = @At("HEAD"), cancellable = true)
     private void onRenderStars(float brightness, MatrixStack matrices, CallbackInfo ci) {
-        if (timeChanger.isEnabled() && !timeChanger.renderStars.isEnabled()) ci.cancel();
+        if (timeChanger.isEnabled() && !timeChanger.renderStars.getValue()) ci.cancel();
     }
 
     @Inject(method = "drawEndLightFlash", at = @At("HEAD"), cancellable = true)
     private void onEndFlash(MatrixStack matrixStack, float f, float skyFactor, float pitch, CallbackInfo ci) {
         NoRender noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
-        if (noRender.isEnabled() && !noRender.endFlashes.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.endFlashes.getValue()) ci.cancel();
     }
 }

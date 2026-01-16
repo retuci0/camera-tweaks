@@ -57,9 +57,9 @@ public class ClientConfig {
         // guardar ajustes con su respectivo tipo de valor, en formato "nombreMódulo:nombreAjuste"
         Object value = null;
         switch (event.getSetting()) {
-            case BooleanSetting b: value = b.isEnabled(); break;
+            case BooleanSetting b: value = b.getValue(); break;
             case EnumSetting e: value = e.getIndex(); break;
-            case KeySetting k: value = k.getKey(); break;
+            case KeySetting k: value = k.getValue(); break;
             case NumberSetting n: value = n.getValue(); break;
             case StringSetting s: value = s.getValue(); break;
             case ListSetting l: value = l.getConfigValues(); break;

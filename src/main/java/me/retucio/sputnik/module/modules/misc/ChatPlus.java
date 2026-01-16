@@ -82,7 +82,7 @@ public class ChatPlus extends Module {
         Text message = event.getMessage();
 
         // registrar mensajes para evitar su eliminación
-        if (logger.isEnabled()) {
+        if (logger.getValue()) {
             String messageString = message.getString();
             if (loggerRegex.matcher(messageString).find()) {
                 MutableText newMessage = Text.empty();
@@ -100,7 +100,7 @@ public class ChatPlus extends Module {
         }
 
         // agregar sellos de tiempo a los mensajes
-        if (timestamps.isEnabled()) {
+        if (timestamps.getValue()) {
             Text timestamp = Text.literal("[" + dateFormat.format(new Date()) + "] ").formatted(Formatting.GRAY);
             message = Text.empty().append(timestamp).append(message);
         }
@@ -112,7 +112,7 @@ public class ChatPlus extends Module {
     @SubscribeEvent
     private void onSendMessage(SendMessageEvent event) {
         // evitar mandar coordenadas por el chat
-        if (coordsProtection.isEnabled() && containsCoordinates(event.getMessage())) {
+        if (coordsProtection.getValue() && containsCoordinates(event.getMessage())) {
             ChatUtil.warn(Text.literal("cuidadito con las coordenadas chavalín").append(
                     getSendButton(event.getMessage())));
 
@@ -127,7 +127,7 @@ public class ChatPlus extends Module {
 
     @SuppressWarnings("DataFlowIssue")
     public void beforeDrawMessage(DrawContext context, ChatHudLine.Visible line, int y, int color) {
-        if (!isEnabled() || !showHeads.isEnabled()) return;
+        if (!isEnabled() || !showHeads.getValue()) return;
 
         // dibujar la cabeza al principio del mensaje
         if (((IChatHudLineVisible) (Object) line).sputnik$isStartOfEntry())
@@ -139,7 +139,7 @@ public class ChatPlus extends Module {
 
     public void afterDrawMessage(DrawContext context) {
         // finalizar renderizado de la cabeza
-        if (!isEnabled() || !showHeads.isEnabled()) return;
+        if (!isEnabled() || !showHeads.getValue()) return;
         context.getMatrices().popMatrix();
     }
 
@@ -218,7 +218,7 @@ public class ChatPlus extends Module {
     }
 
     private void updateDateFormat() {
-        dateFormat = new SimpleDateFormat(timestampSecs.isEnabled() ? "HH:mm:ss" : "HH:mm");
+        dateFormat = new SimpleDateFormat(timestampSecs.getValue() ? "HH:mm:ss" : "HH:mm");
     }
 
     private boolean containsCoordinates(String message) {

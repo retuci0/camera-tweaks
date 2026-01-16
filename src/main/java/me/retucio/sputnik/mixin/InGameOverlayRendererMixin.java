@@ -27,11 +27,11 @@ public abstract class InGameOverlayRendererMixin {
 
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
     private static void noRenderFireOverlay(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Sprite sprite, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.fireOverlay.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.fireOverlay.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderUnderwaterOverlay", at = @At("HEAD"), cancellable = true)
     private static void noRenderUnderwaterOverlay(MinecraftClient client, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.fluidOverlay.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.fluidOverlay.getValue()) ci.cancel();
     }
 }

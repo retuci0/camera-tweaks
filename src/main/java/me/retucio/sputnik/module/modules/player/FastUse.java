@@ -66,8 +66,8 @@ public class FastUse extends Module {
     }
 
     public int getCooldown(ItemStack stack) {
-        if (stack.getItem() instanceof BlockItem && blocks.isEnabled()) return blockCooldown.getIntValue();
-        if (items.isEnabled() && !(stack.getItem() instanceof BlockItem)) return itemCooldown.getIntValue();
+        if (stack.getItem() instanceof BlockItem && blocks.getValue()) return blockCooldown.getIntValue();
+        if (items.getValue() && !(stack.getItem() instanceof BlockItem)) return itemCooldown.getIntValue();
         else return 4;  // cooldown por defecto, 4 ticks
     }
 }

@@ -26,7 +26,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @ModifyReturnValue(method = "getDisplayName", at = @At("RETURN"))
     private Text addHealthIndicator(Text original) {
         Nametags nametags = ModuleManager.INSTANCE.getModuleByClass(Nametags.class);
-        if (!nametags.isEnabled() || !nametags.health.isEnabled()) return original;
+        if (!nametags.isEnabled() || !nametags.health.getValue()) return original;
 
         float health = getHealth();
         float absorption = getAbsorptionAmount();

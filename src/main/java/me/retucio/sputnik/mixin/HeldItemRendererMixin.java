@@ -65,19 +65,19 @@ public abstract class HeldItemRendererMixin {
 
     @ModifyReturnValue(method = "shouldSkipHandAnimationOnSwap", at = @At("RETURN"))
     private boolean modifySkipSwapAnimation(boolean original) {
-        return original || (handView.isEnabled() && handView.skipSwapping.isEnabled());
+        return original || (handView.isEnabled() && handView.skipSwapping.getValue());
     }
 
     @Inject(method = "applyEatOrDrinkTransformation", at = @At(value = "INVOKE", target = "Ljava/lang/Math;pow(DD)D", shift = At.Shift.BEFORE), cancellable = true)
     private void cancelTransformations(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, PlayerEntity player, CallbackInfo ci) {
-        if (handView.isEnabled() && handView.noFood.isEnabled()) ci.cancel();
+        if (handView.isEnabled() && handView.noFood.getValue()) ci.cancel();
     }
 
     @ModifyArg(method = "updateHeldItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F", ordinal = 2), index = 0)
     private float modifyEquipProgressMainhand(float value) {
         if (mc.player == null) return value;
         float progress = mc.player.getAttackCooldownProgress(1);
-        float modified = handView.isEnabled() && handView.oldAnimations.isEnabled() ? 1 : (float) Math.pow(progress, 3);
+        float modified = handView.isEnabled() && handView.oldAnimations.getValue() ? 1 : (float) Math.pow(progress, 3);
 
         return (shouldSkipHandAnimationOnSwap(mainHand, mc.player.getMainHandStack()) ? modified : 0) - equipProgressMainHand;
     }

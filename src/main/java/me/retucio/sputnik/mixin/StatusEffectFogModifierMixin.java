@@ -21,8 +21,8 @@ public abstract class StatusEffectFogModifierMixin {
     public boolean noRenderBadEffects(boolean original) {
         NoRender noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
         if (!noRender.isEnabled()) return original;
-        if (getStatusEffect() == StatusEffects.BLINDNESS && !noRender.blindnessEffect.isEnabled()) return false;
-        if (getStatusEffect() == StatusEffects.DARKNESS && !noRender.darknessEffect.isEnabled()) return false;
+        if (getStatusEffect() == StatusEffects.BLINDNESS && !noRender.blindnessEffect.getValue()) return false;
+        if (getStatusEffect() == StatusEffects.DARKNESS && !noRender.darknessEffect.getValue()) return false;
         return original;
     }
 }

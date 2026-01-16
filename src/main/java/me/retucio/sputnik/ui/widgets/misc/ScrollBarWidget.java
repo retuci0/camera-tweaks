@@ -23,7 +23,7 @@ public class ScrollBarWidget extends Widget {
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        if (contentHeight <= windowHeight || !ClientSettingsFrame.guiSettings.scrollBar.isEnabled()) return;
+        if (contentHeight <= windowHeight || !ClientSettingsFrame.guiSettings.scrollBar.getValue()) return;
 
         int trackX1 = mc.getWindow().getScaledWidth() - 10;
         int trackX2 = trackX1 + 10;
@@ -44,7 +44,7 @@ public class ScrollBarWidget extends Widget {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (button != 0 || !ClientSettingsFrame.guiSettings.scrollBar.isEnabled()) return;
+        if (button != 0 || !ClientSettingsFrame.guiSettings.scrollBar.getValue()) return;
         if (isThumbHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             dragging = true;
             dragY = mouseY;
@@ -60,7 +60,7 @@ public class ScrollBarWidget extends Widget {
 
     @Override
     public void mouseDragged(int mouseX, int mouseY) {
-        if (!dragging || !ClientSettingsFrame.guiSettings.scrollBar.isEnabled()) return;
+        if (!dragging || !ClientSettingsFrame.guiSettings.scrollBar.getValue()) return;
 
         int thumbHeight = getThumbHeight();
         int trackHeight = windowHeight - thumbHeight;

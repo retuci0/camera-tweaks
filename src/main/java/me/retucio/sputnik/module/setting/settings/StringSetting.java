@@ -4,50 +4,24 @@ import me.retucio.sputnik.module.setting.Setting;
 
 import java.util.function.Consumer;
 
-public class StringSetting extends Setting {
+public class StringSetting extends Setting<String> {
 
-    private String value;
-    private String defaultValue;
     private final int maxLength;
 
-    private Consumer<String> updateListener;
-
     public StringSetting(String name, String description, String defaultValue, int maxLength) {
-        super(name, description);
+        super(name, description, defaultValue);
         this.value = defaultValue;
         this.defaultValue = defaultValue;
         this.maxLength = maxLength;
     }
 
-    public String getValue() {
-        return value;
-    }
-
     public void setValue(String value) {
         if (this.value.equals(value)) return;
-        this.value = value.length() > maxLength ? value.substring(0, maxLength) : value;
-        fireUpdateEvent();
-        if (updateListener != null) updateListener.accept(this.value);
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public void reset() {
-        setValue(defaultValue);
+        value = value.length() > maxLength ? value.substring(0, maxLength) : value;
+        super.setValue(value);
     }
 
     public int getMaxLength() {
         return maxLength;
-    }
-
-    public void onUpdate(Consumer<String> listener) {
-        this.updateListener = listener;
-        if (updateListener != null) updateListener.accept(value);
     }
 }

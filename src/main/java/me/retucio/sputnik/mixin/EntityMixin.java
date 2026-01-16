@@ -88,7 +88,7 @@ public abstract class EntityMixin {
 
     @ModifyReturnValue(method = "getName", at = @At("RETURN"))
     private Text showProjectileDamage(Text original) {
-        if (!nametags.isEnabled() || !nametags.showProjectileDamage.isEnabled()) return original;
+        if (!nametags.isEnabled() || !nametags.showProjectileDamage.getValue()) return original;
 
         if ((Object) this instanceof PersistentProjectileEntity arrow) {  // aunque lo llame "arrow", también cubre flechas espectrales y tridentes
             String damage = nametags.getArrowDamage(arrow);
@@ -101,7 +101,7 @@ public abstract class EntityMixin {
     @SuppressWarnings("ConstantConditions")
     @ModifyReturnValue(method = "getCustomName", at = @At("RETURN"))
     private Text displayEntityOwner(Text original) {
-        if (!nametags.isEnabled() || !nametags.petOwner.isEnabled()) return original;
+        if (!nametags.isEnabled() || !nametags.petOwner.getValue()) return original;
         if ((Object) this instanceof TameableEntity entity && entity.getOwnerReference() != null) {
             if (original != null) return original.copy().append(" (de " + nametags.getOwnerName(entity.getOwnerReference()) + ")");
             else return Text.of(nametags.getOwnerName(entity.getOwnerReference()));
@@ -113,7 +113,7 @@ public abstract class EntityMixin {
     @SuppressWarnings("ConstantConditions")
     @ModifyReturnValue(method = "getName", at = @At("RETURN"))
     private Text showBabies(Text original) {
-        if (!nametags.isEnabled() || !nametags.distinguishBabies.isEnabled()) return original;
+        if (!nametags.isEnabled() || !nametags.distinguishBabies.getValue()) return original;
         if ((Object) this instanceof LivingEntity entity && entity.isBaby()) return original.copy().append(" (baby)");
         return original;
     }

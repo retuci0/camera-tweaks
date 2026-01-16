@@ -11,7 +11,9 @@ public enum Category {
     NETWORK("red"),
 
     CLIENT("cliente"),
-    MISC("misc.");
+    MISC("misc."),
+
+    ALL("todos");
 
     private final String name;
     Category(String name) { this.name = name; }

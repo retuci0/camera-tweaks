@@ -28,7 +28,7 @@ public abstract class ItemEntityMixin {
 
         if (!name.equals(original)) name = name.formatted(Formatting.ITALIC);
 
-        if (nametags.countItems.isEnabled()) {
+        if (nametags.countItems.getValue()) {
             if (count > 1) return name.copy().append(" x" + count);
             return name;
         }

@@ -143,7 +143,7 @@ public abstract class ChatHudMixin implements IChatHud {
 
     @ModifyExpressionValue(method = "render(Lnet/minecraft/client/gui/hud/ChatHud$Backend;IIZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;ceil(F)I"))
     private int onRender_modifyWidth(int width) {
-        return (chatPlus.isEnabled() && chatPlus.showHeads.isEnabled()) ? width + 10 : width;
+        return (chatPlus.isEnabled() && chatPlus.showHeads.getValue()) ? width + 10 : width;
     }
 
 

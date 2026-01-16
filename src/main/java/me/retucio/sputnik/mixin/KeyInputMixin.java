@@ -16,7 +16,7 @@ public abstract class KeyInputMixin extends Input {
     @Inject(method = "tick", at = @At("TAIL"))
     private void isPressed(CallbackInfo ci) {
         Freecam freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
-        if (freecam.isEnabled() && freecam.stayCrouching.isEnabled() && freecam.isCrouching())
+        if (freecam.isEnabled() && freecam.stayCrouching.getValue() && freecam.isCrouching())
             playerInput = new PlayerInput(
                 false, false,
                 false, false,

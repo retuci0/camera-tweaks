@@ -8,66 +8,40 @@ import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.KeyUtil;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
-public class KeySetting extends Setting {
-
-    private int key;
-    private int defaultKey;
-
-    private Consumer<Integer> updateListener;
+public class KeySetting extends Setting<Integer> {
 
     public KeySetting(String name, String description, int defaultKey) {
-        super(name, description);
-        this.key = defaultKey;
-        this.defaultKey = defaultKey;
+        super(name, description, defaultKey);
+        this.value = defaultKey;
+        this.defaultValue = defaultKey;
     }
 
-    public int getKey() {
-        return key;
-    }
+    @Override
+    public void setValue(Integer value) {
+        if (this.value.equals(value)) return;
 
-    public void setKey(int key) {
-        if (this.key == key) return;
-
-        if (key == GLFW.GLFW_KEY_ESCAPE) {
-            this.key = GLFW.GLFW_KEY_UNKNOWN;  // asignar la tecla ESC a deshabilitar la tecla
+        if (value == GLFW.GLFW_KEY_ESCAPE) {
+            this.value = GLFW.GLFW_KEY_UNKNOWN;  // asignar la tecla ESC a deshabilitar la tecla
             fireUpdateEvent();
-            if (updateListener != null) updateListener.accept(key);
+            if (updateListener != null) updateListener.accept(value);
             return;
         }
 
         if (ModuleManager.INSTANCE != null) {
             for (Module module : ModuleManager.INSTANCE.getModules())
-                if (module.getKey() == key && !ClientSettingsFrame.guiSettings.multipleKeybinds.isEnabled() && key != -1) {
+                if (module.getKey() == value && !ClientSettingsFrame.guiSettings.multipleKeybinds.getValue() && value != -1) {
                     module.setKey(-1);
                     ChatUtil.info("tecla del módulo " + module.getName() + " restablecida");
                 }
         }
-        this.key = key;
 
-        fireUpdateEvent();
-        if (updateListener != null) updateListener.accept(key);
-    }
-
-    public int getDefaultKey() {
-        return defaultKey;
-    }
-
-    public void setDefaultKey(int key) {
-        this.defaultKey = key;
+        super.setValue(value);
     }
 
     public String getKeyName() {
-        return KeyUtil.getKeyName(key);
-    }
-
-    public void reset() {
-        setKey(defaultKey);
-    }
-
-    public void onUpdate(Consumer<Integer> listener) {
-        this.updateListener = listener;
-        if (updateListener != null) updateListener.accept(key);
+        return KeyUtil.getKeyName(value);
     }
 }

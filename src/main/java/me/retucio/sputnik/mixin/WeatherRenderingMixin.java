@@ -29,14 +29,14 @@ public abstract class WeatherRenderingMixin {
 
     @Inject(method = "addParticlesAndSound", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;addParticleClient(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"), cancellable = true)
     private void noRainParticles(ClientWorld world, Camera camera, int ticks, ParticlesMode particlesMode, int weatherRadius, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.rain.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.rain.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderPrecipitation", at = @At("HEAD"))
     private void noRenderRainAndSnow(VertexConsumerProvider vertexConsumers, Vec3d pos, WeatherRenderState weatherRenderState, CallbackInfo ci) {
         if (noRender.isEnabled()) {
-            if (!noRender.rain.isEnabled()) weatherRenderState.rainPieces.clear();
-            if (!noRender.snow.isEnabled()) weatherRenderState.snowPieces.clear();
+            if (!noRender.rain.getValue()) weatherRenderState.rainPieces.clear();
+            if (!noRender.snow.getValue()) weatherRenderState.snowPieces.clear();
         }
     }
 }

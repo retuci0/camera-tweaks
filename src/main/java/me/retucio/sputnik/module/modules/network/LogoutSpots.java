@@ -61,12 +61,12 @@ public class LogoutSpots extends Module {
 
         outlines.onUpdate(v -> {
             outlineColor.setVisible(v);
-            fullHeight.setVisible(v || filling.isEnabled());
+            fullHeight.setVisible(v || filling.getValue());
         });
 
         filling.onUpdate(v -> {
             fillingColor.setVisible(v);
-            fullHeight.setVisible(v || outlines.isEnabled());
+            fullHeight.setVisible(v || outlines.getValue());
         });
 
         dummy.onUpdate(v -> {
@@ -116,7 +116,7 @@ public class LogoutSpots extends Module {
                     if (player.getUuid().equals(entry.getProfile().id())) {
                         LogoutEntry logoutEntry = new LogoutEntry(player);
 
-                        if (mc.world != null && !mc.world.hasEntity(logoutEntry.dummy) && dummy.isEnabled())
+                        if (mc.world != null && !mc.world.hasEntity(logoutEntry.dummy) && dummy.getValue())
                             mc.world.addEntity(logoutEntry.dummy);
 
                         addLogoutSpot(logoutEntry);
@@ -248,21 +248,21 @@ public class LogoutSpots extends Module {
         }
 
         public void renderBox(MatrixStack matrices) {
-            if (fullHeight.isEnabled()) {
-                if (outlines.isEnabled())
-                    RenderUtil.drawOutlineBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), outlineColor.getColor(), lineWidth.getFloatValue(), true);
-                if (filling.isEnabled())
-                    RenderUtil.drawFilledBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), fillingColor.getColor(), true);
+            if (fullHeight.getValue()) {
+                if (outlines.getValue())
+                    RenderUtil.drawOutlineBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), outlineColor.getValue(), lineWidth.getFloatValue(), true);
+                if (filling.getValue())
+                    RenderUtil.drawFilledBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), fillingColor.getValue(), true);
             } else {
-                if (outlines.isEnabled()) {
+                if (outlines.getValue()) {
                     RenderUtil.drawBlockFaceOutlines(matrices,
                             BlockPos.ofFloored(x + halfWidth, y, z + halfWidth),
-                            Direction.UP, outlineColor.getColor(), lineWidth.getFloatValue(), true);
+                            Direction.UP, outlineColor.getValue(), lineWidth.getFloatValue(), true);
                 }
-                if (filling.isEnabled()) {
+                if (filling.getValue()) {
                     RenderUtil.drawBlockFaceFilled(matrices,
                             BlockPos.ofFloored(x + halfWidth, y, z + halfWidth),
-                            Direction.UP, fillingColor.getColor(), 0.001f, true);
+                            Direction.UP, fillingColor.getValue(), 0.001f, true);
                 }
             }
         }

@@ -40,32 +40,32 @@ public abstract class InGameHudMixin {
 
     @Inject(method = "renderScoreboardSidebar*", at = @At("HEAD"), cancellable = true)
     private void noRenderScoreboard(CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.scoreboard.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.scoreboard.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderTitleAndSubtitle", at = @At("HEAD"), cancellable = true)
     private void noRenderTitles(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.titles.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.titles.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderNauseaOverlay", at = @At("HEAD"), cancellable = true)
     private void noRenderNausea(DrawContext context, float nauseaStrength, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.nauseaEffect.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.nauseaEffect.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
     private void noRenderSpyglass(DrawContext context, float scale, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.spyglassOverlay.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.spyglassOverlay.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
     private void noRenderPortal(DrawContext context, float nauseaStrength, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.portalOverlay.isEnabled()) ci.cancel();
+        if (noRender.isEnabled() && !noRender.portalOverlay.getValue()) ci.cancel();
     }
 
     @Inject(method = "renderOverlay", at = @At("HEAD"), cancellable = true)
     private void noRenderPumpkinBlur(DrawContext context, Identifier texture, float opacity, CallbackInfo ci) {
-        if (noRender.isEnabled() && !noRender.pumpkinOverlay.isEnabled() && texture.getPath().equals("textures/misc/pumpkinblur.png")) ci.cancel();
+        if (noRender.isEnabled() && !noRender.pumpkinOverlay.getValue() && texture.getPath().equals("textures/misc/pumpkinblur.png")) ci.cancel();
     }
 
 
@@ -84,6 +84,6 @@ public abstract class InGameHudMixin {
     @Inject(method = "clear", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;clear(Z)V"), cancellable = true)
     private void onClear(CallbackInfo ci) {
         ChatPlus chatPlus = ModuleManager.INSTANCE.getModuleByClass(ChatPlus.class);
-        if (chatPlus.isEnabled() && chatPlus.keepHistory.isEnabled()) ci.cancel();
+        if (chatPlus.isEnabled() && chatPlus.keepHistory.getValue()) ci.cancel();
     }
 }

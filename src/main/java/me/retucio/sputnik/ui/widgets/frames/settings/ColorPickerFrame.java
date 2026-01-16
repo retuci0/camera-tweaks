@@ -45,7 +45,7 @@ public class ColorPickerFrame extends SettingsFrame {
         super(module, x, y, w, h);
 
         this.colorSetting = colorSetting;
-        this.currentColor = colorSetting.getColor();
+        this.currentColor = colorSetting.getValue();
 
         dummyModule = new Module("selector de colores", "elige colores", Category.CLIENT) {
             @Override public void onEnable() {}
@@ -58,27 +58,26 @@ public class ColorPickerFrame extends SettingsFrame {
 
         // ajustes de color
         redSetting = new NumberSetting("rojo", "cantidad de rojo", colorSetting.getR(), 0, 255, 1);
-        redSetting.setDefaultValue(colorSetting.getDefaultR());
+        redSetting.setDefaultValue((double) colorSetting.getDefaultR());
         greenSetting = new NumberSetting("verde", "cantidad de verde", colorSetting.getG(), 0, 255, 1);
-        greenSetting.setDefaultValue(colorSetting.getDefaultG());
+        greenSetting.setDefaultValue((double) colorSetting.getDefaultG());
         blueSetting = new NumberSetting("azul", "cantidad de azul", colorSetting.getB(), 0, 255, 1);
-        blueSetting.setDefaultValue(colorSetting.getDefaultB());
+        blueSetting.setDefaultValue((double) colorSetting.getDefaultB());
 
         // ajustes de arcoíris
         rainbowSetting = new BooleanSetting("arcoíris", "gay.", colorSetting.isRainbow());
         rainbowSetting.setDefaultValue(colorSetting.getDefaultRainbow());
         rainbowSpeedSetting = new NumberSetting("velocidad del arcoíris", "velocidad de gaming", colorSetting.getRainbowSpeed(), 1, 10000, 2);
-        rainbowSpeedSetting.setDefaultValue(colorSetting.getDefaultRainbowSpeed());
+        rainbowSpeedSetting.setDefaultValue((double) colorSetting.getDefaultRainbowSpeed());
         saturationSetting = new NumberSetting("saturación", "intensidad de la homosexualidad", colorSetting.getSaturation(), 0, 1, 0.01f);
-        saturationSetting.setDefaultValue(colorSetting.getDefaultSaturation());
+        saturationSetting.setDefaultValue((double) colorSetting.getDefaultSaturation());
         brightnessSetting = new NumberSetting("brillo", "brillo de la homosexualidad", colorSetting.getBrightness(), 0, 1, 0.01f);
-        brightnessSetting.setDefaultValue(colorSetting.getDefaultBrightness());
+        brightnessSetting.setDefaultValue((double) colorSetting.getDefaultBrightness());
 
         // añadir ajustes y tal
-        dummyModule.getSg("general").addAll(redSetting, greenSetting, blueSetting, rainbowSpeedSetting, saturationSetting, brightnessSetting, rainbowSetting);
-        for (Setting setting : dummyModule.getSettings()) {
-            if (setting instanceof NumberSetting n) n.onUpdate(v -> updateColorFromSettings());
-            if (setting instanceof BooleanSetting b) b.onUpdate(v -> updateColorFromSettings());
+        dummyModule.getSgGeneral().addAll(redSetting, greenSetting, blueSetting, rainbowSpeedSetting, saturationSetting, brightnessSetting, rainbowSetting);
+        for (Setting<?> setting : dummyModule.getSettings()) {
+            setting.onUpdate(v -> updateColorFromSettings());
             rainbowSetting.onUpdate(v -> {
                 updateColorFromSettings();
                 redSetting.setVisible(!v);
@@ -123,11 +122,11 @@ public class ColorPickerFrame extends SettingsFrame {
         updateWidth();
 
         // al parecer este era el problema :/
-        for (Setting setting : dummyModule.getSettings())
+        for (Setting<?> setting : dummyModule.getSettings())
             if (setting instanceof NumberSetting ns) ns.setLocked(
                     pickingAlpha || pickingHue || pickingSaturationBrightness);
 
-        currentColor = colorSetting.getColor();
+        currentColor = colorSetting.getValue();
 
         int padding = 5;
 
@@ -461,7 +460,7 @@ public class ColorPickerFrame extends SettingsFrame {
         green = greenSetting.getIntValue();
         blue = blueSetting.getIntValue();
         alpha = colorSetting.getA();
-        rainbow = rainbowSetting.isEnabled();
+        rainbow = rainbowSetting.getValue();
         rainbowSpeed = rainbowSpeedSetting.getIntValue();
         saturation = saturationSetting.getFloatValue();
         brightness = brightnessSetting.getFloatValue();
@@ -476,13 +475,13 @@ public class ColorPickerFrame extends SettingsFrame {
     private void updateSettingsFromColor() {
         if (colorSetting == null) return;
 
-        for (Setting setting : dummyModule.getSettings()) {
+        for (Setting<?> setting : dummyModule.getSettings()) {
             switch (setting.getName()) {
                 case "rojo" -> ((NumberSetting) setting).setValue(colorSetting.getR());
                 case "verde" -> ((NumberSetting) setting).setValue(colorSetting.getG());
                 case "azul" -> ((NumberSetting) setting).setValue(colorSetting.getB());
                 case "opacidad" -> ((NumberSetting) setting).setValue(colorSetting.getA());
-                case "arcoíris" -> ((BooleanSetting) setting).setEnabled(colorSetting.isRainbow());
+                case "arcoíris" -> ((BooleanSetting) setting).setValue(colorSetting.isRainbow());
                 case "velocidad del arcoíris" -> ((NumberSetting) setting).setValue(colorSetting.getRainbowSpeed());
                 case "saturación" -> ((NumberSetting) setting).setValue(colorSetting.getSaturation());
                 case "brillo" -> ((NumberSetting) setting).setValue(colorSetting.getBrightness());

@@ -59,7 +59,7 @@ public abstract class CameraMixin {
 
     @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
     private void onClipToSpace(float distance, CallbackInfoReturnable<Float> cir) {
-        if (perspectivePlus.isEnabled() && perspectivePlus.clip.isEnabled())
+        if (perspectivePlus.isEnabled() && perspectivePlus.clip.getValue())
             cir.setReturnValue(distance);
     }
 

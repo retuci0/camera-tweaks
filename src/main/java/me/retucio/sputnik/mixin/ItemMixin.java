@@ -23,7 +23,7 @@ public abstract class ItemMixin {
     @Inject(method = "appendTooltip", at = @At("HEAD"))
     private void onAppendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type, CallbackInfo ci) {
         ShulkerPeek shulkerPeek = ModuleManager.INSTANCE.getModuleByClass(ShulkerPeek.class);
-        if (!shulkerPeek.isEnabled() || !shulkerPeek.showTooltips.isEnabled()) return;
+        if (!shulkerPeek.isEnabled() || !shulkerPeek.showTooltips.getValue()) return;
 
         if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock) {
             if (ShulkerPeek.isShulkerEmpty(stack)) {

@@ -157,7 +157,7 @@ public class HudEditorScreen extends Screen {
 
     @Override
     protected void applyBlur(DrawContext ctx) {
-        if (ClientSettingsFrame.guiSettings.blur.isEnabled()) {
+        if (ClientSettingsFrame.guiSettings.blur.getValue()) {
             super.applyBlur(ctx);
         }
     }

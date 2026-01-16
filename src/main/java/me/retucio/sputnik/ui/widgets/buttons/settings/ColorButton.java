@@ -37,7 +37,7 @@ public class ColorButton extends SettingButton<ColorSetting> {
         int previewY = y + 3;
 
         DrawUtil.drawBorder(ctx, previewX - 1, previewY - 1, previewSize + 2, previewSize + 2, setting.isRainbow() ? Colors.mainColor.getRGB() : -1);
-        ctx.fill(previewX, previewY, previewX + previewSize, previewY + previewSize, setting.getColor().getRGB());
+        ctx.fill(previewX, previewY, previewX + previewSize, previewY + previewSize, setting.getValue().getRGB());
 
         // texto
         String label = setting.getName();

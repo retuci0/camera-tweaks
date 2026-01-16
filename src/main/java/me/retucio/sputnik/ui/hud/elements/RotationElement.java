@@ -16,7 +16,7 @@ public class RotationElement extends TextHudElement {
     @Override
     public String getText(float delta, HUD hud) {
         if (mc.player == null) return getPreviewText();
-        return String.format("%.2f", mc.player.getYaw()) + "º " + String.format("%.2f", mc.player.getPitch()) + "º (" + getDirection() + ")";
+        return String.format("%.2f", mc.player.getYaw() % 360) + "º " + String.format("%.2f", mc.player.getPitch()) + "º (" + getDirection() + ")";
     }
 
     @Override

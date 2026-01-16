@@ -55,6 +55,6 @@ public abstract class LightmapTextureManagerMixin {
 
     @Inject(method = "getDarkness", at = @At("HEAD"), cancellable = true)
     private void noRenderDarkness(LivingEntity entity, float factor, float tickProgress, CallbackInfoReturnable<Float> cir) {
-        if (noRender.isEnabled() && !noRender.darknessEffect.isEnabled()) cir.setReturnValue(0f);
+        if (noRender.isEnabled() && !noRender.darknessEffect.getValue()) cir.setReturnValue(0f);
     }
 }

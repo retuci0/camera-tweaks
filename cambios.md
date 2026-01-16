@@ -1,27 +1,23 @@
-# v2.6
+# v2.7
 
 ## novedades
 
 ### adiciones
 
-- layouts de teclado (en_us y es_es) (fuck azerty)
-- comando `$config` para abrir el marco de ajustes de un módulo
-- elemento del hud que muestra la rotación de la cámara del jugador
+- filtro por categoría de módulos en la barra de búsqueda
 
 #### módulos nuevos:
 
-- fuentes: cambia la tipografía que usa todo el juego a una custom 
-- escalones: actúa con la altura deseada como si se estuviesen subiendo escalones
-- escalones inversos: escalones, pabajo
-- partículas: genera particulas artificiales
+- avioneta: vuela infinitamente usando el glitch de las elytras descubierto por Heppe, o al menos hasta que se te rompan las elytras
+- triangulador de strongholds: usa geometría simple para calcular la intersección de las líneas creadas por los ojos de ender lanzados para obtener la posición aproximada de la stronghold más cercana
+- discordrpc: personaliza la actividad de tu perfil de discord
 
 ### arreglos / mejoras
 
-- ahora puedes cambiar el grosor de las líneas del contorno de los bloques
-- arreglada la compatibilidad con meteor client
-- optimizado y mejorado superposición de luz y resaltado de bloques
-- ahora, en los marcos de seleccion única, en el tooltip de cada opción dice "seleccionar" en lugar de "incluir"
-- ahora precoz también tiene una opción de reducir el cooldown al minar bloques
+- ahora se puede hacer ctrl + v para pegar en los ajustes de texto
+- el color por defecto de la superposición de daño ya es el color principal del mod
+- arreglado el elemento del HUD de rotación
+- arreglado los marcos de ajustes de selección
 
 ## problemas reconocidos
 

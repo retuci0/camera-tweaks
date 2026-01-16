@@ -42,7 +42,7 @@ public class BindCommand extends Command {
     public static boolean onKeyPress(int key) {
         if (listeningModule == null) return false;
         KeySetting bind = listeningModule.getBind();
-        if (bind != null) bind.setKey(key);
+        if (bind != null) bind.setValue(key);
 
         ChatUtil.info(
                 Text.of("la tecla " + Formatting.AQUA + KeyUtil.getKeyName(key) + Formatting.RESET +

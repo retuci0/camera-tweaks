@@ -107,7 +107,7 @@ public class ConfigManager {
         save();
     }
 
-    public static void setSetting(Setting setting, Object value) {
+    public static void setSetting(Setting<?> setting, Object value) {
         ensureConfig();
         config.settings.put(getSettingKey(setting), value);
         save();
@@ -150,7 +150,7 @@ public class ConfigManager {
     // ------------------ APLICAR AJUSTES ------------------
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void applySetting(Module parent, Setting setting) {
+    public static void applySetting(Module parent, Setting<?> setting) {
         String key = getSettingKey(setting);
 
         if (!config.settings.containsKey(key)) return;
@@ -249,7 +249,7 @@ public class ConfigManager {
 
     private static void applyBooleanSetting(BooleanSetting setting, Object value) {
         if (value instanceof Boolean) {
-            setting.setEnabled((Boolean) value);
+            setting.setValue((Boolean) value);
         }
     }
 
@@ -275,9 +275,9 @@ public class ConfigManager {
 
     private static void applyKeySetting(KeySetting setting, Object value) {
         if (value instanceof Double) {
-            setting.setKey(((Double) value).intValue());
+            setting.setValue(((Double) value).intValue());
         } else if (value instanceof Integer) {
-            setting.setKey((Integer) value);
+            setting.setValue((Integer) value);
         }
     }
 
@@ -291,7 +291,7 @@ public class ConfigManager {
                 convertedValues.put(option, booleanValue instanceof Boolean && (Boolean) booleanValue);
             }
 
-            setting.setValues(convertedValues);
+            setting.setValue(convertedValues);
         }
     }
 
@@ -342,7 +342,7 @@ public class ConfigManager {
         if (config == null) config = new ClientConfig();
     }
 
-    private static String getSettingKey(Setting setting) {
+    private static String getSettingKey(Setting<?> setting) {
         return setting.getSg().getModule().getName() + ":" + setting.getName();
     }
 

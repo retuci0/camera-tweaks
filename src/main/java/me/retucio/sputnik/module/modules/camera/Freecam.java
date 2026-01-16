@@ -87,7 +87,7 @@ public class Freecam extends Module {
         fovScale = mc.options.getFovEffectScale().getValue();
         viewBobbing = mc.options.getBobView().getValue();
 
-        if (staticView.isEnabled()) {
+        if (staticView.getValue()) {
             mc.options.getFovEffectScale().setValue(0D);
             mc.options.getBobView().setValue(false);
         }
@@ -119,25 +119,25 @@ public class Freecam extends Module {
         down = KeyUtil.isKeyDown(mc.options.sneakKey);
 
         unpress();
-        if (reloadChunks.isEnabled()) mc.worldRenderer.reload();
+        if (reloadChunks.getValue()) mc.worldRenderer.reload();
 
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        if (reloadChunks.isEnabled()) mc.execute(mc.worldRenderer::reload);
+        if (reloadChunks.getValue()) mc.execute(mc.worldRenderer::reload);
 
         mc.options.setPerspective(perspective);
         crouching = false;
 
-        if (staticView.isEnabled()) {
+        if (staticView.getValue()) {
             mc.options.getFovEffectScale().setValue(fovScale);
             mc.options.getBobView().setValue(viewBobbing);
         }
 
         // para no flaggear el anticheat, cancelar cualquier acción dejada a medias estando en modo libre
-        if (cancelActionPackets.isEnabled()) {
+        if (cancelActionPackets.getValue()) {
             if (mc.interactionManager != null)
                 mc.interactionManager.cancelBlockBreaking();
 
@@ -199,7 +199,7 @@ public class Freecam extends Module {
 
     @SubscribeEvent
     public void onSendPacket(PacketEvent.Send event) {
-        if (!isEnabled() || !cancelActionPackets.isEnabled()) return;
+        if (!isEnabled() || !cancelActionPackets.getValue()) return;
         if (event.getStage() != Stage.PRE) return;
 
         Packet<?> packet = event.getPacket();
@@ -279,7 +279,7 @@ public class Freecam extends Module {
 
     @SubscribeEvent
     private void onMouseScroll(MouseScrollEvent event) {
-        if (scrollSens.getValue() > 0 && mc.currentScreen == null && KeyUtil.isKeyDown(scrollKey.getKey())) {
+        if (scrollSens.getValue() > 0 && mc.currentScreen == null && KeyUtil.isKeyDown(scrollKey.getValue())) {
             speed += event.getVertical() / 4 * (scrollSens.getValue() * speed);
             if (speed < 0.1) speed = 0.1;
             event.cancel();
@@ -304,7 +304,7 @@ public class Freecam extends Module {
             if (mc.player.getId() == packet.playerId())
                 toggle();
         } else if (event.getPacket() instanceof HealthUpdateS2CPacket packet) {
-            if (mc.player.getHealth() - packet.getHealth() > 0 && toggleOnDamage.isEnabled()) {
+            if (mc.player.getHealth() - packet.getHealth() > 0 && toggleOnDamage.getValue()) {
                 ChatUtil.info("cámara libre se ha desactivado porque has recibido daño");
                 toggle();
             }
@@ -324,22 +324,22 @@ public class Freecam extends Module {
 
     @SubscribeEvent
     public void onBreakBlock(BreakBlockEvent event) {
-        if (cancelActionPackets.isEnabled()) event.cancel();
+        if (cancelActionPackets.getValue()) event.cancel();
     }
 
     @SubscribeEvent
     public void onPlaceBlock(PlaceBlockEvent event) {
-        if (cancelActionPackets.isEnabled()) event.cancel();
+        if (cancelActionPackets.getValue()) event.cancel();
     }
 
     @SubscribeEvent
     public void onInteractEntity(InteractEntityEvent event) {
-        if (cancelActionPackets.isEnabled()) event.cancel();
+        if (cancelActionPackets.getValue()) event.cancel();
     }
 
     @SubscribeEvent
     public void onAttack(AttackEntityEvent event) {
-        if (cancelActionPackets.isEnabled()) event.cancel();
+        if (cancelActionPackets.getValue()) event.cancel();
     }
 
     public void changeLookDirection(double deltaX, double deltaY) {

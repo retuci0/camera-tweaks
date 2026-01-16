@@ -56,13 +56,7 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
         if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             // click izquierdo / derecho: abrir marco
             if (button <= 1 && !mc.isShiftPressed()) {
-                if (ClickGUI.INSTANCE.isSettingsFrameOpen(dummy)) {
-                    ClickGUI.INSTANCE.closeSettingsFrame(dummy);
-                    return;
-                }
-
-                rebuildDummy();
-                ClickGUI.INSTANCE.openListSettingsFrame(dummy, parent.getX() + 40, parent.getY() + 40);
+                openFrame();
                 // shift + clic derecho: restablecer valores
             } else if (button == 1 && KeyUtil.isShiftDown()) {
                 setting.reset();
@@ -72,7 +66,7 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
     }
 
     private void rebuildDummy() {
-        dummy.getSettings().clear();
+        dummy.getSgGeneral().getSettings().clear();
         optionButtons.clear();
 
         setting.getOptions().stream()
@@ -90,16 +84,16 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
                             // deseleccionar el resto de opciones
                             for (Map.Entry<T, BooleanSetting> entry : optionButtons.entrySet()) {
                                 if (!entry.getKey().equals(option))
-                                    entry.getValue().setEnabled(false);
+                                    entry.getValue().setValue(false);
                             }
                             setting.setValue(option);
                         } else {
                             if (setting.is(option))
-                                b.setEnabled(true);
+                                b.setValue(true);
                         }
                     });
 
-                    dummy.getSg("general").add(b);
+                    dummy.getSgGeneral().add(b);
                     optionButtons.put(option, b);
                 });
     }
@@ -108,9 +102,24 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
         T currentValue = setting.getValue();
         for (Map.Entry<T, BooleanSetting> entry : optionButtons.entrySet()) {
             boolean shouldBeEnabled = entry.getKey().equals(currentValue);
-            if (entry.getValue().isEnabled() != shouldBeEnabled) {
-                entry.getValue().setEnabled(shouldBeEnabled);
+            if (entry.getValue().getValue() != shouldBeEnabled) {
+                entry.getValue().setValue(shouldBeEnabled);
             }
         }
+    }
+
+    public void openFrame() {
+        if (ClickGUI.INSTANCE.isSettingsFrameOpen(dummy)) {
+            ClickGUI.INSTANCE.closeSettingsFrame(dummy);
+            return;
+        }
+
+        rebuildDummy();
+
+        ClickGUI.INSTANCE.openListSettingsFrame(
+                dummy,
+                parent.getX() + 40,
+                parent.getY() + 40
+        );
     }
 }

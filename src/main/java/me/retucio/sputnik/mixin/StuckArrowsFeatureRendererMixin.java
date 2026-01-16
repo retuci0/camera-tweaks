@@ -13,7 +13,7 @@ public abstract class StuckArrowsFeatureRendererMixin {
     @ModifyReturnValue(method = "getObjectCount", at =  @At("RETURN"))
     private int noRenderStuckArrows(int original) {
         NoRender noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
-        if (noRender.isEnabled() && !noRender.stuckArrows.isEnabled()) return 0;
+        if (noRender.isEnabled() && !noRender.stuckArrows.getValue()) return 0;
         return original;
     }
 }

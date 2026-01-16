@@ -110,13 +110,13 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
     private void renderHand(float tickProgress, boolean sleeping, Matrix4f positionMatrix, CallbackInfo ci) {
-        if ((zoom.isEnabled() && !zoom.showHands.isEnabled())
-                || (freecam.isEnabled() && !freecam.renderHands.isEnabled()))
+        if ((zoom.isEnabled() && !zoom.showHands.getValue())
+                || (freecam.isEnabled() && !freecam.renderHands.getValue()))
             ci.cancel();
     }
 
     @ModifyVariable(method = "renderWorld", ordinal = 6, at = @At(value = "STORE"))
     private float noRenderNauseaDistortion(float scaledNauseaEffectFactor) {
-        return (noRender.isEnabled() && !noRender.nauseaEffect.isEnabled()) ? 0 : scaledNauseaEffectFactor;
+        return (noRender.isEnabled() && !noRender.nauseaEffect.getValue()) ? 0 : scaledNauseaEffectFactor;
     }
 }

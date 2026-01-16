@@ -33,6 +33,7 @@ import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.render.DrawUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
 
+import me.retucio.sputnik.util.render.Textures;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -91,6 +92,8 @@ public class Sputnik implements ClientModInitializer {
         EVENT_BUS.register(RenderUtil.class);
 
         Lists.init();
+
+        Textures.registerAll();
 
         CapeManager.INSTANCE = new CapeManager();
         EVENT_BUS.post(new LoadCapeManagerEvent());
@@ -195,7 +198,7 @@ public class Sputnik implements ClientModInitializer {
     // manejar la lógica de apertura del editor de elementos del hud, con la misma lógica que handleClickGUIKey()
     private void handleHudEditorKey(int key, boolean anyFocused) {
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
-        if (key != hud.editorKey.getKey() || anyFocused || isOnTypingScreen()) return;
+        if (key != hud.editorKey.getValue() || anyFocused || isOnTypingScreen()) return;
 
         if (mc.currentScreen != HudEditorScreen.INSTANCE) {
             if (!hud.isEnabled()) {

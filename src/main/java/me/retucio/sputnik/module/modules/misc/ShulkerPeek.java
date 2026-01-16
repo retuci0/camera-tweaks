@@ -62,7 +62,7 @@ public class ShulkerPeek extends Module {
     @SubscribeEvent
     public void onKey(KeyEvent event) {
         if (mc.player == null) return;
-        if (event.getKey() != previewKey.getKey()) return;
+        if (event.getKey() != previewKey.getValue()) return;
 
         if (event.getAction() == GLFW.GLFW_PRESS) {
             openPreviewScreen();

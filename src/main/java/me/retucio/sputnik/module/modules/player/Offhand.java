@@ -46,7 +46,7 @@ public class Offhand extends Module {
         }
 
         if (holdingItem || (!mc.player.getOffHandStack().isEmpty()
-                && !override.isEnabled()))
+                && !override.getValue()))
             return;
 
         if (mc.player.playerScreenHandler == mc.player.currentScreenHandler) {

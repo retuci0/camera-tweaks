@@ -7,7 +7,6 @@ import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
-import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.client.gui.DrawContext;
@@ -85,13 +84,14 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
 
     private void rebuildDummy() {
         dummy.getSettings().clear();
+        dummy.getSgGeneral().getSettings().clear();
         optionButtons.clear();
 
         setting.getOptions().stream()
                 .sorted(Comparator.comparing(setting::getDisplayName, String.CASE_INSENSITIVE_ORDER))
                 .forEach(option -> {
                     String displayName = setting.getDisplayName(option);
-                    BooleanSetting b = dummy.getSg("general").add(new BooleanSetting(
+                    BooleanSetting b = dummy.getSgGeneral().add(new BooleanSetting(
                             displayName,
                             "incluir " + displayName,
                             setting.isEnabled(option)
@@ -100,10 +100,9 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
                     optionButtons.put(option, b);
                 });
     }
-
     public void refreshDummy() {
         optionButtons.forEach((option, boolSetting) ->
-                boolSetting.setEnabled(setting.isEnabled(option)));
+                boolSetting.setValue(setting.isEnabled(option)));
     }
 
     private int countEnabled() {
