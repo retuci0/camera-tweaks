@@ -6,6 +6,7 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
+import me.retucio.sputnik.util.MiscUtil;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
@@ -58,7 +59,7 @@ public class TextButton extends SettingButton<StringSetting> {
 
         // pegar con ctrl + v
         if (key == GLFW.GLFW_KEY_V && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL)) {
-            buffer.append(mc.keyboard.getClipboard());
+            paste();
             return;
         }
 
@@ -94,8 +95,11 @@ public class TextButton extends SettingButton<StringSetting> {
         return typing;
     }
 
-    private void onBackspace() {
-        if (!buffer.isEmpty())
-            buffer.deleteCharAt(buffer.length() - 1);
+    public void onBackspace() {
+        MiscUtil.backspace(buffer);
+    }
+
+    public void paste() {
+        buffer.append(MiscUtil.getPasteContent(setting.getMaxLength() - buffer.length()));
     }
 }

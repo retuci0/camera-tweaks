@@ -20,7 +20,9 @@ public class CoordsElement extends TextHudElement {
         Freecam freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
         Vec3d pos = freecam != null && freecam.isEnabled()
                 ? new Vec3d(freecam.getX(delta), freecam.getY(delta), freecam.getZ(delta))
-                : mc.player.getEntityPos();
+                : mc.player == null
+                    ? new Vec3d(67, 67, 67)
+                    : mc.player.getEntityPos();
 
         String overworldCoords = (int) pos.x + " " + (int) pos.y + " " + (int) pos.z;
         String netherCoords = (int) pos.x / 8 + " " + (int) pos.y / 8 + " " + (int) pos.z / 8;

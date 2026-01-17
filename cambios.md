@@ -1,23 +1,24 @@
-# v2.7
+# v2.8
 
 ## novedades
 
 ### adiciones
 
-- filtro por categoría de módulos en la barra de búsqueda
-
 #### módulos nuevos:
-
-- avioneta: vuela infinitamente usando el glitch de las elytras descubierto por Heppe, o al menos hasta que se te rompan las elytras
-- triangulador de strongholds: usa geometría simple para calcular la intersección de las líneas creadas por los ojos de ender lanzados para obtener la posición aproximada de la stronghold más cercana
-- discordrpc: personaliza la actividad de tu perfil de discord
 
 ### arreglos / mejoras
 
-- ahora se puede hacer ctrl + v para pegar en los ajustes de texto
-- el color por defecto de la superposición de daño ya es el color principal del mod
-- arreglado el elemento del HUD de rotación
-- arreglado los marcos de ajustes de selección
+- arreglado el gradiente del selector de colores
+- ahora el marco del preview del color en el botón del ajuste de color será el color complementario (rgb, no ryb) del color seleccionado
+
+- ahora puedes borrar palabras enteras con ctrl + borrar
+
+- mejoras al HUD:
+  - movimiento axial: centra los elementos más fácilmente
+  - movimiento con flechas: mueve el elemento seleccionado con las flechas
+  - ahora se puede abrir y usar el editor aun sin estar en un mundo
+  - más previews de elementos coinciden con su valor actual
+  - al parecer he arreglado sin querer un problema que había que no te dejaba seleccionar correctamente elementos del hud
 
 ## problemas reconocidos
 

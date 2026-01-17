@@ -93,31 +93,26 @@ public class HudRenderer {
     }
 
     public static void render(DrawContext ctx, RenderTickCounter tickCounter) {
-        if (shouldSkipRendering()) return;
-
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
-        if (!hud.isEnabled()) return;
-        if (mc.debugHudEntryList.isF3Enabled() && !hud.showOnF3.getValue()) return;
-        if (mc.currentScreen instanceof ChatScreen && !hud.showOnChat.getValue()) return;
 
-        init();
-
-        if (mc.currentScreen instanceof HudEditorScreen) return;
-
-        float delta = tickCounter.getDynamicDeltaTicks();
         for (HudElement element : elements) {
-            if (element.isVisible()) {
-                element.renderInGame(ctx, delta, hud);
+            if (element.isVisible() && !shouldSkipRendering()) {
+                element.renderInGame(ctx, tickCounter.getDynamicDeltaTicks(), hud);
             }
         }
     }
 
     private static boolean shouldSkipRendering() {
+        HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
         return ModuleManager.INSTANCE == null
                 || mc.player == null
                 || mc.getCameraEntity() == null
                 || mc.currentScreen instanceof TitleScreen
-                || mc.options.hudHidden;
+                || mc.options.hudHidden
+                || !hud.isEnabled()
+                || (mc.debugHudEntryList.isF3Enabled() && !hud.showOnF3.getValue())
+                || (mc.currentScreen instanceof ChatScreen && !hud.showOnChat.getValue())
+                || mc.currentScreen instanceof HudEditorScreen;
     }
 
     public static List<HudElement> getElements() {

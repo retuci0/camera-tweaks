@@ -33,10 +33,35 @@ public class TotemsElement extends ImageHudElement {
                 if (stack.getItem() == Items.TOTEM_OF_UNDYING)
                     count++;
             }
+        } else {
+            count = 69;
         }
 
-        ItemStack stack = new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count));
+        drawItem(ctx, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
+    }
 
+    @Override
+    public void renderInEditor(DrawContext ctx, HUD hud) {
+        int count = 0;
+        if (mc.player != null) {
+            for (ItemStack stack : mc.player.getInventory()) {
+                if (stack.getItem() == Items.TOTEM_OF_UNDYING)
+                    count++;
+            }
+        } else {
+            count = 69;
+        }
+
+        drawEditorBackground(ctx);
+        drawItem(ctx, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
+    }
+
+    @Override
+    public List<Text> getTooltip() {
+        return List.of(Text.of("totems disponibles"));
+    }
+
+    private void drawItem(DrawContext ctx, ItemStack stack, int count) {
         ctx.drawItem(stack, x, y);
         if (count > 1) {
             ctx.drawStackOverlay(mc.textRenderer, stack, x, y);
@@ -53,25 +78,5 @@ public class TotemsElement extends ImageHudElement {
                     true
             );
         }
-    }
-
-    @Override
-    public void renderInEditor(DrawContext ctx, HUD hud) {
-        int count = 0;
-        if (mc.player != null) {
-            for (ItemStack stack : mc.player.getInventory()) {
-                if (stack.getItem() == Items.TOTEM_OF_UNDYING)
-                    count++;
-            }
-        }
-
-        drawEditorBackground(ctx);
-
-        ctx.drawItem(new ItemStack(Items.TOTEM_OF_UNDYING, count), x, y);
-    }
-
-    @Override
-    public List<Text> getTooltip() {
-        return List.of(Text.of("totems disponibles"));
     }
 }

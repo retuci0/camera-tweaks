@@ -20,7 +20,7 @@ public class FpsElement extends TextHudElement {
 
     @Override
     public String getPreviewText() {
-        return "FPS: 67";
+        return "FPS: " + mc.getCurrentFps();
     }
 
     @Override

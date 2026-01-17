@@ -147,4 +147,16 @@ public class Colors {
         int bDiff = c1.getBlue() - c2.getBlue();
         return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;
     }
+
+    // espacio de colores RGB, no RYB
+    public static Color getOppositeColor(Color c, boolean keepAlpha) {
+        int alpha = c.getAlpha();
+        if (!keepAlpha) alpha = 255 - alpha;
+        return new Color(
+            255 - c.getRed(),
+            255 - c.getGreen(),
+            255 - c.getBlue(),
+            alpha
+        );
+    }
 }

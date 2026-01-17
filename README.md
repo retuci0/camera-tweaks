@@ -1,6 +1,6 @@
 # jenny's mod 2 100% real
 
-mod para Minecraft Fabric 1.21.10 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
+mod para Minecraft Fabric 1.21.11 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
 
 ## instalación
 

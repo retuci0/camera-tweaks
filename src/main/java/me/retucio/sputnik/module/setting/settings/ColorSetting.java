@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class ColorSetting extends Setting<Color> {
 
-    private Color defaultColor;
     private final boolean defaultRainbow;
     private final int defaultRainbowSpeed;
 
@@ -21,13 +20,13 @@ public class ColorSetting extends Setting<Color> {
     private float saturation;
     private float brightness;
 
-    public ColorSetting(String name, String description, Color defaultColor, boolean rainbow) {
-        super(name, description, defaultColor);
+    public ColorSetting(String name, String description, Color defaultValue, boolean rainbow) {
+        super(name, description, defaultValue);
 
-        this.r = defaultColor.getRed();
-        this.g = defaultColor.getGreen();
-        this.b = defaultColor.getBlue();
-        this.a = defaultColor.getAlpha();
+        this.r = defaultValue.getRed();
+        this.g = defaultValue.getGreen();
+        this.b = defaultValue.getBlue();
+        this.a = defaultValue.getAlpha();
 
         this.rainbow = rainbow;
         this.defaultRainbow = rainbow;
@@ -192,28 +191,20 @@ public class ColorSetting extends Setting<Color> {
         }
     }
 
-    public Color getDefaultColor() {
-        return defaultColor;
-    }
-
-    public void setDefaultColor(Color defaultColor) {
-        this.defaultColor = defaultColor;
-    }
-
     public int getDefaultR() {
-        return defaultColor.getRed();
+        return defaultValue.getRed();
     }
 
     public int getDefaultG() {
-        return defaultColor.getGreen();
+        return defaultValue.getGreen();
     }
 
     public int getDefaultB() {
-        return defaultColor.getBlue();
+        return defaultValue.getBlue();
     }
 
     public int getDefaultA() {
-        return defaultColor.getAlpha();
+        return defaultValue.getAlpha();
     }
 
     public float getDefaultSaturation() {
@@ -242,10 +233,10 @@ public class ColorSetting extends Setting<Color> {
     }
 
     public void reset() {
-        this.r = defaultColor.getRed();
-        this.g = defaultColor.getGreen();
-        this.b = defaultColor.getBlue();
-        this.a = defaultColor.getAlpha();
+        this.r = defaultValue.getRed();
+        this.g = defaultValue.getGreen();
+        this.b = defaultValue.getBlue();
+        this.a = defaultValue.getAlpha();
         this.rainbow = false;
         this.rainbowSpeed = 2;
         this.saturation = 1f;

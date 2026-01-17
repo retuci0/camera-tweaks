@@ -38,8 +38,8 @@ public class DiscordRPC extends Module {
     ));
 
     public StringSetting startTimestamp = sgGeneral.add(new StringSetting(
-            "sello de tiempo", "sello de tiempo del comienzo de la actividad, siguiendo el unix epoch (. para ahora)",
-            ".",
+            "sello de tiempo", "sello de tiempo del comienzo de la actividad, siguiendo el unix epoch (dejar vacío para ahora)",
+            "",
             20
     ));
 
@@ -124,6 +124,8 @@ public class DiscordRPC extends Module {
                 "personaliza la actividad de tu perfil en dishkor",
                 Category.CLIENT);
 
+        rpc.setDebugMode(false);
+
         for (Setting<?> s : getSettings()) {
             s.onUpdate(v -> update());
         }
@@ -202,13 +204,15 @@ public class DiscordRPC extends Module {
     }
 
     private long getTimestamp() {
-        long timestamp = System.currentTimeMillis();
-
-        if (!startTimestamp.getValue().equals(".")) {
+        long timestamp;
+        if (startTimestamp.getValue().trim().isEmpty()) {
+            timestamp = System.currentTimeMillis();
+        } else {
             try {
                 timestamp = Long.parseLong(startTimestamp.getValue());
             } catch (NumberFormatException e) {
-                ChatUtil.error("introduce un NÚMERO (o .)");
+                ChatUtil.error("introduce un NÚMERO (o déjalo vacío)");
+                timestamp = System.currentTimeMillis();
             }
         }
 

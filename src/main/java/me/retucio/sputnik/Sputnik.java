@@ -19,6 +19,7 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 
+import me.retucio.sputnik.ui.hud.HudRenderer;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.hud.HudEditorScreen;
 import me.retucio.sputnik.ui.widgets.buttons.settings.BindButton;
@@ -107,6 +108,8 @@ public class Sputnik implements ClientModInitializer {
         ClickGUI.INSTANCE = new ClickGUI();
         HudEditorScreen.INSTANCE = new HudEditorScreen();
         EVENT_BUS.post(new LoadClickGUIEvent());
+
+        mc.execute(HudRenderer::init);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             EVENT_BUS.post(new ShutdownEvent());

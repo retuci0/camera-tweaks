@@ -11,6 +11,7 @@ import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.ui.widgets.Widget;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
+import me.retucio.sputnik.util.MiscUtil;
 import me.retucio.sputnik.util.render.Textures;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -130,6 +131,11 @@ public class SearchBarWidget extends Widget {
         if (!ClientSettingsFrame.guiSettings.searchBar.getValue()) return;
         if (!focused || action == GLFW.GLFW_RELEASE) return;
 
+        if (key == GLFW.GLFW_KEY_V && KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL)) {
+            paste();
+            return;
+        }
+
         switch (key) {
             case GLFW.GLFW_KEY_ENTER -> focused = false;
             case GLFW.GLFW_KEY_ESCAPE -> {
@@ -151,7 +157,11 @@ public class SearchBarWidget extends Widget {
     }
 
     public void onBackspace() {
-        if (!buffer.isEmpty()) buffer.deleteCharAt(buffer.length() - 1);
+        MiscUtil.backspace(buffer);
+    }
+
+    public void paste() {
+        buffer.append(MiscUtil.getPasteContent(-1));
     }
 
     public void charTyped(char c) {

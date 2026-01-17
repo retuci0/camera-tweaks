@@ -25,21 +25,92 @@ public class HUD extends Module {
     SettingGroup sgElements = addSg(new SettingGroup("elementos", false));
 
     // editor
-    public KeySetting editorKey = sgEditor.add(new KeySetting("tecla del editor", "tecla asignada al editor de elementos del hud", GLFW.GLFW_KEY_PAGE_UP));
+    public KeySetting editorKey = sgEditor.add(new KeySetting(
+            "tecla del editor",
+            "tecla asignada al editor de elementos del hud",
+            GLFW.GLFW_KEY_PAGE_UP
+    ));
+    public BooleanSetting axialMovement = sgEditor.add(new BooleanSetting(
+            "movimiento axial",
+            "te permite mover los elementos sobre los ejes más fácilmente",
+            true
+    ));
+    public NumberSetting axisOffset = sgEditor.add(new NumberSetting(
+            "offset de los ejes",
+            "offset a tener en cuenta al usar el movimiento axial",
+            10,
+            0,
+            50,
+            1
+    ));
+    public BooleanSetting arrowMovement = sgEditor.add(new BooleanSetting(
+            "movimiento con flechas",
+            "te permite mover el elemento seleccionado con las teclas de las flechas",
+            true
+    ));
+    public NumberSetting arrowOffset = sgEditor.add(new NumberSetting(
+            "cuánto mover con las flechas",
+            "cuántos píxeles mover el elemento seleccionado al usar las flechas",
+            2,
+            1,
+            20,
+            1
+    ));
 
-    // ajustes
-    public ColorSetting color = sgDisplay.add(new ColorSetting("color", "color del texto de los elementos del HUD",
-            new Color(255, 255, 255, 255), false));
-    public BooleanSetting shadow = sgDisplay.add(new BooleanSetting("sombra", "texto con sombra", true));
-    public BooleanSetting showOnF3 = sgDisplay.add(new BooleanSetting("mostrar en F3", "renderizar HUD en el menú de debug", false));
-    public BooleanSetting showOnChat = sgDisplay.add(new BooleanSetting("mostrar en chat", "renderizar HUD en la pantalla del chat", false));
+    // renderizado
+    public ColorSetting color = sgDisplay.add(new ColorSetting(
+            "color",
+            "color del texto de los elementos del HUD",
+            new Color(255, 255, 255, 255), false)
+    );
+    public BooleanSetting shadow = sgDisplay.add(new BooleanSetting(
+            "sombra",
+            "texto con sombra",
+            true
+    ));
+    public BooleanSetting showOnF3 = sgDisplay.add(new BooleanSetting(
+            "mostrar en F3",
+            "renderizar HUD en el menú de debug",
+            false
+    ));
+    public BooleanSetting showOnChat = sgDisplay.add(new BooleanSetting(
+            "mostrar en chat",
+            "renderizar HUD en la pantalla del chat",
+            false
+    ));
 
-    public NumberSetting timezone = sgElements.add(new NumberSetting("zona horaria", "zona horaria en UTC+n", 1, -6, 6, 1));
-    public EnumSetting<TimeFormat> timeFormat = sgElements.add(new EnumSetting<>("formato de la hora", "12h o 24h", TimeFormat.class, TimeFormat.TWENTY_FOUR_HOUR));
-    public StringSetting customText = sgElements.add(new StringSetting("texto custom", "marca de agua (dejar vacío para quitar)", "adolf jitler inshtagram feishbuc twiter", 40));
-    public EnumSetting<CoordsMode> coordsMode = sgElements.add(new EnumSetting<>("modo de coordenadas", "qué coordenadas mostrar", CoordsMode.class, CoordsMode.OVERWORLD));
-    public EnumSetting<Dynosaurs> dyno = sgElements.add(new EnumSetting<>("dinosaurio", "qué dinosaurio mostrar",
-            Dynosaurs.class, Dynosaurs.SPINOSAURUS));
+    // elementos
+    public NumberSetting timezone = sgElements.add(new NumberSetting(
+            "zona horaria",
+            "zona horaria en UTC+n",
+            1,
+            -6,
+            6,
+            1
+    ));
+    public EnumSetting<TimeFormat> timeFormat = sgElements.add(new EnumSetting<>(
+            "formato de la hora",
+            "12h o 24h",
+            TimeFormat.class,
+            TimeFormat.TWENTY_FOUR_HOUR
+    ));
+    public StringSetting customText = sgElements.add(new StringSetting(
+            "texto custom",
+            "marca de agua (dejar vacío para quitar)",
+            "adolf jitler inshtagram feishbuc twiter",
+            40
+    ));
+    public EnumSetting<CoordsMode> coordsMode = sgElements.add(new EnumSetting<>(
+            "modo de coordenadas",
+            "qué coordenadas mostrar",
+            CoordsMode.class,
+            CoordsMode.OVERWORLD
+    ));
+    public EnumSetting<Dynosaurs> dyno = sgElements.add(new EnumSetting<>(
+            "dinosaurio",
+            "qué dinosaurio mostrar",
+            Dynosaurs.class, Dynosaurs.SPINOSAURUS
+    ));
 
     public HUD() {
         super("HUD",
@@ -47,6 +118,9 @@ public class HUD extends Module {
                 Category.CLIENT,
                 GLFW.GLFW_KEY_F12
         );
+
+        axialMovement.onUpdate(v -> axisOffset.setVisible(v));
+        arrowMovement.onUpdate(v -> arrowOffset.setVisible(v));
 
         dyno.onUpdate(v -> {
             DynoElement element = (DynoElement) HudRenderer.getElement(DynoElement.class);

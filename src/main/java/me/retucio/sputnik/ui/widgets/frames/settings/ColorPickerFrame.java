@@ -278,7 +278,7 @@ public class ColorPickerFrame extends SettingsFrame {
 
         // gradiente vertical
         for (int sy = 0; sy < saturationBrightnessPickerHeight; sy++) {
-            float brightness = 1 - (sy / (float) saturationBrightnessPickerHeight);
+            float brightness = (sy / (float) saturationBrightnessPickerHeight);
             int alpha = (int)(brightness * 255);
             Color overlay = new Color(0, 0, 0, alpha);
             ctx.fill(saturationBrightnessPickerX, saturationBrightnessPickerY + sy,

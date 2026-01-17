@@ -31,6 +31,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class ClickGUI extends Screen {
     public static ClickGUI INSTANCE;
 
     private boolean anyFocused;
-    private Widget selected = null;
+    private @Nullable Widget selected = null;
 
     private Category categoryFilter = Category.ALL;
 

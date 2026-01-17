@@ -25,11 +25,6 @@ public abstract class HudElement extends Widget {
     public abstract void renderInEditor(DrawContext ctx, HUD hud);
     public abstract List<Text> getTooltip();
 
-    public boolean isHovered(int mouseX, int mouseY) {
-        return mouseX >= x && mouseX <= x + w
-                && mouseY >= y && mouseY <= y + w;
-    }
-
     public String getId() { return id; }
 
     public boolean isVisible() { return visible; }

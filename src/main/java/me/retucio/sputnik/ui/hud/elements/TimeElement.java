@@ -20,7 +20,7 @@ public class TimeElement extends TextHudElement {
 
     @Override
     public String getPreviewText() {
-        return "04:20 PM";
+        return MiscUtil.getCurrentFormattedTime();
     }
 
     @Override

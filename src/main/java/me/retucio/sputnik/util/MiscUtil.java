@@ -7,6 +7,7 @@ import me.retucio.sputnik.module.modules.client.HUD;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
+import org.lwjgl.glfw.GLFW;
 
 import java.time.Instant;
 import java.time.LocalTime;
@@ -66,4 +67,22 @@ public class MiscUtil {
                 .replace("ú", "u");
     }
 
+    public static String getPasteContent(int maxLength) {
+        if (maxLength == -1) return mc.keyboard.getClipboard();
+        return mc.keyboard.getClipboard().substring(0, Math.min(maxLength, mc.keyboard.getClipboard().length()));
+    }
+
+    public static void backspace(StringBuilder buffer) {
+        if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL)) {
+            for (int i = buffer.length() - 1; i >= 0; i--) {
+                char c = buffer.charAt(i);
+                buffer.deleteCharAt(i);
+                if (c == ' ') break;
+            }
+        } else {
+            if (!buffer.isEmpty()) {
+                buffer.deleteCharAt(buffer.length() - 1);
+            }
+        }
+    }
 }
