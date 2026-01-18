@@ -1,4 +1,4 @@
-package me.retucio.sputnik.module.modules.player;
+package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.ClipAtLedgeEvent;
@@ -18,7 +18,7 @@ public class SafeWalk extends Module {
     public SafeWalk() {
         super("muletas",
                 "te ayuda a no caerte de bloques, sin agacharte",
-                Category.PLAYER);
+                Category.MOVEMENT);
     }
 
     @SubscribeEvent

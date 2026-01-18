@@ -1,4 +1,4 @@
-package me.retucio.sputnik.module.modules.player;
+package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.UseItemEvent;
@@ -66,7 +66,7 @@ public class InfiniteElytra extends Module {
     public InfiniteElytra() {
         super("avioneta",
                 "vuela infinitamente, aprovechándose el sistema defectuoso que hizo mojang (hace falta tirarse de unos 50 bloques de altura)",
-                Category.PLAYER);
+                Category.MOVEMENT);
     }
 
 

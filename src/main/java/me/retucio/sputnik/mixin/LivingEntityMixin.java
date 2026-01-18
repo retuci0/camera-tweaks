@@ -1,8 +1,8 @@
 package me.retucio.sputnik.mixin;
 
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.player.ElytraBounce;
-import me.retucio.sputnik.module.modules.player.Step;
+import me.retucio.sputnik.module.modules.movement.ElytraBounce;
+import me.retucio.sputnik.module.modules.movement.Step;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.sound.SoundCategory;

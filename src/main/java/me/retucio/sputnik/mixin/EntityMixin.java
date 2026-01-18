@@ -7,19 +7,23 @@ import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.camera.Freelook;
 import me.retucio.sputnik.module.modules.camera.Rotations;
 import me.retucio.sputnik.module.modules.misc.AntiInvis;
+import me.retucio.sputnik.module.modules.movement.BoatFly;
 import me.retucio.sputnik.module.modules.render.Nametags;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.vehicle.AbstractBoatEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -146,7 +150,16 @@ public abstract class EntityMixin {
     // otros
 
     @Inject(method = "isInvisibleTo", at = @At("RETURN"), cancellable = true)
-    public void renderInvisPlayers(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+    private void renderInvisPlayers(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.INSTANCE.getModuleByClass(AntiInvis.class).isEnabled()) cir.setReturnValue(false);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Inject(method = "getStepHeight", at = @At("RETURN"), cancellable = true)
+    private void modifyBoatStepHeight(CallbackInfoReturnable<Float> cir) {
+        BoatFly boatFly = ModuleManager.INSTANCE.getModuleByClass(BoatFly.class);
+        if (((Object) this) instanceof AbstractBoatEntity && boatFly.isEnabled()) {
+            cir.setReturnValue(boatFly.stepHeight.getFloatValue());
+        }
     }
 }

@@ -1,4 +1,4 @@
-package me.retucio.sputnik.module.modules.player;
+package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -34,7 +34,7 @@ public class ReverseStep extends Module {
     public ReverseStep() {
         super("escalones inversos",
                 "escalones pero pabajo",
-                Category.PLAYER
+                Category.MOVEMENT
         );
     }
 

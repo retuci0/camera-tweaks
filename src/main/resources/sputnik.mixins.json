@@ -3,6 +3,8 @@
   "package": "me.retucio.sputnik.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BlockCollisionSpliteratorMixin",
+    "AbstractBoatEntityMixin",
     "ClientConnectionMixin",
     "EntityMixin",
     "HandshakeC2SPacketMixin",
@@ -14,8 +16,10 @@
     "PlayerEntityMixin",
     "ServerConnectorMixin",
     "StringHelperMixin",
+    "TridentItemMixin",
     "Vec3dMixin",
     "YggdrasilUserApiServiceMixin",
+    "accessor.AbstractBlockAccessor",
     "accessor.ConfirmServerResourcePackScreenAccessor",
     "accessor.PackAccessor",
     "accessor.StatusEffectInstanceAccessor"

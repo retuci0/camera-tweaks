@@ -4,6 +4,7 @@ package me.retucio.sputnik.mixin;
 import me.retucio.sputnik.event.events.GetFOVEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
+import me.retucio.sputnik.module.modules.misc.UnfocusedCpu;
 import me.retucio.sputnik.module.modules.render.NoRender;
 import me.retucio.sputnik.module.modules.camera.Zoom;
 import me.retucio.sputnik.util.interfaces.IVec3d;
@@ -11,6 +12,7 @@ import me.retucio.sputnik.util.interfaces.IVec3d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.entity.Entity;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -29,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 import static me.retucio.sputnik.Sputnik.EVENT_BUS;
+import static me.retucio.sputnik.Sputnik.mc;
 
 
 @Mixin(GameRenderer.class)
@@ -62,6 +66,12 @@ public abstract class GameRendererMixin {
     @ModifyReturnValue(method = "getFov", at = @At("RETURN"))
     private float modifyFov(float original) {
         return EVENT_BUS.post(new GetFOVEvent(original)).getFov();
+    }
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void avoidRenderingUnfocusedCpu(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
+        if (ModuleManager.INSTANCE.getModuleByClass(UnfocusedCpu.class).isEnabled() && !mc.isWindowFocused())
+            ci.cancel();
     }
 
     @Inject(method = "updateCrosshairTarget", at = @At("HEAD"), cancellable = true)

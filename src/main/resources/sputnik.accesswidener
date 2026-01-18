@@ -1,38 +1,47 @@
 accessWidener   v2  named
 
-accessible class net/minecraft/client/MinecraftClient$LoadingContext
-
-accessible field net/minecraft/client/texture/TextureManager textures Ljava/util/Map;
-
+# red
+accessible field net/minecraft/client/network/DataQueryHandler expectedTransactionId I
+accessible field net/minecraft/network/ClientConnection queuedTasks Ljava/util/Queue;
 accessible method net/minecraft/network/ClientConnection handleQueuedTasks ()V
 accessible method net/minecraft/network/ClientConnection sendImmediately (Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V
-accessible field net/minecraft/network/ClientConnection queuedTasks Ljava/util/Queue;
 accessible method net/minecraft/network/ClientConnection handlePacket (Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;)V
-
+accessible method net/minecraft/client/world/ClientWorld getPendingUpdateManager ()Lnet/minecraft/client/network/PendingUpdateManager;
+accessible method net/minecraft/client/network/ClientPlayerInteractionManager sendSequencedPacket (Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V
 accessible class net/minecraft/client/network/ClientCommonNetworkHandler$ConfirmServerResourcePackScreen
 accessible class net/minecraft/client/network/ClientCommonNetworkHandler$ConfirmServerResourcePackScreen$Pack
 
-accessible class net/minecraft/client/font/TextRenderer$Drawer
+# texto
 accessible method net/minecraft/client/font/FontManager getStorageInternal (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
+accessible class net/minecraft/client/font/TextRenderer$Drawer
 
+# entidad
+accessible field net/minecraft/entity/LivingEntity jumpingCooldown I
 accessible method net/minecraft/entity/Entity setFlag (IZ)V
 accessible method net/minecraft/entity/player/PlayerEntity canGlide ()Z
-
-accessible class net/minecraft/client/particle/ParticleSpriteManager$SpriteAwareFactory
-accessible class net/minecraft/client/particle/ParticleSpriteManager$SimpleSpriteProvider
-accessible field net/minecraft/client/particle/BillboardParticle alpha F
-accessible field net/minecraft/client/particle/BillboardParticle scale F
-accessible field net/minecraft/client/particle/Particle velocityMultiplier F
-accessible field net/minecraft/client/particle/Particle gravityStrength F
-accessible field net/minecraft/client/particle/Particle collidesWithWorld Z
-
-accessible field net/minecraft/entity/LivingEntity jumpingCooldown I
 accessible method net/minecraft/entity/LivingEntity calcGlidingVelocity (Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;
 
-accessible method net/minecraft/client/render/RenderLayer <init> (Ljava/lang/String;Lnet/minecraft/client/render/RenderSetup;)V
+# partícula
+accessible field net/minecraft/client/particle/BillboardParticle alpha F
+accessible field net/minecraft/client/particle/Particle velocityMultiplier F
+accessible field net/minecraft/client/particle/BillboardParticle scale F
+accessible field net/minecraft/client/particle/Particle gravityStrength F
+accessible field net/minecraft/client/particle/Particle collidesWithWorld Z
+accessible class net/minecraft/client/particle/ParticleSpriteManager$SpriteAwareFactory
+accessible class net/minecraft/client/particle/ParticleSpriteManager$SimpleSpriteProvider
+
+# renderizado 3d
 accessible field net/minecraft/client/render/WorldRenderer worldRenderState Lnet/minecraft/client/render/state/WorldRenderState;
+accessible method net/minecraft/client/render/RenderLayer <init> (Ljava/lang/String;Lnet/minecraft/client/render/RenderSetup;)V
 accessible method net/minecraft/client/render/GameRenderer getProjectionMatrix (F)Lorg/joml/Matrix4f;
 
+# misc.
+accessible field net/minecraft/client/texture/TextureManager textures Ljava/util/Map;
 accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
 accessible method net/minecraft/client/Keyboard onKey (JILnet/minecraft/client/input/KeyInput;)V
+accessible class net/minecraft/client/MinecraftClient$LoadingContext
 
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket type Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler;
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket entityId I
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
+accessible method net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler getType ()Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType;

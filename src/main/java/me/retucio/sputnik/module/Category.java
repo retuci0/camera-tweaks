@@ -4,6 +4,7 @@ public enum Category {
 
     PLAYER("jugador"),
     WORLD("mundo"),
+    MOVEMENT("movimiento"),
 
     CAMERA("cámara"),
     RENDER("renderizado"),

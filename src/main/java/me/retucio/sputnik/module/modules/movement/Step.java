@@ -1,4 +1,4 @@
-package me.retucio.sputnik.module.modules.player;
+package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -12,6 +12,6 @@ public class Step extends Module {
     ));
 
     public Step() {
-        super("escalones", "hace que el bloque de subida de escalón sea la distancia deseada", Category.PLAYER);
+        super("escalones", "hace que el bloque de subida de escalón sea la distancia deseada", Category.MOVEMENT);
     }
 }

@@ -1,4 +1,4 @@
-package me.retucio.sputnik.module.modules.player;
+package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -13,7 +13,7 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 public class ElytraBounce extends Module {
 
     public ElytraBounce() {
-        super("conejo", "haz el elytra-bounce manteniendo el espacio", Category.PLAYER);
+        super("conejo", "haz el elytra-bounce manteniendo el espacio", Category.MOVEMENT);
     }
 
     public boolean bounce() {

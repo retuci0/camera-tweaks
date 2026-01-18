@@ -126,6 +126,7 @@ public class Sputnik implements ClientModInitializer {
         }
 
         ModuleManager.INSTANCE.getEnabledModules().forEach(Module::onTick);
+        mc.getWindow().setTitle(ClientSettingsFrame.guiSettings.windowTitle.getValue());
     }
 
 

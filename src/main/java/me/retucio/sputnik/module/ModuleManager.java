@@ -6,6 +6,7 @@ import me.retucio.sputnik.module.modules.client.DiscordRPC;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.module.modules.camera.*;
 import me.retucio.sputnik.module.modules.misc.*;
+import me.retucio.sputnik.module.modules.movement.*;
 import me.retucio.sputnik.module.modules.network.*;
 import me.retucio.sputnik.module.modules.player.*;
 import me.retucio.sputnik.module.modules.render.*;
@@ -13,6 +14,7 @@ import me.retucio.sputnik.module.modules.render.CritsPlus;
 import me.retucio.sputnik.module.modules.world.*;
 import me.retucio.sputnik.util.MiscUtil;
 
+import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,60 +32,16 @@ public class ModuleManager {
         addModules();
     }
 
-    // por orden alfabético y todo, flipas
     private void addModules() {
-        modules.add(new AntiInvis());
-        modules.add(new AnvilFont());
-        modules.add(new AttributeSwapper());
-        modules.add(new AutoSign());
-        modules.add(new BlockESP());
-        modules.add(new BlockOutline());
-        modules.add(new BossbarStack());
-        modules.add(new BreakingProgress());
-        modules.add(new BungeecordSpoofer());
-        modules.add(new Capes());
-        modules.add(new ChatPlus());
-        modules.add(new ColoredSigns());
-        modules.add(new CritsPlus());
-        modules.add(new DamageOverlay());
-        modules.add(new DiscordRPC());
-        modules.add(new ElytraBounce());
-        modules.add(new FakePlayer());
-        modules.add(new FastUse());
-        modules.add(new Fonts());
-        modules.add(new Freecam());
-        modules.add(new Freelook());
-        modules.add(new Fullbright());
-        modules.add(new GlintPlus());
-        modules.add(new HandView());
-        modules.add(new Headhitters());
-        modules.add(new HUD());
-        modules.add(new InfiniteElytra());
-        modules.add(new InventoryPlus());
-        modules.add(new LightOverlay());
-        modules.add(new LogoutSpots());
-        modules.add(new Nametags());
-        modules.add(new NoMiningInterruptions());
-        modules.add(new NoRender());
-        modules.add(new Offhand());
-        modules.add(new PacketDelay());
-        modules.add(new Particles());
-        modules.add(new PerspectivePlus());
-        modules.add(new PortalGUI());
-        modules.add(new Racist());
-        modules.add(new Reconnect());
-        modules.add(new ReverseStep());
-        modules.add(new Rotations());
-        modules.add(new RPackBypass());
-        modules.add(new SafeWalk());
-        modules.add(new ScreenshotPlus());
-        modules.add(new ShulkerPeek());
-        modules.add(new Step());
-        modules.add(new StrongholdTriangulator());
-        modules.add(new TimeChanger());
-        modules.add(new UIMove());
-        modules.add(new WarnLowDurability());
-        modules.add(new Zoom());
+        // añadir los módulos
+        addCamera();
+        addClient();
+        addMisc();
+        addMovement();
+        addNetwork();
+        addPlayer();
+        addRender();
+        addWorld();
 
         modules.sort(Comparator.comparing(module -> MiscUtil.removeAccentMarks(module.getName().toLowerCase())));
 
@@ -97,6 +55,102 @@ public class ModuleManager {
             }
         }
     }
+
+    private void add(Module module) {
+        modules.add(module);
+    }
+
+
+
+
+    private void addCamera() {
+        add(new Freecam());
+        add(new Freelook());
+        add(new Fullbright());
+        add(new PerspectivePlus());
+        add(new Rotations());
+        add(new Zoom());
+    }
+
+    private void addClient() {
+        add(new DiscordRPC());
+        add(new HUD());
+
+    }
+
+    private void addMisc() {
+        add(new AntiInvis());
+        add(new AnvilFont());
+        add(new BossbarStack());
+        add(new ChatPlus());
+        add(new FakePlayer());
+        add(new ScreenshotPlus());
+        add(new ShulkerPeek());
+        add(new UnfocusedCpu());
+    }
+
+    private void addMovement() {
+        add(new BoatFly());
+        add(new Dolphin());
+        add(new ElytraBounce());
+        add(new ElytraFly());
+        add(new Headhitters());
+        add(new InfiniteElytra());
+        add(new Jesus());
+        add(new ReverseStep());
+        add(new SafeWalk());
+        add(new Slippy());
+        add(new Step());
+        add(new TridentBoost());
+    }
+
+    private void addNetwork() {
+        add(new BungeecordSpoofer());
+        add(new LogoutSpots());
+        add(new PacketDelay());
+        add(new PacketMine());
+        add(new Reconnect());
+        add(new RPackBypass());
+    }
+
+    private void addPlayer() {
+        add(new AttributeSwapper());
+        add(new Capes());
+        add(new FastUse());
+        add(new HandView());
+        add(new InventoryPlus());
+        add(new MaceKill());
+        add(new Offhand());
+        add(new PortalGUI());
+        add(new UIMove());
+        add(new WarnLowDurability());
+    }
+
+    private void addRender() {
+        add(new BlockESP());
+        add(new BlockOutline());
+        add(new BreakingProgress());
+        add(new CritsPlus());
+        add(new DamageOverlay());
+        add(new Fonts());
+        add(new GlintPlus());
+        add(new Nametags());
+        add(new NoRender());
+        add(new Particles());
+    }
+
+    private void addWorld() {
+        add(new AutoSign());
+        add(new BlockInfo());
+        add(new ColoredSigns());
+        add(new LightOverlay());
+        add(new NoMiningInterruptions());
+        add(new Racist());
+        add(new StrongholdTriangulator());
+        add(new TimeChanger());
+    }
+
+
 
 
     // para obtener módulos más fácilmente (por nombre, clase, o la lista completa)

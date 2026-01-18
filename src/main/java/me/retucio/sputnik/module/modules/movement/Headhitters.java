@@ -1,4 +1,4 @@
-package me.retucio.sputnik.module.modules.player;
+package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -11,7 +11,7 @@ public class Headhitters extends Module {
     public Headhitters() {
         super("headhitters",
                 "mantén pulsado el espacio para hacer headhitting sin tener que espamearlo",
-                Category.PLAYER);
+                Category.MOVEMENT);
     }
 
     @Override

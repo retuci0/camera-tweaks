@@ -1,24 +1,29 @@
-# v2.8
+# v2.9
 
 ## novedades
 
+varios módulos que no quería añadir porque son cheats en toda regla, pero ya total, como la mayoría que he añadido hasta la fecha es baneable
+
 ### adiciones
+
+- categoría de movimiento
 
 #### módulos nuevos:
 
+- packetmine: mina usando paquetes, para minar más rápido o para evitar la animación de minado
+- aliviar cpu: evita renderizar objetos en pantalla si la ventana no está seleccionada
+- delfín: *ruidos de delfín*
+- patinaje: esparce semen allá por donde pisas (haciéndolo más resbaladizo)
+- jesús: hermano se cree Jesús (camina sobre el agua)
+- info. de bloque: (muestra el contenido nbt de un bloque)
+- estampaescrotos: mazo en esteroides
+- tenedor mágico: hermano se cree Poseidón (tweaks a la propulsión acuática del tridente)
+- elytras: vuela con las elytras (en vez de solo planear)
+- barco volador: convierte tu bote de acacia en un caza militar
+
 ### arreglos / mejoras
 
-- arreglado el gradiente del selector de colores
-- ahora el marco del preview del color en el botón del ajuste de color será el color complementario (rgb, no ryb) del color seleccionado
-
-- ahora puedes borrar palabras enteras con ctrl + borrar
-
-- mejoras al HUD:
-  - movimiento axial: centra los elementos más fácilmente
-  - movimiento con flechas: mueve el elemento seleccionado con las flechas
-  - ahora se puede abrir y usar el editor aun sin estar en un mundo
-  - más previews de elementos coinciden con su valor actual
-  - al parecer he arreglado sin querer un problema que había que no te dejaba seleccionar correctamente elementos del hud
+- ahora puedes cambiar el título de la ventana en los ajustes del mod
 
 ## problemas reconocidos
 
