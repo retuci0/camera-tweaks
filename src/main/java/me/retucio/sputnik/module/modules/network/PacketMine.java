@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.network;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.AttackBlockEvent;
-import me.retucio.sputnik.event.events.Render3DEvent;
+import me.retucio.sputnik.event.events.interact.AttackBlockEvent;
+import me.retucio.sputnik.event.events.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -22,9 +22,9 @@ import java.util.List;
 
 public class PacketMine extends Module {
 
-    SettingGroup sgRender = addSg(new SettingGroup("renderizado", true));
+    private final  SettingGroup sgRender = addSg(new SettingGroup("renderizado", true));
 
-    public NumberSetting retryTime = sgGeneral.add(new NumberSetting(
+    private final NumberSetting retryTime = sgGeneral.add(new NumberSetting(
             "delay",
             "delay entre reintentos de minado",
             30,
@@ -33,26 +33,26 @@ public class PacketMine extends Module {
             1
     ));
 
-    public BooleanSetting cancelOutOfReach = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting cancelOutOfReach = sgGeneral.add(new BooleanSetting(
             "cancelar fuera de alcance",
             "cancelar aquellos paquetes que intenten romper bloques fuera del alcance del jugador, para evitar flaggear el anticheat",
             true
     ));
 
-    public BooleanSetting render = sgRender.add(new BooleanSetting(
+    private final BooleanSetting render = sgRender.add(new BooleanSetting(
             "renderizar",
             "renderizar un contorno alrededor de los bloques que están siendo minados",
             true
     ));
 
-    public ColorSetting color = sgRender.add(new ColorSetting(
+    private final ColorSetting color = sgRender.add(new ColorSetting(
             "color",
             "color del contorno renderizado",
             new Color(0, 255, 0, 100),
             false
     ));
 
-    public NumberSetting lineWidth = sgRender.add(new NumberSetting(
+    private final NumberSetting lineWidth = sgRender.add(new NumberSetting(
             "grosor",
             "grosor de las líneas del contorno",
             2,
@@ -105,7 +105,7 @@ public class PacketMine extends Module {
     }
 
     @SubscribeEvent
-    public void onAttackBlock(AttackBlockEvent event) {
+    private void onAttackBlock(AttackBlockEvent event) {
         event.cancel();
         if (!isMining(event.getPos())) {
             miningBlocks.add(new MiningBlock(event));
@@ -113,7 +113,7 @@ public class PacketMine extends Module {
     }
 
     @SubscribeEvent
-    public void onRenderWorld(Render3DEvent event) {
+    private void onRenderWorld(Render3DEvent event) {
         for (MiningBlock block : miningBlocks) {
             block.render(event);
         }

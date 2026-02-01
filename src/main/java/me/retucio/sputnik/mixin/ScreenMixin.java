@@ -3,7 +3,7 @@ package me.retucio.sputnik.mixin;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.config.ConfigManager;
-import me.retucio.sputnik.event.events.ClientClickEvent;
+import me.retucio.sputnik.event.events.input.ClientClickEvent;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

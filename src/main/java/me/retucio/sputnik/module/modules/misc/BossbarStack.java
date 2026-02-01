@@ -1,6 +1,6 @@
 package me.retucio.sputnik.module.modules.misc;
 
-import me.retucio.sputnik.event.events.RenderBossbarEvent;
+import me.retucio.sputnik.event.events.render.RenderBossbarEvent;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -15,17 +15,17 @@ import java.util.WeakHashMap;
 
 public class BossbarStack extends Module {
 
-    public BooleanSetting stackBars = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting stackBars = sgGeneral.add(new BooleanSetting(
             "apilar barras", "apilar las bossbars",
             true
     ));
 
-    public BooleanSetting hideNames = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting hideNames = sgGeneral.add(new BooleanSetting(
             "esconder nombres", "no renderiza el nombre de los bosses",
             false
     ));
 
-    public NumberSetting spaceReduction = sgGeneral.add(new NumberSetting(
+    private final NumberSetting spaceReduction = sgGeneral.add(new NumberSetting(
             "reducción de espacio",
             "cuánto reducir el espacio entre bossbars",
             0,

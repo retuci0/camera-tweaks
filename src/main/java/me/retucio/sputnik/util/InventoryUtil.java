@@ -1,15 +1,17 @@
 package me.retucio.sputnik.util;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.DisconnectEvent;
-import me.retucio.sputnik.event.events.OpenScreenEvent;
+import me.retucio.sputnik.event.events.network.DisconnectEvent;
+import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
 import me.retucio.sputnik.mixin.accessor.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.component.ComponentType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -42,10 +44,37 @@ public class InventoryUtil {
         return null;
     }
 
+    public static List<ItemStack> getStacksOfTag(TagKey<Item> tag) {
+        if (mc.player == null) return null;
+        List<ItemStack> stacks = new ArrayList<>();
+        for (ItemStack stack : mc.player.getInventory()) {
+            for (TagKey<Item> tagkey : stack.streamTags().toList()) {
+                if (tag.equals(tagkey)) {
+                    stacks.add(stack);
+                }
+            }
+        }
+        return stacks;
+    }
+
+    public static List<ItemStack> getStacksOfComponentType(ComponentType<?> componentType) {
+        List<ItemStack> stacks = new ArrayList<>();
+        if (mc.player == null) return stacks;
+        for (ItemStack stack : mc.player.getInventory()) {
+            if (stack.getComponents().getTypes().contains(componentType)) {
+                stacks.add(stack);
+            }
+        }
+        return stacks;
+    }
+
     public static void swapSlots(int containerSlot1, int containerSlot2, HandledScreen<?> screen) {
+        swapSlots(containerSlot1, containerSlot2, screen.getScreenHandler());
+    }
+
+    public static void swapSlots(int containerSlot1, int containerSlot2, ScreenHandler handler) {
         if (mc.player == null || mc.interactionManager == null) return;
 
-        ScreenHandler handler = screen.getScreenHandler();
         int syncId = handler.syncId;
 
         mc.interactionManager.clickSlot(syncId, containerSlot1, 0, SlotActionType.PICKUP, mc.player);
@@ -54,9 +83,11 @@ public class InventoryUtil {
     }
 
     public static void swapWithHotbar(int containerSlot, int hotbarSlot, HandledScreen<?> screen) {
-        if (mc.player == null || mc.interactionManager == null) return;
+        swapWithHotbar(containerSlot, hotbarSlot, screen.getScreenHandler());
+    }
 
-        ScreenHandler handler = screen.getScreenHandler();
+    public static void swapWithHotbar(int containerSlot, int hotbarSlot, ScreenHandler handler) {
+        if (mc.player == null || mc.interactionManager == null) return;
         mc.interactionManager.clickSlot(handler.syncId, containerSlot, hotbarSlot, SlotActionType.SWAP, mc.player);
     }
 
@@ -164,13 +195,30 @@ public class InventoryUtil {
     }
 
     public static List<Integer> findMatchingItems(HandledScreen<?> screen, ItemStack reference) {
+        return findMatchingItems(screen.getScreenHandler(), reference);
+    }
+
+    public static List<Integer> findMatchingItems(ScreenHandler handler, ItemStack reference) {
         List<Integer> matchingSlots = new ArrayList<>();
         if (reference.isEmpty()) return matchingSlots;
 
-        ScreenHandler handler = screen.getScreenHandler();
         for (int i = 0; i < handler.slots.size(); i++) {
             ItemStack stack = handler.getSlot(i).getStack();
             if (!stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(reference, stack)) {
+                matchingSlots.add(i);
+            }
+        }
+
+        return matchingSlots;
+    }
+
+    public static List<Integer> findItem(Item item) {
+        List<Integer> matchingSlots = new ArrayList<>();
+        PlayerInventory inv = mc.player.getInventory();
+
+        for (int i = 0; i < inv.size(); i++) {
+            ItemStack stack = inv.getStack(i);
+            if (!stack.isEmpty() && stack.isOf(item)) {
                 matchingSlots.add(i);
             }
         }

@@ -57,6 +57,4 @@ public class Racist extends Module {
         mc.player.setYaw((float) yaw);
         mc.player.setPitch((float) pitch);
     }
-
-
 }

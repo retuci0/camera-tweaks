@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.network;
 
-import me.retucio.sputnik.event.events.JoinWorldEvent;
+import me.retucio.sputnik.event.events.network.JoinWorldEvent;
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.PacketEvent;
+import me.retucio.sputnik.event.events.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
@@ -22,10 +22,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PacketDelay extends Module {
 
-    public NumberSetting delay = sgGeneral.add(new NumberSetting("delay", "delay a añadir a los paquetes, en milisegundos", 1500, 0, 3000, 5));
-    public EnumSetting<Directions> directions = sgGeneral.add(new EnumSetting<>("dirección", "dirección de los paquetes a los que añadir delay",
+    private final NumberSetting delay = sgGeneral.add(new NumberSetting("delay", "delay a añadir a los paquetes, en milisegundos", 1500, 0, 3000, 5));
+    private final EnumSetting<Directions> directions = sgGeneral.add(new EnumSetting<>("dirección", "dirección de los paquetes a los que añadir delay",
             Directions.class, Directions.BOTH));
-    public EnumSetting<Packets> packets = sgGeneral.add(new EnumSetting<>("paquetes", "paquetes a los que aplicar el delay",
+    private final EnumSetting<Packets> packets = sgGeneral.add(new EnumSetting<>("paquetes", "paquetes a los que aplicar el delay",
             Packets.class, Packets.ALL));
 
     private final List<DelayedPacket> delayedPackets = new CopyOnWriteArrayList<>();
@@ -69,7 +69,7 @@ public class PacketDelay extends Module {
     }
 
     @SubscribeEvent
-    public void onPacketSend(PacketEvent.Send event) {
+    private void onPacketSend(PacketEvent.Send event) {
         if (directions.is(Directions.S2C)
                 || mc.player == null || mc.world == null || mc.getNetworkHandler() == null
                 || (event.getPacket() instanceof KeepAliveC2SPacket && !packets.is(Packets.OTHERS)))
@@ -86,7 +86,7 @@ public class PacketDelay extends Module {
     }
 
     @SubscribeEvent
-    public void onPacketReceive(PacketEvent.Receive event) {
+    private void onPacketReceive(PacketEvent.Receive event) {
         if (mc.player == null || mc.world == null
                 || mc.getNetworkHandler() == null || mc.getNetworkHandler().getConnection() == null
                 || (event.getPacket() instanceof KeepAliveS2CPacket && !packets.is(Packets.OTHERS)))
@@ -105,7 +105,7 @@ public class PacketDelay extends Module {
     }
 
     @SubscribeEvent
-    public void onJoinWorld(JoinWorldEvent event) {
+    private void onJoinWorld(JoinWorldEvent event) {
         ChatUtil.error("delay de paquetes no funciona en un solo jugador");
         toggle();
     }
@@ -126,7 +126,7 @@ public class PacketDelay extends Module {
 
     private record DelayedPacket(Packet<?> packet, long scheduledTime, boolean isOutgoing, PacketListener packetListener) {}
 
-    public enum Directions {
+    private enum Directions {
         C2S("cliente a server"),
         S2C("server a cliente"),
         BOTH("ambos");
@@ -136,7 +136,7 @@ public class PacketDelay extends Module {
         @Override public String toString() { return name; }
     }
 
-    public enum Packets {
+    private enum Packets {
         KEEP_ALIVE("paquetes KeepAlive"),
         OTHERS("todos menos KeepAlive"),
         ALL("todos");

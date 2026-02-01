@@ -7,7 +7,7 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 
 public class TridentBoost extends Module {
 
-    public NumberSetting multiplier = sgGeneral.add(new NumberSetting(
+    public final NumberSetting multiplier = sgGeneral.add(new NumberSetting(
             "boost",
             "multiplicador del movimiento",
             2,
@@ -16,7 +16,7 @@ public class TridentBoost extends Module {
             0.1
     ));
 
-    public BooleanSetting outOfWater = sgGeneral.add(new BooleanSetting(
+    public final BooleanSetting outOfWater = sgGeneral.add(new BooleanSetting(
             "fuera del agua",
             "permitir el uso de la propulsión acuática fuera del agua",
             true

@@ -16,11 +16,22 @@ import net.minecraft.util.math.Direction;
 
 public class Offhand extends Module {
 
-    public OptionSetting<Item> item = sgGeneral.add(new OptionSetting<>("ítem", "ítem a equipar",
-            Lists.itemList, Items.TOTEM_OF_UNDYING, Lists.itemNames));
-    public NumberSetting delaySetting = sgGeneral.add(new NumberSetting("delay", "delay del cambiazo (en ticks)", 0, 0, 20, 1));
-    public BooleanSetting override = sgGeneral.add(new BooleanSetting("anular", "ignora que ya haya un ítem en la mano secundaria", true));
+    private final OptionSetting<Item> item = sgGeneral.add(new OptionSetting<>(
+            "ítem", "ítem a equipar",
+            Lists.itemList, Items.TOTEM_OF_UNDYING, Lists.itemNames
+    ));
 
+    private final NumberSetting delaySetting = sgGeneral.add(new NumberSetting(
+            "delay",
+            "delay del cambiazo (en ticks)",
+            0, 0, 20, 1
+    ));
+
+    private final BooleanSetting override = sgGeneral.add(new BooleanSetting(
+            "anular",
+            "ignora que ya haya un ítem en la mano secundaria",
+            true
+    ));
 
     private int delay;
     private boolean holdingItem;

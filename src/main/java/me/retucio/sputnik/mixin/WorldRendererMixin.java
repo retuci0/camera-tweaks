@@ -3,9 +3,9 @@ package me.retucio.sputnik.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.Render3DEvent;
+import me.retucio.sputnik.event.events.render.Render3DEvent;
+import me.retucio.sputnik.event.events.render.RenderBlockOutlineEvent;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.render.BlockOutline;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.render.NoRender;
 import net.minecraft.client.render.*;
@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import static me.retucio.sputnik.Sputnik.EVENT_BUS;
 import static me.retucio.sputnik.Sputnik.mc;
@@ -62,18 +63,29 @@ public abstract class WorldRendererMixin {
         if (!noRender.blindnessEffect.getValue() || !noRender.darknessEffect.getValue()) cir.setReturnValue(null);
     }
 
-
-    @ModifyArg(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;DDDLnet/minecraft/client/render/state/OutlineRenderState;IF)V"))
-    private int modifyBlockOutlineColor(int original) {
-        BlockOutline outline = ModuleManager.INSTANCE.getModuleByClass(BlockOutline.class);
-        if (!outline.isEnabled()) return original;
-        return outline.color.getRGB();
+    @ModifyArgs(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;DDDLnet/minecraft/client/render/state/OutlineRenderState;IF)V"))
+    private void modifyBlockOutline(Args args) {
+        // SIX SEVEN!!! (me pegan en casa)
+        RenderBlockOutlineEvent event = EVENT_BUS.post(new RenderBlockOutlineEvent(args.get(6), args.get(7)));
+        if (event.getColor() != (int) args.get(6))
+            args.set(6, event.getColor());
+        if (event.getLineWidth() != (float) args.get(7))
+            args.set(7, event.getLineWidth());
     }
 
-    @ModifyArg(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;DDDLnet/minecraft/client/render/state/OutlineRenderState;IF)V"))
-    private float modifyBlockOutlineLineWidth(float original) {
-        BlockOutline outline = ModuleManager.INSTANCE.getModuleByClass(BlockOutline.class);
-        if (!outline.isEnabled()) return original;
-        return outline.lineWidth.getFloatValue();
-    }
+//    @ModifyArg(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;DDDLnet/minecraft/client/render/state/OutlineRenderState;IF)V"))
+//    private int modifyBlockOutlineColor(int original) {
+//        RenderBlockOutlineEvent event = EVENT_BUS.post(new RenderBlockOutlineEvent(original, ))
+//
+//        BlockOutline outline = ModuleManager.INSTANCE.getModuleByClass(BlockOutline.class);
+//        if (!outline.isEnabled()) return original;
+//        return outline.color.getRGB();
+//    }
+//
+//    @ModifyArg(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;DDDLnet/minecraft/client/render/state/OutlineRenderState;IF)V"))
+//    private float modifyBlockOutlineLineWidth(float original) {
+//        BlockOutline outline = ModuleManager.INSTANCE.getModuleByClass(BlockOutline.class);
+//        if (!outline.isEnabled()) return original;
+//        return outline.lineWidth.getFloatValue();
+//    }
 }

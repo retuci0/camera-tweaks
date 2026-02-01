@@ -6,7 +6,7 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 
 public class Step extends Module {
 
-    public NumberSetting height = sgGeneral.add(new NumberSetting(
+    public final NumberSetting height = sgGeneral.add(new NumberSetting(
             "altura", "altura máxima a subir",
             1, 0, 3, 0.1
     ));

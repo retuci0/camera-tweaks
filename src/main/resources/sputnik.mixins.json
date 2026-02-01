@@ -3,8 +3,8 @@
   "package": "me.retucio.sputnik.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "BlockCollisionSpliteratorMixin",
     "AbstractBoatEntityMixin",
+    "BlockCollisionSpliteratorMixin",
     "ClientConnectionMixin",
     "EntityMixin",
     "HandshakeC2SPacketMixin",
@@ -21,6 +21,7 @@
     "YggdrasilUserApiServiceMixin",
     "accessor.AbstractBlockAccessor",
     "accessor.ConfirmServerResourcePackScreenAccessor",
+    "accessor.FishingBobberEntityAccessor",
     "accessor.PackAccessor",
     "accessor.StatusEffectInstanceAccessor"
   ],
@@ -49,6 +50,7 @@
     "ClientWorldMixin",
     "ClientWorldPropertiesMixin",
     "ConfirmScreenMixin",
+    "CreativeInventoryScreenMixin",
     "DamageParticleFactoryMixin",
     "DamageParticleMixin",
     "DisconnectedScreenMixin",
@@ -75,6 +77,7 @@
     "ScreenMixin",
     "ScreenshotRecorderMixin",
     "ServerInfoMixin",
+    "ShaderLoaderMixin",
     "SkyRendererMixin",
     "StatusEffectFogModifierMixin",
     "StuckArrowsFeatureRendererMixin",

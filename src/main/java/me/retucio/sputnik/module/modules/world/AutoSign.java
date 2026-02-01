@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.world;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.OpenScreenEvent;
-import me.retucio.sputnik.event.events.PacketEvent;
+import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
+import me.retucio.sputnik.event.events.network.PacketEvent;
 import me.retucio.sputnik.mixin.accessor.AbstractSignEditScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class AutoSign extends Module {
 
-    public String[] text = null;
+    private String[] text = null;
 
     public AutoSign() {
         super("autocartel",
@@ -35,7 +35,7 @@ public class AutoSign extends Module {
     }
 
     @SubscribeEvent
-    public void onOpenScreen(OpenScreenEvent event) {
+    private void onOpenScreen(OpenScreenEvent event) {
         if (event.getScreen() instanceof AbstractSignEditScreen screen && text != null && mc != null && mc.player != null) {
             event.cancel();
             SignBlockEntity sign = ((AbstractSignEditScreenAccessor) screen).getBlockEntity();
@@ -44,7 +44,7 @@ public class AutoSign extends Module {
     }
 
     @SubscribeEvent
-    public void onSendPacket(PacketEvent.Send event) {
+    private void onSendPacket(PacketEvent.Send event) {
         if (event.getPacket() instanceof UpdateSignC2SPacket packet) {
             if (text == null) text = packet.getText().clone();
             else System.arraycopy(text, 0, packet.getText(), 0, 4);

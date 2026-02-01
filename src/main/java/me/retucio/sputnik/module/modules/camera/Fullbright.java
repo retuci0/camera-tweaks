@@ -18,20 +18,20 @@ import java.awt.*;
 
 public class Fullbright extends Module {
 
-    public EnumSetting<Modes> mode = sgGeneral.add(new EnumSetting<>("modo", "qué modo de iluminación emplear (usar poción con shaders)", Modes.class, Modes.GAMMA));
+    public final EnumSetting<Modes> mode = sgGeneral.add(new EnumSetting<>("modo", "qué modo de iluminación emplear (usar poción con shaders)", Modes.class, Modes.GAMMA));
 
-    public ColorSetting color = sgGeneral.add(new ColorSetting("filtro", "filtro de color", new Color(255, 255, 255, 255), false));
+    public final ColorSetting color = sgGeneral.add(new ColorSetting("filtro", "filtro de color", new Color(255, 255, 255, 255), false));
 
     public Fullbright() {
         super("brilli brilli",
                 "deshabilita la oscuridad (y aplica colores a los shaders)",
                 Category.CAMERA,
                 GLFW.GLFW_KEY_K);
+
         mode.onUpdate(mode -> { if (mode != Modes.POTION) disableNightVision(); });
         mode.onUpdate(mode -> {
             boolean v = mode.equals(Modes.GAMMA);
             color.setVisible(v);
-
             if (v) disableNightVision();
         });
     }

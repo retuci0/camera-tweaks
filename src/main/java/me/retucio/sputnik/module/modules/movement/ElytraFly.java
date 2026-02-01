@@ -11,7 +11,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class ElytraFly extends Module {
 
-    public NumberSetting speed = sgGeneral.add(new NumberSetting(
+    private final NumberSetting speed = sgGeneral.add(new NumberSetting(
             "velocidad",
             "mi madre es parcialmente vagabunda",
             1,

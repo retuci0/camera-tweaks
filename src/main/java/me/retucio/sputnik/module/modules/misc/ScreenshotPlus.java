@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.misc;
 
 import me.retucio.sputnik.command.CommandManager;
-import me.retucio.sputnik.event.events.ClientClickEvent;
+import me.retucio.sputnik.event.events.input.ClientClickEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -31,15 +31,15 @@ import java.io.IOException;
 
 public class ScreenshotPlus extends Module {
 
-    SettingGroup sgButtons = addSg(new SettingGroup("botones", true));
+    private final SettingGroup sgButtons = addSg(new SettingGroup("botones", true));
 
-    public EnumSetting<ScreenshotActions> defaultAction = sgGeneral.add(new EnumSetting<>("por defecto", "qué acción tomar por defecto",
+    public final EnumSetting<ScreenshotActions> defaultAction = sgGeneral.add(new EnumSetting<>("por defecto", "qué acción tomar por defecto",
             ScreenshotActions.class, ScreenshotActions.NONE));
 
-    public BooleanSetting saveButton = sgButtons.add(new BooleanSetting("botón de guardar", "mostrar botón para guardar la captura localmente", true));
-    public BooleanSetting copyButton = sgButtons.add(new BooleanSetting("botón de copiar", "mostrar botón para copiar la captura al portapapeles", true));
-    public BooleanSetting openButton = sgButtons.add(new BooleanSetting("botón de abrir", "mostrar botón para abrir el archivo de la captura", true));
-    public BooleanSetting discardButton = sgButtons.add(new BooleanSetting("botón de descartar", "mostrar botón para descartar la captura", true));
+    private final BooleanSetting saveButton = sgButtons.add(new BooleanSetting("botón de guardar", "mostrar botón para guardar la captura localmente", true));
+    private final BooleanSetting copyButton = sgButtons.add(new BooleanSetting("botón de copiar", "mostrar botón para copiar la captura al portapapeles", true));
+    private final BooleanSetting openButton = sgButtons.add(new BooleanSetting("botón de abrir", "mostrar botón para abrir el archivo de la captura", true));
+    private final BooleanSetting discardButton = sgButtons.add(new BooleanSetting("botón de descartar", "mostrar botón para descartar la captura", true));
 
     private NativeImage screenshot;
     private File screenshotFile;

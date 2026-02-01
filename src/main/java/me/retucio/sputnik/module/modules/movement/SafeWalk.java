@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.ClipAtLedgeEvent;
+import me.retucio.sputnik.event.events.interact.ClipAtLedgeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
@@ -13,7 +13,7 @@ import net.minecraft.world.RaycastContext;
 
 public class SafeWalk extends Module {
 
-    public NumberSetting fallDistance = sgGeneral.add(new NumberSetting("distancia de caída", "distancia de caída máxima permitida", 1, 0, 10, 0.1));
+    private final NumberSetting fallDistance = sgGeneral.add(new NumberSetting("distancia de caída", "distancia de caída máxima permitida", 1, 0, 10, 0.1));
 
     public SafeWalk() {
         super("muletas",
@@ -22,7 +22,7 @@ public class SafeWalk extends Module {
     }
 
     @SubscribeEvent
-    public void onClipAtLedge(ClipAtLedgeEvent event) {
+    private void onClipAtLedge(ClipAtLedgeEvent event) {
         if (mc.player == null || mc.world == null) return;
 
         if (fallDistance.getValue() > 1) {

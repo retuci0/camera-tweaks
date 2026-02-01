@@ -7,7 +7,7 @@ import me.retucio.sputnik.util.ChatUtil;
 
 public class BungeecordSpoofer extends Module {
 
-    public StringSetting address = sgGeneral.add(new StringSetting("dirección", "la dirección IP que será enviada al server", "127.0.0.1", 15));
+    public final StringSetting address = sgGeneral.add(new StringSetting("dirección", "la dirección IP que será enviada al server", "127.0.0.1", 15));
 
     public BungeecordSpoofer() {
         super("spoofer de bungeecord",

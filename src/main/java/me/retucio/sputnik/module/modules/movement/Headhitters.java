@@ -6,7 +6,7 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 
 public class Headhitters extends Module {
 
-    public NumberSetting delay = sgGeneral.add(new NumberSetting("delay", "delay de saltos", 0, 0, 20, 1));
+    private final NumberSetting delay = sgGeneral.add(new NumberSetting("delay", "delay de saltos", 0, 0, 20, 1));
 
     public Headhitters() {
         super("headhitters",

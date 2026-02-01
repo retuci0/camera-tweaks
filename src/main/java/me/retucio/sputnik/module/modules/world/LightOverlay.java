@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.world;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.Render3DEvent;
+import me.retucio.sputnik.event.events.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -22,58 +22,58 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LightOverlay extends Module {
 
-    SettingGroup sgDetection = addSg(new SettingGroup("detección", true));
-    SettingGroup sgColors = addSg(new SettingGroup("colores", true));
-    SettingGroup sgOptimization = addSg(new SettingGroup("optimización", true));
+    private final SettingGroup sgDetection = addSg(new SettingGroup("detección", true));
+    private final SettingGroup sgColors = addSg(new SettingGroup("colores", true));
+    private final SettingGroup sgOptimization = addSg(new SettingGroup("optimización", true));
 
     // detección
-    public NumberSetting radius = sgDetection.add(new NumberSetting(
+    private final NumberSetting radius = sgDetection.add(new NumberSetting(
             "radio",
             "radio a tener en cuenta al renderizar superposición",
             16, 5, 128, 1));
 
-    public NumberSetting yRadius = sgDetection.add(new NumberSetting(
+    private final NumberSetting yRadius = sgDetection.add(new NumberSetting(
             "rango vertical",
             "distancia vertical a tener en cuenta",
             4, 1, 16, 1));
 
-    public BooleanSetting onWater = sgDetection.add(new BooleanSetting(
+    private final BooleanSetting onWater = sgDetection.add(new BooleanSetting(
             "en agua",
             "mostrar también bloques cubiertos en agua", true));
 
-    public BooleanSetting dontCullWater = sgDetection.add(new BooleanSetting(
+    private final BooleanSetting dontCullWater = sgDetection.add(new BooleanSetting(
             "evitar culling en agua",
             "mostrar superposición a través de bloques para poder verla desde fuera del agua", false));
 
 
     // optimización, porque iba como la mierda
-    public NumberSetting updateInterval = sgOptimization.add(new NumberSetting(
+    private final NumberSetting updateInterval = sgOptimization.add(new NumberSetting(
             "intervalo de búsqueda",
             "cada cuántos ticks actualizar la búsqueda de bloques",
             10, 1, 80, 1));
 
-    public NumberSetting movementThreshold = sgOptimization.add(new NumberSetting(
+    private final NumberSetting movementThreshold = sgOptimization.add(new NumberSetting(
             "umbral de movimiento",
             "distancia que debe moverse el jugador antes de forzar una actualización",
             3.0, 0.5, 10.0, 0.5));
 
-    public BooleanSetting asyncSearch = sgOptimization.add(new BooleanSetting(
+    private final BooleanSetting asyncSearch = sgOptimization.add(new BooleanSetting(
             "búsqueda asíncrona",
             "buscar bloques en un hilo separado (reduce lag)",
             true));
 
-    public BooleanSetting incrementalUpdates = sgOptimization.add(new BooleanSetting(
+    private final BooleanSetting incrementalUpdates = sgOptimization.add(new BooleanSetting(
             "actualizaciones incrementales",
             "actualizar solo los bloques nuevos / eliminados en lugar de recalcular todo",
             true));
 
     // colores
-    public ColorSetting lightColor = sgColors.add(new ColorSetting(
+    private final ColorSetting lightColor = sgColors.add(new ColorSetting(
             "color de la luz",
             "color de los bloques con luz",
             new Color(0, 255, 0, 67), false));
 
-    public ColorSetting darknessColor = sgColors.add(new ColorSetting(
+    private final ColorSetting darknessColor = sgColors.add(new ColorSetting(
             "color de oscuridad",
             "color de bloques con 0 luz",
             new Color(255, 0, 0, 67), false));
@@ -124,7 +124,7 @@ public class LightOverlay extends Module {
 
     @SubscribeEvent
     @SuppressWarnings("deprecation")
-    public void onRenderWorld(Render3DEvent event) {
+    private void onRenderWorld(Render3DEvent event) {
         if (mc.player == null || mc.world == null) return;
 
         // actualización periódica

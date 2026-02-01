@@ -46,8 +46,10 @@ public abstract class Setting<T> {
     }
 
     public String getName() {
-        return name;
+        return name.strip();
     }
+
+    public String getTrueName() { return name; }
 
     public String getDescription() {
         return description;

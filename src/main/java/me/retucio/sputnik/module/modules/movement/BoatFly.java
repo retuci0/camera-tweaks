@@ -1,9 +1,9 @@
 package me.retucio.sputnik.module.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
-import me.retucio.sputnik.event.BoatMoveEvent;
+import me.retucio.sputnik.event.events.interact.BoatMoveEvent;
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.PacketEvent;
+import me.retucio.sputnik.event.events.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -13,7 +13,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class BoatFly extends Module {
 
-    public NumberSetting speed = sgGeneral.add(new NumberSetting(
+    private final NumberSetting speed = sgGeneral.add(new NumberSetting(
             "velocidad horizontal",
             "velocidad a la que moverse horizontalmente",
             2,
@@ -22,7 +22,7 @@ public class BoatFly extends Module {
             0.1
     ));
 
-    public NumberSetting vSpeed = sgGeneral.add(new NumberSetting(
+    private final NumberSetting vSpeed = sgGeneral.add(new NumberSetting(
             "velocidad vertical",
             "velocidad a la que moverse verticalmente",
             1,
@@ -31,7 +31,7 @@ public class BoatFly extends Module {
             0.1
     ));
 
-    public NumberSetting stepHeight = sgGeneral.add(new NumberSetting(
+    public final NumberSetting stepHeight = sgGeneral.add(new NumberSetting(
             "altura de escalonado",
             "como escalones pero pal barco",
             0.5,
@@ -40,7 +40,7 @@ public class BoatFly extends Module {
             0.1
     ));
 
-    public BooleanSetting cancelPackets = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting cancelPackets = sgGeneral.add(new BooleanSetting(
             "cancelar paquetes",
             "cancelar paquetes de movimiento del barco enviados por el servidor",
             false
@@ -73,7 +73,7 @@ public class BoatFly extends Module {
         double cos = Math.cos(Math.toRadians(yaw));
 
         double x = speed * dz * sin;
-        double y = speed * dy;
+        double y = vSpeed.getValue() * dy;
         double z = speed * dz * -cos;
 
         x += speed * dx * -cos;

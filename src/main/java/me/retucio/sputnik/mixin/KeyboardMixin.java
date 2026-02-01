@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.KeyEvent;
+import me.retucio.sputnik.event.events.input.KeyEvent;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.input.KeyInput;
 import org.spongepowered.asm.mixin.Mixin;

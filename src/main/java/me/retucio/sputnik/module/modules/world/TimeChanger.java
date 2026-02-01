@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.world;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.PacketEvent;
+import me.retucio.sputnik.event.events.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -10,16 +10,21 @@ import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 
-// continúa en ClientWorldPropertiesMixin, DimensionTypeMixin,
+
+/** continúa en:
+ * @see me.retucio.sputnik.mixin.ClientWorldPropertiesMixin
+ * @see me.retucio.sputnik.mixin.SkyRendererMixin
+ */
+
 public class TimeChanger extends Module {
 
-    SettingGroup sgCelestialBodies = addSg(new SettingGroup("cuerpos celeste", false));
+    private final SettingGroup sgCelestialBodies = addSg(new SettingGroup("cuerpos celeste", false));
 
-    public NumberSetting time = sgGeneral.add(new NumberSetting("hora", "hora del juego", 0, -20000, 20000, 1));
+    public final NumberSetting time = sgGeneral.add(new NumberSetting("hora", "hora del juego", 0, -20000, 20000, 1));
 
-    public BooleanSetting renderSun = sgCelestialBodies.add(new BooleanSetting("sol", "que haya sol o no", true));
-    public BooleanSetting renderMoon = sgCelestialBodies.add(new BooleanSetting("luna", "que haya luna o no", true));
-    public BooleanSetting renderStars = sgCelestialBodies.add(new BooleanSetting("estrellas", "que hayan estrellas o no", true));
+    public final BooleanSetting renderSun = sgCelestialBodies.add(new BooleanSetting("sol", "que haya sol o no", true));
+    public final BooleanSetting renderMoon = sgCelestialBodies.add(new BooleanSetting("luna", "que haya luna o no", true));
+    public final BooleanSetting renderStars = sgCelestialBodies.add(new BooleanSetting("estrellas", "que hayan estrellas o no", true));
 
     public EnumSetting<MoonPhases> moonPhase = sgCelestialBodies.add(new EnumSetting<>("fase lunar", "fase lunar actual", MoonPhases.class, MoonPhases.DEFAULT));
 
@@ -47,18 +52,18 @@ public class TimeChanger extends Module {
         super.onDisable();
     }
 
-    @SubscribeEvent
-    public void onPacketReceive(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket packet) {
-            realTime = packet.timeOfDay();
-            event.cancel();
-        }
-    }
-
     @Override
     public void onTick() {
         if (mc.world == null) return;
         mc.world.getLevelProperties().setTimeOfDay(time.getLongValue());
+    }
+
+    @SubscribeEvent
+    private void onPacketReceive(PacketEvent.Receive event) {
+        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket packet) {
+            realTime = packet.timeOfDay();
+            event.cancel();
+        }
     }
 
     public enum MoonPhases {

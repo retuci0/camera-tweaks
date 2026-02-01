@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.camera;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.ChangeRotationEvent;
+import me.retucio.sputnik.event.events.render.ChangeRotationEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -10,11 +10,11 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class Rotations extends Module {
 
-    public NumberSetting yaw = sgGeneral.add(new NumberSetting("guiñada", "eje vertical - giro horizontal (yaw)", 0, -180, 180, 1));
-    public NumberSetting pitch = sgGeneral.add(new NumberSetting("cabeceo", "eje horizontal - giro vertical (pitch)", 0, -90, 90, 1));
+    private final NumberSetting yaw = sgGeneral.add(new NumberSetting("guiñada", "eje vertical - giro horizontal (yaw)", 0, -180, 180, 1));
+    private final NumberSetting pitch = sgGeneral.add(new NumberSetting("cabeceo", "eje horizontal - giro vertical (pitch)", 0, -90, 90, 1));
 
-    public BooleanSetting smooth = sgGeneral.add(new BooleanSetting("evitar movimiento", "cancela todo movimiento de la cámara", false));
-    public BooleanSetting serverSide = sgGeneral.add(new BooleanSetting("serverside", "espamea paquetes de rotación al servidor", false));
+    private final BooleanSetting smooth = sgGeneral.add(new BooleanSetting("evitar movimiento", "cancela todo movimiento de la cámara", false));
+    private final BooleanSetting serverSide = sgGeneral.add(new BooleanSetting("serverside", "espamea paquetes de rotación al servidor", false));
 
     public Rotations() {
         super("rotaciones",
@@ -30,15 +30,21 @@ public class Rotations extends Module {
         mc.player.setPitch(pitch.getFloatValue());
 
         if (serverSide.getValue())
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
-                    yaw.getFloatValue(), pitch.getFloatValue(), mc.player.isOnGround(), mc.player.horizontalCollision));
+            mc.player.networkHandler.sendPacket(
+                    new PlayerMoveC2SPacket.LookAndOnGround(
+                        yaw.getFloatValue(),
+                        pitch.getFloatValue(),
+                        mc.player.isOnGround(),
+                        mc.player.horizontalCollision
+                    )
+            );
     }
 
     @SubscribeEvent
-    public void onChangeRotation(ChangeRotationEvent event) {
+    private void onChangeRotation(ChangeRotationEvent event) {
         if (smooth.getValue()
                 && (event.getYaw() != yaw.getFloatValue() || event.getPitch() != pitch.getFloatValue())){
             event.cancel();
-    }}
-
+        }
+    }
 }

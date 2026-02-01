@@ -2,8 +2,8 @@ package me.retucio.sputnik.module.modules.player;
 
 import me.retucio.sputnik.event.Event;
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.KeyEvent;
-import me.retucio.sputnik.event.events.MouseClickEvent;
+import me.retucio.sputnik.event.events.input.KeyEvent;
+import me.retucio.sputnik.event.events.input.MouseClickEvent;
 import me.retucio.sputnik.mixin.accessor.HandledScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -16,9 +16,9 @@ import org.lwjgl.glfw.GLFW;
 
 public class InventoryPlus extends Module {
 
-    public KeySetting row1key = sgGeneral.add(new KeySetting("fila 1", "tecla para mover items a la primera fila", GLFW.GLFW_KEY_A));
-    public KeySetting row2key = sgGeneral.add(new KeySetting("fila 2", "tecla para mover items a la segunda fila", GLFW.GLFW_KEY_S));
-    public KeySetting row3key = sgGeneral.add(new KeySetting("fila 3", "tecla para mover items a la tercera fila", GLFW.GLFW_KEY_D));
+    private final KeySetting row1key = sgGeneral.add(new KeySetting("fila 1", "tecla para mover items a la primera fila", GLFW.GLFW_KEY_A));
+    private final KeySetting row2key = sgGeneral.add(new KeySetting("fila 2", "tecla para mover items a la segunda fila", GLFW.GLFW_KEY_S));
+    private final KeySetting row3key = sgGeneral.add(new KeySetting("fila 3", "tecla para mover items a la tercera fila", GLFW.GLFW_KEY_D));
 
     public InventoryPlus() {
         super("inventario plus",
@@ -27,13 +27,13 @@ public class InventoryPlus extends Module {
     }
 
     @SubscribeEvent
-    public void onKey(KeyEvent event) {
+    private void onKey(KeyEvent event) {
         if (event.getAction() == GLFW.GLFW_RELEASE) return;
         processInput(event.getKey(), event);
     }
 
     @SubscribeEvent
-    public void onMouseButton(MouseClickEvent event) {
+    private void onMouseButton(MouseClickEvent event) {
         if (event.getAction() == GLFW.GLFW_RELEASE) return;
         processInput(event.getButton(), event);
     }

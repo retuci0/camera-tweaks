@@ -34,10 +34,18 @@ accessible class net/minecraft/client/particle/ParticleSpriteManager$SimpleSprit
 accessible field net/minecraft/client/render/WorldRenderer worldRenderState Lnet/minecraft/client/render/state/WorldRenderState;
 accessible method net/minecraft/client/render/RenderLayer <init> (Ljava/lang/String;Lnet/minecraft/client/render/RenderSetup;)V
 accessible method net/minecraft/client/render/GameRenderer getProjectionMatrix (F)Lorg/joml/Matrix4f;
+accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder withSnippet (Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;)V
 
 # misc.
+accessible field net/minecraft/client/MinecraftClient resourceManager Lnet/minecraft/resource/ReloadableResourceManagerImpl;
 accessible field net/minecraft/client/texture/TextureManager textures Ljava/util/Map;
+accessible method net/minecraft/client/MinecraftClient doItemUse ()V
+
+accessible class net/minecraft/entity/projectile/FishingBobberEntity$State
+
 accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
+accessible method net/minecraft/client/gui/screen/ingame/HandledScreen handleHotbarKeyPressed (Lnet/minecraft/client/input/KeyInput;)Z
+
 accessible method net/minecraft/client/Keyboard onKey (JILnet/minecraft/client/input/KeyInput;)V
 accessible class net/minecraft/client/MinecraftClient$LoadingContext
 

@@ -22,19 +22,19 @@ import java.util.List;
 
 public class WarnLowDurability extends Module {
 
-    SettingGroup sgWarn = addSg(new SettingGroup("aviso", true));
-    SettingGroup sgSound = addSg(new SettingGroup("sonido", true));
+    private final SettingGroup sgWarn = addSg(new SettingGroup("aviso", true));
+    private final SettingGroup sgSound = addSg(new SettingGroup("sonido", true));
 
-    public NumberSetting limitPercentage = sgGeneral.add(new NumberSetting("porcentaje", "porcentaje de durabilidad restante a la que se te avisa",
+    private final NumberSetting limitPercentage = sgGeneral.add(new NumberSetting("porcentaje", "porcentaje de durabilidad restante a la que se te avisa",
             5, 1, 100, 1));
 
-    public BooleanSetting message = sgWarn.add(new BooleanSetting("enviar mensaje", "enviar un mensaje para alertar al usuario", true));
-    public BooleanSetting playSound = sgWarn.add(new BooleanSetting("reproducir sonido", "reproducir un sonido para alertar al usuario", true));
+    private final BooleanSetting message = sgWarn.add(new BooleanSetting("enviar mensaje", "enviar un mensaje para alertar al usuario", true));
+    private final BooleanSetting playSound = sgWarn.add(new BooleanSetting("reproducir sonido", "reproducir un sonido para alertar al usuario", true));
 
-    public OptionSetting<SoundEvent> sound = sgSound.add(new OptionSetting<>("sonido", "qué sonido reproducir",
+    private final OptionSetting<SoundEvent> sound = sgSound.add(new OptionSetting<>("sonido", "qué sonido reproducir",
             Lists.soundList, SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), Lists.soundNames));
-    public NumberSetting volume = sgSound.add(new NumberSetting("volumen", "volumen del sonido", 70, 0, 125, 1));
-    public NumberSetting pitch = sgSound.add(new NumberSetting("frecuencia", "altura del sonido", 70, 0, 125, 1));
+    private final NumberSetting volume = sgSound.add(new NumberSetting("volumen", "volumen del sonido", 70, 0, 125, 1));
+    private final NumberSetting pitch = sgSound.add(new NumberSetting("frecuencia", "altura del sonido", 70, 0, 125, 1));
 
     private final List<ItemStack> warned = new ArrayList<>();
     private float prevPercentage = -1;

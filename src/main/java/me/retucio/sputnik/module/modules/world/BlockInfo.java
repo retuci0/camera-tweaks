@@ -2,15 +2,12 @@ package me.retucio.sputnik.module.modules.world;
 
 import com.google.gson.Gson;
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.KeyEvent;
+import me.retucio.sputnik.event.events.input.KeyEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
-import me.retucio.sputnik.module.setting.SettingGroup;
-import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.util.ChatUtil;
-import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.hit.BlockHitResult;
@@ -21,18 +18,15 @@ import org.lwjgl.glfw.GLFW;
 import java.util.Collection;
 
 
-// copy summon / setblock command
-// copy json data to clipboard
-// print data (keybinds)
 public class BlockInfo extends Module {
 
-    public KeySetting key = sgGeneral.add(new KeySetting(
+    private final KeySetting key = sgGeneral.add(new KeySetting(
             "tecla",
             "tecla a pulsar para obtener la info.",
             GLFW.GLFW_KEY_CAPS_LOCK
     ));
 
-    public EnumSetting<CopyMode> copy = sgGeneral.add(new EnumSetting<>(
+    private final EnumSetting<CopyMode> copy = sgGeneral.add(new EnumSetting<>(
             "copiar",
             "copiar al portapapeles",
             CopyMode.class,
@@ -46,7 +40,7 @@ public class BlockInfo extends Module {
     }
 
     @SubscribeEvent
-    public void onKey(KeyEvent event) {
+    private void onKey(KeyEvent event) {
         if (mc.player == null || mc.world == null) return;
         if (event.getKey() != key.getValue() || event.getAction() != GLFW.GLFW_PRESS) return;
 
@@ -83,7 +77,7 @@ public class BlockInfo extends Module {
         }
     }
 
-    public enum CopyMode {
+    private enum CopyMode {
         DONT("no copiar"),
         COMMAND("copiar comando /setblock"),
         JSON("copiar contenido json");

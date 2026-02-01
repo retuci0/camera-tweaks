@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.render;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.Render3DEvent;
+import me.retucio.sputnik.event.events.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -24,75 +24,70 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockESP extends Module {
 
-    SettingGroup sgSearch = addSg(new SettingGroup("búsqueda", true));
-    SettingGroup sgOulines = addSg(new SettingGroup("contorno", true));
-    SettingGroup sgFilling = addSg(new SettingGroup("relleno", true));
-
+    private final SettingGroup sgSearch = addSg(new SettingGroup("búsqueda", true));
+    private final SettingGroup sgOulines = addSg(new SettingGroup("contorno", true));
+    private final SettingGroup sgFilling = addSg(new SettingGroup("relleno", true));
 
     // bloques
-
-    public ListSetting<Block> blocks = sgGeneral.add(new ListSetting<>(
+    private final ListSetting<Block> blocks = sgGeneral.add(new ListSetting<>(
             "bloques", "bloques a resaltar",
             Lists.blockList,
             Lists.allFalse(Lists.blockList),
             Lists.blockNames
     ));
 
-    public NumberSetting maxBlocks = sgGeneral.add(new NumberSetting(
+    private final NumberSetting maxBlocks = sgGeneral.add(new NumberSetting(
             "máx. bloques", "número máximo de bloques a resaltar",
             500, 1, 2000, 1
     ));
 
 
     // búsqueda
-
-    public NumberSetting radius = sgSearch.add(new NumberSetting(
+    private final NumberSetting radius = sgSearch.add(new NumberSetting(
             "radio", "radio de búsqueda de bloques",
             24, 2, 128, 1
     ));
 
-    public NumberSetting searchInterval = sgSearch.add(new NumberSetting(
+    private final NumberSetting searchInterval = sgSearch.add(new NumberSetting(
             "intervalo", "intervalo de búsqueda en ticks",
             10, 1, 40, 1
     ));
 
-    public BooleanSetting asyncSearch = sgSearch.add(new BooleanSetting(
+    private final BooleanSetting asyncSearch = sgSearch.add(new BooleanSetting(
             "búsqueda asíncrona", "busca los bloques en un hilo separado (optimización)",
             true
     ));
 
-    public NumberSetting distanceToMove = sgSearch.add(new NumberSetting(
+    private final NumberSetting distanceToMove = sgSearch.add(new NumberSetting(
             "distancia a moverse", "distancia a moverse antes de actualizar los bloques",
             3, 0, 10, 0.1
     ));
 
 
     // contorno
-
-    public BooleanSetting outlines = sgOulines.add(new BooleanSetting(
+    private final BooleanSetting outlines = sgOulines.add(new BooleanSetting(
             "contorno", "renderizar contorno de bloques",
             true
     ));
 
-    public ColorSetting outlineColor = sgOulines.add(new ColorSetting(
+    private final ColorSetting outlineColor = sgOulines.add(new ColorSetting(
             "color del contorno", "color del contorno",
             Colors.CELESTE, false
     ));
 
-    public NumberSetting lineWidth = sgOulines.add(new NumberSetting(
+    private final NumberSetting lineWidth = sgOulines.add(new NumberSetting(
             "grosor del contorno", "grosor de las líneas del contorno",
             1, 1, 5, 0.2
     ));
 
 
     // relleno
-
-    public BooleanSetting fillings = sgFilling.add(new BooleanSetting(
+    private final BooleanSetting fillings = sgFilling.add(new BooleanSetting(
             "relleno", "renderizar relleno de bloques",
             true
     ));
 
-    public ColorSetting fillingColor = sgFilling.add(new ColorSetting(
+    private final ColorSetting fillingColor = sgFilling.add(new ColorSetting(
             "color del relleno", "color del relleno",
             new Color(57, 177, 215, 67), false
     ));
@@ -144,7 +139,7 @@ public class BlockESP extends Module {
     }
 
     @SubscribeEvent
-    public void onRenderWorld(Render3DEvent event) {
+    private void onRenderWorld(Render3DEvent event) {
         if (mc.player == null || mc.world == null) return;
 
         // aplicar el intervalo

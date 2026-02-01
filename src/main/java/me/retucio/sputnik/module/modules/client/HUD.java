@@ -20,9 +20,9 @@ import java.awt.*;
 
 public class HUD extends Module {
 
-    SettingGroup sgEditor = addSg(new SettingGroup("editor", true));
-    SettingGroup sgDisplay = addSg(new SettingGroup("visualización", true));
-    SettingGroup sgElements = addSg(new SettingGroup("elementos", false));
+    private final SettingGroup sgEditor = addSg(new SettingGroup("editor", true));
+    private final SettingGroup sgDisplay = addSg(new SettingGroup("visualización", true));
+    private final SettingGroup sgElements = addSg(new SettingGroup("elementos", false));
 
     // editor
     public KeySetting editorKey = sgEditor.add(new KeySetting(

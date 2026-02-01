@@ -64,6 +64,10 @@ public class NumberSetting extends Setting<Double> {
         super.setValue(value);
     }
 
+    public boolean isValid(double value) {
+        return value >= min && value <= max;
+    }
+
     public double getMin() {
         return min;
     }

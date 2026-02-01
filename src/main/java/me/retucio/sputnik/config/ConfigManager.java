@@ -343,7 +343,7 @@ public class ConfigManager {
     }
 
     private static String getSettingKey(Setting<?> setting) {
-        return setting.getSg().getModule().getName() + ":" + setting.getName();
+        return setting.getSg().getModule().getName() + ":" + setting.getTrueName();
     }
 
     public static boolean hasLoaded() {

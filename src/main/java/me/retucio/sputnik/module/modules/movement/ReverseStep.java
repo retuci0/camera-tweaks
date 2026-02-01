@@ -11,22 +11,22 @@ import net.minecraft.world.RaycastContext;
 
 public class ReverseStep extends Module {
 
-    public NumberSetting height = sgGeneral.add(new NumberSetting(
+    private final NumberSetting height = sgGeneral.add(new NumberSetting(
             "altura", "altura máxima a bajar",
             1, 0, 20, 0.1
     ));
 
-    public NumberSetting velocity = sgGeneral.add(new NumberSetting(
-            "velocidad", "velocidad a la que caer en bps",
+    private final NumberSetting velocity = sgGeneral.add(new NumberSetting(
+            "velocidad", "velocidad a la que caer",
             1, 0, 10, 0.1
     ));
 
-    public BooleanSetting jumping = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting jumping = sgGeneral.add(new BooleanSetting(
             "saltar", "permitir saltar",
             true
     ));
 
-    public BooleanSetting disableInWater = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting disableInWater = sgGeneral.add(new BooleanSetting(
             "desactivar en agua", ".",
             true
     ));
@@ -52,7 +52,8 @@ public class ReverseStep extends Module {
 
         double dropHeight = getHeight();
         if (dropHeight > 0 && dropHeight <= height.getValue()) {
-            mc.player.addVelocity(0, -height.getValue() + mc.player.getVelocity().getY(), 0);
+            double dy = (-height.getValue() + mc.player.getVelocity().getY()) * velocity.getValue();
+            mc.player.addVelocity(0, dy, 0);
         }
     }
 

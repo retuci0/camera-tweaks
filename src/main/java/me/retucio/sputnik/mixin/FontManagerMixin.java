@@ -30,8 +30,9 @@ public abstract class FontManagerMixin {
         if (id.equals(StyleSpriteSource.Font.DEFAULT.id())) {
             cir.setReturnValue(getStorageInternal(
                     Identifier.of(
-                            Sputnik.MOD_ID,
-                            fonts.font.getValue())
+                        Sputnik.MOD_ID,
+                        fonts.getFont()
+                    )
             ));
         }
     }

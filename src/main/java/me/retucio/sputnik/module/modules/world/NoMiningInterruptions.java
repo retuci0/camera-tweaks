@@ -11,8 +11,8 @@ import net.minecraft.registry.tag.ItemTags;
 
 public class NoMiningInterruptions extends Module {
 
-    public BooleanSetting withPickaxeOnly = sgGeneral.add(new BooleanSetting("solo con pico", "ignorar entidades solamente cuando se sujeta un pico", false));
-    public ListSetting<EntityType<?>> entities = sgGeneral.add(new ListSetting<>("entidades", "entidades a ignorar",
+    private final BooleanSetting withPickaxeOnly = sgGeneral.add(new BooleanSetting("solo con pico", "ignorar entidades solamente cuando se sujeta un pico", false));
+    private final ListSetting<EntityType<?>> entities = sgGeneral.add(new ListSetting<>("entidades", "entidades a ignorar",
             Lists.entityList, Lists.allTrue(Lists.entityList), Lists.entityNames));
 
     public NoMiningInterruptions() {

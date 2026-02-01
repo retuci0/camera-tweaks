@@ -17,7 +17,7 @@ import java.awt.*;
 
 public class DamageOverlay extends Module {
 
-    public ColorSetting colorSetting = sgGeneral.add(new ColorSetting(
+    private final ColorSetting colorSetting = sgGeneral.add(new ColorSetting(
             "color",
             "color",
             Colors.mainColor,

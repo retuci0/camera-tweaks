@@ -2,7 +2,7 @@ package me.retucio.sputnik.mixin;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.command.CommandManager;
-import me.retucio.sputnik.event.events.SendMessageEvent;
+import me.retucio.sputnik.event.events.network.SendMessageEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.render.NoRender;
 import me.retucio.sputnik.util.ChatUtil;

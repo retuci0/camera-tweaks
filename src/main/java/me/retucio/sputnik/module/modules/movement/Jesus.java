@@ -1,14 +1,13 @@
 package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.BlockShapeEvent;
+import me.retucio.sputnik.event.events.interact.BlockShapeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import me.retucio.sputnik.util.ChatUtil;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
@@ -18,22 +17,22 @@ import net.minecraft.util.shape.VoxelShapes;
 
 public class Jesus extends Module {
 
-    SettingGroup sgBlocks = addSg(new SettingGroup("bloques", true));
+    private final SettingGroup sgBlocks = addSg(new SettingGroup("bloques", true));
 
-    public EnumSetting<JesusMode> mode = sgGeneral.add(new EnumSetting<>(
+    private final EnumSetting<JesusMode> mode = sgGeneral.add(new EnumSetting<>(
             "modo",
             "cómo caminar",
             JesusMode.class,
             JesusMode.SOLID
     ));
 
-    public BooleanSetting allowSneaking = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting allowSneaking = sgGeneral.add(new BooleanSetting(
             "permitir agacharse",
             "te permite usar el botón de agacharse para sumergirte en el agua",
             true
     ));
 
-    public NumberSetting minFallHeight = sgGeneral.add(new NumberSetting(
+    private final NumberSetting minFallHeight = sgGeneral.add(new NumberSetting(
             "distancia de caída",
             "distancia de caída mínima para sumergirse en vez de impactar",
             3,
@@ -42,19 +41,19 @@ public class Jesus extends Module {
             0.1
     ));
 
-    public BooleanSetting water = sgBlocks.add(new BooleanSetting(
+    private final BooleanSetting water = sgBlocks.add(new BooleanSetting(
             "agua",
             "permitir caminar en agua",
             true
     ));
 
-    public BooleanSetting lava = sgBlocks.add(new BooleanSetting(
+    private final BooleanSetting lava = sgBlocks.add(new BooleanSetting(
             "lava",
             "permitir caminar en lava",
             true
     ));
 
-    public BooleanSetting powderedSnow = sgBlocks.add(new BooleanSetting(
+    private final BooleanSetting powderedSnow = sgBlocks.add(new BooleanSetting(
             "nieve en polvo",
             "permitir caminar en nieve en polvo",
             true
@@ -98,7 +97,7 @@ public class Jesus extends Module {
     }
 
     @SubscribeEvent
-    public void onBlockShape(BlockShapeEvent event) {
+    private void onBlockShape(BlockShapeEvent event) {
         if (event.getState().getBlock() == Blocks.LAVA && !lava.getValue()) return;
         if (event.getState().getBlock() == Blocks.WATER && !water.getValue()) return;
         if (event.getState().getBlock() == Blocks.POWDER_SNOW && !powderedSnow.getValue()) return;
@@ -122,7 +121,7 @@ public class Jesus extends Module {
         return !state.isEmpty() && pos.y - blockPos.getY() <= state.getHeight();
     }
 
-    public enum JesusMode {
+    private enum JesusMode {
         VIBRATE("vibrador"),
         SOLID("sólido");
 

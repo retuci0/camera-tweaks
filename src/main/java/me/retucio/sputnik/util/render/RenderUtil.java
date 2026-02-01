@@ -6,6 +6,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
+import org.joml.Vector3f;
 
 import java.awt.*;
 
@@ -46,6 +47,34 @@ public class RenderUtil {
         }
 
         drawFilledRect(matrices, x1, y, x2 + width, y + width, color);
+    }
+
+    public static void drawVector(MatrixStack matrices, Vector3f start, Vec3d direction, Color c, float lineWidth) {
+        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
+
+        MatrixStack.Entry pose = matrices.peek();
+
+        int color = c.getRGB();
+        float r = ((color >> 16) & 0xFF) / 255f;
+        float g = ((color >> 8) & 0xFF) / 255f;
+        float b = (color & 0xFF) / 255f;
+        float a = ((color >> 24) & 0xFF) / 255f;
+
+        float endX = start.x() + (float) direction.x;
+        float endY = start.y() + (float) direction.y;
+        float endZ = start.z() + (float) direction.z;
+
+        buffer.vertex(pose.getPositionMatrix(), start.x(), start.y(), start.z())
+                .color(r, g, b, a)
+                .normal(pose, (float) direction.x, (float) direction.y, (float) direction.z)
+                .lineWidth(lineWidth);
+
+        buffer.vertex(pose.getPositionMatrix(), endX, endY, endZ)
+                .color(r, g, b, a)
+                .normal(pose, (float) direction.x, (float) direction.y, (float) direction.z)
+                .lineWidth(lineWidth);
+
+        Layers.lines().draw(buffer.end());
     }
 
     public static void drawVerticalLine(MatrixStack matrices, float x, float y1, float y2, Color color, float width) {

@@ -16,13 +16,13 @@ import org.lwjgl.glfw.GLFW;
 
 public class Freelook extends Module {
 
-    public EnumSetting<CameraMode> mode = sgGeneral.add(new EnumSetting<>("cámara a mover", "elige cual cámara mover con el ratón y cuál se queda estática",
+    public final EnumSetting<CameraMode> mode = sgGeneral.add(new EnumSetting<>("cámara a mover", "elige cual cámara mover con el ratón y cuál se queda estática",
             CameraMode.class, CameraMode.CAMERA));
 
-    public NumberSetting arrowSens = sgGeneral.add(new NumberSetting("sensibilidad de las flechas", "cuánto rotan la cámara estática las flechas (0 para desactivar)",
+    private final NumberSetting arrowSens = sgGeneral.add(new NumberSetting("sensibilidad de las flechas", "cuánto rotan la cámara estática las flechas (0 para desactivar)",
             4, 0, 10, 0.1));
 
-    public NumberSetting mouseSens = sgGeneral.add(new NumberSetting("sensibilidad del ratón", ".",
+    public final NumberSetting mouseSens = sgGeneral.add(new NumberSetting("sensibilidad del ratón", ".",
             0.1, 0, 2, 0.05));
 
     private float yaw;

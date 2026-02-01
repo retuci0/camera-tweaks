@@ -32,6 +32,7 @@ import me.retucio.sputnik.ui.widgets.Button;
 import me.retucio.sputnik.util.*;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.render.DrawUtil;
+import me.retucio.sputnik.util.render.Pipelines;
 import me.retucio.sputnik.util.render.RenderUtil;
 
 import me.retucio.sputnik.util.render.Textures;
@@ -94,7 +95,7 @@ public class Sputnik implements ClientModInitializer {
 
         Lists.init();
 
-        Textures.registerAll();
+        Textures.init();
 
         CapeManager.INSTANCE = new CapeManager();
         EVENT_BUS.post(new LoadCapeManagerEvent());

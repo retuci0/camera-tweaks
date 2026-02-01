@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
  * @see me.retucio.sputnik.mixin.ServerInfoMixin
  */
 
+// https://github.com/emilyy-dev/bypass-resource-pack
 public class RPackBypass extends Module {
 
     public String TAG_NAME = "bypassTextures";

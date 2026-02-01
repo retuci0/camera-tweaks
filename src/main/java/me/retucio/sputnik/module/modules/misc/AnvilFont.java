@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class AnvilFont extends Module {
 
-    public EnumSetting<FontMode> fontMode = sgGeneral.add(new EnumSetting<>("tipografía", "qué tipografía utilizar",
+    private final EnumSetting<FontMode> fontMode = sgGeneral.add(new EnumSetting<>("tipografía", "qué tipografía utilizar",
             FontMode.class, FontMode.NORMAL));
 
     String text;
@@ -136,7 +136,7 @@ public class AnvilFont extends Module {
         }
     }
 
-    public enum FontMode {
+    private enum FontMode {
         NORMAL("normal"),
         UPPERCASE("mayúsculas"),
         CIRCLED("redondo"),

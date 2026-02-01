@@ -17,19 +17,19 @@ import net.minecraft.util.DyeColor;
 
 public class GlintPlus extends Module {
 
-    public BooleanSetting items = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting items = sgGeneral.add(new BooleanSetting(
             "items",
             "modificar el destello de encantamiento de los items",
             true
     ));
 
-    public BooleanSetting armor = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting armor = sgGeneral.add(new BooleanSetting(
             "armadura",
             "modificar el destello de encantamiento de la armadura",
             true
     ));
 
-    public EnumSetting<GlintColors> glintColor = sgGeneral.add(new EnumSetting<>(
+    private final EnumSetting<GlintColors> glintColor = sgGeneral.add(new EnumSetting<>(
             "colores",
             "color del glint",
             GlintColors.class,

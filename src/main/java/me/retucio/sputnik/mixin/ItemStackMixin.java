@@ -1,6 +1,6 @@
 package me.retucio.sputnik.mixin;
 
-import me.retucio.sputnik.event.events.DamageItemEvent;
+import me.retucio.sputnik.event.events.interact.DamageItemEvent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -2,9 +2,11 @@ package me.retucio.sputnik.module;
 
 public enum Category {
 
+    COMBAT("combate"),
     PLAYER("jugador"),
-    WORLD("mundo"),
     MOVEMENT("movimiento"),
+
+    WORLD("mundo"),
 
     CAMERA("cámara"),
     RENDER("renderizado"),

@@ -3,7 +3,7 @@ package me.retucio.sputnik.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.BlockShapeEvent;
+import me.retucio.sputnik.event.events.interact.BlockShapeEvent;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;

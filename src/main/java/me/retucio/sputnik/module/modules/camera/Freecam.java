@@ -2,7 +2,13 @@ package me.retucio.sputnik.module.modules.camera;
 
 import me.retucio.sputnik.event.Stage;
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.*;
+import me.retucio.sputnik.event.events.input.KeyEvent;
+import me.retucio.sputnik.event.events.input.MouseClickEvent;
+import me.retucio.sputnik.event.events.input.MouseScrollEvent;
+import me.retucio.sputnik.event.events.interact.*;
+import me.retucio.sputnik.event.events.network.ChunkOcclusionEvent;
+import me.retucio.sputnik.event.events.network.DisconnectEvent;
+import me.retucio.sputnik.event.events.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -42,22 +48,22 @@ import org.lwjgl.glfw.GLFW;
 public class Freecam extends Module {
 
     // ajustes
-    SettingGroup sgSpeed = addSg(new SettingGroup("velocidad", true));
+    private final SettingGroup sgSpeed = addSg(new SettingGroup("velocidad", true));
 
-    public BooleanSetting toggleOnDamage = sgGeneral.add(new BooleanSetting("desactivar al recibir daño", "desactiva el módulo tras recibir daño", true));
-    public BooleanSetting reloadChunks = sgGeneral.add(new BooleanSetting("recargar chunks", "recargar chunks para arreglar el culling de las cuevas", true));
-    public BooleanSetting renderHands = sgGeneral.add(new BooleanSetting("manos visibles", "decide si se renderizan las manos mientras la cámara esté libre", true));
-    public BooleanSetting stayCrouching = sgGeneral.add(new BooleanSetting("mantenerse agachado", "mantener al jugador agachado tras entrar en el modo de cámara libre", false));
-    public BooleanSetting staticView = sgGeneral.add(new BooleanSetting("visión estática", "desactiva ajustes que muevan la cámara", true));
-    public BooleanSetting cancelActionPackets = sgGeneral.add(new BooleanSetting("cancelar paquetes", "evita flaggear el anticheat al interactuar con bloques / entidades", true));
-    public BooleanSetting blockOutlines = sgGeneral.add(new BooleanSetting("contorno de bloques", "mostrar el contorno de los bloques estando en el modo de cámara libre", true));
+    private final BooleanSetting toggleOnDamage = sgGeneral.add(new BooleanSetting("desactivar al recibir daño", "desactiva el módulo tras recibir daño", true));
+    private final BooleanSetting reloadChunks = sgGeneral.add(new BooleanSetting("recargar chunks", "recargar chunks para arreglar el culling de las cuevas", true));
+    public final BooleanSetting renderHands = sgGeneral.add(new BooleanSetting("manos visibles", "decide si se renderizan las manos mientras la cámara esté libre", true));
+    public final BooleanSetting stayCrouching = sgGeneral.add(new BooleanSetting("mantenerse agachado", "mantener al jugador agachado tras entrar en el modo de cámara libre", false));
+    private final BooleanSetting staticView = sgGeneral.add(new BooleanSetting("visión estática", "desactiva ajustes que muevan la cámara", true));
+    private final BooleanSetting cancelActionPackets = sgGeneral.add(new BooleanSetting("cancelar paquetes", "evita flaggear el anticheat al interactuar con bloques / entidades", true));
+    public final BooleanSetting blockOutlines = sgGeneral.add(new BooleanSetting("contorno de bloques", "mostrar el contorno de los bloques estando en el modo de cámara libre", true));
 
-    public NumberSetting speedSetting = sgSpeed.add(new NumberSetting(
+    private final NumberSetting speedSetting = sgSpeed.add(new NumberSetting(
             "velocidad", "velocidad de movimiento de la cámara",
             1, 0, 10, 0.2));
 
-    public KeySetting scrollKey = sgSpeed.add(new KeySetting("tecla del scroll", "tecla a mantener pulsada para cambiar velocidad con el scroll", GLFW.GLFW_KEY_LEFT_CONTROL));
-    public NumberSetting scrollSens = sgSpeed.add(new NumberSetting(
+    private final KeySetting scrollKey = sgSpeed.add(new KeySetting("tecla del scroll", "tecla a mantener pulsada para cambiar velocidad con el scroll", GLFW.GLFW_KEY_LEFT_CONTROL));
+    private final NumberSetting scrollSens = sgSpeed.add(new NumberSetting(
             "sensibilidad del scroll", "sensibilidad de la rueda del ratón para modificar la velocidad, 0 para desactivar",
             1, 0, 2, 0.1));
 
@@ -198,7 +204,7 @@ public class Freecam extends Module {
     }
 
     @SubscribeEvent
-    public void onSendPacket(PacketEvent.Send event) {
+    private void onSendPacket(PacketEvent.Send event) {
         if (!isEnabled() || !cancelActionPackets.getValue()) return;
         if (event.getStage() != Stage.PRE) return;
 
@@ -212,7 +218,7 @@ public class Freecam extends Module {
     }
 
     @SubscribeEvent
-    public void onKey(KeyEvent event) {
+    private void onKey(KeyEvent event) {
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
         if (mc.currentScreen != null) return;
 
@@ -245,7 +251,7 @@ public class Freecam extends Module {
     }
 
     @SubscribeEvent
-    public void onMouseClick(MouseClickEvent event) {  // por si el restrasado del usuario usa el ratón para moverse
+    private void onMouseClick(MouseClickEvent event) {  // por si el restrasado del usuario usa el ratón para moverse
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
         if (mc.currentScreen != null) return;
 
@@ -279,7 +285,7 @@ public class Freecam extends Module {
 
     @SubscribeEvent
     private void onMouseScroll(MouseScrollEvent event) {
-        if (scrollSens.getValue() > 0 && mc.currentScreen == null && KeyUtil.isKeyDown(scrollKey.getValue())) {
+        if (scrollSens.getValue() > 0 && mc.currentScreen == null && scrollKey.isDown()) {
             speed += event.getVertical() / 4 * (scrollSens.getValue() * speed);
             if (speed < 0.1) speed = 0.1;
             event.cancel();
@@ -292,12 +298,12 @@ public class Freecam extends Module {
     }
 
     @SubscribeEvent
-    public void onLeaveGame(DisconnectEvent event) {
+    private void onLeaveGame(DisconnectEvent event) {
         toggle();
     }
 
     @SubscribeEvent
-    public void onPacketReceive(PacketEvent.Receive event) {
+    private void onPacketReceive(PacketEvent.Receive event) {
         if (mc.player == null) return;  // el jugador probablemente nunca sea nulo bajo estas circunstancias pero quién sabe
 
         if (event.getPacket() instanceof DeathMessageS2CPacket packet) {
@@ -312,7 +318,7 @@ public class Freecam extends Module {
     }
 
     @SubscribeEvent
-    public void onOpenScreen(OpenScreenEvent event) {
+    private void onOpenScreen(OpenScreenEvent event) {
         unpress();
         stopMoving();
         prevPos.set(pos);
@@ -323,22 +329,22 @@ public class Freecam extends Module {
     // los paquetes ya se cancelan, pero visualmente estos eventos se siguen dando
 
     @SubscribeEvent
-    public void onBreakBlock(BreakBlockEvent event) {
+    private void onBreakBlock(BreakBlockEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }
 
     @SubscribeEvent
-    public void onPlaceBlock(PlaceBlockEvent event) {
+    private void onPlaceBlock(PlaceBlockEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }
 
     @SubscribeEvent
-    public void onInteractEntity(InteractEntityEvent event) {
+    private void onInteractEntity(InteractEntityEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }
 
     @SubscribeEvent
-    public void onAttack(AttackEntityEvent event) {
+    private void onAttack(AttackEntityEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }
 

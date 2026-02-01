@@ -19,36 +19,36 @@ import me.retucio.sputnik.util.ChatUtil;
 
 public class DiscordRPC extends Module {
 
-    SettingGroup sgImage = addSg(new SettingGroup("imágenes", false));
-    SettingGroup sgButton = addSg(new SettingGroup("botón", false));
+    private final SettingGroup sgImage = addSg(new SettingGroup("imágenes", false));
+    private final SettingGroup sgButton = addSg(new SettingGroup("botón", false));
 
 
     // general
 
-    public StringSetting details = sgGeneral.add(new StringSetting(
+    private final StringSetting details = sgGeneral.add(new StringSetting(
             "detalles", "título",
             "usando el mod de putas de retucio",
             40
     ));
 
-    public StringSetting state = sgGeneral.add(new StringSetting(
+    private final StringSetting state = sgGeneral.add(new StringSetting(
             "estado", "subtítulo",
             "(se lo está pasando en grande)",
             40
     ));
 
-    public StringSetting startTimestamp = sgGeneral.add(new StringSetting(
+    private final StringSetting startTimestamp = sgGeneral.add(new StringSetting(
             "sello de tiempo", "sello de tiempo del comienzo de la actividad, siguiendo el unix epoch (dejar vacío para ahora)",
             "",
             20
     ));
 
-    public EnumSetting<ActivityTypes> activityType = sgGeneral.add(new EnumSetting<>(
+    private final EnumSetting<ActivityTypes> activityType = sgGeneral.add(new EnumSetting<>(
             "tipo de actividad", "qué tipo de actividad se está llevando a cabo",
             ActivityTypes.class, ActivityTypes.PLAYING
     ));
 
-    public StringSetting appId = sgGeneral.add(new StringSetting(
+    private final StringSetting appId = sgGeneral.add(new StringSetting(
             "id del bot", "id del bot a usar (obtener de discord.dev)",
             "1314254766150258729", 20
     ));
@@ -56,25 +56,25 @@ public class DiscordRPC extends Module {
 
     // imágenes
 
-    public StringSetting largeImageKey = sgImage.add(new StringSetting(
+    private final StringSetting largeImageKey = sgImage.add(new StringSetting(
             "imagen grande", "clave de la imagen grande",
             "pengiun",
             40
     ));
 
-    public StringSetting largeImageText = sgImage.add(new StringSetting(
+    private final StringSetting largeImageText = sgImage.add(new StringSetting(
             "texto de la imagen grande", "texto mostrado junto a la imagen grande",
             "pengüino",
             40
     ));
 
-    public StringSetting smallImageKey = sgImage.add(new StringSetting(
+    private final StringSetting smallImageKey = sgImage.add(new StringSetting(
             "imagen pequeña", "clave de la imagen pequeña",
             "pengiun",
             40
     ));
 
-    public StringSetting smallImageText = sgImage.add(new StringSetting(
+    private final StringSetting smallImageText = sgImage.add(new StringSetting(
             "texto de la imagen pequeña", "texto mostrado junto a la imagen pequeña",
             "pengüino",
             40
@@ -83,13 +83,13 @@ public class DiscordRPC extends Module {
 
     // botón
 
-    public StringSetting buttonText = sgButton.add(new StringSetting(
+    private final StringSetting buttonText = sgButton.add(new StringSetting(
             "texto del botón", "texto a mostrar en el botón",
             "hola",
             20
     ));
 
-    public StringSetting buttonUrl = sgButton.add(new StringSetting(
+    private final StringSetting buttonUrl = sgButton.add(new StringSetting(
             "url del botón", "rickroll en gran 26 :wilted_rose:",
             "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
             20
@@ -192,7 +192,7 @@ public class DiscordRPC extends Module {
         }
     }
 
-    public void reload() {
+    private void reload() {
         if (initialized && isEnabled()) {
             rpc.shutdown();
             try {
@@ -219,7 +219,7 @@ public class DiscordRPC extends Module {
         return timestamp / 1000;
     }
 
-    public enum ActivityTypes {
+    private enum ActivityTypes {
         PLAYING("jugando"),
         STREAMING("streameando"),
         LISTENING("escuchando"),

@@ -5,9 +5,9 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.ClientClickEvent;
-import me.retucio.sputnik.event.events.ReceiveMessageEvent;
-import me.retucio.sputnik.event.events.SendMessageEvent;
+import me.retucio.sputnik.event.events.input.ClientClickEvent;
+import me.retucio.sputnik.event.events.network.ReceiveMessageEvent;
+import me.retucio.sputnik.event.events.network.SendMessageEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -46,15 +46,15 @@ public class ChatPlus extends Module {
     // ajustes
     SettingGroup sgChat = addSg(new SettingGroup("funcionamiento del chat", true));
 
-    public BooleanSetting timestamps = sgGeneral.add(new BooleanSetting("sello de tiempo", "muestra a qué hora se ha enviado un mensaje", true));
-    public BooleanSetting timestampSecs = sgGeneral.add(new BooleanSetting("mostrar segundos", "muestra segundos también en el sello de tiempo", false));
-    public BooleanSetting showHeads = sgGeneral.add(new BooleanSetting("cabezas", "muestra la cabeza del jugador junto a su mensaje", true));
+    private final BooleanSetting timestamps = sgGeneral.add(new BooleanSetting("sello de tiempo", "muestra a qué hora se ha enviado un mensaje", true));
+    private final BooleanSetting timestampSecs = sgGeneral.add(new BooleanSetting("mostrar segundos", "muestra segundos también en el sello de tiempo", false));
+    public final BooleanSetting showHeads = sgGeneral.add(new BooleanSetting("cabezas", "muestra la cabeza del jugador junto a su mensaje", true));
 
-    public BooleanSetting coordsProtection = sgChat.add(new BooleanSetting("proteger coordenadas", "evitar enviar coordenadas por el chat", true));
-    public BooleanSetting keepHistory = sgChat.add(new BooleanSetting("no borrar chat", "no borrar el chat tras desconectarse", true));
-    public BooleanSetting logger = sgChat.add(new BooleanSetting("registro", "evita que se borre el chat de un server", true));
-    public BooleanSetting noCharLimit = sgChat.add(new BooleanSetting("quitar límite de caracteres", "te deja escribir mensajes tan largos como desees", false));
-    public NumberSetting chatHistoryExtraLength = sgChat.add(new NumberSetting("expandir chat", "cuántas líneas añadir al historial del chat",
+    private final BooleanSetting coordsProtection = sgChat.add(new BooleanSetting("proteger coordenadas", "evitar enviar coordenadas por el chat", true));
+    public final BooleanSetting keepHistory = sgChat.add(new BooleanSetting("no borrar chat", "no borrar el chat tras desconectarse", true));
+    private final BooleanSetting logger = sgChat.add(new BooleanSetting("registro", "evita que se borre el chat de un server", true));
+    public final BooleanSetting noCharLimit = sgChat.add(new BooleanSetting("quitar límite de caracteres", "te deja escribir mensajes tan largos como desees", false));
+    public final NumberSetting chatHistoryExtraLength = sgChat.add(new NumberSetting("expandir chat", "cuántas líneas añadir al historial del chat",
             0, 0, 1000, 1));
 
     public ChatPlus()  {
@@ -68,6 +68,7 @@ public class ChatPlus extends Module {
     }
 
     public final IntList lines = new IntArrayList();
+
     private record CustomHeadEntry(String prefix, Identifier texture) {}
     private static final List<CustomHeadEntry> CUSTOM_HEAD_ENTRIES = new ArrayList<>();
     private SimpleDateFormat dateFormat;
@@ -78,7 +79,7 @@ public class ChatPlus extends Module {
     private static final Pattern coordRegex = Pattern.compile("(?<x>-?\\d{3,}(?:\\.\\d*)?)(?:\\s+(?<y>-?\\d{1,3}(?:\\.\\d*)?))?\\s+(?<z>-?\\d{3,}(?:\\.\\d*)?)");
 
     @SubscribeEvent
-    public void onReceiveMessage(ReceiveMessageEvent event) {
+    private void onReceiveMessage(ReceiveMessageEvent event) {
         Text message = event.getMessage();
 
         // registrar mensajes para evitar su eliminación
@@ -126,7 +127,7 @@ public class ChatPlus extends Module {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    public void beforeDrawMessage(DrawContext context, ChatHudLine.Visible line, int y, int color) {
+    private void beforeDrawMessage(DrawContext context, ChatHudLine.Visible line, int y, int color) {
         if (!isEnabled() || !showHeads.getValue()) return;
 
         // dibujar la cabeza al principio del mensaje

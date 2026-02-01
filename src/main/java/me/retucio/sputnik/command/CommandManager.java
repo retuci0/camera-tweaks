@@ -32,17 +32,21 @@ public class CommandManager {
 
     public static void registerCommands() {
         addCommand(new BindCommand());
+        addCommand(new ClickSlotCommand());
         addCommand(new ConfigCommand());
         addCommand(new CopyScreenshotCommand());
         addCommand(new EnderChestCommand());
         addCommand(new GarbageCleanerCommand());
         addCommand(new PeekCommand());
+        addCommand(new PluginsCommand());
         addCommand(new PrefixCommand());
         addCommand(new PurgeCommand());
+        addCommand(new RepeatCommand());
         addCommand(new SaveScreenshotCommand());
         addCommand(new SendCommand());
         addCommand(new SpectateCommand());
         addCommand(new ToggleCommand());
+        addCommand(new WaitCommand());
 
         commands.sort(Comparator.comparing(Command::getName));
 

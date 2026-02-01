@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin;
 
-import me.retucio.sputnik.event.events.MouseClickEvent;
-import me.retucio.sputnik.event.events.MouseScrollEvent;
+import me.retucio.sputnik.event.events.input.MouseClickEvent;
+import me.retucio.sputnik.event.events.input.MouseScrollEvent;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.input.MouseInput;
 import org.spongepowered.asm.mixin.Mixin;

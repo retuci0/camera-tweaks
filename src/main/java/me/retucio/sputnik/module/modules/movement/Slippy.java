@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class Slippy extends Module {
 
-    public NumberSetting slipperiness = sgGeneral.add(new NumberSetting(
+    private final NumberSetting slipperiness = sgGeneral.add(new NumberSetting(
             "cantidad de semen",
             "cuánto semen agregar a los bloques por los que pasas",
             1,

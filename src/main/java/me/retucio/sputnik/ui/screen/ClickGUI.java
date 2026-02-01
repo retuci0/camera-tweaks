@@ -2,9 +2,9 @@ package me.retucio.sputnik.ui.screen;
 
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.KeyEvent;
-import me.retucio.sputnik.event.events.MouseClickEvent;
-import me.retucio.sputnik.event.events.MouseScrollEvent;
+import me.retucio.sputnik.event.events.input.KeyEvent;
+import me.retucio.sputnik.event.events.input.MouseClickEvent;
+import me.retucio.sputnik.event.events.input.MouseScrollEvent;
 import me.retucio.sputnik.event.events.sputnik.SettingsFrameEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;

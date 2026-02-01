@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.render;
 
 import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.Render3DEvent;
+import me.retucio.sputnik.event.events.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -14,24 +14,25 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
+import org.jspecify.annotations.NonNull;
 
 import java.awt.*;
 
 public class BreakingProgress extends Module {
 
-    SettingGroup sgOulines = addSg(new SettingGroup("contorno", true));
-    SettingGroup sgFilling = addSg(new SettingGroup("relleno", true));
+    private final SettingGroup sgOulines = addSg(new SettingGroup("contorno", true));
+    private final SettingGroup sgFilling = addSg(new SettingGroup("relleno", true));
 
-    public EnumSetting<BreakMode> breakMode = sgGeneral.add(new EnumSetting<>("modo de minado", "elige si el cubo se encoge o se dilata",
+    private final EnumSetting<BreakMode> breakMode = sgGeneral.add(new EnumSetting<>("modo de minado", "elige si el cubo se encoge o se dilata",
             BreakMode.class, BreakMode.INWARDS));
 
-    public BooleanSetting outlines = sgOulines.add(new BooleanSetting("contorno", "renderizar contorno", true));
-    public ColorSetting outlineColor = sgOulines.add(new ColorSetting("color del contorno", "color del contorno",
+    private final BooleanSetting outlines = sgOulines.add(new BooleanSetting("contorno", "renderizar contorno", true));
+    private final ColorSetting outlineColor = sgOulines.add(new ColorSetting("color del contorno", "color del contorno",
             new Color(0, 255, 0, 200), false));
-    public NumberSetting lineWidth = sgOulines.add(new NumberSetting("grosor de línea", "grosor de las líneas del contorno", 1, 1, 5, 0.1));
+    private final NumberSetting lineWidth = sgOulines.add(new NumberSetting("grosor de línea", "grosor de las líneas del contorno", 1, 1, 5, 0.1));
 
-    public BooleanSetting fillings = sgFilling.add(new BooleanSetting("relleno", "renderizar relleno", true));
-    public ColorSetting fillingColor = sgFilling.add(new ColorSetting("color del relleno", "color del relleno",
+    private final BooleanSetting fillings = sgFilling.add(new BooleanSetting("relleno", "renderizar relleno", true));
+    private final ColorSetting fillingColor = sgFilling.add(new ColorSetting("color del relleno", "color del relleno",
             new Color(0, 255, 0, 60), false));
 
 
@@ -42,7 +43,7 @@ public class BreakingProgress extends Module {
     }
 
     @SubscribeEvent
-    public void onRenderWorld(Render3DEvent event) {
+    private void onRenderWorld(Render3DEvent event) {
         if (mc.interactionManager == null || mc.world == null) return;
         if (!(mc.crosshairTarget instanceof BlockHitResult hitResult)) return;
         BlockPos pos = hitResult.getBlockPos();
@@ -60,6 +61,13 @@ public class BreakingProgress extends Module {
                 ? 1f - progress
                 : progress;
 
+        Box scaledBox = scaleBox(box, shrinkFactor);
+
+        if (outlines.getValue()) RenderUtil.drawOutlineBox(event.getMatrices(), scaledBox, outlineColor.getValue(), lineWidth.getFloatValue(), false);
+        if (fillings.getValue()) RenderUtil.drawFilledBox(event.getMatrices(), scaledBox, fillingColor.getValue(), false);
+    }
+
+    private static Box scaleBox(Box box, float shrinkFactor) {
         double centerX = (box.minX + box.maxX) / 2;
         double centerY = (box.minY + box.maxY) / 2;
         double centerZ = (box.minZ + box.maxZ) / 2;
@@ -68,16 +76,13 @@ public class BreakingProgress extends Module {
         double shrunkY = (box.maxY - box.minY) / 2 * shrinkFactor;
         double shrunkZ = (box.maxZ - box.minZ) / 2 * shrinkFactor;
 
-        Box scaledBox = new Box(
+        return new Box(
                 centerX - shrunkX, centerY - shrunkY, centerZ - shrunkZ,
                 centerX + shrunkX, centerY + shrunkZ, centerZ + shrunkZ
         );
-
-        if (outlines.getValue()) RenderUtil.drawOutlineBox(event.getMatrices(), scaledBox, outlineColor.getValue(), lineWidth.getFloatValue(), false);
-        if (fillings.getValue()) RenderUtil.drawFilledBox(event.getMatrices(), scaledBox, fillingColor.getValue(), false);
     }
 
-    public enum BreakMode {
+    private enum BreakMode {
         INWARDS("para dentro"),
         OUTWARDS("para fuera");
 

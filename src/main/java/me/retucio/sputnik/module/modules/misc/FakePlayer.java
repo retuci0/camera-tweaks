@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class FakePlayer extends Module {
 
-    public StringSetting name = sgGeneral.add(new StringSetting("nombre", "qué nombre asignarle al jugador", "apio boy", 22));
+    private final StringSetting name = sgGeneral.add(new StringSetting("nombre", "qué nombre asignarle al jugador", "apio boy", 22));
 
     private OtherClientPlayerEntity player = null;
 

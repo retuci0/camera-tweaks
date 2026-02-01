@@ -1,6 +1,9 @@
 package me.retucio.sputnik.util;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.Sputnik;
+import me.retucio.sputnik.command.Command;
+import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.sputnik.LoadModuleManagerEvent;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
@@ -17,6 +20,20 @@ public class ChatUtil {
     @SubscribeEvent
     public static void onLoadModuleManager(LoadModuleManagerEvent event) {
         prefix = Colors.getFormatting(Colors.mainColor) + "[" + ClientSettingsFrame.guiSettings.chatName.getValue() + "] ";
+    }
+
+    public static void simulateChatMessage(String message) {
+        if (message.startsWith("/")) {
+            mc.player.networkHandler.sendChatCommand(message.substring(1));
+        } else if (message.startsWith(CommandManager.INSTANCE.getPrefix())) {
+            try {
+                CommandManager.dispatch(message.substring(CommandManager.INSTANCE.getPrefix().length()));
+            } catch (CommandSyntaxException e) {
+                ChatUtil.error(e.getMessage());
+            }
+        } else {
+            mc.player.networkHandler.sendChatMessage(message);
+        }
     }
 
 

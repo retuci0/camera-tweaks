@@ -17,8 +17,8 @@ import java.util.Random;
 
 public class Particles extends Module {
 
-    SettingGroup sgDispersion = addSg(new SettingGroup("dispersión", true));
-    SettingGroup sgOffset = addSg(new SettingGroup("desplazamiento", true));
+    private final SettingGroup sgDispersion = addSg(new SettingGroup("dispersión", true));
+    private final SettingGroup sgOffset = addSg(new SettingGroup("desplazamiento", true));
 
     List<SimpleParticleType> particleList = Lists.particleList.stream()
             .filter(particleType -> particleType instanceof SimpleParticleType)
@@ -27,10 +27,10 @@ public class Particles extends Module {
 
     Map<SimpleParticleType, String> particleNames = Lists.getMapOfLists(particleList,
             particleList.stream().map(particle -> Text.translatable(
-                    Registries.PARTICLE_TYPE.getId(particle).toShortTranslationKey()).getString()
-            ).toList());
+                    Registries.PARTICLE_TYPE.getId(particle).toShortTranslationKey()).getString())
+                    .toList());
 
-    public ListSetting<SimpleParticleType> particles = sgGeneral.add(new ListSetting<>(
+    private final ListSetting<SimpleParticleType> particles = sgGeneral.add(new ListSetting<>(
             "partículas",
             "partículas a generar",
             particleList,
@@ -38,83 +38,80 @@ public class Particles extends Module {
             particleNames
     ));
 
-    public NumberSetting spawnInterval = sgGeneral.add(new NumberSetting(
+    private final NumberSetting spawnInterval = sgGeneral.add(new NumberSetting(
             "intervalo",
             "intervalo entre generaciones (en ticks)",
             4, 1, 100, 1
     ));
 
-    public NumberSetting particleCount = sgGeneral.add(new NumberSetting(
+    private final NumberSetting particleCount = sgGeneral.add(new NumberSetting(
             "cantidad",
             "partículas por generación",
             10, 1, 100, 1
     ));
 
 
-    public NumberSetting velocity = sgDispersion.add(new NumberSetting(
+    private final NumberSetting velocity = sgDispersion.add(new NumberSetting(
             "velocidad",
             "multiplicador de la velocidad de dispersión",
             0.2, 0, 2, 0.05
     ));
 
-    public NumberSetting spreadX = sgDispersion.add(new NumberSetting(
+    private final NumberSetting spreadX = sgDispersion.add(new NumberSetting(
             "dispersión X",
             "dispersión horizontal de posición",
             0.5, 0, 5, 0.1
     ));
 
-    public NumberSetting spreadY = sgDispersion.add(new NumberSetting(
+    private final NumberSetting spreadY = sgDispersion.add(new NumberSetting(
             "dispersión Y",
             "dispersión vertical de posición",
             0.5, 0, 5, 0.1
     ));
 
-    public NumberSetting spreadZ = sgDispersion.add(new NumberSetting(
+    private final NumberSetting spreadZ = sgDispersion.add(new NumberSetting(
             "dispersión Z",
             "dispersión de profundidad de posición",
             0.5, 0, 5, 0.1
     ));
 
-    public NumberSetting velocityRandomness = sgDispersion.add(new NumberSetting(
+    private final NumberSetting velocityRandomness = sgDispersion.add(new NumberSetting(
             "aleatoriedad velocidad",
             "variación aleatoria en la velocidad",
             0.3, 0, 1, 0.05
     ));
 
-    public NumberSetting positionRandomness = sgDispersion.add(new NumberSetting(
+    private final NumberSetting positionRandomness = sgDispersion.add(new NumberSetting(
             "aleatoriedad posición",
             "variación aleatoria en la posición",
             0.2, 0, 1, 0.05
     ));
 
 
-    public NumberSetting offsetX = sgOffset.add(new NumberSetting(
+    private final NumberSetting offsetX = sgOffset.add(new NumberSetting(
             "desplazamiento pos. X",
             "desplazamiento en el eje X respecto al jugador",
             0, -1, 1, 0.01
     ));
 
-    public NumberSetting offsetY = sgOffset.add(new NumberSetting(
+    private final NumberSetting offsetY = sgOffset.add(new NumberSetting(
             "desplazamiento pos. Y",
             "desplazamiento en el eje Y respecto al jugador",
             0, -1, 1, 0.01
     ));
 
-    public NumberSetting offsetZ = sgOffset.add(new NumberSetting(
+    private final NumberSetting offsetZ = sgOffset.add(new NumberSetting(
             "desplazamiento pos. Z",
             "desplazamiento en el eje Z respecto al jugador",
             -0.8, -1, 1, 0.01
     ));
 
-
     private final Random random = new Random();
     private int tickCounter = 0;
-
 
     public Particles() {
         super("partículas", "emite particulas artificiales", Category.RENDER);
     }
-
 
     @Override
     public void onEnable() {

@@ -41,6 +41,10 @@ public class KeySetting extends Setting<Integer> {
         super.setValue(value);
     }
 
+    public boolean isDown() {
+        return KeyUtil.isKeyDown(this.value);
+    }
+
     public String getKeyName() {
         return KeyUtil.getKeyName(value);
     }

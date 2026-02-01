@@ -10,13 +10,13 @@ import org.lwjgl.glfw.GLFW;
 
 public class FastUse extends Module {
 
-    public BooleanSetting items = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting items = sgGeneral.add(new BooleanSetting(
             "items",
             "usar items precozmente",
             true
     ));
 
-    public NumberSetting itemCooldown = sgGeneral.add(new NumberSetting(
+    private final NumberSetting itemCooldown = sgGeneral.add(new NumberSetting(
             "cooldown de items",
             "cooldown para usar items en ticks",
             0,
@@ -26,13 +26,13 @@ public class FastUse extends Module {
     ));
 
 
-    public BooleanSetting blocks = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting blocks = sgGeneral.add(new BooleanSetting(
             "bloques",
             "colocar bloques precozmente",
             true
     ));
 
-    public NumberSetting blockCooldown = sgGeneral.add(new NumberSetting(
+    private final NumberSetting blockCooldown = sgGeneral.add(new NumberSetting(
             "cooldown de bloques",
             "cooldown para colocar bloques en ticks",
             0,
@@ -42,13 +42,13 @@ public class FastUse extends Module {
     ));
 
 
-    public BooleanSetting mining = sgGeneral.add(new BooleanSetting(
+    public final BooleanSetting mining = sgGeneral.add(new BooleanSetting(
             "minar",
             "minar precozmente",
             true
     ));
 
-    public NumberSetting miningCooldown = sgGeneral.add(new NumberSetting(
+    public final NumberSetting miningCooldown = sgGeneral.add(new NumberSetting(
             "cooldown al minar",
             "cooldown entre rotura de bloques en ticks",
             5, 0, 20, 1

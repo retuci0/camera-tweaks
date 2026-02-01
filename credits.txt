@@ -7,6 +7,9 @@ Trouser Streak: https://github.com/etianl/Trouser-Streak
 No More Purple: https://github.com/Pepperoni-Jabroni/NoMorePurple/
 bypass-resource-pack: https://github.com/emilyy-dev/bypass-resource-pack
 elytra-recast: https://github.com/InLieuOfLuna/elytra-recast/
+SpearHax: https://github.com/etianl/spearHax/
+ProjectileTrajectoryPreview: https://github.com/maDU59/ProjectilesTrajectoryPreview
+DupersUnited public addon: https://discord.gg/dupes  |  https://dupers.wtf
 
 probablemente más pero como tengo demencia se me olvida
 si quieres que te acredite o quite tu código de mi mod, mándame un mensaje en discord (username: retucio) y sin problemas :)

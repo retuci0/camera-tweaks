@@ -9,12 +9,12 @@ import me.retucio.sputnik.util.Lists;
 
 public class Fonts extends Module {
 
-    public OptionSetting<String> font = sgGeneral.add(new OptionSetting<>(
+    private final OptionSetting<String> font = sgGeneral.add(new OptionSetting<>(
             "fuente", "fuente a emplear",
             Lists.fontList, "ubuntu")
     );
 
-    public BooleanSetting reload = sgGeneral.add(new BooleanSetting(
+    private final BooleanSetting reload = sgGeneral.add(new BooleanSetting(
        "recargar", "recargar automáticamente",
        false
     ));
@@ -41,5 +41,9 @@ public class Fonts extends Module {
         if (mc.getResourceManager() != null && reload.getValue()) {
             mc.reloadResources();
         }
+    }
+
+    public String getFont() {
+        return font.getValue();
     }
 }

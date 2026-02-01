@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static me.retucio.sputnik.Sputnik.mc;
 
@@ -32,6 +33,19 @@ public class MiscUtil {
         destination.x = source.x;
         destination.y = source.y;
         destination.z = source.z;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getHighest(List<T> list) {
+        if (list.getFirst() == null || !(list.getFirst() instanceof Number value)) return null;
+        Number maxValue = value;
+        for (T t : list) {
+            if (((Number) t).doubleValue() > maxValue.doubleValue()) {
+                maxValue = (Number) t;
+            }
+        }
+
+        return (T) maxValue;
     }
 
     public static String getCurrentFormattedTime() {

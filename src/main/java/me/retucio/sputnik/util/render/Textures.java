@@ -41,7 +41,7 @@ public class Textures {
         return false;
     }
 
-    public static void registerAll() {
+    public static void init() {
         for (Identifier id : textures) {
             register(id);
         }

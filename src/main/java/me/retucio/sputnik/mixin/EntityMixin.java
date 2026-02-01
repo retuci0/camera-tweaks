@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import me.retucio.sputnik.event.events.ChangeRotationEvent;
+import me.retucio.sputnik.event.events.render.ChangeRotationEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.camera.Freelook;
@@ -20,10 +20,8 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -99,6 +97,15 @@ public abstract class EntityMixin {
             if (!damage.equals("0")) return original.copy().append(Text.literal(" (" + damage + ")").formatted(Formatting.RED));
         }
 
+        return original;
+    }
+
+    @ModifyReturnValue(method = "getName", at = @At("RETURN"))
+    private Text showTntPrimeTime(Text original) {
+        if (!nametags.isEnabled() || !nametags.tntPrime.getValue()) return original;
+        if ((Object) this instanceof TntEntity tnt) {
+            return Text.of(nametags.getTntPrimeTime(tnt));
+        }
         return original;
     }
 

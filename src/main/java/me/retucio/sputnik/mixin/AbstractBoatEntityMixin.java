@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.BoatMoveEvent;
+import me.retucio.sputnik.event.events.interact.BoatMoveEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.movement.BoatFly;
 import net.minecraft.entity.MovementType;

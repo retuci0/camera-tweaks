@@ -2,7 +2,7 @@ package me.retucio.sputnik.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.Render2DEvent;
+import me.retucio.sputnik.event.events.render.Render2DEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.misc.ChatPlus;
 import me.retucio.sputnik.module.modules.camera.Freecam;

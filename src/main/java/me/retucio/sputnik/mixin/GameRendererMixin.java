@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin;
 
 
-import me.retucio.sputnik.event.events.GetFOVEvent;
+import me.retucio.sputnik.event.events.render.GetFOVEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.misc.UnfocusedCpu;
@@ -24,7 +24,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
