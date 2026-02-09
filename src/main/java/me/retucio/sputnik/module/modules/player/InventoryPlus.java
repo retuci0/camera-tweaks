@@ -4,7 +4,7 @@ import me.retucio.sputnik.event.Event;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.input.KeyEvent;
 import me.retucio.sputnik.event.events.input.MouseClickEvent;
-import me.retucio.sputnik.mixin.accessor.HandledScreenAccessor;
+import me.retucio.sputnik.mixin.accessors.HandledScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.KeySetting;

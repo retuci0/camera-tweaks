@@ -48,17 +48,11 @@ public class MaceKill extends Module {
 
     @SubscribeEvent
     @SuppressWarnings("ConstantConditions")
-    public void onPacketSend(PacketEvent.Send event) {
+    private void onPacketSend(PacketEvent.Send event) {
         if (mc.player == null) return;
         if (mc.player.getMainHandStack().getItem() == Items.MACE
                 && event.getPacket() instanceof PlayerInteractEntityC2SPacket packet
                 && packet.type.getType() == PlayerInteractEntityC2SPacket.InteractType.ATTACK) {
-
-            // que te follen marcos
-            if (mc.player.getName().getString().equals("Ninjaesqueleto")) {
-                mc.getNetworkHandler().sendChatMessage("ME ENCANTA VER FEMBOYS CON EL PITO PEQUEÑO");
-                return;
-            }
 
             try {
                 if (mc.world.getEntityById(packet.entityId) instanceof LivingEntity target) {

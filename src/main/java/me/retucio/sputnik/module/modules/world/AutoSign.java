@@ -3,7 +3,7 @@ package me.retucio.sputnik.module.modules.world;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
 import me.retucio.sputnik.event.events.network.PacketEvent;
-import me.retucio.sputnik.mixin.accessor.AbstractSignEditScreenAccessor;
+import me.retucio.sputnik.mixin.accessors.AbstractSignEditScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.util.ChatUtil;

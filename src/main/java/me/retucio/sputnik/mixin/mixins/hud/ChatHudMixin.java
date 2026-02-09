@@ -1,0 +1,189 @@
+package me.retucio.sputnik.mixin.mixins.hud;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import me.retucio.sputnik.event.events.network.ReceiveMessageEvent;
+import me.retucio.sputnik.module.ModuleManager;
+import me.retucio.sputnik.module.modules.misc.ChatPlus;
+import me.retucio.sputnik.util.interfaces.IChatHud;
+import me.retucio.sputnik.util.interfaces.IChatHudLine;
+import me.retucio.sputnik.util.interfaces.IChatHudLineVisible;
+import me.retucio.sputnik.util.interfaces.IMessageHandler;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.client.gui.hud.MessageIndicator;
+import net.minecraft.network.message.MessageSignatureData;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
+
+import static me.retucio.sputnik.Sputnik.*;
+
+@Mixin(ChatHud.class)
+public abstract class ChatHudMixin implements IChatHud {
+
+    @Unique
+    private boolean skipOnAddMessage;
+
+    @Unique
+    private int nextId;
+
+    @Unique
+    ChatPlus chatPlus;
+
+    @Shadow @Final
+    private List<ChatHudLine> messages;
+
+    @Shadow @Final
+    private List<ChatHudLine.Visible> visibleMessages;
+
+    @Shadow
+    public abstract void addMessage(Text message);
+
+    @Shadow
+    public abstract void addMessage(Text message, @Nullable MessageSignatureData signatureData, @Nullable MessageIndicator indicator);
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void getModules(MinecraftClient client, CallbackInfo ci) {
+        chatPlus = ModuleManager.INSTANCE.getModuleByClass(ChatPlus.class);
+    }
+
+
+    // métodos relacionados a las interfaces IChatHud, IChatHudLine, IChadHudLineVisible y IMessageHandler
+
+    @Override
+    public void sputnik$add(Text message, int id) {
+        nextId = id;
+        addMessage(message);
+        nextId = 0;
+    }
+
+    @Inject(method = "addVisibleMessage", at = @At(value = "INVOKE", target = "Ljava/util/List;addFirst(Ljava/lang/Object;)V", shift = At.Shift.AFTER))
+    private void onAddMessageAfterNewChatHudLineVisible(ChatHudLine message, CallbackInfo ci) {
+        ((IChatHudLine) (Object) visibleMessages.getFirst()).sputnik$setId(nextId);
+    }
+
+    @Inject(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;addFirst(Ljava/lang/Object;)V", shift = At.Shift.AFTER))
+    private void onAddMessageAfterNewChatHudLine(ChatHudLine message, CallbackInfo ci) {
+        ((IChatHudLine) (Object) messages.getFirst()).sputnik$setId(nextId);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    @ModifyExpressionValue(method = "addVisibleMessage", at = @At(value = "NEW", target = "(ILnet/minecraft/text/OrderedText;Lnet/minecraft/client/gui/hud/MessageIndicator;Z)Lnet/minecraft/client/gui/hud/ChatHudLine$Visible;"))
+    private ChatHudLine.Visible onAddMessage_modifyChatHudLineVisible(ChatHudLine.Visible line, @Local(ordinal = 1) int j) {
+        IMessageHandler handler = (IMessageHandler) mc.getMessageHandler();
+        if (handler == null) return line;
+
+        IChatHudLineVisible iLine = (IChatHudLineVisible) (Object) line;
+
+        iLine.sputnik$setSender(handler.sputnik$getSender());
+        iLine.sputnik$setStartOfEntry(j == 0);
+
+        return line;
+    }
+
+    @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V", at = @At(value = "NEW", target = "(ILnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)Lnet/minecraft/client/gui/hud/ChatHudLine;"))
+    private ChatHudLine onAddMessage_modifyChatHudLine(ChatHudLine line) {
+        IMessageHandler handler = (IMessageHandler) mc.getMessageHandler();
+        if (handler == null) return line;
+
+        ((IChatHudLine) (Object) line).sputnik$setSender(handler.sputnik$getSender());
+        return line;
+    }
+
+    @Override
+    public List<ChatHudLine.Visible> sputnik$getVisibleMessages() {
+        return visibleMessages;
+    }
+
+
+    // modificar contenido del mensaje
+
+    @Inject(at = @At("HEAD"), method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V", cancellable = true)
+    private void onAddMessage(Text message, MessageSignatureData signatureData, MessageIndicator indicator, CallbackInfo ci) {
+        if (skipOnAddMessage) return;
+
+        ReceiveMessageEvent event = EVENT_BUS.post(new ReceiveMessageEvent(message, indicator, nextId));
+
+        if (event.isCancelled()) {
+            ci.cancel();
+        } else {
+            visibleMessages.removeIf(msg -> ((IChatHudLine) (Object) msg).sputnik$getId() == nextId && nextId != 0);
+
+            for (int i = messages.size() - 1; i > -1; i--) {
+                if (((IChatHudLine) (Object) messages.get(i)).sputnik$getId() == nextId && nextId != 0) {
+                    messages.remove(i);
+                    chatPlus.removeLine(i);
+                }
+            }
+
+            if (event.wasModified()) {
+                ci.cancel();
+
+                skipOnAddMessage = true;
+                addMessage(event.getMessage(), signatureData, event.getIndicator());
+                skipOnAddMessage = false;
+            }
+        }
+    }
+
+
+
+    // cabezas
+
+    @ModifyExpressionValue(method = "render(Lnet/minecraft/client/gui/hud/ChatHud$Backend;IIZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;ceil(F)I"))
+    private int onRender_modifyWidth(int width) {
+        return (chatPlus.isEnabled() && chatPlus.showHeads.getValue()) ? width + 10 : width;
+    }
+
+
+    // historial (registro) del chat
+
+    @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "CONSTANT", args = "intValue=100"))
+    private int maxLength(int size) {
+        if (!chatPlus.isEnabled()) return size;
+        return size + chatPlus.chatHistoryExtraLength.getIntValue();
+    }
+
+    @ModifyExpressionValue(method = "addVisibleMessage", at = @At(value = "CONSTANT", args = "intValue=100"))
+    private int maxLengthVisible(int size) {
+        if (!chatPlus.isEnabled()) return size;
+        return size + chatPlus.chatHistoryExtraLength.getIntValue();
+    }
+
+    @Inject(method = "addVisibleMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;isChatFocused()Z"))
+    private void onBreakChatMessageLines(ChatHudLine message, CallbackInfo ci, @Local List<OrderedText> list) {
+        chatPlus.lines.addFirst(list.size());
+    }
+
+    @Inject(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;removeLast()Ljava/lang/Object;"))
+    private void onRemoveMessage(ChatHudLine message, CallbackInfo ci) {
+        int extra = chatPlus.chatHistoryExtraLength.getIntValue();
+        int size = chatPlus.lines.size();
+
+        while (size > 100 + extra) {
+            chatPlus.lines.removeLast();
+            size--;
+        }
+    }
+
+    @Inject(method = "clear", at = @At("HEAD"))
+    private void onClear(boolean clearHistory, CallbackInfo ci) {
+        chatPlus.lines.clear();
+    }
+
+    @Inject(method = "refresh", at = @At("HEAD"))
+    private void onRefresh(CallbackInfo ci) {
+        chatPlus.lines.clear();
+    }
+}

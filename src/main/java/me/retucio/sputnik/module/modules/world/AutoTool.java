@@ -3,7 +3,7 @@ package me.retucio.sputnik.module.modules.world;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.input.KeyEvent;
 import me.retucio.sputnik.event.events.input.MouseClickEvent;
-import me.retucio.sputnik.mixin.accessor.KeyBindingAccessor;
+import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;

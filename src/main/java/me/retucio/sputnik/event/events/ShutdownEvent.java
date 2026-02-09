@@ -1,10 +1,11 @@
 package me.retucio.sputnik.event.events;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.misc.MinecraftClientMixin;
 
 
 /**
- * @see me.retucio.sputnik.mixin.MinecraftClientMixin#onStop
+ * @see MinecraftClientMixin#onStop
  */
 public class ShutdownEvent extends Event {
 

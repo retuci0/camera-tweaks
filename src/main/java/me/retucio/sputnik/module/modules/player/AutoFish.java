@@ -1,21 +1,25 @@
 package me.retucio.sputnik.module.modules.player;
 
-import me.retucio.sputnik.mixin.accessor.FishingBobberEntityAccessor;
+import me.retucio.sputnik.event.SubscribeEvent;
+import me.retucio.sputnik.event.events.interact.SwitchSlotEvent;
+import me.retucio.sputnik.mixin.accessors.FishingBobberEntityAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
+import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 
 import java.util.List;
 
-// todo: catch delay, seleccionar la mejor caña, evitar romper la caña
+// todo: catch delay, seleccionar la mejor caña
 public class AutoFish extends Module {
 
     private final SettingGroup sgRecast = addSg(new SettingGroup("recast", true));
@@ -26,7 +30,6 @@ public class AutoFish extends Module {
             true
     ));
 
-
     private final NumberSetting recastDelay = sgRecast.add(new NumberSetting(
             "delay ",
             "delay entre que se pesca un pez y se vuelve a lanzar la caña",
@@ -35,7 +38,6 @@ public class AutoFish extends Module {
             20,
             1
     ));
-
 
     private final BooleanSetting onlyRecastIfLookingAtWater = sgRecast.add(new BooleanSetting(
             "solo si mirando al agua",
@@ -52,8 +54,15 @@ public class AutoFish extends Module {
             1
     ));
 
+    private final BooleanSetting dontBreak = sgGeneral.add(new BooleanSetting(
+            "evitar romper",
+            "evitar romper la caña si está en las últimas",
+            true
+    ));
+
     private int delay = -1;
     private boolean shouldRecast;
+    private boolean warned;
 
     public AutoFish() {
         super("auto pesca", "pesca por ti", Category.PLAYER);
@@ -64,6 +73,13 @@ public class AutoFish extends Module {
         });
 
         onlyRecastIfLookingAtWater.onUpdate(v -> recastRaycastDistance.setVisible(v));
+    }
+
+    @Override
+    public void onDisable() {
+        delay = -1;
+        shouldRecast = false;
+        warned = false;
     }
 
     @Override
@@ -102,21 +118,38 @@ public class AutoFish extends Module {
         }
     }
 
+    @SubscribeEvent
+    public void onSwitchSlot(SwitchSlotEvent event) {
+        warned = false;
+    }
+
     private void useFishingRod() {
-        switchToFishingRod();
+        int slot = switchToFishingRod();
+        if (slot == -1) return;
+
+        ItemStack rod = mc.player.getInventory().getStack(slot);
+        if (rod.getDamage() >= rod.getMaxDamage() - 1 && dontBreak.getValue()) {
+            if (!warned) {
+                ChatUtil.warn("caña a punto de romperse");
+                warned = true;
+            }
+            return;
+        }
+
         mc.doItemUse();
         delay = 0;
         shouldRecast = false;
     }
 
-    private void switchToFishingRod() {
-        if (mc.player.getActiveItem().isOf(Items.FISHING_ROD)) return;
+    private int switchToFishingRod() {
+        if (mc.player.getActiveItem().isOf(Items.FISHING_ROD)) return mc.player.getInventory().getSelectedSlot();
         List<Integer> slots = InventoryUtil.findItem(Items.FISHING_ROD);
         for (int slot : slots) {
             if (PlayerInventory.isValidHotbarIndex(slot)) {
                 mc.player.getInventory().setSelectedSlot(slot);
-                return;
+                return slot;
             }
         }
+        return -1;
     }
 }

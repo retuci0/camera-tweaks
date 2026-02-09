@@ -9,6 +9,7 @@ import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
+import me.retucio.sputnik.ui.screen.UpdateScreen;
 import org.lwjgl.glfw.GLFW;
 
 // continúa en GameRendererMixin

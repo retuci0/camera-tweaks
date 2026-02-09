@@ -3,13 +3,16 @@ package me.retucio.sputnik.module.modules.render;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.retucio.sputnik.Sputnik;
+import me.retucio.sputnik.mixin.mixins.entity.EntityMixin;
+import me.retucio.sputnik.mixin.mixins.entity.ItemEntityMixin;
+import me.retucio.sputnik.mixin.mixins.player.PlayerEntityMixin;
+import me.retucio.sputnik.mixin.mixins.render.LivingEntityRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
-import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.Lists;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
@@ -34,10 +37,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.EntityMixin
- * @see me.retucio.sputnik.mixin.ItemEntityMixin
- * @see me.retucio.sputnik.mixin.LivingEntityRendererMixin
- * @see me.retucio.sputnik.mixin.PlayerEntityMixin
+ * @see EntityMixin
+ * @see ItemEntityMixin
+ * @see LivingEntityRendererMixin
+ * @see PlayerEntityMixin
  */
 
 public class Nametags extends Module {

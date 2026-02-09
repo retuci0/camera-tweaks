@@ -1,13 +1,14 @@
 package me.retucio.sputnik.event.events.render;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.render.WorldRendererMixin;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 
 
 /**
- * @see me.retucio.sputnik.mixin.WorldRendererMixin#render
+ * @see WorldRendererMixin#render
  */
 public class Render3DEvent extends Event {
 

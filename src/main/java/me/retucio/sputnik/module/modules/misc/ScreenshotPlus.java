@@ -2,6 +2,7 @@ package me.retucio.sputnik.module.modules.misc;
 
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.events.input.ClientClickEvent;
+import me.retucio.sputnik.mixin.mixins.io.ScreenshotRecorderMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -26,7 +27,7 @@ import java.io.IOException;
 
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.ScreenshotRecorderMixin
+ * @see ScreenshotRecorderMixin
  */
 
 public class ScreenshotPlus extends Module {

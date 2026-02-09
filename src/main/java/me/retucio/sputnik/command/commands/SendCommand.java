@@ -3,7 +3,7 @@ package me.retucio.sputnik.command.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
-import me.retucio.sputnik.mixin.accessor.ClientPlayNetworkHandlerAccessor;
+import me.retucio.sputnik.mixin.accessors.ClientPlayNetworkHandlerAccessor;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.encryption.NetworkEncryptionUtils;

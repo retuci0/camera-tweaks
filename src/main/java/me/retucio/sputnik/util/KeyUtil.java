@@ -1,6 +1,6 @@
 package me.retucio.sputnik.util;
 
-import me.retucio.sputnik.mixin.accessor.KeyBindingAccessor;
+import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import org.lwjgl.glfw.GLFW;
@@ -12,8 +12,12 @@ import java.util.Locale;
 
 import static me.retucio.sputnik.Sputnik.mc;
 
-// cosas útiles relacionadas a las teclas
+// cosas útiles relacionadas con las teclas
 public class KeyUtil {
+
+    public static int getKeyAction(int key) {
+        return GLFW.glfwGetKey(mc.getWindow().getHandle(), key);
+    }
 
     public static boolean isKeyDown(int key) {
         return GLFW.glfwGetKey(

@@ -1,5 +1,9 @@
 package me.retucio.sputnik.module.modules.render;
 
+import me.retucio.sputnik.mixin.mixins.hud.InGameHudMixin;
+import me.retucio.sputnik.mixin.mixins.network.ClientPlayNetworkHandlerMixin;
+import me.retucio.sputnik.mixin.mixins.render.*;
+import me.retucio.sputnik.mixin.mixins.world.ParticleManagerMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -11,16 +15,16 @@ import net.minecraft.particle.ParticleType;
 import net.minecraft.util.Formatting;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.ClientPlayNetworkHandlerMixin
- * @see me.retucio.sputnik.mixin.FogRendererMixin
- * @see me.retucio.sputnik.mixin.GameRendererMixin
- * @see me.retucio.sputnik.mixin.InGameHudMixin
- * @see me.retucio.sputnik.mixin.InGameOverlayRendererMixin
- * @see me.retucio.sputnik.mixin.ParticleManagerMixin
- * @see me.retucio.sputnik.mixin.StatusEffectFogModifierMixin
- * @see me.retucio.sputnik.mixin.StuckArrowsFeatureRendererMixin
- * @see me.retucio.sputnik.mixin.TextRendererDrawerMixin
- * @see me.retucio.sputnik.mixin.WeatherRenderingMixin
+ * @see ClientPlayNetworkHandlerMixin
+ * @see FogRendererMixin
+ * @see GameRendererMixin
+ * @see InGameHudMixin
+ * @see InGameOverlayRendererMixin
+ * @see ParticleManagerMixin
+ * @see StatusEffectFogModifierMixin
+ * @see StuckArrowsFeatureRendererMixin
+ * @see TextRendererDrawerMixin
+ * @see WeatherRenderingMixin
  */
 
 public class NoRender extends Module {

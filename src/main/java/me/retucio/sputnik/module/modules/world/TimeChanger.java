@@ -2,6 +2,8 @@ package me.retucio.sputnik.module.modules.world;
 
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.network.PacketEvent;
+import me.retucio.sputnik.mixin.mixins.render.SkyRendererMixin;
+import me.retucio.sputnik.mixin.mixins.world.ClientWorldPropertiesMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -12,8 +14,8 @@ import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.ClientWorldPropertiesMixin
- * @see me.retucio.sputnik.mixin.SkyRendererMixin
+ * @see ClientWorldPropertiesMixin
+ * @see SkyRendererMixin
  */
 
 public class TimeChanger extends Module {

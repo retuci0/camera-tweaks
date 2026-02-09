@@ -1,10 +1,11 @@
 package me.retucio.sputnik.event.events.input;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.io.MouseMixin;
 
 
 /**
- * @see me.retucio.sputnik.mixin.MouseMixin#onMouseScroll
+ * @see MouseMixin#onMouseScroll
  */
 public class MouseScrollEvent extends Event {
 

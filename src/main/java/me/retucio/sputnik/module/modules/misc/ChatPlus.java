@@ -8,6 +8,10 @@ import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.input.ClientClickEvent;
 import me.retucio.sputnik.event.events.network.ReceiveMessageEvent;
 import me.retucio.sputnik.event.events.network.SendMessageEvent;
+import me.retucio.sputnik.mixin.mixins.hud.ChatHudMixin;
+import me.retucio.sputnik.mixin.mixins.hud.InGameHudMixin;
+import me.retucio.sputnik.mixin.mixins.misc.StringHelperMixin;
+import me.retucio.sputnik.mixin.mixins.screen.ChatScreenMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -35,10 +39,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.ChatHudMixin
- * @see me.retucio.sputnik.mixin.ChatScreenMixin
- * @see me.retucio.sputnik.mixin.InGameHudMixin
- * @see me.retucio.sputnik.mixin.StringHelperMixin
+ * @see ChatHudMixin
+ * @see ChatScreenMixin
+ * @see InGameHudMixin
+ * @see StringHelperMixin
  */
 
 public class ChatPlus extends Module {

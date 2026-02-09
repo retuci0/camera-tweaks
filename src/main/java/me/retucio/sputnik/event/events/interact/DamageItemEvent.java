@@ -1,11 +1,12 @@
 package me.retucio.sputnik.event.events.interact;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.item.ItemStackMixin;
 import net.minecraft.item.ItemStack;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ItemStackMixin#onDamage
+ * @see ItemStackMixin#onDamage
  */
 public class DamageItemEvent extends Event {
 

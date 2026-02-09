@@ -3,7 +3,7 @@ package me.retucio.sputnik.util;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.network.DisconnectEvent;
 import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
-import me.retucio.sputnik.mixin.accessor.KeyBindingAccessor;
+import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.ComponentType;
@@ -36,7 +36,7 @@ public class InventoryUtil {
 
     private static Inventory echestInv;
 
-    public static ItemStack getStackOfItem(Item item) {
+    public static ItemStack getStackOf(Item item) {
         if (mc.player == null) return null;
         for (ItemStack stack : mc.player.getInventory())
             if (stack.getItem() == item)

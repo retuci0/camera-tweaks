@@ -1,10 +1,11 @@
 package me.retucio.sputnik.event.events.network;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.network.ClientPlayNetworkHandlerMixin;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ClientPlayNetworkHandlerMixin#onSendMessage
+ * @see ClientPlayNetworkHandlerMixin#onSendMessage
  */
 public class SendMessageEvent extends Event {
 

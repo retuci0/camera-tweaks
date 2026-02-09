@@ -1,6 +1,7 @@
 package me.retucio.sputnik.event.events.render;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.hud.BossBarHudMixin;
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.text.Text;
 
@@ -8,9 +9,9 @@ import java.util.Iterator;
 
 
 /**
- * @see me.retucio.sputnik.mixin.BossBarHudMixin#modifyBossBarIterator
- * @see me.retucio.sputnik.mixin.BossBarHudMixin#modifyBossBarName
- * @see me.retucio.sputnik.mixin.BossBarHudMixin#modifySpacingConstant
+ * @see BossBarHudMixin#modifyBossBarIterator
+ * @see BossBarHudMixin#modifyBossBarName
+ * @see BossBarHudMixin#modifySpacingConstant
  */
 public class RenderBossbarEvent {
 

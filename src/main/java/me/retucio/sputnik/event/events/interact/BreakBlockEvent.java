@@ -1,11 +1,12 @@
 package me.retucio.sputnik.event.events.interact;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
 import net.minecraft.util.math.BlockPos;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ClientPlayerInteractionManagerMixin#onBlockBreak
+ * @see ClientPlayerInteractionManagerMixin#onBlockBreak
  */
 public class BreakBlockEvent extends Event {
 

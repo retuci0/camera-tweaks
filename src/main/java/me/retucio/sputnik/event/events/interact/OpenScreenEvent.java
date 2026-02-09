@@ -1,11 +1,12 @@
 package me.retucio.sputnik.event.events.interact;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.misc.MinecraftClientMixin;
 import net.minecraft.client.gui.screen.Screen;
 
 
 /**
- * @see me.retucio.sputnik.mixin.MinecraftClientMixin#onOpenScreen
+ * @see MinecraftClientMixin#onOpenScreen
  */
 public class OpenScreenEvent extends Event {
 

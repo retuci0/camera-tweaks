@@ -1,9 +1,10 @@
 package me.retucio.sputnik.event.events.network;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.world.ChunkOcclusionDataBuilderMixin;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ChunkOcclusionDataBuilderMixin#onChunkOcclusion
+ * @see ChunkOcclusionDataBuilderMixin#onChunkOcclusion
  */
 public class ChunkOcclusionEvent extends Event {}

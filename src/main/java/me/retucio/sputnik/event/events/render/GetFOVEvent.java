@@ -1,10 +1,11 @@
 package me.retucio.sputnik.event.events.render;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.render.GameRendererMixin;
 
 
 /**
- * @see me.retucio.sputnik.mixin.GameRendererMixin#modifyFov
+ * @see GameRendererMixin#modifyFov
  */
 public class GetFOVEvent extends Event {
 

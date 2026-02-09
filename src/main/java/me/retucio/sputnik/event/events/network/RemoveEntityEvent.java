@@ -1,11 +1,12 @@
 package me.retucio.sputnik.event.events.network;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.world.ClientWorldMixin;
 import net.minecraft.entity.Entity;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ClientWorldMixin#onRemoveEntity
+ * @see ClientWorldMixin#onRemoveEntity
  */
 public class RemoveEntityEvent extends Event {
 

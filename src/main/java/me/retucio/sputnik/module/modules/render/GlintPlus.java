@@ -1,5 +1,8 @@
 package me.retucio.sputnik.module.modules.render;
 
+import me.retucio.sputnik.mixin.mixins.render.BufferStorageMixin;
+import me.retucio.sputnik.mixin.mixins.render.EquipmentRendererMixin;
+import me.retucio.sputnik.mixin.mixins.render.ItemRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -10,9 +13,9 @@ import net.minecraft.client.render.RenderLayers;
 import net.minecraft.util.DyeColor;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.BufferStorageMixin
- * @see me.retucio.sputnik.mixin.EquipmentRendererMixin
- * @see me.retucio.sputnik.mixin.ItemRendererMixin
+ * @see BufferStorageMixin
+ * @see EquipmentRendererMixin
+ * @see ItemRendererMixin
  */
 
 public class GlintPlus extends Module {

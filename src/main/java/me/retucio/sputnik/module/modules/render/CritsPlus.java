@@ -1,5 +1,6 @@
 package me.retucio.sputnik.module.modules.render;
 
+import me.retucio.sputnik.mixin.mixins.world.DamageParticleMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -8,10 +9,8 @@ import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.Colors;
 
-import java.awt.*;
-
 /** continúa en:
- * @see me.retucio.sputnik.mixin.DamageParticleMixin
+ * @see DamageParticleMixin
  * @see me.retucio.sputnik.mixin.DamageParticleMixin$DamageParticleFactoryMixin
  */
 

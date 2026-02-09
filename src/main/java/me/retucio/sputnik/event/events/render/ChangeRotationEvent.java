@@ -1,12 +1,13 @@
 package me.retucio.sputnik.event.events.render;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.entity.EntityMixin;
 
 
 /**
- * @see me.retucio.sputnik.mixin.EntityMixin#onRotation
- * @see me.retucio.sputnik.mixin.EntityMixin#onChangeYaw
- * @see me.retucio.sputnik.mixin.EntityMixin#onChangePitch
+ * @see EntityMixin#onRotation
+ * @see EntityMixin#onChangeYaw
+ * @see EntityMixin#onChangePitch
  */
 public class ChangeRotationEvent extends Event {
 

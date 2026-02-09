@@ -1,6 +1,6 @@
 package me.retucio.sputnik.module.modules.misc;
 
-import me.retucio.sputnik.mixin.accessor.AnvilScreenAccessor;
+import me.retucio.sputnik.mixin.accessors.AnvilScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;

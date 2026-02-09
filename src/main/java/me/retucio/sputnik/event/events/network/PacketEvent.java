@@ -2,13 +2,14 @@ package me.retucio.sputnik.event.events.network;
 
 import me.retucio.sputnik.event.Event;
 import me.retucio.sputnik.event.Stage;
+import me.retucio.sputnik.mixin.mixins.network.ClientConnectionMixin;
 import net.minecraft.network.packet.Packet;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ClientConnectionMixin#onSendPacketPre
- * @see me.retucio.sputnik.mixin.ClientConnectionMixin#onSendPacketPost
- * @see me.retucio.sputnik.mixin.ClientConnectionMixin#onReceivePacket
+ * @see ClientConnectionMixin#onSendPacketPre
+ * @see ClientConnectionMixin#onSendPacketPost
+ * @see ClientConnectionMixin#onReceivePacket
  */
 public class PacketEvent {
 

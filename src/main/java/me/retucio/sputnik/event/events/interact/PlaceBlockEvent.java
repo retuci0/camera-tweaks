@@ -1,12 +1,13 @@
 package me.retucio.sputnik.event.events.interact;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ClientPlayerInteractionManagerMixin#onBlockPlace
+ * @see ClientPlayerInteractionManagerMixin#onBlockPlace
  */
 public class PlaceBlockEvent extends Event {
 

@@ -3,6 +3,7 @@ package me.retucio.sputnik.module.modules.player;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.render.RenderHeldItemEvent;
 import me.retucio.sputnik.event.events.render.RenderArmEvent;
+import me.retucio.sputnik.mixin.mixins.render.HeldItemRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -13,7 +14,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.HeldItemRendererMixin
+ * @see HeldItemRendererMixin
  */
 
 public class HandView extends Module {

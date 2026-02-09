@@ -1,12 +1,13 @@
 package me.retucio.sputnik.event.events.network;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.network.ClientConnectionMixin;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.network.DisconnectionInfo;
 
 
 /**
- * @see me.retucio.sputnik.mixin.ClientConnectionMixin#onDisconnect
+ * @see ClientConnectionMixin#onDisconnect
  */
 public class DisconnectEvent extends Event {
 

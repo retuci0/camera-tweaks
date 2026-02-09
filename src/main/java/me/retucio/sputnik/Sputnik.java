@@ -1,6 +1,5 @@
 package me.retucio.sputnik;
 
-
 import me.retucio.sputnik.cape.CapeManager;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.command.commands.BindCommand;
@@ -22,6 +21,7 @@ import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.HudRenderer;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.hud.HudEditorScreen;
+import me.retucio.sputnik.ui.screen.UpdateScreen;
 import me.retucio.sputnik.ui.widgets.buttons.settings.BindButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.TextButton;
@@ -32,7 +32,6 @@ import me.retucio.sputnik.ui.widgets.Button;
 import me.retucio.sputnik.util.*;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.render.DrawUtil;
-import me.retucio.sputnik.util.render.Pipelines;
 import me.retucio.sputnik.util.render.RenderUtil;
 
 import me.retucio.sputnik.util.render.Textures;
@@ -51,6 +50,13 @@ import org.apache.logging.log4j.Logger;
 
 import org.lwjgl.glfw.GLFW;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class Sputnik implements ClientModInitializer {
@@ -83,6 +89,8 @@ public class Sputnik implements ClientModInitializer {
         mc = MinecraftClient.getInstance();
         ConfigManager.load();
 
+        VersionChecker.check();
+
         EVENT_BUS.register(this);
 
         EVENT_BUS.register(ChatUtil.class);
@@ -94,7 +102,6 @@ public class Sputnik implements ClientModInitializer {
         EVENT_BUS.register(RenderUtil.class);
 
         Lists.init();
-
         Textures.init();
 
         CapeManager.INSTANCE = new CapeManager();
@@ -124,6 +131,11 @@ public class Sputnik implements ClientModInitializer {
                 && !ConfigManager.hasLoaded()) {
             ConfigManager.applyConfig();
             settingsApplied = true;
+        }
+
+        if (VersionChecker.shouldShowScreen && !(mc.currentScreen instanceof UpdateScreen)) {
+            VersionChecker.shouldShowScreen = false;
+            CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(() -> mc.execute(() -> mc.setScreen(new UpdateScreen())));
         }
 
         ModuleManager.INSTANCE.getEnabledModules().forEach(Module::onTick);
@@ -189,8 +201,6 @@ public class Sputnik implements ClientModInitializer {
         if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused || isOnTypingScreen())
             return;
 
-        // al parecer esto hace que con la tecla de la interfaz puedas ir cambiando de splash text en la pantalla del título
-        // pero me ha hecho gracia así que así se queda
         if (mc.currentScreen != ClickGUI.INSTANCE) {
             prevScreen = mc.currentScreen;
             mc.setScreen(ClickGUI.INSTANCE);

@@ -1,5 +1,10 @@
 package me.retucio.sputnik.module.modules.network;
 
+import me.retucio.sputnik.mixin.mixins.network.ClientCommonNetworkHandlerMixin;
+import me.retucio.sputnik.mixin.mixins.network.ResourcePackPolicyMixin;
+import me.retucio.sputnik.mixin.mixins.network.ServerConnectorMixin;
+import me.retucio.sputnik.mixin.mixins.network.ServerInfoMixin;
+import me.retucio.sputnik.mixin.mixins.screen.ConfirmScreenMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import net.minecraft.client.network.ServerInfo;
@@ -7,11 +12,11 @@ import net.minecraft.text.Text;
 
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.ClientCommonNetworkHandlerMixin
- * @see me.retucio.sputnik.mixin.ConfirmScreenMixin
- * @see me.retucio.sputnik.mixin.ResourcePackPolicyMixin
- * @see me.retucio.sputnik.mixin.ServerConnectorMixin
- * @see me.retucio.sputnik.mixin.ServerInfoMixin
+ * @see ClientCommonNetworkHandlerMixin
+ * @see ConfirmScreenMixin
+ * @see ResourcePackPolicyMixin
+ * @see ServerConnectorMixin
+ * @see ServerInfoMixin
  */
 
 // https://github.com/emilyy-dev/bypass-resource-pack

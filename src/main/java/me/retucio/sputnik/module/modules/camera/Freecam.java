@@ -9,6 +9,10 @@ import me.retucio.sputnik.event.events.interact.*;
 import me.retucio.sputnik.event.events.network.ChunkOcclusionEvent;
 import me.retucio.sputnik.event.events.network.DisconnectEvent;
 import me.retucio.sputnik.event.events.network.PacketEvent;
+import me.retucio.sputnik.mixin.mixins.entity.EntityMixin;
+import me.retucio.sputnik.mixin.mixins.io.KeyInputMixin;
+import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
+import me.retucio.sputnik.mixin.mixins.render.*;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -35,14 +39,14 @@ import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.CameraMixin
- * @see me.retucio.sputnik.mixin.ChunkBorderDebugRendererMixin
- * @see me.retucio.sputnik.mixin.ClientPlayerInteractionManagerMixin
- * @see me.retucio.sputnik.mixin.EntityMixin
- * @see me.retucio.sputnik.mixin.GameRendererMixin
- * @see me.retucio.sputnik.mixin.KeyInputMixin
- * @see me.retucio.sputnik.mixin.LivingEntityRendererMixin
- * @see me.retucio.sputnik.mixin.WorldRendererMixin
+ * @see CameraMixin
+ * @see ChunkBorderDebugRendererMixin
+ * @see ClientPlayerInteractionManagerMixin
+ * @see EntityMixin
+ * @see GameRendererMixin
+ * @see KeyInputMixin
+ * @see LivingEntityRendererMixin
+ * @see WorldRendererMixin
  */
 
 public class Freecam extends Module {

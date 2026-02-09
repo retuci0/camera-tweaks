@@ -1,12 +1,13 @@
 package me.retucio.sputnik.event.events.render;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.render.HeldItemRendererMixin;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 
 
 /**
- * @see me.retucio.sputnik.mixin.HeldItemRendererMixin#onRenderArm
+ * @see HeldItemRendererMixin#onRenderArm
  */
 public class RenderArmEvent extends Event {
 

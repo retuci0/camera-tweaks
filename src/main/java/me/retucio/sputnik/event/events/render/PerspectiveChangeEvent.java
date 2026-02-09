@@ -1,11 +1,12 @@
 package me.retucio.sputnik.event.events.render;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.misc.GameOptionsMixin;
 import net.minecraft.client.option.Perspective;
 
 
 /**
- * @see me.retucio.sputnik.mixin.GameOptionsMixin#changePerspective
+ * @see GameOptionsMixin#changePerspective
  */
 public class PerspectiveChangeEvent extends Event {
 

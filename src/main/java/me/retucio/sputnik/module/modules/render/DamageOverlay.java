@@ -1,6 +1,7 @@
 package me.retucio.sputnik.module.modules.render;
 
-import me.retucio.sputnik.mixin.accessor.OverlayTextureAccessor;
+import me.retucio.sputnik.mixin.accessors.OverlayTextureAccessor;
+import me.retucio.sputnik.mixin.mixins.render.OverlayTextureMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
@@ -12,7 +13,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import java.awt.*;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.OverlayTextureMixin
+ * @see OverlayTextureMixin
  */
 
 public class DamageOverlay extends Module {

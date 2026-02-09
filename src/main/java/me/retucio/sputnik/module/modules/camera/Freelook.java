@@ -1,5 +1,7 @@
 package me.retucio.sputnik.module.modules.camera;
 
+import me.retucio.sputnik.mixin.mixins.entity.EntityMixin;
+import me.retucio.sputnik.mixin.mixins.render.CameraMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
@@ -10,8 +12,8 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.CameraMixin
- * @see me.retucio.sputnik.mixin.EntityMixin
+ * @see CameraMixin
+ * @see EntityMixin
  */
 
 public class Freelook extends Module {

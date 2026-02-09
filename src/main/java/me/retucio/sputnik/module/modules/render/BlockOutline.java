@@ -2,14 +2,16 @@ package me.retucio.sputnik.module.modules.render;
 
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.render.RenderBlockOutlineEvent;
+import me.retucio.sputnik.mixin.mixins.render.WorldRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
+import me.retucio.sputnik.ui.screen.UpdateScreen;
 import me.retucio.sputnik.util.Colors;
 
 /** continúa en:
- * @see me.retucio.sputnik.mixin.WorldRendererMixin
+ * @see WorldRendererMixin
  */
 
 public class BlockOutline extends Module {

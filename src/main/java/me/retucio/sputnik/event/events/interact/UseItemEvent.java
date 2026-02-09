@@ -1,12 +1,13 @@
 package me.retucio.sputnik.event.events.interact;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.misc.MinecraftClientMixin;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 
 
 /**
- * @see me.retucio.sputnik.mixin.MinecraftClientMixin#onUseItem
+ * @see MinecraftClientMixin#onUseItem
  */
 public class UseItemEvent extends Event {
 

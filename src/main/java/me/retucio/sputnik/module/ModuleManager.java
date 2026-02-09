@@ -141,8 +141,10 @@ public class ModuleManager {
         add(new BreakingProgress());
         add(new CritsPlus());
         add(new DamageOverlay());
+        add(new EntityESP());
         add(new Fonts());
         add(new GlintPlus());
+        add(new Hitboxes());
         add(new Nametags());
         add(new NoRender());
         add(new Particles());

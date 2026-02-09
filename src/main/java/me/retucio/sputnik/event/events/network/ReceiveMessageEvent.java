@@ -1,11 +1,12 @@
 package me.retucio.sputnik.event.events.network;
 
 import me.retucio.sputnik.event.Event;
+import me.retucio.sputnik.mixin.mixins.hud.ChatHudMixin;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.Text;
 
 /**
- * @see me.retucio.sputnik.mixin.ChatHudMixin#onAddMessage
+ * @see ChatHudMixin#onAddMessage
  */
 public class ReceiveMessageEvent extends Event {
 
