@@ -1,23 +1,17 @@
-# v3.1
+# v3.2
 
 ## novedades
-
-- aviso para actualizar
 
 ### adiciones
 
 #### módulos nuevos:
 
-- resaltado de entidades: wallhack para entidades, modo de caja y de brillo
-- hitboxes: cambia el color de las hitboxes de f3+b
+- dupe de bundle: robado de .gg/dupes, usando un bundle y un libro de bookbot, dupea 63 del ítem deseado
+- j. k. rowling: rellena libros con caca de manera automática
 
 ### arreglos / mejoras
 
-- más opciones para amortiguar caídas con tobillos fuertes
-- selección de minado ahora solo renderizará el contorno si su ajuste está activado
-- prioridad de selección de minado, cuantos más clics tenga un bloque, mayor será su prioridad. también la opción de deseleccionar un bloque.
-- opción para minar bloques en orden forzosamente en selección de minado (no funciona del todo)
-- evitar romper la caña si está a punto de romperse en auto pesca
+- ahora el aviso de actualizaciones ya funciona bien
 
 ## problemas reconocidos
 

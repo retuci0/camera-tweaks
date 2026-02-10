@@ -34,16 +34,18 @@ public class VersionChecker {
                 latestRemoteVersion = extract(gradleProperties);
 
                 if (latestRemoteVersion != null) {
-                    String remoteVersion = (latestRemoteVersion);
+                    String remoteVersion = cleanVersion(latestRemoteVersion);
                     String localVersion = cleanVersion(currentVersion);
 
-                    if (!remoteVersion.equals(localVersion)) {
+                    if (compareVersions(localVersion, remoteVersion) == -1) {
                         updateAvailable = true;
                         Sputnik.LOGGER.info("actualización disponible. local: {}, más reciente: {}",
                                 currentVersion, latestRemoteVersion);
                         shouldShowScreen = true;
-                    } else {
+                    } else if (compareVersions(localVersion, remoteVersion) == 0){
                         Sputnik.LOGGER.info("el mod está al día: v{}", currentVersion);
+                    } else {
+                        Sputnik.LOGGER.info("mod en estado de desarrollo: v{}", currentVersion);
                     }
                 }
             } else {
@@ -84,6 +86,32 @@ public class VersionChecker {
         return version.trim();
     }
 
+    private static int compareVersions(String version1, String version2) {
+        if (version1 == null || version2 == null) return 0;
+
+        String[] parts1 = version1.split("\\.");
+        String[] parts2 = version2.split("\\.");
+
+        int maxLength = Math.max(parts1.length, parts2.length);
+
+        for (int i = 0; i < maxLength; i++) {
+            int v1 = (i < parts1.length) ? parseVersionPart(parts1[i]) : 0;
+            int v2 = (i < parts2.length) ? parseVersionPart(parts2[i]) : 0;
+
+            if (v1 < v2) return -1;
+            if (v1 > v2) return 1;
+        }
+
+        return 0;
+    }
+
+    private static int parseVersionPart(String part) {
+        try {
+            return Integer.parseInt(part);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
 
     private static URI getFileURI() {
         try {

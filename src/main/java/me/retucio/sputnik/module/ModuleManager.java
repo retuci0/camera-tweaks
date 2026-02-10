@@ -84,7 +84,9 @@ public class ModuleManager {
     private void addMisc() {
         add(new AntiInvis());
         add(new AnvilFont());
+        add(new BookBot());
         add(new BossbarStack());
+        add(new BundleDupe());
         add(new ChatPlus());
         add(new CreativeInventoryHotbarKeybinds());
         add(new FakePlayer());

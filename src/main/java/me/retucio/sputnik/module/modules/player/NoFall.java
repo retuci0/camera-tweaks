@@ -25,7 +25,7 @@ import net.minecraft.util.hit.HitResult;
 
 import java.util.List;
 
-// todo: implementar otros tipos de MLGs (cama, miel, slime, heno, ...)
+// todo: arreglar MLGs con bloques
 public class NoFall extends Module {
 
     private boolean placed;

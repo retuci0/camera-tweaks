@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static me.retucio.sputnik.Sputnik.mc;
 
@@ -35,6 +36,17 @@ public class InventoryUtil {
     public static final int OFFHAND_SLOT = 40;
 
     private static Inventory echestInv;
+
+    public static ItemStack find(Predicate<ItemStack> predicate) {
+        if (mc.player == null) return null;
+        for (int i = 0; i <= mc.player.getInventory().size(); i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (predicate.test(stack)) {
+                return stack;
+            }
+        }
+        return null;
+    }
 
     public static ItemStack getStackOf(Item item) {
         if (mc.player == null) return null;
@@ -80,6 +92,10 @@ public class InventoryUtil {
         mc.interactionManager.clickSlot(syncId, containerSlot1, 0, SlotActionType.PICKUP, mc.player);
         mc.interactionManager.clickSlot(syncId, containerSlot2, 0, SlotActionType.PICKUP, mc.player);
         mc.interactionManager.clickSlot(syncId, containerSlot1, 0, SlotActionType.PICKUP, mc.player);
+    }
+
+    public static void swapWithHotbar(int containerSlot, int hotbarSlot) {
+        swapWithHotbar(containerSlot, hotbarSlot, mc.player.playerScreenHandler);
     }
 
     public static void swapWithHotbar(int containerSlot, int hotbarSlot, HandledScreen<?> screen) {

@@ -1,5 +1,6 @@
 package me.retucio.sputnik;
 
+import com.ibm.icu.text.CaseMap;
 import me.retucio.sputnik.cape.CapeManager;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.command.commands.BindCommand;
@@ -9,6 +10,7 @@ import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.event.EventBus;
 import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.event.events.ShutdownEvent;
+import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
 import me.retucio.sputnik.event.events.sputnik.LoadCapeManagerEvent;
 import me.retucio.sputnik.event.events.sputnik.LoadClickGUIEvent;
 import me.retucio.sputnik.event.events.sputnik.LoadCommandManagerEvent;
@@ -42,6 +44,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.gui.screen.ingame.AnvilScreen;
@@ -131,11 +134,6 @@ public class Sputnik implements ClientModInitializer {
                 && !ConfigManager.hasLoaded()) {
             ConfigManager.applyConfig();
             settingsApplied = true;
-        }
-
-        if (VersionChecker.shouldShowScreen && !(mc.currentScreen instanceof UpdateScreen)) {
-            VersionChecker.shouldShowScreen = false;
-            CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(() -> mc.execute(() -> mc.setScreen(new UpdateScreen())));
         }
 
         ModuleManager.INSTANCE.getEnabledModules().forEach(Module::onTick);
@@ -242,6 +240,16 @@ public class Sputnik implements ClientModInitializer {
                 || mc.currentScreen instanceof AnvilScreen
                 || mc.currentScreen instanceof AbstractSignEditScreen
                 || mc.currentScreen instanceof AbstractCommandBlockScreen;
+    }
+
+    // notificar al usuario de que hay una actualización disponible, si la hay
+    @SubscribeEvent
+    public void onSetScreen(OpenScreenEvent event) {
+        if (VersionChecker.shouldShowScreen && event.getScreen() instanceof TitleScreen) {
+            event.cancel();
+            VersionChecker.shouldShowScreen = false;
+            mc.execute(() -> mc.currentScreen = new UpdateScreen());
+        }
     }
 
     @SubscribeEvent

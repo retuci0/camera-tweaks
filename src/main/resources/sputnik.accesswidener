@@ -14,6 +14,7 @@ accessible class net/minecraft/client/network/ClientCommonNetworkHandler$Confirm
 # texto
 accessible method net/minecraft/client/font/FontManager getStorageInternal (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
 accessible class net/minecraft/client/font/TextRenderer$Drawer
+accessible field net/minecraft/client/font/TextHandler widthRetriever Lnet/minecraft/client/font/TextHandler$WidthRetriever;
 
 # entidad
 accessible field net/minecraft/entity/LivingEntity jumpingCooldown I

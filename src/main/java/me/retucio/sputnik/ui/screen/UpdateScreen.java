@@ -4,6 +4,7 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.util.VersionChecker;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
@@ -21,8 +22,6 @@ public class UpdateScreen extends Screen {
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private final DirectionalLayoutWidget grid = DirectionalLayoutWidget.vertical();
 
-    private final Text outdatedText = Text.of("version desactualizada: " + Sputnik.MOD_VERSION);
-    private final Text updateText = Text.of("descarga la última versión (" + VersionChecker.getLatestVersion() + ") desde aquí:");
     private final URI updateLink = URI.create(FabricLoader.getInstance()
             .getModContainer(Sputnik.MOD_ID)
             .orElseThrow()
@@ -32,6 +31,20 @@ public class UpdateScreen extends Screen {
             get()
             + "/releases/latest"
     );
+
+    private final Text outdatedText = Text.of("version desactualizada: " + Sputnik.MOD_VERSION);
+    private final Text updateText = Text.of("descarga la última versión (" + VersionChecker.getLatestVersion() + ") desde aquí:");
+
+    private final ButtonWidget idgafButton = ButtonWidget.builder(
+            Text.of("me la pela"),
+            button -> this.close()
+    ).build();
+
+    private final ButtonWidget updateButton = ButtonWidget.builder(
+            Text.of("CLIC AQUÍ"),
+    button -> handleOpenUri(mc, this, updateLink)
+    ).build();
+
 
     public UpdateScreen() {
         super(Text.literal(Formatting.BOLD + "actualizar"));
@@ -48,18 +61,7 @@ public class UpdateScreen extends Screen {
 
         this.grid.getMainPositioner().margin(2);
 
-        ButtonWidget updateButton = ButtonWidget.builder(
-                Text.of("CLIC AQUÍ"),
-                button -> {
-                    handleOpenUri(mc, this, updateLink);
-                }
-        ).build();
         this.grid.add(updateButton);
-
-        ButtonWidget idgafButton = ButtonWidget.builder(
-                Text.of("me la pela"),
-                button -> this.close()
-        ).build();
         this.grid.add(idgafButton);
 
         this.grid.refreshPositions();
@@ -75,5 +77,10 @@ public class UpdateScreen extends Screen {
     @Override
     public boolean shouldCloseOnEsc() {
         return false;
+    }
+
+    @Override
+    public boolean canInterruptOtherScreen() {
+        return true;
     }
 }

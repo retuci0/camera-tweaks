@@ -9,11 +9,14 @@ import me.retucio.sputnik.event.events.TickEvent;
 import me.retucio.sputnik.event.events.interact.UseItemEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.player.FastUse;
+import me.retucio.sputnik.ui.screen.UpdateScreen;
+import me.retucio.sputnik.util.VersionChecker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -31,6 +34,10 @@ public abstract class MinecraftClientMixin {
 
 
     // eventos
+
+    @Shadow
+    @Nullable
+    public Screen currentScreen;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTickPre(CallbackInfo ci) {
@@ -66,7 +73,6 @@ public abstract class MinecraftClientMixin {
         UseItemEvent event = Sputnik.EVENT_BUS.post(new UseItemEvent(Sputnik.mc.player.getStackInHand(hand), hand));
         if (event.isCancelled()) ci.cancel();
     }
-
 
     // telemetría
 
