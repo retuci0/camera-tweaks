@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.player;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -13,7 +13,7 @@ public class AntiHunger extends Module {
         super("anti hambre", "previene el hambre, haciéndole creer al server que nunca corres", Category.PLAYER);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (mc.player == null) return;
         if (mc.player.hasVehicle() || mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) return;

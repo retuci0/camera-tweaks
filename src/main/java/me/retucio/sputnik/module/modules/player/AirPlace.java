@@ -1,10 +1,10 @@
 package me.retucio.sputnik.module.modules.player;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.KeyEvent;
-import me.retucio.sputnik.event.events.input.MouseScrollEvent;
-import me.retucio.sputnik.event.events.render.Render3DEvent;
-import me.retucio.sputnik.event.events.interact.UseItemEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.input.KeyEvent;
+import me.retucio.sputnik.event.input.MouseScrollEvent;
+import me.retucio.sputnik.event.render.Render3DEvent;
+import me.retucio.sputnik.event.interact.UseItemEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -106,7 +106,7 @@ public class AirPlace extends Module {
         result = mc.getCameraEntity().raycast(rangeValue, 0, false);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onUseItem(UseItemEvent event) {
         if (!(result instanceof BlockHitResult bhr) || !(event.getStack().getItem() instanceof BlockItem)) return;
         Vec3d hitPos = Vec3d.ofCenter(bhr.getBlockPos());
@@ -117,21 +117,21 @@ public class AirPlace extends Module {
             NetworkUtil.interactBlock(result, event.getHand(), true);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onMouseScroll(MouseScrollEvent event) {
         if (!scrollKey.isDown()) return;
         rangeValue += (int) Math.round((event.getVertical() * scrollSens.getValue()));
         event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onKey(KeyEvent event) {
         if (event.getKey() == scrollKey.getValue() && event.getAction() == GLFW.GLFW_RELEASE) {
             rangeValue = (int) Math.clamp(rangeValue, range.getMin(), range.getMax());
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderWorld(Render3DEvent event) {
         if (!(result instanceof BlockHitResult bhr)
                 || (mc.crosshairTarget != null

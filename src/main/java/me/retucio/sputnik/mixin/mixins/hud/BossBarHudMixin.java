@@ -2,7 +2,7 @@ package me.retucio.sputnik.mixin.mixins.hud;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.retucio.sputnik.event.events.render.RenderBossbarEvent;
+import me.retucio.sputnik.event.render.RenderBossbarEvent;
 import net.minecraft.client.gui.hud.BossBarHud;
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.text.Text;

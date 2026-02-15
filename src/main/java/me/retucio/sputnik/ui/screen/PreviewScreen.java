@@ -1,7 +1,7 @@
 package me.retucio.sputnik.ui.screen;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.module.modules.misc.ShulkerPeek;
+import me.retucio.sputnik.module.modules.inventory.ShulkerPeek;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gl.RenderPipelines;

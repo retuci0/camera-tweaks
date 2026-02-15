@@ -1,15 +1,14 @@
 package me.retucio.sputnik.module.modules.camera;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.render.GetFOVEvent;
-import me.retucio.sputnik.event.events.input.MouseScrollEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.render.GetFOVEvent;
+import me.retucio.sputnik.event.input.MouseScrollEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import me.retucio.sputnik.ui.screen.UpdateScreen;
 import org.lwjgl.glfw.GLFW;
 
 // continúa en GameRendererMixin
@@ -88,7 +87,6 @@ public class Zoom extends Module {
             mc.options.getMouseSensitivity().setValue(prevMouseSens * mouseSensMultiplier.getValue());
     }
 
-    @SubscribeEvent
     private void onMouseScroll(MouseScrollEvent event) {
         boolean key = scrollKey.getValue() == GLFW.GLFW_KEY_UNKNOWN || scrollKey.isDown();
         if (isEnabled() && scrollSens.getValue() > 0 && key) {
@@ -99,7 +97,7 @@ public class Zoom extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onGetFov(GetFOVEvent event) {
         event.setFov((float) (event.getFov() / value));
 

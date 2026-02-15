@@ -1,9 +1,8 @@
 package me.retucio.sputnik.module.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
-import me.retucio.sputnik.event.events.interact.BoatMoveEvent;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.BoatMoveEvent;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -50,7 +49,7 @@ public class BoatFly extends Module {
         super("barco volador", "convierte tu bote de acacia en un Lockheed F-117 Nighthawk", Category.MOVEMENT);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onBoatMove(BoatMoveEvent event) {
         if (event.getBoat().getControllingPassenger() != mc.player) return;
         event.getBoat().setYaw(mc.player.getYaw());
@@ -82,7 +81,7 @@ public class BoatFly extends Module {
         event.getBoat().setVelocity(new Vec3d(x, y, z));
     }
 
-    @Subscribe
+    @EventListener
     private void onReceivePacket(PacketEvent.Receive event) {
         if (event.getPacket() instanceof VehicleMoveS2CPacket && cancelPackets.getValue()) {
             event.cancel();

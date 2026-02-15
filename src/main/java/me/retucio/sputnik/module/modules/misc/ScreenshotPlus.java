@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.misc;
 
 import me.retucio.sputnik.command.CommandManager;
-import me.retucio.sputnik.event.events.input.ClientClickEvent;
+import me.retucio.sputnik.event.input.ClientClickEvent;
 import me.retucio.sputnik.mixin.mixins.io.ScreenshotRecorderMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;

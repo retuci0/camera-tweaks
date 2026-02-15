@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.setting;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.sputnik.UpdateSettingEvent;
+import me.retucio.sputnik.event.sputnik.UpdateSettingEvent;
 import me.retucio.sputnik.module.Module;
 
 import java.util.function.Consumer;

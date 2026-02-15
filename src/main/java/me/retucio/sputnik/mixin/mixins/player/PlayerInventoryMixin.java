@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin.mixins.player;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.interact.SwitchSlotEvent;
+import me.retucio.sputnik.event.interact.SwitchSlotEvent;
 import net.minecraft.entity.player.PlayerInventory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

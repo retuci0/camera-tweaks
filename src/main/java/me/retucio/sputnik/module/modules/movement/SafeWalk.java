@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.movement;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.interact.ClipAtLedgeEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.ClipAtLedgeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
@@ -21,7 +21,7 @@ public class SafeWalk extends Module {
                 Category.MOVEMENT);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onClipAtLedge(ClipAtLedgeEvent event) {
         if (mc.player == null || mc.world == null) return;
 

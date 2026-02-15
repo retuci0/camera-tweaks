@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.network;
 
-import me.retucio.sputnik.event.events.network.JoinWorldEvent;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.JoinWorldEvent;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
@@ -68,7 +68,7 @@ public class PacketDelay extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (directions.is(Directions.S2C)
                 || mc.player == null || mc.world == null || mc.getNetworkHandler() == null
@@ -85,7 +85,7 @@ public class PacketDelay extends Module {
         ));
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPacketReceive(PacketEvent.Receive event) {
         if (mc.player == null || mc.world == null
                 || mc.getNetworkHandler() == null || mc.getNetworkHandler().getConnection() == null
@@ -104,7 +104,7 @@ public class PacketDelay extends Module {
         ));
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onJoinWorld(JoinWorldEvent event) {
         ChatUtil.error("delay de paquetes no funciona en un solo jugador");
         toggle();

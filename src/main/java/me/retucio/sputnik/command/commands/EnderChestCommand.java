@@ -2,8 +2,7 @@ package me.retucio.sputnik.command.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.TickEvent;
+import me.retucio.sputnik.event.TickEvent;
 import me.retucio.sputnik.ui.screen.PreviewScreen;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
@@ -35,7 +34,6 @@ public class EnderChestCommand extends Command {
         });
     }
 
-    @SubscribeEvent
     public void onTick(TickEvent.Post event) {
         if (shouldOpenEchest) {
             shouldOpenEchest = false;

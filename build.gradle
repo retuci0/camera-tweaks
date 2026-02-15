@@ -11,20 +11,29 @@ base {
 }
 
 repositories {
-    maven {
-        name = "FDD Maven"
-        url = "https://maven.firstdark.dev/releases"
-    }
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
+	maven {
+		name = "FDD Maven"
+		url = "https://maven.firstdark.dev/releases"
+	}
 }
 
 dependencies {
     // mc
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+	// mappings
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+
+	// fabric & su api
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    // otros
+	// sistema de eventos
+	modImplementation  "com.github.retuci0:neutrino:${project.neutrino_version}"
+
+    // rpc de discord
     include(modImplementation "dev.firstdark.discordrpc:discord-rpc:1.0.3")
 }
 

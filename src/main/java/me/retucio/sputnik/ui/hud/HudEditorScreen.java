@@ -2,8 +2,7 @@ package me.retucio.sputnik.ui.hud;
 
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.config.ConfigManager;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.KeyEvent;
+import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
@@ -152,7 +151,6 @@ public class HudEditorScreen extends Screen {
         return super.mouseReleased(click);
     }
 
-    @SubscribeEvent
     // he sustituído el método del súper por un evento para ver si así se podían
     // registrar dos teclas a la vez, pero resulta que no :P
     public void onKey(KeyEvent event) {

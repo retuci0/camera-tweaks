@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.world;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.mixin.mixins.render.SkyRendererMixin;
 import me.retucio.sputnik.mixin.mixins.world.ClientWorldPropertiesMixin;
 import me.retucio.sputnik.module.Category;
@@ -60,7 +60,7 @@ public class TimeChanger extends Module {
         mc.world.getLevelProperties().setTimeOfDay(time.getLongValue());
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof WorldTimeUpdateS2CPacket packet) {
             realTime = packet.timeOfDay();

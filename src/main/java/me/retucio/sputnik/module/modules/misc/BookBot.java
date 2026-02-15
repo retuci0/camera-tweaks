@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.misc;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.DisconnectEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.DisconnectEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -135,7 +135,7 @@ public class BookBot extends Module {
         );
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onDisconnect(DisconnectEvent event) {
         if (toggleOnDisconnect.getValue()) {
             toggle();

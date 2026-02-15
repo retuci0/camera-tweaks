@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.network;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.AddEntityEvent;
-import me.retucio.sputnik.event.events.render.Render3DEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.AddEntityEvent;
+import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
@@ -151,7 +151,7 @@ public class LogoutSpots extends Module {
         lastDimension = currentDimension;
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onEntityAdded(AddEntityEvent event) {
         if (event.getEntity() instanceof PlayerEntity player) {
             for (LogoutEntry entry : players) {
@@ -169,7 +169,7 @@ public class LogoutSpots extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onWorldRender(Render3DEvent event) {
         if (mc.player == null || mc.world == null) return;
 

@@ -2,7 +2,7 @@ package me.retucio.sputnik.mixin.mixins.player;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.interact.ClipAtLedgeEvent;
+import me.retucio.sputnik.event.interact.ClipAtLedgeEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.render.Nametags;
 import net.minecraft.entity.EntityType;

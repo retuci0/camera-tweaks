@@ -1,10 +1,10 @@
 package me.retucio.sputnik.mixin.mixins.network;
 
+import com.github.retucio.neutrino.Event;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import me.retucio.sputnik.event.Stage;
-import me.retucio.sputnik.event.events.network.DisconnectEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import me.retucio.sputnik.event.network.DisconnectEvent;
+import me.retucio.sputnik.event.network.PacketEvent;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.network.packet.Packet;
@@ -23,13 +23,13 @@ public abstract class ClientConnectionMixin {
 
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;)V", at = @At("HEAD"), cancellable = true)
     private void onSendPacketPre(Packet<?> packet, ChannelFutureListener channelFutureListener, CallbackInfo ci) {
-        PacketEvent.Send event = EVENT_BUS.post(new PacketEvent.Send(packet, Stage.PRE));
+        PacketEvent.Send event = EVENT_BUS.post(new PacketEvent.Send(packet, Event.Stage.PRE));
         if (event.isCancelled()) ci.cancel();
     }
 
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;)V", at = @At("TAIL"), cancellable = true)
     private void onSendPacketPost(Packet<?> packet, ChannelFutureListener channelFutureListener, CallbackInfo ci) {
-        PacketEvent.Send event = EVENT_BUS.post(new PacketEvent.Send(packet, Stage.POST));
+        PacketEvent.Send event = EVENT_BUS.post(new PacketEvent.Send(packet, Event.Stage.POST));
         if (event.isCancelled()) ci.cancel();
     }
 

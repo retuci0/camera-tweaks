@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.world;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.AddEntityEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.AddEntityEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.util.ChatUtil;
@@ -76,7 +76,7 @@ public class StrongholdTriangulator extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onAddEntity(AddEntityEvent event) {
         if (mc.player == null || mc.world == null) return;
         if (mc.player.getStackInHand(Hand.MAIN_HAND).getItem() != Items.ENDER_EYE) return;

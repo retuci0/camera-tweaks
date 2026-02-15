@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.camera;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.MouseScrollEvent;
-import me.retucio.sputnik.event.events.render.PerspectiveChangeEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.input.MouseScrollEvent;
+import me.retucio.sputnik.event.render.PerspectiveChangeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -45,12 +45,12 @@ public class PerspectivePlus extends Module {
         super.onEnable();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPerspectiveChange(PerspectiveChangeEvent event) {
         distance = defaultDistance.getValue();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onMouseScroll(MouseScrollEvent event) {
         if (mc.options.getPerspective() == net.minecraft.client.option.Perspective.FIRST_PERSON
             || mc.currentScreen != null || scrollSens.getValue() <= 0) return;

@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.misc.CreativeInventoryHotbarKeybinds;
+import me.retucio.sputnik.module.modules.inventory.CreativeInventoryHotbarKeybinds;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.input.KeyInput;
 import org.spongepowered.asm.mixin.Mixin;

@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.world.NoMiningInterruptions;
-import me.retucio.sputnik.module.modules.player.PortalGUI;
+import me.retucio.sputnik.module.modules.inventory.PortalGUI;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;

@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.combat;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.interact.AttackEntityEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.AttackEntityEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -33,7 +33,7 @@ public class AttributeSwapper extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAttack(AttackEntityEvent event) {
         prevSlot = mc.player.getInventory().getSelectedSlot();
         mc.player.getInventory().setSelectedSlot(slot.getIntValue() - 1);

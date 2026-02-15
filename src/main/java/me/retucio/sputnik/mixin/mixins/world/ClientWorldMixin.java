@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin.mixins.world;
 
-import me.retucio.sputnik.event.events.network.AddEntityEvent;
-import me.retucio.sputnik.event.events.network.RemoveEntityEvent;
+import me.retucio.sputnik.event.network.AddEntityEvent;
+import me.retucio.sputnik.event.network.RemoveEntityEvent;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.Nullable;

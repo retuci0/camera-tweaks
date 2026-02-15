@@ -1,7 +1,7 @@
 package me.retucio.sputnik.ui.widgets.frames;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.sputnik.ModuleFrameEvent;
+import me.retucio.sputnik.event.sputnik.ModuleFrameEvent;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.ui.screen.ClickGUI;

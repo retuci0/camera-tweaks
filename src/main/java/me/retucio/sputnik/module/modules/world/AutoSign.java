@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.world;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.OpenScreenEvent;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.mixin.accessors.AbstractSignEditScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -34,7 +34,7 @@ public class AutoSign extends Module {
         super.onDisable();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onOpenScreen(OpenScreenEvent event) {
         if (event.getScreen() instanceof AbstractSignEditScreen screen && text != null && mc != null && mc.player != null) {
             event.cancel();
@@ -43,7 +43,7 @@ public class AutoSign extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onSendPacket(PacketEvent.Send event) {
         if (event.getPacket() instanceof UpdateSignC2SPacket packet) {
             if (text == null) text = packet.getText().clone();

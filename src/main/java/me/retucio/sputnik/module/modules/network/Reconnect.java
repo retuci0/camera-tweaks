@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.network;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.DisconnectEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.DisconnectEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
@@ -18,7 +18,7 @@ public class Reconnect extends Module {
                 Category.NETWORK);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onDisconnect(DisconnectEvent event) {
         lastServer = event.getServer();
     }

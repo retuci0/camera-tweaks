@@ -1,20 +1,18 @@
 package me.retucio.sputnik;
 
-import com.ibm.icu.text.CaseMap;
+import com.github.retucio.neutrino.EventBus;
 import me.retucio.sputnik.cape.CapeManager;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.command.commands.BindCommand;
 
 import me.retucio.sputnik.config.ConfigManager;
 
-import me.retucio.sputnik.event.EventBus;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.ShutdownEvent;
-import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
-import me.retucio.sputnik.event.events.sputnik.LoadCapeManagerEvent;
-import me.retucio.sputnik.event.events.sputnik.LoadClickGUIEvent;
-import me.retucio.sputnik.event.events.sputnik.LoadCommandManagerEvent;
-import me.retucio.sputnik.event.events.sputnik.LoadModuleManagerEvent;
+import me.retucio.sputnik.event.ShutdownEvent;
+import me.retucio.sputnik.event.interact.OpenScreenEvent;
+import me.retucio.sputnik.event.sputnik.LoadCapeManagerEvent;
+import me.retucio.sputnik.event.sputnik.LoadClickGUIEvent;
+import me.retucio.sputnik.event.sputnik.LoadCommandManagerEvent;
+import me.retucio.sputnik.event.sputnik.LoadModuleManagerEvent;
 
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
@@ -53,14 +51,6 @@ import org.apache.logging.log4j.Logger;
 
 import org.lwjgl.glfw.GLFW;
 
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 
 public class Sputnik implements ClientModInitializer {
 
@@ -94,15 +84,15 @@ public class Sputnik implements ClientModInitializer {
 
         VersionChecker.check();
 
-        EVENT_BUS.register(this);
+        EVENT_BUS.subscribe(this);
 
-        EVENT_BUS.register(ChatUtil.class);
-        EVENT_BUS.register(DrawUtil.class);
-        EVENT_BUS.register(EntityUtil.class);
-        EVENT_BUS.register(InventoryUtil.class);
-        EVENT_BUS.register(MiscUtil.class);
-        EVENT_BUS.register(NetworkUtil.class);
-        EVENT_BUS.register(RenderUtil.class);
+        EVENT_BUS.subscribe(ChatUtil.class);
+        EVENT_BUS.subscribe(DrawUtil.class);
+        EVENT_BUS.subscribe(EntityUtil.class);
+        EVENT_BUS.subscribe(InventoryUtil.class);
+        EVENT_BUS.subscribe(MiscUtil.class);
+        EVENT_BUS.subscribe(NetworkUtil.class);
+        EVENT_BUS.subscribe(RenderUtil.class);
 
         Lists.init();
         Textures.init();
@@ -243,7 +233,6 @@ public class Sputnik implements ClientModInitializer {
     }
 
     // notificar al usuario de que hay una actualización disponible, si la hay
-    @SubscribeEvent
     public void onSetScreen(OpenScreenEvent event) {
         if (VersionChecker.shouldShowScreen && event.getScreen() instanceof TitleScreen) {
             event.cancel();
@@ -252,7 +241,6 @@ public class Sputnik implements ClientModInitializer {
         }
     }
 
-    @SubscribeEvent
     public void onStop(ShutdownEvent event) {
         ConfigManager.save();
     }

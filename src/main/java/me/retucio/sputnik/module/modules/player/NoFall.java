@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.player;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -11,9 +11,7 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
 import me.retucio.sputnik.util.Lists;
-import me.retucio.sputnik.util.NetworkUtil;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -112,7 +110,7 @@ public class NoFall extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (mc.player == null
                 || mc.getNetworkHandler() == null

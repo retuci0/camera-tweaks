@@ -1,6 +1,6 @@
 package me.retucio.sputnik.mixin.mixins.world;
 
-import me.retucio.sputnik.event.events.network.ChunkOcclusionEvent;
+import me.retucio.sputnik.event.network.ChunkOcclusionEvent;
 import net.minecraft.client.render.chunk.ChunkOcclusionDataBuilder;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;

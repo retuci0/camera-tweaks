@@ -6,8 +6,7 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.command.Command;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.util.ChatUtil;
 
 import net.minecraft.client.network.ClientCommandSource;
@@ -90,7 +89,6 @@ public class PluginsCommand extends Command {
         node.getChildren().forEach(this::checkNodeForPlugins);
     }
 
-    @SubscribeEvent
     private void onPacketReceive(PacketEvent.Receive event) {
         if (!scanning) return;
 

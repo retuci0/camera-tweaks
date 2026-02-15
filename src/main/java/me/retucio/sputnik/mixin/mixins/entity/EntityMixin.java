@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin.mixins.entity;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import me.retucio.sputnik.event.events.render.ChangeRotationEvent;
+import me.retucio.sputnik.event.render.ChangeRotationEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.camera.Freelook;

@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.combat;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -46,8 +46,8 @@ public class MaceKill extends Module {
         max.onUpdate(v -> height.setVisible(!v));
     }
 
-    @SubscribeEvent
     @SuppressWarnings("ConstantConditions")
+    @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (mc.player == null) return;
         if (mc.player.getMainHandStack().getItem() == Items.MACE

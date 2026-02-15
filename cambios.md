@@ -1,18 +1,22 @@
-# v3.2
+# v3.3
 
 ## novedades
+
+- cambiado de sistema de eventos
+- categoría de inventario
 
 ### adiciones
 
 #### módulos nuevos:
 
-- dupe de bundle: robado de .gg/dupes, usando un bundle y un libro de bookbot, dupea 63 del ítem deseado
-- j. k. rowling: rellena libros con caca de manera automática
+- reponer: repone items a medida que se usan de forma automática
 
 ### arreglos / mejoras
 
-- ahora el aviso de actualizaciones ya funciona bien
+- ahora el grosor de línea de hitboxes funciona
+- ahora cabezas de chatplus funciona, a medias
 
 ## problemas reconocidos
 
+- es posible que algunos módulos hayan dejado de funcionar correctamente, ya que he cambiado de sistema de eventos
 - muchos, pero repórtalos en la página de problemas si quieres para que queden bien registrados 

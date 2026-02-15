@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.render;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.render.Render3DEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -82,7 +82,7 @@ public class EntityESP extends Module {
         filling.onUpdate(v -> fillingColor.setVisible(v));
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderWorld(Render3DEvent event) {
         if (mode.is(ESPMode.BOX)) drawBoxes(event.getMatrices());
     }

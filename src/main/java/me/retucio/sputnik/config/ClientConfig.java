@@ -1,7 +1,6 @@
 package me.retucio.sputnik.config;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.sputnik.*;
+import me.retucio.sputnik.event.sputnik.*;
 import me.retucio.sputnik.module.setting.settings.*;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 
@@ -38,19 +37,17 @@ public class ClientConfig {
     public Map<String, String> hudImagePaths = new HashMap<>();
 
     // posición de la barra de búsqueda (x, y)
-    public int[] searchBarPosition = new int[]{340, 16};
+    public int[] searchBarPosition = new int[] { 340, 16 };
 
     public ClientConfig() {
-        EVENT_BUS.register(this);
+        EVENT_BUS.subscribe(this);
     }
 
-    @SubscribeEvent
     public void onToggleModule(ToggleModuleEvent event) {
         ConfigManager.setModuleState(event.getModule());
     }
 
     @SuppressWarnings("rawtypes")
-    @SubscribeEvent
     public void onUpdateSetting(UpdateSettingEvent event) {
         if (mc == null || !event.shouldSave()) return;
 
@@ -71,24 +68,20 @@ public class ClientConfig {
         ConfigManager.setSetting(event.getSetting(), value);
     }
 
-    @SubscribeEvent
     public void onOpenSettingsFrame(SettingsFrameEvent.Open event) {
         ConfigManager.setFramePosition(event.getFrame());
     }
 
-    @SubscribeEvent
     public void onCloseSettingsFrame(SettingsFrameEvent.Close event) {
         settingsFrames.remove(event.getFrame().getModule().getName());
         ConfigManager.save();
     }
 
-    @SubscribeEvent
     public void onMoveSettingsFrame(SettingsFrameEvent.Move event) {
         settingsFrames.replace(event.getFrame().getModule().getName(), new int[]{event.getFrame().getX(), event.getFrame().getY()});
         ConfigManager.save();
     }
 
-    @SubscribeEvent
     public void onExtendModuleFrame(ModuleFrameEvent.Extend event) {
         extendableFrames.put("M", new FrameData(
                 ClickGUI.INSTANCE.getModulesFrame().getX(),
@@ -96,7 +89,6 @@ public class ClientConfig {
                 ClickGUI.INSTANCE.getModulesFrame().extended));
     }
 
-    @SubscribeEvent
     public void onMoveModuleFrame(ModuleFrameEvent.Move event) {
         extendableFrames.replace("M", new FrameData(
                 ClickGUI.INSTANCE.getModulesFrame().getX(),
@@ -104,7 +96,6 @@ public class ClientConfig {
                 ClickGUI.INSTANCE.getModulesFrame().extended));
     }
 
-    @SubscribeEvent
     public void onExtendGUISettingsFrame(GUISettingsFrameEvent.Extend event) {
         extendableFrames.put("S", new FrameData(
                 ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),
@@ -112,7 +103,6 @@ public class ClientConfig {
                 ClickGUI.INSTANCE.getGuiSettingsFrame().extended));
     }
 
-    @SubscribeEvent
     public void onMoveGUISettingsFrame(GUISettingsFrameEvent.Move event) {
         extendableFrames.replace("S", new FrameData(
                 ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),

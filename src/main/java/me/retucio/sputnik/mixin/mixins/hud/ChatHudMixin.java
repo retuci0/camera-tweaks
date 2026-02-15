@@ -2,7 +2,7 @@ package me.retucio.sputnik.mixin.mixins.hud;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.retucio.sputnik.event.events.network.ReceiveMessageEvent;
+import me.retucio.sputnik.event.network.ReceiveMessageEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.misc.ChatPlus;
 import me.retucio.sputnik.util.interfaces.IChatHud;

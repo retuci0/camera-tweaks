@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin.mixins.item;
 
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.misc.ShulkerPeek;
+import me.retucio.sputnik.module.modules.inventory.ShulkerPeek;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.BlockItem;

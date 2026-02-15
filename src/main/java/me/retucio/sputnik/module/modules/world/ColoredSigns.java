@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.world;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.StringSetting;
@@ -22,7 +22,7 @@ public class ColoredSigns extends Module {
                 Category.WORLD);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onSendPacket(PacketEvent.Send event) {
         if (event.getPacket() instanceof UpdateSignC2SPacket packet) {
             for (int i = 0; i < 4; i++) {

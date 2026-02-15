@@ -12,6 +12,7 @@ public enum Category {
     RENDER("renderizado"),
 
     NETWORK("red"),
+    INVENTORY("inventario"),
 
     CLIENT("cliente"),
     MISC("misc."),

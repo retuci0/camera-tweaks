@@ -1,8 +1,7 @@
 package me.retucio.sputnik.util;
 
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import me.retucio.sputnik.event.network.PacketEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
@@ -41,7 +40,6 @@ public class NetworkUtil {
         estimatedTPS = sum / tpsHistory.size();
     }
 
-    @SubscribeEvent
     public void onReceivePacket(PacketEvent.Receive event) {
         if (event.getPacket() instanceof WorldTimeUpdateS2CPacket packet) {
             long currentWorldTime = packet.time();

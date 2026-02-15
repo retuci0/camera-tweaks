@@ -1,10 +1,10 @@
 package me.retucio.sputnik.command;
 
+import com.github.retucio.neutrino.EventListener;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.command.commands.*;
-import me.retucio.sputnik.event.SubscribeEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 
@@ -52,8 +52,8 @@ public class CommandManager {
 
         for (Command command : commands) {
             for (Method method : command.getClass().getDeclaredMethods()) {
-                if (method.isAnnotationPresent(SubscribeEvent.class)) {
-                    Sputnik.EVENT_BUS.register(command);
+                if (method.isAnnotationPresent(EventListener.class)) {
+                    Sputnik.EVENT_BUS.subscribe(command);
                     break;
                 }
             }

@@ -16,6 +16,10 @@ accessible method net/minecraft/client/font/FontManager getStorageInternal (Lnet
 accessible class net/minecraft/client/font/TextRenderer$Drawer
 accessible field net/minecraft/client/font/TextHandler widthRetriever Lnet/minecraft/client/font/TextHandler$WidthRetriever;
 
+# chat
+accessible class net/minecraft/client/gui/hud/ChatHud$Interactable
+accessible class net/minecraft/client/gui/hud/ChatHud$LineConsumer
+
 # entidad
 accessible field net/minecraft/entity/LivingEntity jumpingCooldown I
 accessible method net/minecraft/entity/Entity setFlag (IZ)V

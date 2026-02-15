@@ -1,6 +1,6 @@
 package me.retucio.sputnik.mixin.mixins.misc;
 
-import me.retucio.sputnik.event.events.render.PerspectiveChangeEvent;
+import me.retucio.sputnik.event.render.PerspectiveChangeEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import net.minecraft.client.option.GameOptions;

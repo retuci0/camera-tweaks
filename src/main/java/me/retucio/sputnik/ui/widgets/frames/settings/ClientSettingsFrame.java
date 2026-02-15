@@ -1,7 +1,7 @@
 package me.retucio.sputnik.ui.widgets.frames.settings;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.events.sputnik.GUISettingsFrameEvent;
+import me.retucio.sputnik.event.sputnik.GUISettingsFrameEvent;
 import me.retucio.sputnik.module.modules.client.GUI;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
@@ -9,8 +9,6 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gui.DrawContext;
-
-import java.util.List;
 
 public class ClientSettingsFrame extends SettingsFrame {
 

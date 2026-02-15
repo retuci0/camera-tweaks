@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.movement;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.interact.UseItemEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.UseItemEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
@@ -101,7 +101,7 @@ public class InfiniteElytra extends Module {
         mc.player.setPitch(pitch);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onUseItem(UseItemEvent event) {
         if (mc.player == null) return;
         if (mc.player.getStackInHand(event.getHand()).getItem() == Items.FIREWORK_ROCKET && !mc.player.isSpectator() && mc.player.isGliding()) {

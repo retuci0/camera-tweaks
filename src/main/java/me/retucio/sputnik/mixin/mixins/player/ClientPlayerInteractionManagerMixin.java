@@ -1,6 +1,6 @@
 package me.retucio.sputnik.mixin.mixins.player;
 
-import me.retucio.sputnik.event.events.interact.*;
+import me.retucio.sputnik.event.interact.*;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.player.FastUse;

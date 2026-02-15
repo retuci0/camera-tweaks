@@ -114,6 +114,7 @@ public class SpearKill extends Module {
                 return e;
             }
         }
+
         return null;
     }
 }

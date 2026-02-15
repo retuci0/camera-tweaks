@@ -15,7 +15,7 @@ public class Hitboxes extends Module {
             true
     ));
 
-    private final NumberSetting lineWidth = sgGeneral.add(new NumberSetting(
+    public final NumberSetting lineWidth = sgGeneral.add(new NumberSetting(
             "grosor",
             "grosor de las líneas",
             1,

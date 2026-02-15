@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.network;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.interact.AttackBlockEvent;
-import me.retucio.sputnik.event.events.render.Render3DEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.AttackBlockEvent;
+import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -10,6 +10,7 @@ import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
+import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.math.BlockPos;
@@ -100,11 +101,13 @@ public class PacketMine extends Module {
 
     private final List<MiningBlock> miningBlocks = new ArrayList<>();
     private int currentOrderIndex = 0;
+    private long lastSelectionTime = 0;
 
     @Override
     public void onDisable() {
         miningBlocks.clear();
         currentOrderIndex = 0;
+        lastSelectionTime = 0;
         super.onDisable();
     }
 
@@ -162,10 +165,16 @@ public class PacketMine extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onAttackBlock(AttackBlockEvent event) {
         event.cancel();
-        if (mc.player.age % selectionDelay.getIntValue() != 0) return;
+
+        long now = System.currentTimeMillis();
+        int delayTicks = selectionDelay.getIntValue();
+        if (delayTicks > 0 && now - lastSelectionTime < delayTicks * 50L) {
+            return;
+        }
+        lastSelectionTime = now;
 
         MiningBlock existingBlock = getMiningBlock(event.getPos());
         if (existingBlock == null) {
@@ -185,7 +194,7 @@ public class PacketMine extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderWorld(Render3DEvent event) {
         if (!render.getValue()) return;
         for (MiningBlock block : miningBlocks) {
@@ -202,7 +211,7 @@ public class PacketMine extends Module {
         if (!block.mining) {
             return block.mine();
         } else if (block.shouldRetry()) {
-            block.startTime = mc.player.age;
+            block.startTime = System.currentTimeMillis();
             block.mining = false;
             return block.mine();
         }
@@ -234,7 +243,7 @@ public class PacketMine extends Module {
         public MiningBlock(AttackBlockEvent event) {
             this.pos = event.getPos();
             this.dir = event.getDir();
-            startTime = mc.player.age;
+            startTime = System.currentTimeMillis();
         }
 
         public boolean mine() {
@@ -267,7 +276,7 @@ public class PacketMine extends Module {
         }
 
         public boolean shouldRetry() {
-            return mining && (mc.player.age - startTime >= retryTime.getValue());
+            return mining && (System.currentTimeMillis() - startTime >= retryTime.getValue());
         }
     }
 

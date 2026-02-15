@@ -1,8 +1,7 @@
 package me.retucio.sputnik.util;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.DisconnectEvent;
-import me.retucio.sputnik.event.events.interact.OpenScreenEvent;
+import me.retucio.sputnik.event.network.DisconnectEvent;
+import me.retucio.sputnik.event.interact.OpenScreenEvent;
 import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -39,13 +38,25 @@ public class InventoryUtil {
 
     public static ItemStack find(Predicate<ItemStack> predicate) {
         if (mc.player == null) return null;
-        for (int i = 0; i <= mc.player.getInventory().size(); i++) {
+        for (int i = 0; i < mc.player.getInventory().size(); i++) {
             ItemStack stack = mc.player.getInventory().getStack(i);
             if (predicate.test(stack)) {
                 return stack;
             }
         }
         return null;
+    }
+
+    public static List<ItemStack> findAll(Predicate<ItemStack> predicate) {
+        List<ItemStack> stacks = new ArrayList<>();
+        if (mc.player == null) return stacks;
+        for (int i = 0; i < mc.player.getInventory().size(); i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (predicate.test(stack)) {
+                stacks.add(stack);
+            }
+        }
+        return stacks;
     }
 
     public static ItemStack getStackOf(Item item) {
@@ -78,6 +89,20 @@ public class InventoryUtil {
             }
         }
         return stacks;
+    }
+
+
+    public static void move(int fromSlot, int toSlot) {
+        if (mc.player == null || mc.interactionManager == null) return;
+
+        int syncId = mc.player.playerScreenHandler.syncId;
+
+        mc.interactionManager.clickSlot(syncId, fromSlot, 0, SlotActionType.PICKUP, mc.player);
+        mc.interactionManager.clickSlot(syncId, toSlot, 0, SlotActionType.PICKUP, mc.player);
+
+        if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
+            mc.interactionManager.clickSlot(syncId, fromSlot, 0, SlotActionType.PICKUP, mc.player);
+        }
     }
 
     public static void swapSlots(int containerSlot1, int containerSlot2, HandledScreen<?> screen) {
@@ -303,7 +328,6 @@ public class InventoryUtil {
         return -1;
     }
 
-    @SubscribeEvent
     public static void onOpenScreen(OpenScreenEvent event) {
         if (mc.player == null
                 || event.getScreen() == null
@@ -315,7 +339,6 @@ public class InventoryUtil {
             echestInv = handler.getInventory();
     }
 
-    @SubscribeEvent
     public void onDisconnect(DisconnectEvent event) {
         echestInv = null;
     }

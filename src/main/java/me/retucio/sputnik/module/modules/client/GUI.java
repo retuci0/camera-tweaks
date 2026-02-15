@@ -1,11 +1,11 @@
 package me.retucio.sputnik.module.modules.client;
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.command.CommandManager;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.TickEvent;
-import me.retucio.sputnik.event.events.sputnik.LoadClickGUIEvent;
-import me.retucio.sputnik.event.events.sputnik.LoadCommandManagerEvent;
+import me.retucio.sputnik.event.TickEvent;
+import me.retucio.sputnik.event.sputnik.LoadClickGUIEvent;
+import me.retucio.sputnik.event.sputnik.LoadCommandManagerEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
@@ -111,13 +111,13 @@ public class GUI extends Module {
                 Category.CLIENT,
                 GLFW.GLFW_KEY_RIGHT_SHIFT);
 
-        me.retucio.sputnik.Sputnik.EVENT_BUS.register(this);
+        Sputnik.EVENT_BUS.subscribe(this);
         keyMode.setVisible(false);
         notify.setVisible(false);
         searchBar.onUpdate(v -> matchCase.setVisible(v));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onLoadCommandManager(LoadCommandManagerEvent event) {
         commandPrefix.onUpdate(CommandManager.INSTANCE::setPrefix);
         commandPrefix.setDefaultValue(CommandManager.INSTANCE.getPrefix());
@@ -128,7 +128,7 @@ public class GUI extends Module {
         });
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onLoadClickGUI(LoadClickGUIEvent event) {
         color.onUpdate(v -> {
             Colors.red = color.getR();
@@ -139,7 +139,7 @@ public class GUI extends Module {
         });
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onTick(TickEvent.Post event) {
         if (color.isRainbow()) {
             Colors.red = color.getR();

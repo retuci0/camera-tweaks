@@ -1,8 +1,8 @@
 package me.retucio.sputnik.mixin.mixins.render;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import me.retucio.sputnik.event.events.render.RenderHeldItemEvent;
-import me.retucio.sputnik.event.events.render.RenderArmEvent;
+import me.retucio.sputnik.event.render.RenderHeldItemEvent;
+import me.retucio.sputnik.event.render.RenderArmEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.player.HandView;
 import net.minecraft.client.MinecraftClient;

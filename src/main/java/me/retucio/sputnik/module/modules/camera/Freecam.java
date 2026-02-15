@@ -1,14 +1,14 @@
 package me.retucio.sputnik.module.modules.camera;
 
-import me.retucio.sputnik.event.Stage;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.KeyEvent;
-import me.retucio.sputnik.event.events.input.MouseClickEvent;
-import me.retucio.sputnik.event.events.input.MouseScrollEvent;
-import me.retucio.sputnik.event.events.interact.*;
-import me.retucio.sputnik.event.events.network.ChunkOcclusionEvent;
-import me.retucio.sputnik.event.events.network.DisconnectEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.Event;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.input.KeyEvent;
+import me.retucio.sputnik.event.input.MouseClickEvent;
+import me.retucio.sputnik.event.input.MouseScrollEvent;
+import me.retucio.sputnik.event.interact.*;
+import me.retucio.sputnik.event.network.ChunkOcclusionEvent;
+import me.retucio.sputnik.event.network.DisconnectEvent;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.mixin.mixins.entity.EntityMixin;
 import me.retucio.sputnik.mixin.mixins.io.KeyInputMixin;
 import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
@@ -207,10 +207,10 @@ public class Freecam extends Module {
         pos.set(pos.x + dx, pos.y + dy, pos.z + dz);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onSendPacket(PacketEvent.Send event) {
         if (!isEnabled() || !cancelActionPackets.getValue()) return;
-        if (event.getStage() != Stage.PRE) return;
+        if (event.getStage() != Event.Stage.PRE) return;
 
         Packet<?> packet = event.getPacket();
         if (packet instanceof PlayerActionC2SPacket
@@ -221,7 +221,7 @@ public class Freecam extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onKey(KeyEvent event) {
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
         if (mc.currentScreen != null) return;
@@ -254,7 +254,7 @@ public class Freecam extends Module {
         if (shouldCancel) event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onMouseClick(MouseClickEvent event) {  // por si el restrasado del usuario usa el ratón para moverse
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
         if (mc.currentScreen != null) return;
@@ -287,7 +287,7 @@ public class Freecam extends Module {
         if (shouldCancel) event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onMouseScroll(MouseScrollEvent event) {
         if (scrollSens.getValue() > 0 && mc.currentScreen == null && scrollKey.isDown()) {
             speed += event.getVertical() / 4 * (scrollSens.getValue() * speed);
@@ -296,17 +296,17 @@ public class Freecam extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onChunkOcclusion(ChunkOcclusionEvent event) {
         event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onLeaveGame(DisconnectEvent event) {
         toggle();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPacketReceive(PacketEvent.Receive event) {
         if (mc.player == null) return;  // el jugador probablemente nunca sea nulo bajo estas circunstancias pero quién sabe
 
@@ -321,7 +321,7 @@ public class Freecam extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onOpenScreen(OpenScreenEvent event) {
         unpress();
         stopMoving();
@@ -332,22 +332,22 @@ public class Freecam extends Module {
 
     // los paquetes ya se cancelan, pero visualmente estos eventos se siguen dando
 
-    @SubscribeEvent
+    @EventListener
     private void onBreakBlock(BreakBlockEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPlaceBlock(PlaceBlockEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onInteractEntity(InteractEntityEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onAttack(AttackEntityEvent event) {
         if (cancelActionPackets.getValue()) event.cancel();
     }

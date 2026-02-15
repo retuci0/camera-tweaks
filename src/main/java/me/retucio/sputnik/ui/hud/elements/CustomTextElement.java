@@ -1,7 +1,6 @@
 package me.retucio.sputnik.ui.hud.elements;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.sputnik.UpdateSettingEvent;
+import me.retucio.sputnik.event.sputnik.UpdateSettingEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.TextHudElement;
@@ -37,7 +36,6 @@ public class CustomTextElement extends TextHudElement {
         );
     }
 
-    @SubscribeEvent
     public void onUpdateSetting(UpdateSettingEvent event) {
         if (ModuleManager.INSTANCE == null) return;
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);

@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.player;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.interact.SwitchSlotEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.SwitchSlotEvent;
 import me.retucio.sputnik.mixin.accessors.FishingBobberEntityAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -118,7 +118,7 @@ public class AutoFish extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSwitchSlot(SwitchSlotEvent event) {
         warned = false;
     }

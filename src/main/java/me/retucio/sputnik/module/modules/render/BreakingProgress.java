@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.render;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.render.Render3DEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -14,7 +14,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
-import org.jspecify.annotations.NonNull;
 
 import java.awt.*;
 
@@ -42,7 +41,7 @@ public class BreakingProgress extends Module {
                 Category.RENDER);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderWorld(Render3DEvent event) {
         if (mc.interactionManager == null || mc.world == null) return;
         if (!(mc.crosshairTarget instanceof BlockHitResult hitResult)) return;

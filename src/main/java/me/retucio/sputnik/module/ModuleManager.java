@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module;
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.SubscribeEvent;
 import me.retucio.sputnik.module.modules.client.DiscordRPC;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.module.modules.camera.*;
@@ -9,6 +9,7 @@ import me.retucio.sputnik.module.modules.combat.AttributeSwapper;
 import me.retucio.sputnik.module.modules.combat.MaceKill;
 import me.retucio.sputnik.module.modules.combat.ProjectileTrajectories;
 import me.retucio.sputnik.module.modules.combat.SpearKill;
+import me.retucio.sputnik.module.modules.inventory.*;
 import me.retucio.sputnik.module.modules.misc.*;
 import me.retucio.sputnik.module.modules.movement.*;
 import me.retucio.sputnik.module.modules.network.*;
@@ -51,8 +52,8 @@ public class ModuleManager {
         // registrar los "listeners" necesarios
         for (Module module : getEnabledModules()) {
             for (Method method : module.getClass().getDeclaredMethods()) {
-                if (method.isAnnotationPresent(SubscribeEvent.class)) {
-                    Sputnik.EVENT_BUS.register(module);
+                if (method.isAnnotationPresent(EventListener.class)) {
+                    Sputnik.EVENT_BUS.subscribe(module);
                     break;
                 }
             }
@@ -90,6 +91,7 @@ public class ModuleManager {
         add(new ChatPlus());
         add(new CreativeInventoryHotbarKeybinds());
         add(new FakePlayer());
+        add(new Replenish());
         add(new ScreenshotPlus());
         add(new ShulkerPeek());
         add(new UnfocusedCpu());

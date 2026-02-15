@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.camera;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.render.ChangeRotationEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.render.ChangeRotationEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -40,7 +40,7 @@ public class Rotations extends Module {
             );
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onChangeRotation(ChangeRotationEvent event) {
         if (smooth.getValue()
                 && (event.getYaw() != yaw.getFloatValue() || event.getPitch() != pitch.getFloatValue())){

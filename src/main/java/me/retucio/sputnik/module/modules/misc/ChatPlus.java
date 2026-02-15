@@ -1,13 +1,13 @@
 package me.retucio.sputnik.module.modules.misc;
 
+import com.github.retucio.neutrino.EventListener;
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import me.retucio.sputnik.command.CommandManager;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.ClientClickEvent;
-import me.retucio.sputnik.event.events.network.ReceiveMessageEvent;
-import me.retucio.sputnik.event.events.network.SendMessageEvent;
+import me.retucio.sputnik.event.input.ClientClickEvent;
+import me.retucio.sputnik.event.network.ReceiveMessageEvent;
+import me.retucio.sputnik.event.network.SendMessageEvent;
 import me.retucio.sputnik.mixin.mixins.hud.ChatHudMixin;
 import me.retucio.sputnik.mixin.mixins.hud.InGameHudMixin;
 import me.retucio.sputnik.mixin.mixins.misc.StringHelperMixin;
@@ -72,6 +72,7 @@ public class ChatPlus extends Module {
     }
 
     public final IntList lines = new IntArrayList();
+    public ChatHudLine.Visible line;
 
     private record CustomHeadEntry(String prefix, Identifier texture) {}
     private static final List<CustomHeadEntry> CUSTOM_HEAD_ENTRIES = new ArrayList<>();
@@ -82,7 +83,7 @@ public class ChatPlus extends Module {
     private static final Pattern timestampRegex = Pattern.compile("^<\\d{1,2}:\\d{1,2}>");
     private static final Pattern coordRegex = Pattern.compile("(?<x>-?\\d{3,}(?:\\.\\d*)?)(?:\\s+(?<y>-?\\d{1,3}(?:\\.\\d*)?))?\\s+(?<z>-?\\d{3,}(?:\\.\\d*)?)");
 
-    @SubscribeEvent
+    @EventListener
     private void onReceiveMessage(ReceiveMessageEvent event) {
         Text message = event.getMessage();
 
@@ -114,7 +115,7 @@ public class ChatPlus extends Module {
         event.setMessage(message);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onSendMessage(SendMessageEvent event) {
         // evitar mandar coordenadas por el chat
         if (coordsProtection.getValue() && containsCoordinates(event.getMessage())) {
@@ -131,51 +132,44 @@ public class ChatPlus extends Module {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    private void beforeDrawMessage(DrawContext context, ChatHudLine.Visible line, int y, int color) {
-        if (!isEnabled() || !showHeads.getValue()) return;
+    public void beforeDrawMessage(DrawContext context, int y, int color) {
+        if (!isEnabled() || !showHeads.getValue() || lines == null) return;
 
-        // dibujar la cabeza al principio del mensaje
-        if (((IChatHudLineVisible) (Object) line).sputnik$isStartOfEntry())
+        if (((IChatHudLineVisible) (Object) line).sputnik$isStartOfEntry())  {
             drawTexture(context, (IChatHudLine) (Object) line, y, color);
-
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(10, 0);
+        }
     }
 
-    public void afterDrawMessage(DrawContext context) {
-        // finalizar renderizado de la cabeza
+    public void afterDrawMessage() {
         if (!isEnabled() || !showHeads.getValue()) return;
-        context.getMatrices().popMatrix();
+        line = null;
     }
-
     @SuppressWarnings("DataFlowIssue")
     private void drawTexture(DrawContext context, IChatHudLine line, int y, int color) {
         String text = line.sputnik$getText().trim();
 
         int startOffset = 0;
 
-        // buscar el sello del tiempo si lo hay para dibujar la cabeza correctamente
         try {
             Matcher m = timestampRegex.matcher(text);
             if (m.find()) startOffset = m.end() + 1;
-        } catch (IllegalStateException ignored) {}
+        }
+        catch (IllegalStateException ignored) {}
 
-        // dibujar el icono del mod
         for (CustomHeadEntry entry : CUSTOM_HEAD_ENTRIES) {
-            if (text.startsWith(entry.prefix().trim(), startOffset)) {
+            if (text.startsWith(entry.prefix(), startOffset)) {
                 context.drawTexture(RenderPipelines.GUI_TEXTURED, entry.texture(), 0, y, 0, 0, 8, 8, 64, 64, 64, 64, color);
                 return;
             }
         }
 
-        // obtener y dibujar la cabeza del jugador
         GameProfile sender = getSender(line, text);
         if (sender == null) return;
 
         PlayerListEntry entry = mc.getNetworkHandler().getPlayerListEntry(sender.id());
         if (entry == null) return;
 
-        PlayerSkinDrawer.draw(context, entry.getSkinTextures(), 0, y, 8);
+        PlayerSkinDrawer.draw(context, entry.getSkinTextures(), 0, y, 8, color);
     }
 
     @SuppressWarnings("DataFlowIssue")

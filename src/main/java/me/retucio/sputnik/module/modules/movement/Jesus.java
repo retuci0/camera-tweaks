@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.movement;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.interact.BlockShapeEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.interact.BlockShapeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -96,7 +96,7 @@ public class Jesus extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onBlockShape(BlockShapeEvent event) {
         if (event.getState().getBlock() == Blocks.LAVA && !lava.getValue()) return;
         if (event.getState().getBlock() == Blocks.WATER && !water.getValue()) return;

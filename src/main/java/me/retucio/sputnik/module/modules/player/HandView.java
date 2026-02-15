@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.player;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.render.RenderHeldItemEvent;
-import me.retucio.sputnik.event.events.render.RenderArmEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.render.RenderHeldItemEvent;
+import me.retucio.sputnik.event.render.RenderArmEvent;
 import me.retucio.sputnik.mixin.mixins.render.HeldItemRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -101,8 +101,8 @@ public class HandView extends Module {
                 Category.PLAYER);
     }
 
-    @SubscribeEvent
-    private void onHeldItemRender(RenderHeldItemEvent event) {
+    @EventListener
+    private void onRenderHand(RenderHeldItemEvent event) {
         switch (event.getHand()) {
             case MAIN_HAND -> {
                 scale(event.getMatrices(), new Vec3d(scaleMainX.getValue(), scaleMainY.getValue(), scaleMainZ.getValue()));
@@ -117,7 +117,7 @@ public class HandView extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderArm(RenderArmEvent event) {
         scale(event.getMatrices(), new Vec3d(scaleArmX.getValue(), scaleArmY.getValue(), scaleArmZ.getValue()));
         translate(event.getMatrices(), new Vec3d(posArmX.getValue(), posArmY.getValue(), posArmZ.getValue()));

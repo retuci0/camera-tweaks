@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.misc;
 
-import me.retucio.sputnik.event.events.render.RenderBossbarEvent;
-import me.retucio.sputnik.event.SubscribeEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.render.RenderBossbarEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -43,7 +43,7 @@ public class BossbarStack extends Module {
                 Category.MISC);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderBossText(RenderBossbarEvent.BossText event) {
         if (hideNames.getValue()) {
             event.setName(Text.empty());
@@ -58,12 +58,12 @@ public class BossbarStack extends Module {
             event.setName(event.getName().copy().append(" x" + amount));
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderBossSpacing(RenderBossbarEvent.BossSpacing event) {
         event.setSpacing(10 - spaceReduction.getIntValue());
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderBossBars(RenderBossbarEvent.BossIterator event) {
         if (stackBars.getValue()) {
             HashMap<String, ClientBossBar> chosenBarMap = new HashMap<>();

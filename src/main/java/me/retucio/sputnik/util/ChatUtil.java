@@ -2,10 +2,8 @@ package me.retucio.sputnik.util;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.CommandManager;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.sputnik.LoadModuleManagerEvent;
+import me.retucio.sputnik.event.sputnik.LoadModuleManagerEvent;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -17,7 +15,6 @@ public class ChatUtil {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static String prefix = getDefaultPrefix();
 
-    @SubscribeEvent
     public static void onLoadModuleManager(LoadModuleManagerEvent event) {
         prefix = Colors.getFormatting(Colors.mainColor) + "[" + ClientSettingsFrame.guiSettings.chatName.getValue() + "] ";
     }

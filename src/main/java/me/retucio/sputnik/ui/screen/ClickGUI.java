@@ -1,11 +1,11 @@
 package me.retucio.sputnik.ui.screen;
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.KeyEvent;
-import me.retucio.sputnik.event.events.input.MouseClickEvent;
-import me.retucio.sputnik.event.events.input.MouseScrollEvent;
-import me.retucio.sputnik.event.events.sputnik.SettingsFrameEvent;
+import me.retucio.sputnik.event.input.KeyEvent;
+import me.retucio.sputnik.event.input.MouseClickEvent;
+import me.retucio.sputnik.event.input.MouseScrollEvent;
+import me.retucio.sputnik.event.sputnik.SettingsFrameEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.Setting;
@@ -63,7 +63,7 @@ public class ClickGUI extends Screen {
     public ClickGUI() {
         super(Text.of("interfaz"));
         settingsFrames.add(guiSettingsFrame);
-        Sputnik.EVENT_BUS.register(this);
+        Sputnik.EVENT_BUS.subscribe(this);
     }
 
     @Override
@@ -172,18 +172,18 @@ public class ClickGUI extends Screen {
         return super.mouseDragged(click, deltaX, deltaY);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onKey(KeyEvent event) {
         searchBar.onKey(event.getKey(), event.getAction());
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMouseScroll(MouseScrollEvent event) {
         miscWidgets.forEach(w -> w.mouseScrolled(
                 event.getVertical() * guiSettings.scrollSens.getValue()));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMouseMiddleButton(MouseClickEvent event) {
         // mover todos los marcos a un punto visible al presionar shift + la rueda del ratón
         if (Sputnik.mc.currentScreen != this || event.getButton() != 2 || !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) return;

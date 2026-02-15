@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.camera;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.network.PacketEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
@@ -50,7 +50,7 @@ public class Autism extends Module {
         ));
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround packet
                 && packet.getYaw(yaw) != yaw) event.cancel();

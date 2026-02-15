@@ -1,13 +1,12 @@
 package me.retucio.sputnik.module.modules.render;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.render.RenderBlockOutlineEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.render.RenderBlockOutlineEvent;
 import me.retucio.sputnik.mixin.mixins.render.WorldRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import me.retucio.sputnik.ui.screen.UpdateScreen;
 import me.retucio.sputnik.util.Colors;
 
 /** continúa en:
@@ -38,7 +37,7 @@ public class BlockOutline extends Module {
                 Category.RENDER);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onRenderBlockOutline(RenderBlockOutlineEvent event) {
         event.setColor(color.getRGB());
         event.setLineWidth(lineWidth.getFloatValue());

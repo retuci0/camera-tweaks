@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin.mixins.render;
 
 
-import me.retucio.sputnik.event.events.render.GetFOVEvent;
+import me.retucio.sputnik.event.render.GetFOVEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.misc.UnfocusedCpu;

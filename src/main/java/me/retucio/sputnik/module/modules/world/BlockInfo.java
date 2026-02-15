@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.world;
 
+import com.github.retucio.neutrino.EventListener;
 import com.google.gson.Gson;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.KeyEvent;
+import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
@@ -39,7 +39,7 @@ public class BlockInfo extends Module {
                 Category.WORLD);
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onKey(KeyEvent event) {
         if (mc.player == null || mc.world == null) return;
         if (event.getKey() != key.getValue() || event.getAction() != GLFW.GLFW_PRESS) return;

@@ -1,9 +1,9 @@
 package me.retucio.sputnik.module;
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.config.ConfigManager;
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.sputnik.ToggleModuleEvent;
+import me.retucio.sputnik.event.sputnik.ToggleModuleEvent;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
@@ -104,8 +104,8 @@ public class Module {
     public void onEnable() {
         if (notify.getValue()) ChatUtil.info(getName() + " fue activado");
         for (Method method : getClass().getDeclaredMethods())
-            if (method.isAnnotationPresent(SubscribeEvent.class)) {
-                Sputnik.EVENT_BUS.register(this);
+            if (method.isAnnotationPresent(EventListener.class)) {
+                Sputnik.EVENT_BUS.subscribe(this);
                 break;
         }
         Sputnik.EVENT_BUS.post(new ToggleModuleEvent(this));
@@ -113,8 +113,8 @@ public class Module {
 
     public void onDisable() {
         if (notify.getValue()) ChatUtil.info(getName() + " fue desactivado");
-        if (Sputnik.EVENT_BUS.isRegistered(this))
-            Sputnik.EVENT_BUS.unregister(this);
+        if (Sputnik.EVENT_BUS.isSubscribed(this))
+            Sputnik.EVENT_BUS.unsubscribe(this);
         Sputnik.EVENT_BUS.post(new ToggleModuleEvent(this));
     }
 

@@ -1,7 +1,6 @@
 package me.retucio.sputnik.util;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.TickEvent;
+import me.retucio.sputnik.event.TickEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,7 +20,6 @@ public class MiscUtil {
 
     public static Screen screen;
 
-    @SubscribeEvent
     public static void onTick(TickEvent.Post event) {
         if (screen != null && mc.currentScreen == null) {
             mc.setScreen(screen);

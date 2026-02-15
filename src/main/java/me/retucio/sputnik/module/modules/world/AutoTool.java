@@ -1,8 +1,8 @@
 package me.retucio.sputnik.module.modules.world;
 
-import me.retucio.sputnik.event.SubscribeEvent;
-import me.retucio.sputnik.event.events.input.KeyEvent;
-import me.retucio.sputnik.event.events.input.MouseClickEvent;
+import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.event.input.KeyEvent;
+import me.retucio.sputnik.event.input.MouseClickEvent;
 import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -105,12 +105,12 @@ public class AutoTool extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onKey(KeyEvent event) {
         handle(event.getKey(), event.getAction());
     }
 
-    @SubscribeEvent
+    @EventListener
     private void onClick(MouseClickEvent event) {
         handle(event.getButton(), event.getAction());
     }
