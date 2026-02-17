@@ -33,4 +33,8 @@ public class Render3DEvent extends Event {
     public Camera getCamera() {
         return camera;
     }
+
+    public float getTickDelta() {
+        return tc.getDynamicDeltaTicks();
+    }
 }

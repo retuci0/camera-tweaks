@@ -408,11 +408,11 @@ public class ClickGUI extends Screen {
 
     // selección de widgets
 
-    public Widget getSelected() {
+    public @Nullable Widget getSelected() {
         return selected;
     }
 
-    public void setSelected(Widget widget) {
+    public void setSelected(@Nullable Widget widget) {
         this.selected = widget;
     }
 

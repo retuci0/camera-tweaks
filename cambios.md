@@ -2,21 +2,19 @@
 
 ## novedades
 
-- cambiado de sistema de eventos
-- categoría de inventario
-
 ### adiciones
+
+- ahora se puede asignar un botón del ratón a un módulo
 
 #### módulos nuevos:
 
-- reponer: repone items a medida que se usan de forma automática
+- mochila: te permite llevar items en los slots de crafteo del inventario
+- tecla de perla: te permite lanzar una perla con tan solo un pulsamiento de tecla, siempre y cuando tengas en el inventario
 
 ### arreglos / mejoras
 
-- ahora el grosor de línea de hitboxes funciona
-- ahora cabezas de chatplus funciona, a medias
+- arreglada la cagada de Mojang de las teclas debug
 
 ## problemas reconocidos
 
-- es posible que algunos módulos hayan dejado de funcionar correctamente, ya que he cambiado de sistema de eventos
 - muchos, pero repórtalos en la página de problemas si quieres para que queden bien registrados 

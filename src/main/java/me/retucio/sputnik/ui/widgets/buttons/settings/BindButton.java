@@ -15,6 +15,9 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 // botón para configurar la tecla asignada a un módulo. comienza a escuchar al hacerle clic.
 public class BindButton extends SettingButton<KeySetting> {
@@ -41,15 +44,38 @@ public class BindButton extends SettingButton<KeySetting> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
-            if (button == 0) {
-                listening = !listening;
-            }
-            else if (button == 1 && KeyUtil.isShiftDown()) {
-                setting.reset();
+        boolean hovered = isHovered(mouseX, mouseY);
+
+        if (hovered && ClickGUI.INSTANCE.trySelect(this)) {
+            if (listening) {
+                List<KeyBinding> keys = new ArrayList<>(List.of(mc.options.allKeys));
+                keys.removeAll(List.of(mc.options.debugKeys));
+                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
+
+                for (KeyBinding bind : keys) {
+                    if (bind.matchesKey(new KeyInput(button, 0, 0))) {
+                        if (!allowMultiple) {
+                            ChatUtil.warn("esa tecla ya está cogida por "
+                                    + Formatting.GREEN + "\"" + I18n.translate(bind.getId()) + "\"");
+                            listening = false;
+                            return;
+                        }
+                    }
+                }
+
+                setting.setValue(button);
+                listening = false;
+            } else {
+                if (button == 0) {
+                    listening = true;
+                } else if (button == 1 && KeyUtil.isShiftDown()) {
+                    setting.reset();
+                }
             }
         } else {
-            listening = false;
+            if (listening) {
+                listening = false;
+            }
         }
     }
 
@@ -59,7 +85,9 @@ public class BindButton extends SettingButton<KeySetting> {
         if (key == GLFW.GLFW_KEY_ESCAPE) {
             setting.setValue(GLFW.GLFW_KEY_UNKNOWN);
         } else {
-            for (KeyBinding bind : mc.options.allKeys) {
+            List<KeyBinding> keys = new ArrayList<>(List.of(mc.options.allKeys));
+            keys.removeAll(List.of(mc.options.debugKeys));
+            for (KeyBinding bind : keys) {
                 // no permitir usar la misma tecla para varias acciones, si el ajuste para esto está activado
                 boolean keyAlreadyBound = bind.matchesKey(new KeyInput(key, 0, 0));
                 boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();

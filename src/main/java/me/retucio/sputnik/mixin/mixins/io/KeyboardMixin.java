@@ -17,7 +17,7 @@ public abstract class KeyboardMixin {
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     private void onKeyPress(long window, int action, KeyInput input, CallbackInfo ci) {
         if (input.key() == -1) return;
-        Sputnik.INSTANCE.onKey(input.key(), action);
+        Sputnik.INSTANCE.onInput(input.key(), action);
         KeyEvent event = EVENT_BUS.post(new KeyEvent(input.key(), input.scancode(), action));
         if (event.isCancelled()) ci.cancel();
     }

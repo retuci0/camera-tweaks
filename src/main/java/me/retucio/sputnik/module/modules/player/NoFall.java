@@ -143,7 +143,7 @@ public class NoFall extends Module {
 
     private ItemStack getMlgItem() {
         for (Item item : items.getEnabledOptions()) {
-            ItemStack stack = InventoryUtil.getStackOf(item);
+            ItemStack stack = InventoryUtil.find(itemStack -> itemStack.isOf(item));
             if (stack != null && PlayerInventory.isValidHotbarIndex(mc.player.getInventory().getSlotWithStack(stack))) {
                 return stack;
             }

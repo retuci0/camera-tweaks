@@ -47,6 +47,17 @@ public class InventoryUtil {
         return null;
     }
 
+    public static int findSlot(Predicate<ItemStack> predicate) {
+        if (mc.player == null) return -1;
+        for (int i = 0; i < mc.player.getInventory().size(); i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (predicate.test(stack)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static List<ItemStack> findAll(Predicate<ItemStack> predicate) {
         List<ItemStack> stacks = new ArrayList<>();
         if (mc.player == null) return stacks;
@@ -57,14 +68,6 @@ public class InventoryUtil {
             }
         }
         return stacks;
-    }
-
-    public static ItemStack getStackOf(Item item) {
-        if (mc.player == null) return null;
-        for (ItemStack stack : mc.player.getInventory())
-            if (stack.getItem() == item)
-                return stack;
-        return null;
     }
 
     public static List<ItemStack> getStacksOfTag(TagKey<Item> tag) {

@@ -1,5 +1,6 @@
 package me.retucio.sputnik.mixin.mixins.io;
 
+import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.input.MouseClickEvent;
 import me.retucio.sputnik.event.input.MouseScrollEvent;
 import net.minecraft.client.Mouse;
@@ -16,6 +17,7 @@ public abstract class MouseMixin {
 
     @Inject(method = "onMouseButton", at = @At("HEAD"), cancellable = true)
     private void onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
+        Sputnik.INSTANCE.onInput(input.button(), action);
         MouseClickEvent event = EVENT_BUS.post(new MouseClickEvent(action, input.button()));
         if (event.isCancelled()) ci.cancel();
     }

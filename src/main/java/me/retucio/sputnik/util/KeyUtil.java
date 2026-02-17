@@ -5,6 +5,7 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.im.InputContext;

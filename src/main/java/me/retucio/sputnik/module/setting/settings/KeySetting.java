@@ -32,7 +32,7 @@ public class KeySetting extends Setting<Integer> {
 
         if (ModuleManager.INSTANCE != null) {
             for (Module module : ModuleManager.INSTANCE.getModules())
-                if (module.getKey() == value && !ClientSettingsFrame.guiSettings.multipleKeybinds.getValue() && value != -1) {
+                if (module.getKey() == value && value != -1) {
                     module.setKey(-1);
                     ChatUtil.info("tecla del módulo " + module.getName() + " restablecida");
                 }

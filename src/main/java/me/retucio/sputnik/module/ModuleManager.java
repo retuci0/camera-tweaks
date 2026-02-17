@@ -40,6 +40,7 @@ public class ModuleManager {
         // añadir los módulos
         addCamera();
         addClient();
+        addInventory();
         addMisc();
         addMovement();
         addNetwork();
@@ -87,14 +88,23 @@ public class ModuleManager {
         add(new AnvilFont());
         add(new BookBot());
         add(new BossbarStack());
-        add(new BundleDupe());
         add(new ChatPlus());
-        add(new CreativeInventoryHotbarKeybinds());
         add(new FakePlayer());
         add(new Replenish());
         add(new ScreenshotPlus());
-        add(new ShulkerPeek());
         add(new UnfocusedCpu());
+    }
+
+    private void addInventory() {
+        add(new BundleDupe());
+        add(new CreativeInventoryHotbarKeybinds());
+        add(new InventoryPlus());
+        add(new Offhand());
+        add(new PortalGUI());
+        add(new Replenish());
+        add(new ShulkerPeek());
+        add(new UIMove());
+        add(new XCarry());
     }
 
     private void addMovement() {
@@ -129,12 +139,9 @@ public class ModuleManager {
         add(new Capes());
         add(new FastUse());
         add(new HandView());
-        add(new InventoryPlus());
+        add(new KeyPearl());
         add(new MaceKill());
         add(new NoFall());
-        add(new Offhand());
-        add(new PortalGUI());
-        add(new UIMove());
         add(new SpearKill());
         add(new WarnLowDurability());
     }

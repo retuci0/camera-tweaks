@@ -5,11 +5,19 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.ModuleArgumentType;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
+import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.KeyUtil;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import javax.swing.text.JTextComponent;
+import java.util.ArrayList;
+import java.util.List;
 
 // asignar una tecla a un módulo, lógica similar a BindButton
 public class BindCommand extends Command {
@@ -42,6 +50,24 @@ public class BindCommand extends Command {
     public static boolean onKeyPress(int key) {
         if (listeningModule == null) return false;
         KeySetting bind = listeningModule.getBind();
+
+        if (ClientSettingsFrame.guiSettings.multipleKeybinds.getValue()) {
+            List<KeyBinding> keys = new ArrayList<>(List.of(mc.options.allKeys));
+            keys.removeAll(List.of(mc.options.debugKeys));
+
+            for (KeyBinding kb : keys) {
+                boolean keyAlreadyBound = kb.matchesKey(new KeyInput(key, 0, 0));
+                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
+
+                if (keyAlreadyBound && !allowMultiple) {
+                    ChatUtil.warn("esa tecla ya está cogida por "
+                            + Formatting.GREEN + "\"" + I18n.translate(kb.getId()) + "\"");
+                    listeningModule = null;
+                    return true;
+                }
+            }
+        }
+
         if (bind != null) bind.setValue(key);
 
         ChatUtil.info(

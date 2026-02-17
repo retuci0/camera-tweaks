@@ -19,34 +19,52 @@ public class RenderUtil {
 
     // líneas
 
-    public static void drawHorizontalLine(MatrixStack matrices, float x1, float x2, float y, Color color) {
-        if (x2 < x1) {
-            float i = x1;
-            x1 = x2;
-            x2 = i;
-        }
+    public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end, Color color, float lineWidth) {
+        Camera camera = mc.gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getCameraPos();
 
-        drawFilledRect(matrices, x1, y, x2 + 1, y + 1, color);
+        float startX = (float) (start.x - cameraPos.x);
+        float startY = (float) (start.y - cameraPos.y);
+        float startZ = (float) (start.z - cameraPos.z);
+        float endX   = (float) (end.x - cameraPos.x);
+        float endY   = (float) (end.y - cameraPos.y);
+        float endZ   = (float) (end.z - cameraPos.z);
+
+        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
+
+        float nx = -1.0f, ny = -1f, nz = -1.0f;
+
+        buffer.vertex(matrices.peek().getPositionMatrix(), startX, startY, startZ)
+                .color(color.getRGB())
+                .normal(nx, ny, nz)
+                .lineWidth(lineWidth);
+        buffer.vertex(matrices.peek().getPositionMatrix(), endX, endY, endZ)
+                .color(color.getRGB())
+                .normal(nx, ny, nz)
+                .lineWidth(lineWidth);
+
+        Layers.lines().draw(buffer.end());
     }
 
-    public static void drawVerticalLine(MatrixStack matrices, float x, float y1, float y2, Color color) {
-        if (y2 < y1) {
-            float i = y1;
-            y1 = y2;
-            y2 = i;
-        }
+    public static void drawLine2D(MatrixStack matrices, float x1, float y1, float x2, float y2, Color color, float lineWidth) {
+        float r = color.getRed() / 255f;
+        float g = color.getGreen() / 255f;
+        float b = color.getBlue() / 255f;
+        float a = color.getAlpha() / 255f;
 
-        drawFilledRect(matrices, x, y1 + 1, x + 1, y2, color);
-    }
+        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
+        float nx = 0, ny = 0, nz = 1; // normals not used
 
-    public static void drawHorizontalLine(MatrixStack matrices, float x1, float x2, float y, Color color, float width) {
-        if (x2 < x1) {
-            float i = x1;
-            x1 = x2;
-            x2 = i;
-        }
+        buffer.vertex(matrices.peek().getPositionMatrix(), x1, y1, 0)
+                .color(r, g, b, a)
+                .normal(nx, ny, nz)
+                .lineWidth(lineWidth);
+        buffer.vertex(matrices.peek().getPositionMatrix(), x2, y2, 0)
+                .color(r, g, b, a)
+                .normal(nx, ny, nz)
+                .lineWidth(lineWidth);
 
-        drawFilledRect(matrices, x1, y, x2 + width, y + width, color);
+        Layers.lines().draw(buffer.end());
     }
 
     public static void drawVector(MatrixStack matrices, Vector3f start, Vec3d direction, Color c, float lineWidth) {
@@ -77,18 +95,8 @@ public class RenderUtil {
         Layers.lines().draw(buffer.end());
     }
 
-    public static void drawVerticalLine(MatrixStack matrices, float x, float y1, float y2, Color color, float width) {
-        if (y2 < y1) {
-            float i = y1;
-            y1 = y2;
-            y2 = i;
-        }
 
-        drawFilledRect(matrices, x, y1 + width, x + width, y2, color);
-    }
-
-
-    // caras
+    /* caras */
 
     public static void drawFilledRect(MatrixStack matrices, float x, float y, float width, float height, Color color) {
         float r = color.getRed() / 255f;
@@ -108,13 +116,6 @@ public class RenderUtil {
 
         Layers.quads().draw(buffer.end());
         matrices.pop();
-    }
-
-    public static void drawRectOutlines(MatrixStack stack, float x1, float y1, float x2, float y2, Color color, float width) {
-        drawHorizontalLine(stack, x1, x2, y1, color, width);
-        drawVerticalLine(stack, x2, y1, y2, color, width);
-        drawHorizontalLine(stack, x1, x2, y2, color, width);
-        drawVerticalLine(stack, x1, y1, y2, color, width);
     }
 
     public static void drawBlockFaceOutlines(MatrixStack matrices, BlockPos pos, Direction face, Color color, float lineWidth, boolean cull) {
@@ -302,6 +303,19 @@ public class RenderUtil {
         else Layers.quads().draw(buffer.end());
     }
 
+
+    public static void drawTriangle(MatrixStack matrices, float x1, float y1, float x2, float y2, float x3, float y3, Color color) {
+        float r = color.getRed() / 255f;
+        float g = color.getGreen() / 255f;
+        float b = color.getBlue() / 255f;
+        float a = color.getAlpha() / 255f;
+
+        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        buffer.vertex(matrices.peek().getPositionMatrix(), x1, y1, 0).color(r, g, b, a);
+        buffer.vertex(matrices.peek().getPositionMatrix(), x2, y2, 0).color(r, g, b, a);
+        buffer.vertex(matrices.peek().getPositionMatrix(), x3, y3, 0).color(r, g, b, a);
+        Layers.quads().draw(buffer.end());
+    }
 
     // cajas
 
