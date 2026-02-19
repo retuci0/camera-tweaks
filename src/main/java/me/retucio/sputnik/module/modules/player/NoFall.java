@@ -11,7 +11,10 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
 import me.retucio.sputnik.util.Lists;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -20,20 +23,31 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
 // todo: arreglar MLGs con bloques
 public class NoFall extends Module {
 
-    private boolean placed;
+    private boolean placed, shouldUse;
 
-    private final List<Item> mlgItems = List.of(Items.WATER_BUCKET, Items.ENDER_PEARL, Items.POWDER_SNOW_BUCKET,
-            Items.SLIME_BLOCK, Items.HAY_BLOCK, Items.HONEY_BLOCK,  Items.BLACK_BED,
+    private final List<Item> mlgItems = List.of(Items.WATER_BUCKET, Items.ENDER_PEARL,
+            Items.POWDER_SNOW_BUCKET, Items.TWISTING_VINES, Items.SLIME_BLOCK,
+            Items.HAY_BLOCK, Items.HONEY_BLOCK,  Items.BLACK_BED,
             Items.BLUE_BED, Items.BROWN_BED, Items.CYAN_BED, Items.GRAY_BED,
             Items.GREEN_BED, Items.LIGHT_BLUE_BED, Items.LIGHT_GRAY_BED, Items.LIME_BED,
             Items.MAGENTA_BED, Items.ORANGE_BED, Items.PINK_BED, Items.PURPLE_BED,
             Items.RED_BED, Items.WHITE_BED, Items.YELLOW_BED);
+
+    private final List<Block> safeBlocks = List.of(
+            Blocks.WATER, Blocks.SLIME_BLOCK, Blocks.HAY_BLOCK, Blocks.HONEY_BLOCK,
+            Blocks.TWISTING_VINES, Blocks.BLACK_BED, Blocks.BLUE_BED, Blocks.BROWN_BED,
+            Blocks.CYAN_BED, Blocks.GRAY_BED, Blocks.GREEN_BED, Blocks.LIGHT_BLUE_BED,
+            Blocks.LIGHT_GRAY_BED, Blocks.LIME_BED, Blocks.MAGENTA_BED, Blocks.ORANGE_BED,
+            Blocks.PINK_BED, Blocks.PURPLE_BED, Blocks.RED_BED, Blocks. WHITE_BED,
+            Blocks.YELLOW_BED);
 
     private final EnumSetting<NoFallMode> mode = sgGeneral.add(new EnumSetting<>(
             "modo",
@@ -57,10 +71,16 @@ public class NoFall extends Module {
             1
     ));
 
-    private final BooleanSetting clutch = sgGeneral.add( new BooleanSetting(
+    private final BooleanSetting clutch = sgGeneral.add(new BooleanSetting(
             "salvada",
             "cambiar a modo paquete si no se encuentra un cubo disponible",
             true
+    ));
+
+    private final BooleanSetting center = sgGeneral.add(new BooleanSetting(
+            "centrar jugador",
+            "centrar jugador respecto al bloque que tenga debajo",
+            false
     ));
 
     public NoFall() {
@@ -77,11 +97,34 @@ public class NoFall extends Module {
 
         if (mc.player.isOnGround()) {
             placed = false;
+            shouldUse = false;
         }
 
-        if (mode.is(NoFallMode.CLUTCH) && mc.player.fallDistance >= distance.getValue() && !mc.player.isOnGround() && !placed) {
-            HitResult result = mc.getCameraEntity().raycast(3, 0, false);
-            if (result instanceof BlockHitResult) {
+        if (shouldUse) {
+            mc.doItemUse();
+        }
+
+        if (mode.is(NoFallMode.CLUTCH)
+                && mc.player.fallDistance >= distance.getValue()
+                && !mc.player.isOnGround()
+                && !placed) {
+
+            if (center.getValue()) {
+                Vec3d diff = mc.player.getEntityPos().subtract(mc.player.getBlockPos().toCenterPos());
+                if (diff.lengthSquared() > 10e-3) {
+                    Vec3d impulse = new Vec3d(-diff.x * 0.05, 0, -diff.z * 0.05);
+                    mc.player.addVelocity(impulse.x, impulse.y, impulse.z);
+                }
+            }
+
+            HitResult result = mc.getCameraEntity().raycast(3, 0, true);
+            if (result instanceof BlockHitResult bhr) {
+                BlockPos pos = bhr.getBlockPos();
+                while (mc.world.getBlockState(pos).isOf(Blocks.AIR)) {
+                    pos = pos.down();
+                }
+                if (isSafeBlock(pos)) return;
+
                 // encontrar ítem
                 ItemStack mlgItem = getMlgItem();
                 if (mlgItem == null) {
@@ -101,6 +144,13 @@ public class NoFall extends Module {
 
                 int slot = mc.player.getInventory().getSlotWithStack(mlgItem);
                 mc.player.getInventory().setSelectedSlot(slot);
+
+                // usar bloque
+                if (mlgItem.getItem() instanceof BlockItem) {
+                    shouldUse = true;
+                    placed = true;
+                    return;
+                }
 
                 // usar ítem
                 ActionResult didPlace = mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
@@ -149,6 +199,10 @@ public class NoFall extends Module {
             }
         }
         return null;
+    }
+
+    private boolean isSafeBlock(BlockPos pos) {
+        return safeBlocks.contains(mc.world.getBlockState(pos).getBlock());
     }
 
     private enum NoFallMode {

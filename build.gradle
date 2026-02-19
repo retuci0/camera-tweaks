@@ -31,7 +31,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// sistema de eventos
-	modImplementation  "com.github.retuci0:neutrino:${project.neutrino_version}"
+	include(modImplementation  "com.github.retuci0:neutrino:${project.neutrino_version}")
 
     // rpc de discord
     include(modImplementation "dev.firstdark.discordrpc:discord-rpc:1.0.3")

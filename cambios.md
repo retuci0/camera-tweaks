@@ -1,20 +1,18 @@
-# v3.3
+# v3.5
 
 ## novedades
 
 ### adiciones
 
-- ahora se puede asignar un botón del ratón a un módulo
 
 #### módulos nuevos:
 
-- mochila: te permite llevar items en los slots de crafteo del inventario
-- tecla de perla: te permite lanzar una perla con tan solo un pulsamiento de tecla, siempre y cuando tengas en el inventario
 
 ### arreglos / mejoras
 
-- arreglada la cagada de Mojang de las teclas debug
+- arreglado el crash por no incluir el sistema de eventos en el mod (soy gilipollas)
+- mejoras varias al módulo tobillos fuertes
+- ahora el módulo de interfaces en portales funciona correctamente
+- reponer ya no está repe
 
 ## problemas reconocidos
-
-- muchos, pero repórtalos en la página de problemas si quieres para que queden bien registrados 

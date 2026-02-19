@@ -60,6 +60,7 @@
     "mixins.network.ResourcePackPolicyMixin",
     "mixins.network.ServerInfoMixin",
     "mixins.network.TelemetryManagerMixin",
+    "mixins.player.ClientPlayerEntityMixin",
     "mixins.player.ClientPlayerInteractionManagerMixin",
     "mixins.render.BufferStorageMixin",
     "mixins.render.CameraMixin",

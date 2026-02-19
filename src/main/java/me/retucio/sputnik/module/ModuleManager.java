@@ -90,7 +90,6 @@ public class ModuleManager {
         add(new BossbarStack());
         add(new ChatPlus());
         add(new FakePlayer());
-        add(new Replenish());
         add(new ScreenshotPlus());
         add(new UnfocusedCpu());
     }
