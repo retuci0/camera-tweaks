@@ -116,6 +116,7 @@ public class ModuleManager {
         add(new Jesus());
         add(new ReverseStep());
         add(new SafeWalk());
+        add(new Scaffold());
         add(new Slippy());
         add(new Step());
         add(new TridentBoost());
@@ -171,6 +172,7 @@ public class ModuleManager {
         add(new Racist());
         add(new StrongholdTriangulator());
         add(new TimeChanger());
+        add(new Timer());
     }
 
 

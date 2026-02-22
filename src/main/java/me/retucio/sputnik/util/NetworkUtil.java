@@ -2,15 +2,27 @@ package me.retucio.sputnik.util;
 
 
 import me.retucio.sputnik.event.network.PacketEvent;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,5 +98,75 @@ public class NetworkUtil {
         }
 
         mc.player.setSneaking(wasSneaking);
+    }
+
+    public static boolean placeBlock(BlockPos blockPos, Hand hand, int slot, boolean rotate, boolean swingHand, boolean checkEntities, boolean swapBack) {
+        if (slot < 0 || slot > 8) return false;
+
+        Block toPlace = Blocks.OBSIDIAN;
+        ItemStack i = hand == Hand.MAIN_HAND ? mc.player.getInventory().getStack(slot) : mc.player.getOffHandStack();
+        if (i.getItem() instanceof BlockItem blockItem) toPlace = blockItem.getBlock();
+        if (!canPlaceBlock(blockPos, checkEntities, toPlace)) return false;
+
+        Vec3d hitPos = Vec3d.ofCenter(blockPos);
+
+        BlockPos neighbour;
+        Direction side = getClosestSide(blockPos);
+
+        if (side == null) {
+            side = Direction.UP;
+            neighbour = blockPos;
+        } else {
+            neighbour = blockPos.offset(side);
+            hitPos = hitPos.add(side.getOffsetX() * 0.5, side.getOffsetY() * 0.5, side.getOffsetZ() * 0.5);
+        }
+
+        BlockHitResult bhr = new BlockHitResult(hitPos, side.getOpposite(), neighbour, false);
+
+        int prevSlot = mc.player.getInventory().getSelectedSlot();
+
+        if (rotate) {
+            mc.player.setYaw((float) EntityUtil.getYaw(hitPos));
+            mc.player.setPitch((float) EntityUtil.getPitch(hitPos));
+        }
+
+        InventoryUtil.swapWithHotbar(mc.player.getInventory().getSelectedSlot(), slot);
+        interactBlock(bhr, hand, swingHand);
+
+        if (swapBack) {
+            InventoryUtil.swapWithHotbar(mc.player.getInventory().getSelectedSlot(), prevSlot);
+        }
+
+        return true;
+    }
+
+    public static boolean canPlaceBlock(BlockPos blockPos, boolean checkEntities, Block block) {
+        if (blockPos == null) return false;
+        if (!World.isValid(blockPos)) return false;
+        if (!mc.world.getBlockState(blockPos).isReplaceable()) return false;
+        return !checkEntities || mc.world.canPlace(block.getDefaultState(), blockPos, ShapeContext.absent());
+    }
+
+    public static Direction getClosestSide(BlockPos blockPos) {
+        Vec3d lookVec = blockPos.toCenterPos().subtract(mc.player.getEyePos());
+        double bestRelevancy = -Double.MAX_VALUE;
+        Direction bestSide = null;
+
+        for (Direction side : Direction.values()) {
+            BlockPos neighbor = blockPos.offset(side);
+            BlockState state = mc.world.getBlockState(neighbor);
+
+            if (state.isAir()) continue;
+
+            if (!state.getFluidState().isEmpty()) continue;
+
+            double relevancy = side.getAxis().choose(lookVec.getX(), lookVec.getY(), lookVec.getZ()) * side.getDirection().offset();
+            if (relevancy > bestRelevancy) {
+                bestRelevancy = relevancy;
+                bestSide = side;
+            }
+        }
+
+        return bestSide;
     }
 }

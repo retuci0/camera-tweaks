@@ -88,6 +88,12 @@ public class PacketMine extends Module {
             0.1
     ));
 
+    private final BooleanSetting dontBreak = sgGeneral.add(new BooleanSetting(
+            "no romper",
+            "evita romper el pico",
+            true
+    ));
+
     public PacketMine() {
         super("selección de minado",
                 "selecciona bloques a minar con paquetes",
@@ -150,7 +156,9 @@ public class PacketMine extends Module {
                             currentOrderIndex = (currentOrderIndex + 1) % miningBlocks.size();
                             break;
                         }
-                        currentOrderIndex = (currentOrderIndex + 1) % miningBlocks.size();
+                        if (!miningBlocks.isEmpty()) {
+                            currentOrderIndex = (currentOrderIndex + 1) % miningBlocks.size();
+                        }
                     } while (currentOrderIndex != startIndex);
 
                     if (!processed) {
@@ -249,6 +257,12 @@ public class PacketMine extends Module {
         public boolean mine() {
             if (pos.getSquaredDistance(mc.player.getEntityPos()) > Math.pow(mc.player.getBlockInteractionRange(), 2)
                     && cancelOutOfReach.getValue()) {
+                return false;
+            }
+
+            if (dontBreak.getValue() && mc.player.getMainHandStack().getMaxDamage() - mc.player.getMainHandStack().getDamage() <= 1) {
+                ChatUtil.warn("pico por romperse");
+                toggle();
                 return false;
             }
 

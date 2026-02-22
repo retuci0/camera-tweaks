@@ -4,15 +4,19 @@
 
 ### adiciones
 
+#### comandos nuevos:
+
+- repesperar: combinación de \$repetir y \$esperar
 
 #### módulos nuevos:
 
+- andamios: coloca bloques a tus pies a medida que caminas
+- cocaína: hace que todo vaya más rápido o más lento
 
 ### arreglos / mejoras
 
-- arreglado el crash por no incluir el sistema de eventos en el mod (soy gilipollas)
-- mejoras varias al módulo tobillos fuertes
-- ahora el módulo de interfaces en portales funciona correctamente
-- reponer ya no está repe
+- opción para no romper el pico en selección de minado
 
 ## problemas reconocidos
+
+- lo de siempre

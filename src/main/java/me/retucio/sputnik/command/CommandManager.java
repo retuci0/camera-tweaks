@@ -42,6 +42,7 @@ public class CommandManager {
         addCommand(new PrefixCommand());
         addCommand(new PurgeCommand());
         addCommand(new RepeatCommand());
+        addCommand(new RepeatWaitCommand());
         addCommand(new SaveScreenshotCommand());
         addCommand(new SendCommand());
         addCommand(new SpectateCommand());

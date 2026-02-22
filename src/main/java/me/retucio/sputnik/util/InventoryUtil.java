@@ -70,7 +70,20 @@ public class InventoryUtil {
         return stacks;
     }
 
-    public static List<ItemStack> getStacksOfTag(TagKey<Item> tag) {
+    public static List<Integer> findAllSlots(Predicate<ItemStack> predicate) {
+        List<Integer> slots = new ArrayList<>();
+        if (mc.player == null) return slots;
+        for (int i = 0; i < mc.player.getInventory().size(); i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (predicate.test(stack)) {
+                slots.add(i);
+            }
+        }
+        return slots;
+    }
+
+
+    public static List<ItemStack> find(TagKey<Item> tag) {
         if (mc.player == null) return null;
         List<ItemStack> stacks = new ArrayList<>();
         for (ItemStack stack : mc.player.getInventory()) {
@@ -83,7 +96,7 @@ public class InventoryUtil {
         return stacks;
     }
 
-    public static List<ItemStack> getStacksOfComponentType(ComponentType<?> componentType) {
+    public static List<ItemStack> find(ComponentType<?> componentType) {
         List<ItemStack> stacks = new ArrayList<>();
         if (mc.player == null) return stacks;
         for (ItemStack stack : mc.player.getInventory()) {
@@ -256,20 +269,6 @@ public class InventoryUtil {
         return matchingSlots;
     }
 
-    public static List<Integer> findItem(Item item) {
-        List<Integer> matchingSlots = new ArrayList<>();
-        PlayerInventory inv = mc.player.getInventory();
-
-        for (int i = 0; i < inv.size(); i++) {
-            ItemStack stack = inv.getStack(i);
-            if (!stack.isEmpty() && stack.isOf(item)) {
-                matchingSlots.add(i);
-            }
-        }
-
-        return matchingSlots;
-    }
-
     public static void quickMoveAll(HandledScreen<?> screen, ItemStack reference) {
         if (mc.player == null || mc.interactionManager == null) return;
 
@@ -349,6 +348,4 @@ public class InventoryUtil {
     public static Inventory getEchestInv() {
         return echestInv;
     }
-
-
 }

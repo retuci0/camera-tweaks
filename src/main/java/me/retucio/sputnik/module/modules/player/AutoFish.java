@@ -143,7 +143,7 @@ public class AutoFish extends Module {
 
     private int switchToFishingRod() {
         if (mc.player.getActiveItem().isOf(Items.FISHING_ROD)) return mc.player.getInventory().getSelectedSlot();
-        List<Integer> slots = InventoryUtil.findItem(Items.FISHING_ROD);
+        List<Integer> slots = InventoryUtil.findAllSlots(stack -> stack.isOf(Items.FISHING_ROD));
         for (int slot : slots) {
             if (PlayerInventory.isValidHotbarIndex(slot)) {
                 mc.player.getInventory().setSelectedSlot(slot);

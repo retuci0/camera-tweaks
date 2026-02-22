@@ -23,6 +23,7 @@
     "mixins.network.ServerConnectorMixin",
     "mixins.network.YggdrasilUserApiServiceMixin",
     "mixins.player.PlayerEntityMixin",
+    "mixins.player.PlayerInputMixin",
     "mixins.player.PlayerInventoryMixin",
     "mixins.world.BlockCollisionSpliteratorMixin"
   ],
@@ -96,6 +97,7 @@
     "mixins.world.DamageParticleFactoryMixin",
     "mixins.world.DamageParticleMixin",
     "mixins.world.EmitterParticleMixin",
-    "mixins.world.ParticleManagerMixin"
+    "mixins.world.ParticleManagerMixin",
+    "mixins.world.RenderTickCounterDynamicMixin"
   ]
 }

@@ -163,7 +163,7 @@ public class AutoTool extends Module {
         if (result.getType() == HitResult.Type.MISS || !(result instanceof BlockHitResult bhr)) return;
         BlockState state = mc.world.getBlockState(bhr.getBlockPos());
 
-        List<ItemStack> tools = InventoryUtil.getStacksOfComponentType(DataComponentTypes.TOOL);
+        List<ItemStack> tools = InventoryUtil.find(DataComponentTypes.TOOL);
         if (tools.isEmpty()) return;
 
         Map<Float, ItemStack> speeds = new HashMap<>();
