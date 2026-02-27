@@ -15,7 +15,13 @@ import net.minecraft.world.RaycastContext;
 import java.util.Comparator;
 import java.util.List;
 
-// https://github.com/etianl/spearHax/blob/main/src/main/java/things/haxHandler.java
+
+/**
+ * @link <a href="https://github.com/etianl/spearHax/blob/main/src/main/java/things/haxHandler.java">créditos a etianl</a>
+ *
+ * @"author" retucio
+ */
+
 public class SpearKill extends Module {
 
     private final BooleanSetting onlyPlayers = sgGeneral.add(new BooleanSetting(

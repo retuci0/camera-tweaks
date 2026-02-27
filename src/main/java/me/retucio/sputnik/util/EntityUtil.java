@@ -2,6 +2,7 @@ package me.retucio.sputnik.util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
@@ -95,7 +96,26 @@ public class EntityUtil {
         return mc.player.getPitch() + MathHelper.wrapDegrees((float) -Math.toDegrees(Math.atan2(diffY, diffXZ)) - mc.player.getPitch());
     }
 
-    public static enum Target {
+    public static void lookAt(Vec3d pos) {
+        lookAtClient(pos);
+        lookAtServer(pos);
+    }
+
+    public static void lookAtClient(Vec3d pos) {
+        mc.player.setYaw((float) getYaw(pos));
+        mc.player.setPitch((float) getPitch(pos));
+    }
+
+    public static void lookAtServer(Vec3d pos) {
+        mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
+                (float) getYaw(pos),
+                (float) getPitch(pos),
+                mc.player.isOnGround(),
+                mc.player.horizontalCollision
+        ));
+    }
+
+    public enum Target {
         HEAD,
         BODY,
         FEET;

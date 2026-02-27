@@ -8,6 +8,10 @@ import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
+/**
+ * @author retucio
+ */
+
 public class Rotations extends Module {
 
     private final NumberSetting yaw = sgGeneral.add(new NumberSetting("guiñada", "eje vertical - giro horizontal (yaw)", 0, -180, 180, 1));

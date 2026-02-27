@@ -11,7 +11,13 @@ import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import org.lwjgl.glfw.GLFW;
 
-// continúa en GameRendererMixin
+
+/** continúa en:
+ * @see me.retucio.sputnik.mixin.mixins.render.GameRendererMixin
+ *
+ * @author retucio
+ */
+
 public class Zoom extends Module {
 
     private final SettingGroup sgVisual = addSg(new SettingGroup("visual", true));
@@ -87,6 +93,7 @@ public class Zoom extends Module {
             mc.options.getMouseSensitivity().setValue(prevMouseSens * mouseSensMultiplier.getValue());
     }
 
+    @EventListener
     private void onMouseScroll(MouseScrollEvent event) {
         boolean key = scrollKey.getValue() == GLFW.GLFW_KEY_UNKNOWN || scrollKey.isDown();
         if (isEnabled() && scrollSens.getValue() > 0 && key) {

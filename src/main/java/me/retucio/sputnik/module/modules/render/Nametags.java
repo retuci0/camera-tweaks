@@ -82,17 +82,17 @@ public class Nametags extends Module {
         defaultEntities.replace(EntityType.TNT, true);
         entities.setDefaultValue(defaultEntities);
 
-        health.onUpdate(v -> healthMode.setVisible(v));
+        health.onUpdate(v -> healthMode.visibility(v));
 
         entities.onUpdate(entities -> {
-            items.setVisible(entities.get(EntityType.ITEM));
+            items.visibility(entities.get(EntityType.ITEM));
 
             boolean anyProjectile = entities.get(EntityType.TRIDENT)
                     || entities.get(EntityType.ARROW)
                     || entities.get(EntityType.SPECTRAL_ARROW);
-            showProjectileDamage.setVisible(anyProjectile);
+            showProjectileDamage.visibility(anyProjectile);
 
-            tntPrime.setVisible(entities.get(EntityType.TNT));
+            tntPrime.visibility(entities.get(EntityType.TNT));
         });
     }
 

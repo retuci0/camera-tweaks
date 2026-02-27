@@ -1,5 +1,6 @@
 package me.retucio.sputnik.config;
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.sputnik.*;
 import me.retucio.sputnik.module.setting.settings.*;
 import me.retucio.sputnik.ui.screen.ClickGUI;
@@ -43,11 +44,13 @@ public class ClientConfig {
         EVENT_BUS.subscribe(this);
     }
 
+    @EventListener
     public void onToggleModule(ToggleModuleEvent event) {
         ConfigManager.setModuleState(event.getModule());
     }
 
     @SuppressWarnings("rawtypes")
+    @EventListener
     public void onUpdateSetting(UpdateSettingEvent event) {
         if (mc == null || !event.shouldSave()) return;
 
@@ -68,20 +71,24 @@ public class ClientConfig {
         ConfigManager.setSetting(event.getSetting(), value);
     }
 
+    @EventListener
     public void onOpenSettingsFrame(SettingsFrameEvent.Open event) {
         ConfigManager.setFramePosition(event.getFrame());
     }
 
+    @EventListener
     public void onCloseSettingsFrame(SettingsFrameEvent.Close event) {
         settingsFrames.remove(event.getFrame().getModule().getName());
         ConfigManager.save();
     }
 
+    @EventListener
     public void onMoveSettingsFrame(SettingsFrameEvent.Move event) {
         settingsFrames.replace(event.getFrame().getModule().getName(), new int[]{event.getFrame().getX(), event.getFrame().getY()});
         ConfigManager.save();
     }
 
+    @EventListener
     public void onExtendModuleFrame(ModuleFrameEvent.Extend event) {
         extendableFrames.put("M", new FrameData(
                 ClickGUI.INSTANCE.getModulesFrame().getX(),
@@ -89,6 +96,7 @@ public class ClientConfig {
                 ClickGUI.INSTANCE.getModulesFrame().extended));
     }
 
+    @EventListener
     public void onMoveModuleFrame(ModuleFrameEvent.Move event) {
         extendableFrames.replace("M", new FrameData(
                 ClickGUI.INSTANCE.getModulesFrame().getX(),
@@ -96,6 +104,7 @@ public class ClientConfig {
                 ClickGUI.INSTANCE.getModulesFrame().extended));
     }
 
+    @EventListener
     public void onExtendGUISettingsFrame(GUISettingsFrameEvent.Extend event) {
         extendableFrames.put("S", new FrameData(
                 ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),
@@ -103,6 +112,7 @@ public class ClientConfig {
                 ClickGUI.INSTANCE.getGuiSettingsFrame().extended));
     }
 
+    @EventListener
     public void onMoveGUISettingsFrame(GUISettingsFrameEvent.Move event) {
         extendableFrames.replace("S", new FrameData(
                 ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),

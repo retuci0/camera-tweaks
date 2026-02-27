@@ -8,6 +8,11 @@ import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
+
+/**
+ * @author retucio
+ */
+
 public class Autism extends Module {
 
     private final NumberSetting interval = sgGeneral.add(new NumberSetting(

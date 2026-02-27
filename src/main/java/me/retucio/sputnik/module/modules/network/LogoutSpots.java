@@ -60,13 +60,13 @@ public class LogoutSpots extends Module {
                 Category.NETWORK);
 
         outlines.onUpdate(v -> {
-            outlineColor.setVisible(v);
-            fullHeight.setVisible(v || filling.getValue());
+            outlineColor.visibility(v);
+            fullHeight.visibility(v || filling.getValue());
         });
 
         filling.onUpdate(v -> {
-            fillingColor.setVisible(v);
-            fullHeight.setVisible(v || outlines.getValue());
+            fillingColor.visibility(v);
+            fullHeight.visibility(v || outlines.getValue());
         });
 
         dummy.onUpdate(v -> {

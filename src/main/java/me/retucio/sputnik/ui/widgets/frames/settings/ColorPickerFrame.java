@@ -53,7 +53,7 @@ public class ColorPickerFrame extends SettingsFrame {
         };
 
         // ocultar ajustes innecesarios
-        dummyModule.getSettings().forEach(s -> s.setVisible(false));
+        dummyModule.getSettings().forEach(s -> s.visibility(false));
         dummyModule.shouldSaveSettings(false);
 
         // ajustes de color
@@ -80,12 +80,12 @@ public class ColorPickerFrame extends SettingsFrame {
             setting.onUpdate(v -> updateColorFromSettings());
             rainbowSetting.onUpdate(v -> {
                 updateColorFromSettings();
-                redSetting.setVisible(!v);
-                greenSetting.setVisible(!v);
-                blueSetting.setVisible(!v);
-                rainbowSpeedSetting.setVisible(v);
-                saturationSetting.setVisible(v);
-                brightnessSetting.setVisible(v);
+                redSetting.visibility(!v);
+                greenSetting.visibility(!v);
+                blueSetting.visibility(!v);
+                rainbowSpeedSetting.visibility(v);
+                saturationSetting.visibility(v);
+                brightnessSetting.visibility(v);
             });
         }
 

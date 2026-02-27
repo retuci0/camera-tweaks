@@ -14,6 +14,10 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * @author retucio
+ */
+
 public class InventoryPlus extends Module {
 
     private final KeySetting row1key = sgGeneral.add(new KeySetting("fila 1", "tecla para mover items a la primera fila", GLFW.GLFW_KEY_A));

@@ -5,7 +5,6 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.List;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.im.InputContext;
@@ -20,17 +19,14 @@ public class KeyUtil {
         return GLFW.glfwGetKey(mc.getWindow().getHandle(), key);
     }
 
+    public static boolean isKeyDown(KeyBinding key) {
+        return isKeyDown(getKey(key));
+    }
+
     public static boolean isKeyDown(int key) {
         return GLFW.glfwGetKey(
                 mc.getWindow().getHandle(),
                 key) != GLFW.GLFW_RELEASE;
-    }
-
-    public static boolean isKeyDown(KeyBinding key) {
-        return GLFW.glfwGetKey(
-                mc.getWindow().getHandle(),
-                ((KeyBindingAccessor) key).getBoundKey().getCode()
-        ) != GLFW.GLFW_RELEASE;
     }
 
     public static boolean isShiftDown() {
@@ -38,6 +34,9 @@ public class KeyUtil {
                 || isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
+    public static int getKey(KeyBinding kb) {
+        return ((KeyBindingAccessor) kb).getBoundKey().getCode();
+    }
 
     public static boolean isCapsLockOn() throws HeadlessException {
         return Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);

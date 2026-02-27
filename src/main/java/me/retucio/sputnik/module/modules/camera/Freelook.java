@@ -14,6 +14,8 @@ import org.lwjgl.glfw.GLFW;
 /** continúa en:
  * @see CameraMixin
  * @see EntityMixin
+ *
+ * @author retucio
  */
 
 public class Freelook extends Module {

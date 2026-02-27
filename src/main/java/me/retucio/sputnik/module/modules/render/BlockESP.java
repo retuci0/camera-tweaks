@@ -111,12 +111,12 @@ public class BlockESP extends Module {
         );
 
         outlines.onUpdate(v -> {
-            outlineColor.setVisible(v);
-            lineWidth.setVisible(v);
+            outlineColor.visibility(v);
+            lineWidth.visibility(v);
         });
 
         fillings.onUpdate(v ->
-                fillingColor.setVisible(v)
+                fillingColor.visibility(v)
         );
     }
 

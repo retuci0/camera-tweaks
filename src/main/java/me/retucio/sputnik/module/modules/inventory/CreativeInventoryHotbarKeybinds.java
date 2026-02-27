@@ -5,10 +5,12 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 
 
-/**
- * continúa en
+/** continúa en
  * @see CreativeInventoryScreenMixin
+ *
+ * @author retucio
  */
+
 public class CreativeInventoryHotbarKeybinds extends Module {
 
     public CreativeInventoryHotbarKeybinds() {

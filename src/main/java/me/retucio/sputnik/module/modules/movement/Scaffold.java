@@ -172,19 +172,19 @@ public class Scaffold extends Module {
     public Scaffold() {
         super("andamios", "pone bloques bajo tus pies de manera automática", Category.MOVEMENT);
 
-        extend.onUpdate(extendDistance::setVisible);
+        extend.onUpdate(extendDistance::visibility);
 
         tower.onUpdate(v -> {
-            towerSpeed.setVisible(v);
-            towerWhileMoving.setVisible(v);
+            towerSpeed.visibility(v);
+            towerWhileMoving.visibility(v);
         });
 
         outlines.onUpdate(v -> {
-            outlineColor.setVisible(v);
-            lineWidth.setVisible(v);
+            outlineColor.visibility(v);
+            lineWidth.visibility(v);
         });
 
-        fillings.onUpdate(fillingColor::setVisible);
+        fillings.onUpdate(fillingColor::visibility);
     }
 
 
@@ -330,7 +330,7 @@ public class Scaffold extends Module {
 
     public enum ListMode {
         WHITELIST("lista blanca (incluir)"),
-        BLACKLIST("lista negra (excluir");
+        BLACKLIST("lista negra (excluir)");
 
         private final String name;
         ListMode(String name) { this.name = name; }

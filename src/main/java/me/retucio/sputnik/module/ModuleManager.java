@@ -159,6 +159,7 @@ public class ModuleManager {
         add(new Nametags());
         add(new NoRender());
         add(new Particles());
+        add(new Tracers());
     }
 
     private void addWorld() {

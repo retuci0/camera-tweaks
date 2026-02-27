@@ -97,7 +97,7 @@ public class LightOverlay extends Module {
                 "te muestra el nivel de luz en bloques, para prevenir mob spawns",
                 Category.WORLD);
 
-        onWater.onUpdate(v -> dontCullWater.setVisible(v));
+        onWater.onUpdate(v -> dontCullWater.visibility(v));
     }
 
     @Override

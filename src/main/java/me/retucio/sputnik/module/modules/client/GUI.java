@@ -21,7 +21,11 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
-// módulo no visible solo para los ajustes de la interfaz (y del cliente en general)
+
+/** módulo no visible solo para los ajustes del mod
+ * @author retucio
+ */
+
 public class GUI extends Module {
 
     private final SettingGroup sgWidgets = addSg(new SettingGroup("widgets", true));
@@ -62,7 +66,7 @@ public class GUI extends Module {
             "distinguir mayúsculas",
             "la búsqueda es sensible a mayúsculas y minúsculas",
             false
-    ));
+    )).visibility(searchBar::getValue);
     // ^^^ no sé de qué sirve porque está todo en minúsculas pero bueno
 
     public final BooleanSetting blur = sgUi.add(new BooleanSetting(
@@ -112,9 +116,9 @@ public class GUI extends Module {
                 GLFW.GLFW_KEY_RIGHT_SHIFT);
 
         Sputnik.EVENT_BUS.subscribe(this);
-        keyMode.setVisible(false);
-        notify.setVisible(false);
-        searchBar.onUpdate(v -> matchCase.setVisible(v));
+
+        keyMode.visibility(false);
+        notify.visibility(false);
     }
 
     @EventListener

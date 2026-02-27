@@ -67,7 +67,7 @@ public class ChatPlus extends Module {
                 Category.MISC);
         updateDateFormat();
         updateClientName();
-        timestamps.onUpdate(v -> timestampSecs.setVisible(v));
+        timestamps.onUpdate(v -> timestampSecs.visibility(v));
         timestampSecs.onUpdate(x -> updateDateFormat());
     }
 

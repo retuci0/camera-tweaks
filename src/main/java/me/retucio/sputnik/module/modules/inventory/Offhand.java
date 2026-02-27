@@ -14,6 +14,10 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+/**
+ * @author retucio
+ */
+
 public class Offhand extends Module {
 
     private final OptionSetting<Item> item = sgGeneral.add(new OptionSetting<>(

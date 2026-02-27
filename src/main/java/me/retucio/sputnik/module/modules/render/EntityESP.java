@@ -71,15 +71,15 @@ public class EntityESP extends Module {
     public EntityESP() {
         super("resaltado de entidades", "resalta el contorno de las entidades seleccionadas a través de bloques", Category.RENDER);
         mode.onUpdate(v -> {
-            glowColor.setVisible(v == ESPMode.GLOW);
-            outlines.setVisible(v == ESPMode.BOX);
-            filling.setVisible(v == ESPMode.BOX);
-            outlineColor.setVisible(outlines.isVisible());
-            fillingColor.setVisible(filling.isVisible());
+            glowColor.visibility(v == ESPMode.GLOW);
+            outlines.visibility(v == ESPMode.BOX);
+            filling.visibility(v == ESPMode.BOX);
+            outlineColor.visibility(outlines.isVisible());
+            fillingColor.visibility(filling.isVisible());
         });
 
-        outlines.onUpdate(v -> outlineColor.setVisible(v));
-        filling.onUpdate(v -> fillingColor.setVisible(v));
+        outlines.onUpdate(v -> outlineColor.visibility(v));
+        filling.onUpdate(v -> fillingColor.visibility(v));
     }
 
     @EventListener

@@ -1,6 +1,7 @@
 package me.retucio.sputnik;
 
 import com.github.retucio.neutrino.EventBus;
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.cape.CapeManager;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.command.commands.BindCommand;
@@ -235,6 +236,7 @@ public class Sputnik implements ClientModInitializer {
                 || mc.currentScreen instanceof AbstractCommandBlockScreen;
     }
 
+    @EventListener
     // notificar al usuario de que hay una actualización disponible, si la hay
     public void onSetScreen(OpenScreenEvent event) {
         if (VersionChecker.shouldShowScreen && event.getScreen() instanceof TitleScreen) {
@@ -244,6 +246,7 @@ public class Sputnik implements ClientModInitializer {
         }
     }
 
+    @EventListener
     public void onStop(ShutdownEvent event) {
         ConfigManager.save();
     }

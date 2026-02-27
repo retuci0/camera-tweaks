@@ -35,7 +35,12 @@ import java.util.List;
 import java.util.Optional;
 
 
-// https://github.com/maDU59/ProjectilesTrajectoryPreview
+/**
+ * @link <a href="https://github.com/maDU59/ProjectilesTrajectoryPreview">créditos a maDU59</a>
+ *
+ * @"author" retucio
+ */
+
 public class ProjectileTrajectories extends Module {
 
     private final SettingGroup sgTrajectory = addSg(new SettingGroup("trayectoria", true));
@@ -114,10 +119,10 @@ public class ProjectileTrajectories extends Module {
     public ProjectileTrajectories() {
         super("trayectoria", "muestra la trayectoria de los proyectiles", Category.COMBAT);
 
-        fillingTargets.onUpdate(v -> fillingColor.setVisible(v != TrajectoryTargets.NONE));
+        fillingTargets.onUpdate(v -> fillingColor.visibility(v != TrajectoryTargets.NONE));
         outlineTargets.onUpdate(v -> {
-            outlineColor.setVisible(v != TrajectoryTargets.NONE);
-            outlineWidth.setVisible(v != TrajectoryTargets.NONE);
+            outlineColor.visibility(v != TrajectoryTargets.NONE);
+            outlineWidth.visibility(v != TrajectoryTargets.NONE);
         });
     }
 

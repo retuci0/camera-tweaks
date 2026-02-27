@@ -1,6 +1,5 @@
 package me.retucio.sputnik.module.modules.inventory;
 
-import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
@@ -78,8 +77,7 @@ public class UIMove extends Module {
         if (handler == null || !screens.isEnabled(handler)) return;
 
         for (KeyBinding kb : movementKeys) {
-            kb.setPressed(KeyUtil.isKeyDown((
-                    (KeyBindingAccessor) kb).getBoundKey().getCode()));
+            kb.setPressed(KeyUtil.isKeyDown(KeyUtil.getKey(kb)));
         }
     }
 

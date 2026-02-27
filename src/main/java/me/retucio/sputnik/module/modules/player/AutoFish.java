@@ -67,12 +67,12 @@ public class AutoFish extends Module {
     public AutoFish() {
         super("auto pesca", "pesca por ti", Category.PLAYER);
         autoRecast.onUpdate(v -> {
-            recastDelay.setVisible(v);
-            onlyRecastIfLookingAtWater.setVisible(v);
-            recastRaycastDistance.setVisible(v);
+            recastDelay.visibility(v);
+            onlyRecastIfLookingAtWater.visibility(v);
+            recastRaycastDistance.visibility(v);
         });
 
-        onlyRecastIfLookingAtWater.onUpdate(v -> recastRaycastDistance.setVisible(v));
+        onlyRecastIfLookingAtWater.onUpdate(v -> recastRaycastDistance.visibility(v));
     }
 
     @Override

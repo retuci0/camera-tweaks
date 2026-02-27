@@ -1,5 +1,6 @@
 package me.retucio.sputnik.command.commands;
 
+import com.github.retucio.neutrino.EventListener;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.event.TickEvent;
@@ -34,6 +35,7 @@ public class EnderChestCommand extends Command {
         });
     }
 
+    @EventListener
     public void onTick(TickEvent.Post event) {
         if (shouldOpenEchest) {
             shouldOpenEchest = false;

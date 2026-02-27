@@ -1,21 +1,18 @@
-# v3.5
+# v3.7
 
 ## novedades
 
 ### adiciones
 
-#### comandos nuevos:
-
-- repesperar: combinación de \$repetir y \$esperar
-
 #### módulos nuevos:
 
-- andamios: coloca bloques a tus pies a medida que caminas
-- cocaína: hace que todo vaya más rápido o más lento
+- trazos: dibuja líneas apuntando a entidades cercanas
 
 ### arreglos / mejoras
 
-- opción para no romper el pico en selección de minado
+- la config. ya funciona de nuevo
+- la escucha de eventos ha sido arreglada, arreglando cosas como la ruedita del zoom y algunos comandos
+- selección de minado ya no crashea al no usar pico
 
 ## problemas reconocidos
 

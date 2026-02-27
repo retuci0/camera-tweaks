@@ -2,7 +2,6 @@ package me.retucio.sputnik.util;
 
 import me.retucio.sputnik.event.network.DisconnectEvent;
 import me.retucio.sputnik.event.interact.OpenScreenEvent;
-import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.ComponentType;
@@ -325,8 +324,11 @@ public class InventoryUtil {
     }
 
     public static int getSlotNumberFromKey(int key) {
-        for (int i = 0; i < 9; i++)
-            if (((KeyBindingAccessor) (mc.options.hotbarKeys[i])).getBoundKey().getCode() == key) return i;
+        for (int i = 0; i < 9; i++) {
+            if (KeyUtil.getKey(mc.options.hotbarKeys[i]) == key) {
+                return i;
+            }
+        }
         return -1;
     }
 

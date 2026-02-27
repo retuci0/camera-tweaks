@@ -11,7 +11,13 @@ import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import org.lwjgl.glfw.GLFW;
 
-// continúa en CameraMixin
+
+/** continúa en:
+ * @see me.retucio.sputnik.mixin.mixins.render.CameraMixin
+ *
+ * @author retucio
+ */
+
 public class PerspectivePlus extends Module {
 
     // ajustes

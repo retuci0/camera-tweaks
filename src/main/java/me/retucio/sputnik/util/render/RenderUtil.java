@@ -14,69 +14,34 @@ import java.awt.*;
 public class RenderUtil {
 
     private static final MinecraftClient mc = MinecraftClient.getInstance();
-    private static final Tessellator tesselator = Tessellator.getInstance();
+    private static final Tessellator tessellator = Tessellator.getInstance();
 
 
-    // líneas
+    /* líneas */
 
-    public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end, Color color, float lineWidth) {
-        Camera camera = mc.gameRenderer.getCamera();
-        Vec3d cameraPos = camera.getCameraPos();
+    // https://github.com/TheF1xer/GateClient-1.12.2/blob/main/src/main/java/me/thef1xer/gateclient/util/RenderUtil.java
+    public static void drawTracer(MatrixStack matrices, Vec3d pos, Color color, float lineWidth) {
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
+        Camera cam = mc.gameRenderer.getCamera();
 
-        float startX = (float) (start.x - cameraPos.x);
-        float startY = (float) (start.y - cameraPos.y);
-        float startZ = (float) (start.z - cameraPos.z);
-        float endX   = (float) (end.x - cameraPos.x);
-        float endY   = (float) (end.y - cameraPos.y);
-        float endZ   = (float) (end.z - cameraPos.z);
+        Vector3f cameraVector = new Vector3f(0, 0, 1)
+                .rotateX((float) Math.toRadians(cam.getPitch()))
+                .rotateY((float) -Math.toRadians(cam.getYaw()));
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
-
-        float nx = -1.0f, ny = -1f, nz = -1.0f;
-
-        buffer.vertex(matrices.peek().getPositionMatrix(), startX, startY, startZ)
-                .color(color.getRGB())
-                .normal(nx, ny, nz)
-                .lineWidth(lineWidth);
-        buffer.vertex(matrices.peek().getPositionMatrix(), endX, endY, endZ)
-                .color(color.getRGB())
-                .normal(nx, ny, nz)
-                .lineWidth(lineWidth);
-
-        Layers.lines().draw(buffer.end());
-    }
-
-    public static void drawLine2D(MatrixStack matrices, float x1, float y1, float x2, float y2, Color color, float lineWidth) {
-        float r = color.getRed() / 255f;
-        float g = color.getGreen() / 255f;
-        float b = color.getBlue() / 255f;
-        float a = color.getAlpha() / 255f;
-
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
-        float nx = 0, ny = 0, nz = 1; // normals not used
-
-        buffer.vertex(matrices.peek().getPositionMatrix(), x1, y1, 0)
-                .color(r, g, b, a)
-                .normal(nx, ny, nz)
-                .lineWidth(lineWidth);
-        buffer.vertex(matrices.peek().getPositionMatrix(), x2, y2, 0)
-                .color(r, g, b, a)
-                .normal(nx, ny, nz)
-                .lineWidth(lineWidth);
-
+        buffer.vertex(matrices.peek(), cameraVector.x, cameraVector.y, cameraVector.z).color(color.getRGB()).normal(-1, -1, -1).lineWidth(lineWidth);
+        buffer.vertex(matrices.peek(), (float) (pos.x - cam.getCameraPos().x), (float) (pos.y - cam.getCameraPos().y), (float) (pos.z - cam.getCameraPos().z)).color(color.getRGB()).normal(-1, -1, -1).lineWidth(lineWidth);
         Layers.lines().draw(buffer.end());
     }
 
     public static void drawVector(MatrixStack matrices, Vector3f start, Vec3d direction, Color c, float lineWidth) {
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
-
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
         MatrixStack.Entry pose = matrices.peek();
 
         int color = c.getRGB();
-        float r = ((color >> 16) & 0xFF) / 255f;
-        float g = ((color >> 8) & 0xFF) / 255f;
-        float b = (color & 0xFF) / 255f;
         float a = ((color >> 24) & 0xFF) / 255f;
+        float r = ((color >> 16) & 0xFF) / 255f;
+        float g = ((color >>  8) & 0xFF) / 255f;
+        float b = ((color >>  0) & 0xFF) / 255f;
 
         float endX = start.x() + (float) direction.x;
         float endY = start.y() + (float) direction.y;
@@ -107,7 +72,7 @@ public class RenderUtil {
         matrices.push();
         matrices.translate(0, 0, 0);
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         buffer.vertex(matrices.peek().getPositionMatrix(), x, y + height, 0).color(r, g, b, a);
         buffer.vertex(matrices.peek().getPositionMatrix(), x + width, y + height, 0).color(r, g, b, a);
@@ -128,7 +93,7 @@ public class RenderUtil {
         float maxY = minY + 1;
         float maxZ = minZ + 1;
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
 
         switch (face) {
             case UP:
@@ -253,7 +218,7 @@ public class RenderUtil {
             }
         }
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         switch (face) {
             case DOWN:
@@ -310,7 +275,7 @@ public class RenderUtil {
         float b = color.getBlue() / 255f;
         float a = color.getAlpha() / 255f;
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
         buffer.vertex(matrices.peek().getPositionMatrix(), x1, y1, 0).color(r, g, b, a);
         buffer.vertex(matrices.peek().getPositionMatrix(), x2, y2, 0).color(r, g, b, a);
         buffer.vertex(matrices.peek().getPositionMatrix(), x3, y3, 0).color(r, g, b, a);
@@ -329,7 +294,7 @@ public class RenderUtil {
         float maxY = (float) (box.maxY - cameraPos.y);
         float maxZ = (float) (box.maxZ - cameraPos.z);
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
 
         // parte inferior
         buffer.vertex(matrices.peek(), minX, minY, minZ).color(color.getRGB()).normal(-1, -1, -1).lineWidth(lineWidth);
@@ -384,7 +349,7 @@ public class RenderUtil {
         float maxY = (float) (box.maxY - cameraPos.y);
         float maxZ = (float) (box.maxZ - cameraPos.z);
 
-        BufferBuilder buffer = tesselator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         
         buffer.vertex(matrices.peek().getPositionMatrix(), minX, minY, minZ).color(color.getRGB());
         buffer.vertex(matrices.peek().getPositionMatrix(), maxX, minY, minZ).color(color.getRGB());

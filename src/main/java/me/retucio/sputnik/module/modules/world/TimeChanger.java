@@ -35,7 +35,7 @@ public class TimeChanger extends Module {
                 "te deja cambiar visualmente el progreso del día, entre otras cosas",
                 Category.WORLD);
 
-        renderMoon.onUpdate(v -> moonPhase.setVisible(v));
+        renderMoon.onUpdate(v -> moonPhase.visibility(v));
     }
 
     private long realTime;

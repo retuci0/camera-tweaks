@@ -3,12 +3,12 @@ package me.retucio.sputnik.module.modules.world;
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.event.input.MouseClickEvent;
-import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.InventoryUtil;
+import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.MiscUtil;
 
 import net.minecraft.block.BlockState;
@@ -59,7 +59,7 @@ public class AutoTool extends Module {
 
     public AutoTool() {
         super("auto herramienta", "cambia a la herramienta adecuada automáticamente", Category.WORLD);
-        switchBack.onUpdate(v -> switchBackDelaySetting.setVisible(v));
+        switchBack.onUpdate(v -> switchBackDelaySetting.visibility(v));
     }
 
     @Override
@@ -117,7 +117,7 @@ public class AutoTool extends Module {
 
     private void handle(int key, int action) {
         if (mc.player == null || mc.player.getInventory() == null) return;
-        if (key != ((KeyBindingAccessor) mc.options.attackKey).getBoundKey().getCode()) return;
+        if (key != KeyUtil.getKey(mc.options.attackKey)) return;
 
         if (action == GLFW.GLFW_PRESS) {
             onStartMining();

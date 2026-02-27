@@ -7,11 +7,30 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 
+
+/**
+ * @author retucio
+ */
+
 public class AttributeSwapper extends Module {
 
-    private final NumberSetting slot = sgGeneral.add(new NumberSetting("slot", "slot al que cambiar", 1, 1, 9, 1));
-    private final BooleanSetting swap = sgGeneral.add(new BooleanSetting("cambiar de vuelta", "volver al slot inicial tras haber aplicado el swapping", true));
-    private final NumberSetting swapDelay = sgGeneral.add(new NumberSetting("delay de cambio de vuelta", "tiempo que se tarda en volver al slot inicial", 1, 1, 20, 1));
+    private final NumberSetting slot = sgGeneral.add(new NumberSetting(
+            "slot",
+            "slot al que cambiar",
+            1, 1, 9, 1
+    ));
+
+    private final BooleanSetting swap = sgGeneral.add(new BooleanSetting(
+            "cambiar de vuelta",
+            "volver al slot inicial tras haber aplicado el swapping",
+            true
+    ));
+
+    private final NumberSetting swapDelay = sgGeneral.add(new NumberSetting(
+            "delay de cambio de vuelta",
+            "tiempo que se tarda en volver al slot inicial",
+            1, 1, 20, 1
+    ));
 
     private int delay = 0;
     private int prevSlot = -1;

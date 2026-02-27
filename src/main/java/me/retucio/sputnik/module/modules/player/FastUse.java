@@ -61,8 +61,8 @@ public class FastUse extends Module {
                 Category.PLAYER,
                 GLFW.GLFW_KEY_F6);
 
-        items.onUpdate(v -> itemCooldown.setVisible(v));
-        blocks.onUpdate(v -> blockCooldown.setVisible(v));
+        items.onUpdate(v -> itemCooldown.visibility(v));
+        blocks.onUpdate(v -> blockCooldown.visibility(v));
     }
 
     public int getCooldown(ItemStack stack) {

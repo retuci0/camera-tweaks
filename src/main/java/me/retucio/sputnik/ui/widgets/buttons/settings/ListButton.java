@@ -33,9 +33,9 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
         };
 
         // ocultar cosas innecesarias
-        dummy.getSettings().get(0).setVisible(false);
-        dummy.getSettings().get(1).setVisible(false);
-        dummy.getSettings().get(2).setVisible(false);
+        dummy.getSettings().get(0).visibility(false);
+        dummy.getSettings().get(1).visibility(false);
+        dummy.getSettings().get(2).visibility(false);
         dummy.shouldSaveSettings(false);
     }
 

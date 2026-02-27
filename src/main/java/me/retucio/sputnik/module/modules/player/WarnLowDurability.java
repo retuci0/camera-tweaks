@@ -45,9 +45,9 @@ public class WarnLowDurability extends Module {
                 Category.PLAYER);
 
         playSound.onUpdate(v -> {
-            sound.setVisible(v);
-            volume.setVisible(v);
-            pitch.setVisible(v);
+            sound.visibility(v);
+            volume.visibility(v);
+            pitch.visibility(v);
         });
     }
 

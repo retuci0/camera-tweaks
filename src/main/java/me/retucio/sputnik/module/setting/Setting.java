@@ -4,6 +4,7 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.sputnik.UpdateSettingEvent;
 import me.retucio.sputnik.module.Module;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 // base para los tipos de ajustes
@@ -17,6 +18,7 @@ public abstract class Setting<T> {
 
     protected Consumer<T> updateListener;
 
+    protected BooleanSupplier visibilityCondition = null;
     protected boolean visible = true;
     protected boolean searchMatch = true;
 
@@ -30,11 +32,21 @@ public abstract class Setting<T> {
     }
 
     public boolean isVisible() {
+        if (visibilityCondition != null) {
+            return visibilityCondition.getAsBoolean();
+        }
         return visible;
     }
 
-    public void setVisible(boolean visible) {
+    public void visibility(boolean visible) {
         this.visible = visible;
+        this.visibilityCondition = null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S extends Setting<T>> S visibility(BooleanSupplier condition) {
+        this.visibilityCondition = condition;
+        return (S) this;
     }
 
     public boolean isSearchMatch() {

@@ -1,5 +1,6 @@
 package me.retucio.sputnik.command.commands;
 
+import com.github.retucio.neutrino.EventListener;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.EntityArgumentType;
@@ -37,6 +38,7 @@ public class SpectateCommand extends Command {
                 );
     }
 
+    @EventListener
     public void onKey(KeyEvent event) {
         if (mc.getCameraEntity() != mc.player && mc.currentScreen == null
                 && event.getKey() == GLFW.GLFW_KEY_ESCAPE && event.getAction() != GLFW.GLFW_RELEASE ) {

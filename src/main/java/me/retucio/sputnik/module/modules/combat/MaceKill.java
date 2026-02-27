@@ -17,7 +17,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 
-// https://github.com/etianl/Trouser-Streak/blob/ce27abd30435ca2b43a5e5546f5b070c07c6291a/src/main/java/pwn/noobs/trouserstreak/modules/MaceKill.java
+/**
+ * @link <a href="https://github.com/etianl/Trouser-Streak/blob/ce27abd30435ca2b43a5e5546f5b070c07c6291a/src/main/java/pwn/noobs/trouserstreak/modules/MaceKill.java">créditos a etianl</a>
+ *
+ * @"author" retucio
+ */
+
 public class MaceKill extends Module {
 
     private final BooleanSetting max = sgGeneral.add(new BooleanSetting(
@@ -33,7 +38,7 @@ public class MaceKill extends Module {
             1,
             170,
             1
-    ));
+    )).visibility(() -> !max.getValue());
 
     private final BooleanSetting preventDeath = sgGeneral.add(new BooleanSetting(
             "prevenir muerte",
@@ -43,11 +48,10 @@ public class MaceKill extends Module {
 
     public MaceKill() {
         super("estampaescrotos", "estampa escrotos ajenos", Category.COMBAT);
-        max.onUpdate(v -> height.setVisible(!v));
     }
 
-    @SuppressWarnings("ConstantConditions")
     @EventListener
+    @SuppressWarnings("ConstantConditions")
     private void onPacketSend(PacketEvent.Send event) {
         if (mc.player == null) return;
         if (mc.player.getMainHandStack().getItem() == Items.MACE

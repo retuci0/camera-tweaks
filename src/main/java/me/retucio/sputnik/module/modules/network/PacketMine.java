@@ -1,6 +1,7 @@
 package me.retucio.sputnik.module.modules.network;
 
 import com.github.retucio.neutrino.EventListener;
+import it.unimi.dsi.fastutil.booleans.BooleanSet;
 import me.retucio.sputnik.event.interact.AttackBlockEvent;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
@@ -11,10 +12,16 @@ import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
+import me.retucio.sputnik.util.EntityUtil;
+import me.retucio.sputnik.util.MiscUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 
 import java.awt.*;
@@ -66,6 +73,12 @@ public class PacketMine extends Module {
             false
     ));
 
+    private final EnumSetting<RotateMode> rotate = sgGeneral.add(new EnumSetting<>(
+            "rotar",
+            "rotar al minar bloques mediante el módulo",
+            RotateMode.class, RotateMode.NONE
+    ));
+
     private final BooleanSetting render = sgRender.add(new BooleanSetting(
             "renderizar",
             "renderizar un contorno alrededor de los bloques que están siendo minados",
@@ -89,7 +102,7 @@ public class PacketMine extends Module {
     ));
 
     private final BooleanSetting dontBreak = sgGeneral.add(new BooleanSetting(
-            "no romper",
+            "no romper pico",
             "evita romper el pico",
             true
     ));
@@ -100,8 +113,8 @@ public class PacketMine extends Module {
                 Category.NETWORK);
 
         render.onUpdate(v -> {
-            color.setVisible(v);
-            lineWidth.setVisible(v);
+            color.visibility(v);
+            lineWidth.visibility(v);
         });
     }
 
@@ -139,9 +152,7 @@ public class PacketMine extends Module {
         if (clickAction.is(ClickAction.ADD_PRIORITY)) {
             miningBlocks.sort(Comparator.comparingInt(block -> -block.clicks));
             for (MiningBlock block : miningBlocks) {
-                if (processBlock(block)) {
-                    break;
-                }
+                processBlock(block);
             }
         } else {
             if (inOrder.getValue()) {
@@ -260,11 +271,15 @@ public class PacketMine extends Module {
                 return false;
             }
 
-            if (dontBreak.getValue() && mc.player.getMainHandStack().getMaxDamage() - mc.player.getMainHandStack().getDamage() <= 1) {
+            if (dontBreak.getValue()
+                    && mc.player.isHolding(ItemStack::isDamageable)
+                    && mc.player.getMainHandStack().getMaxDamage() - mc.player.getMainHandStack().getDamage() <= 1) {
                 ChatUtil.warn("pico por romperse");
                 toggle();
                 return false;
             }
+
+            rotate();
 
             mc.interactionManager.sendSequencedPacket(mc.world, sequence ->
                     new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, dir, sequence));
@@ -289,6 +304,15 @@ public class PacketMine extends Module {
             );
         }
 
+        private void rotate() {
+            Vec3d pos = Vec3d.of(this.pos);
+            switch (rotate.getValue()) {
+                case CLIENT -> EntityUtil.lookAtClient(pos);
+                case SERVER -> EntityUtil.lookAtServer(pos);
+                case BOTH -> EntityUtil.lookAt(pos);
+            }
+        }
+
         public boolean shouldRetry() {
             return mining && (System.currentTimeMillis() - startTime >= retryTime.getValue());
         }
@@ -301,6 +325,17 @@ public class PacketMine extends Module {
 
         private final String name;
         ClickAction(String name) { this.name = name; }
+        @Override public String toString() { return name; }
+    }
+
+    private enum RotateMode {
+        CLIENT("cámara"),
+        SERVER("mediante paquetes"),
+        BOTH("ambos"),
+        NONE("no");
+
+        private final String name;
+        RotateMode(String name) { this.name = name; }
         @Override public String toString() { return name; }
     }
 }

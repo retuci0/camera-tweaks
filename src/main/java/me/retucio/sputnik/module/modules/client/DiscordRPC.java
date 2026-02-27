@@ -17,6 +17,10 @@ import me.retucio.sputnik.module.setting.settings.StringSetting;
 import me.retucio.sputnik.util.ChatUtil;
 
 
+/**
+ * @author retucio
+ */
+
 public class DiscordRPC extends Module {
 
     private final SettingGroup sgImage = addSg(new SettingGroup("imágenes", false));

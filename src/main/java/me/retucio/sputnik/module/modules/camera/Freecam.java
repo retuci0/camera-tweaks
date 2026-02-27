@@ -47,6 +47,8 @@ import org.lwjgl.glfw.GLFW;
  * @see KeyInputMixin
  * @see LivingEntityRendererMixin
  * @see WorldRendererMixin
+ *
+ * @author retucio
  */
 
 public class Freecam extends Module {

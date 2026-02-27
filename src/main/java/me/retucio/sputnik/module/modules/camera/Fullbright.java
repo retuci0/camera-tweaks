@@ -15,13 +15,24 @@ import java.awt.*;
 
 /** continúa en:
  * @see LightmapTextureManagerMixin
+ *
+ * @author retucio
  */
 
 public class Fullbright extends Module {
 
-    public final EnumSetting<Modes> mode = sgGeneral.add(new EnumSetting<>("modo", "qué modo de iluminación emplear (usar poción con shaders)", Modes.class, Modes.GAMMA));
+    public final EnumSetting<Modes> mode = sgGeneral.add(new EnumSetting<>(
+            "modo",
+            "qué modo de iluminación emplear (usar poción con shaders)",
+            Modes.class, Modes.GAMMA
+    ));
 
-    public final ColorSetting color = sgGeneral.add(new ColorSetting("filtro", "filtro de color", new Color(255, 255, 255, 255), false));
+    public final ColorSetting color = sgGeneral.add(new ColorSetting(
+            "filtro",
+            "filtro de color",
+            new Color(255, 255, 255, 255),
+            false
+    )).visibility(() -> mode.is(Modes.GAMMA));
 
     public Fullbright() {
         super("brilli brilli",
@@ -32,7 +43,6 @@ public class Fullbright extends Module {
         mode.onUpdate(mode -> { if (mode != Modes.POTION) disableNightVision(); });
         mode.onUpdate(mode -> {
             boolean v = mode.equals(Modes.GAMMA);
-            color.setVisible(v);
             if (v) disableNightVision();
         });
     }
