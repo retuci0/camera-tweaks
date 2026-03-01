@@ -19,6 +19,16 @@ public class RenderUtil {
 
     /* líneas */
 
+    public static void drawLine(MatrixStack matrices, Vec3d from, Vec3d to, Color color, float lineWidth) {
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);
+        Vec3d cam = mc.gameRenderer.getCamera().getCameraPos();
+
+        buffer.vertex(matrices.peek(), (float) (from.x - cam.x), (float) (from.y - cam.y), (float) (from.z - cam.z)).color(color.getRGB()).normal(-1, -1, -1).lineWidth(lineWidth);
+        buffer.vertex(matrices.peek(), (float) (to.x - cam.x), (float) (to.y - cam.y), (float) (to.z - cam.z)).color(color.getRGB()).normal(-1, -1, -1).lineWidth(lineWidth);
+
+        Layers.lines().draw(buffer.end());
+    }
+
     // https://github.com/TheF1xer/GateClient-1.12.2/blob/main/src/main/java/me/thef1xer/gateclient/util/RenderUtil.java
     public static void drawTracer(MatrixStack matrices, Vec3d pos, Color color, float lineWidth) {
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH);

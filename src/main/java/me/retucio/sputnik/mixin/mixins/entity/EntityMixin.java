@@ -2,12 +2,14 @@ package me.retucio.sputnik.mixin.mixins.entity;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.sputnik.event.render.ChangeRotationEvent;
+import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.camera.Freelook;
 import me.retucio.sputnik.module.modules.camera.Rotations;
 import me.retucio.sputnik.module.modules.misc.AntiInvis;
 import me.retucio.sputnik.module.modules.movement.BoatFly;
+import me.retucio.sputnik.module.modules.movement.Velocity;
 import me.retucio.sputnik.module.modules.render.Nametags;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.TameableEntity;
@@ -20,6 +22,8 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -168,5 +172,11 @@ public abstract class EntityMixin {
         if (((Object) this) instanceof AbstractBoatEntity && boatFly.isEnabled()) {
             cir.setReturnValue(boatFly.stepHeight.getFloatValue());
         }
+    }
+
+    @Inject(method = "pushAwayFrom", at = @At("HEAD"), cancellable = true)
+    private void onPushed(Entity entity, CallbackInfo ci) {
+        Velocity velocity = ModuleManager.INSTANCE.getModuleByClass(Velocity.class);
+        if (velocity.isEnabled() && !velocity.push.getValue() && (Object) this == mc.player) ci.cancel();
     }
 }

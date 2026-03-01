@@ -112,6 +112,7 @@ public class ModuleManager {
         add(new ElytraBounce());
         add(new ElytraFly());
         add(new Headhitters());
+        add(new HitboxDesync());
         add(new InfiniteElytra());
         add(new Jesus());
         add(new ReverseStep());
@@ -120,6 +121,7 @@ public class ModuleManager {
         add(new Slippy());
         add(new Step());
         add(new TridentBoost());
+        add(new Velocity());
     }
 
     private void addNetwork() {
@@ -149,6 +151,7 @@ public class ModuleManager {
     private void addRender() {
         add(new BlockESP());
         add(new BlockOutline());
+        add(new Breadcrumbs());
         add(new BreakingProgress());
         add(new CritsPlus());
         add(new DamageOverlay());

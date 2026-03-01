@@ -126,8 +126,7 @@ public class NetworkUtil {
         int prevSlot = mc.player.getInventory().getSelectedSlot();
 
         if (rotate) {
-            mc.player.setYaw((float) EntityUtil.getYaw(hitPos));
-            mc.player.setPitch((float) EntityUtil.getPitch(hitPos));
+            EntityUtil.lookAtServer(hitPos);
         }
 
         InventoryUtil.swapWithHotbar(mc.player.getInventory().getSelectedSlot(), slot);

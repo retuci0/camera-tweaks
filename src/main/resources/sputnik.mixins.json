@@ -5,6 +5,8 @@
   "mixins": [
     "accessors.AbstractBlockAccessor",
     "accessors.ConfirmServerResourcePackScreenAccessor",
+    "accessors.EntityVelocityUpdateS2CPacketAccessor",
+    "accessors.ExplosionS2CPacketAccessor",
     "accessors.FishingBobberEntityAccessor",
     "accessors.PackAccessor",
     "accessors.StatusEffectInstanceAccessor",

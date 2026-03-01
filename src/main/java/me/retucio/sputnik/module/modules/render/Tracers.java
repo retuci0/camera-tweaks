@@ -97,7 +97,7 @@ public class Tracers extends Module {
         for (Entity entity : mc.world.getEntities()) {
             Color color = getColor(entity);
             if (color == null) continue;
-            Vec3d interpolatedPos = entity.getLerpedPos(event.getTickDelta());
+            Vec3d interpolatedPos = entity.getLerpedPos(event.getTickDelta()).add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
             RenderUtil.drawTracer(event.getMatrices(), interpolatedPos, color, lineWidth.getFloatValue());
         }
     }

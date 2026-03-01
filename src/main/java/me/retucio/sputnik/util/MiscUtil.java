@@ -6,6 +6,7 @@ import me.retucio.sputnik.module.modules.client.HUD;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import java.time.Instant;
@@ -96,5 +97,14 @@ public class MiscUtil {
                 buffer.deleteCharAt(buffer.length() - 1);
             }
         }
+    }
+
+
+    public static Vec3d vec3dOf(Vector3f v) {
+        return new Vec3d(v.x, v.y, v.z);
+    }
+
+    public static Vector3f vec3fOf(Vec3d v) {
+        return new Vector3f((float) v.x, (float) v.y, (float) v.z);
     }
 }

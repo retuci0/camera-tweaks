@@ -1,4 +1,4 @@
-# v3.7
+# v3.8
 
 ## novedades
 
@@ -6,13 +6,14 @@
 
 #### módulos nuevos:
 
-- trazos: dibuja líneas apuntando a entidades cercanas
+- desync de hitbox: exploit chino para meterse en bloques
+- recorrido: muestra tu recorrido
+- retroceso: modifica el retroceso a tomar
 
 ### arreglos / mejoras
 
-- la config. ya funciona de nuevo
-- la escucha de eventos ha sido arreglada, arreglando cosas como la ruedita del zoom y algunos comandos
-- selección de minado ya no crashea al no usar pico
+- rotar, de andamios, ahora solo rota server-side
+- mostrar últimos bloques colocados en andamios
 
 ## problemas reconocidos
 

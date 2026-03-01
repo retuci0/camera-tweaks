@@ -34,9 +34,10 @@ public class HudRenderer {
         addElement(new FpsElement(), positions, visibilities);
         addElement(new TpsElement(), positions, visibilities);
         addElement(new CustomTextElement(), positions, visibilities);
-        addElement(new TimeElement(), positions, visibilities);
         addElement(new PingElement(), positions, visibilities);
         addElement(new RotationElement(), positions, visibilities);
+        addElement(new TimeElement(), positions, visibilities);
+        addElement(new UptimeElement(), positions, visibilities);
 
         addElement(new DynoElement(), positions, visibilities);
         addElement(new EchestElement(), positions, visibilities);

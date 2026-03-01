@@ -59,6 +59,7 @@ public class Sputnik implements ClientModInitializer {
     public static final Sputnik INSTANCE = new Sputnik();
     public static final EventBus EVENT_BUS = new EventBus();
     public static final Logger LOGGER = LogManager.getLogger(Sputnik.class);
+    public static final long LAUNCH_TIME = System.currentTimeMillis();
     public static MinecraftClient mc;
 
     // id y versión

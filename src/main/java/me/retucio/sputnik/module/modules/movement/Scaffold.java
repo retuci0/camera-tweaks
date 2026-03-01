@@ -10,10 +10,7 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.*;
 
-import me.retucio.sputnik.util.Colors;
-import me.retucio.sputnik.util.InventoryUtil;
-import me.retucio.sputnik.util.Lists;
-import me.retucio.sputnik.util.NetworkUtil;
+import me.retucio.sputnik.util.*;
 import me.retucio.sputnik.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.FallingBlock;
@@ -25,6 +22,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Scaffold extends Module {
@@ -79,7 +79,7 @@ public class Scaffold extends Module {
             0,
             4,
             0.1
-    ));
+    )).visibility(extend::getValue);
 
 
     /* torre */
@@ -97,13 +97,13 @@ public class Scaffold extends Module {
             0,
             1,
             0.01
-    ));
+    )).visibility(tower::getValue);
 
     private final BooleanSetting towerWhileMoving = sgBridge.add(new BooleanSetting(
             "torre moviéndose",
             "te permite hacer una torre mientras te mueves",
             false
-    ));
+    )).visibility(tower::getValue);
 
 
     /* otros */
@@ -140,7 +140,7 @@ public class Scaffold extends Module {
             "color a usar al renderizar el contorno",
             Colors.mainColor,
             false
-    ));
+    )).visibility(outlines::getValue);
 
     private final NumberSetting lineWidth = sgRender.add(new NumberSetting(
             "grosor de línea",
@@ -149,7 +149,7 @@ public class Scaffold extends Module {
             0.1,
             10,
             0.1
-    ));
+    )).visibility(outlines::getValue);
 
     private final BooleanSetting fillings = sgRender.add(new BooleanSetting(
             "relleno",
@@ -162,35 +162,44 @@ public class Scaffold extends Module {
             "color a uisar al renderizar el relleno",
             Colors.withAlpha(Colors.mainColor, 60),
             false
+    )).visibility(fillings::getValue);
+
+    private final BooleanSetting showLastPlaced = sgRender.add(new BooleanSetting(
+            "mostrar últimos bloques",
+            "mostrar los últimos bloques colocados",
+            true
     ));
+
+    private final BooleanSetting fade = sgRender.add(new BooleanSetting(
+            "gradiente",
+            "gradiente de opacidad de los últimos bloques colocados",
+            true
+    )).visibility(showLastPlaced::getValue);
+
+    private final NumberSetting lifeTime = sgRender.add(new NumberSetting(
+            "esperanza de vida",
+            "esperanza de vida de los últimos bloques colocados (renderizado)",
+            1,
+            0,
+            5,
+            0.1
+    )).visibility(showLastPlaced::getValue);
 
 
     private final BlockPos.Mutable bp = new BlockPos.Mutable();
+    private final List<PlacedBlock> lastPlacedBlocks = new ArrayList<>();
     private Integer mjY = null;
 
 
     public Scaffold() {
         super("andamios", "pone bloques bajo tus pies de manera automática", Category.MOVEMENT);
-
-        extend.onUpdate(extendDistance::visibility);
-
-        tower.onUpdate(v -> {
-            towerSpeed.visibility(v);
-            towerWhileMoving.visibility(v);
-        });
-
-        outlines.onUpdate(v -> {
-            outlineColor.visibility(v);
-            lineWidth.visibility(v);
-        });
-
-        fillings.onUpdate(fillingColor::visibility);
     }
 
 
     @Override
     public void onDisable() {
         mjY = null;
+        super.onDisable();
     }
 
     @Override
@@ -204,6 +213,11 @@ public class Scaffold extends Module {
             Vec3d dir = Vec3d.fromPolar(0, mc.player.getYaw()).normalize().multiply(extendDistance.getValue());
             pos = pos.add(dir.x, 0, dir.z);
         }
+
+        lastPlacedBlocks.removeIf(block -> {
+            block.age++;
+            return block.age >= block.lifeTime;
+        });
 
         // seleccionar nivel Y
         double y;
@@ -233,7 +247,7 @@ public class Scaffold extends Module {
         if (tower.getValue()
                 && mc.options.jumpKey.isPressed()
                 && !mc.options.sneakKey.isPressed()
-                && !mc.player.getInventory().getSelectedStack().isEmpty()
+                && mc.player.getInventory().getSelectedStack().getItem() instanceof BlockItem
                 && !mc.world.isAir(mc.player.getBlockPos().down())) {
             Vec3d velocity = mc.player.getVelocity();
             Box playerBox = mc.player.getBoundingBox();
@@ -252,8 +266,25 @@ public class Scaffold extends Module {
 
     @EventListener
     private void onRenderWorld(Render3DEvent event) {
-        if (outlines.getValue()) RenderUtil.drawBlockOutline(event.getMatrices(), bp, outlineColor.getValue(), lineWidth.getFloatValue(), false);
         if (fillings.getValue()) RenderUtil.drawBlockFilled(event.getMatrices(), bp, fillingColor.getValue(), false);
+        if (outlines.getValue()) RenderUtil.drawBlockOutline(event.getMatrices(), bp, outlineColor.getValue(), lineWidth.getFloatValue(), false);
+
+        if (!showLastPlaced.getValue()) return;
+        for (PlacedBlock block : lastPlacedBlocks) {
+            if (bp.asVector3i().equals(block.pos.asVector3i())) continue;
+            if (fillings.getValue()) {
+                Color fc = fade.getValue()
+                        ? Colors.withAlpha(fillingColor.getValue(), (int) ((1 - ((float) block.age / (float) block.lifeTime)) * fillingColor.getA()))
+                        : fillingColor.getValue();
+                RenderUtil.drawBlockFilled(event.getMatrices(), block.pos, fc, false);
+            }
+            if (outlines.getValue()) {
+                Color oc = fade.getValue()
+                        ? Colors.withAlpha(outlineColor.getValue(), (int) ((1 - ((float) block.age / (float) block.lifeTime)) * outlineColor.getA()))
+                        : outlineColor.getValue();
+                RenderUtil.drawBlockOutline(event.getMatrices(), block.pos, oc, lineWidth.getFloatValue(), false);
+            }
+        }
     }
 
     @EventListener
@@ -292,15 +323,30 @@ public class Scaffold extends Module {
             mc.player.getInventory().setSelectedSlot(slot);
         }
 
+
         // colocar bloque
-        NetworkUtil.placeBlock(
+        if (NetworkUtil.placeBlock(
                 pos, Hand.MAIN_HAND,
                 mc.player.getInventory().getSelectedSlot(),
                 rotate.getValue(),
                 false,
                 true,
                 true
-        );
+        )) {
+            lastPlacedBlocks.add(new PlacedBlock(pos.toImmutable(), lifeTime.getIntValue() * 20));
+        }
+    }
+
+    private static class PlacedBlock {
+        BlockPos pos;
+        final int lifeTime;
+        int age;
+
+        PlacedBlock(BlockPos pos, int lifeTime) {
+            this.pos = pos;
+            this.lifeTime = lifeTime;
+            this.age = 0;
+        }
     }
 
     // método helper para ver si un bloque cumple con el filtro
