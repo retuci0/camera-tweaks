@@ -100,6 +100,7 @@
     "mixins.world.DamageParticleMixin",
     "mixins.world.EmitterParticleMixin",
     "mixins.world.ParticleManagerMixin",
-    "mixins.world.RenderTickCounterDynamicMixin"
+    "mixins.world.RenderTickCounterDynamicMixin",
+    "mixins.world.TotemParticleMixin"
   ]
 }

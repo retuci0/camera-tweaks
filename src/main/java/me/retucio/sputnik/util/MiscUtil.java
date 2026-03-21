@@ -1,5 +1,6 @@
 package me.retucio.sputnik.util;
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.TickEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
@@ -21,6 +22,7 @@ public class MiscUtil {
 
     public static Screen screen;
 
+    @EventListener
     public static void onTick(TickEvent.Post event) {
         if (screen != null && mc.currentScreen == null) {
             mc.setScreen(screen);

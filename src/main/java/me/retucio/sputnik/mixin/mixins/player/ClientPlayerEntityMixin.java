@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.world.NoMiningInterruptions;
 import me.retucio.sputnik.module.modules.inventory.PortalGUI;
+import me.retucio.sputnik.util.ChatUtil;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
@@ -15,6 +16,8 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static me.retucio.sputnik.Sputnik.mc;
 

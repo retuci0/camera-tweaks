@@ -111,10 +111,12 @@ public class ModuleManager {
         add(new Dolphin());
         add(new ElytraBounce());
         add(new ElytraFly());
+        add(new FastStairs());
         add(new Headhitters());
         add(new HitboxDesync());
         add(new InfiniteElytra());
         add(new Jesus());
+        add(new Parkour());
         add(new ReverseStep());
         add(new SafeWalk());
         add(new Scaffold());
@@ -153,6 +155,7 @@ public class ModuleManager {
         add(new BlockOutline());
         add(new Breadcrumbs());
         add(new BreakingProgress());
+        add(new Confetti());
         add(new CritsPlus());
         add(new DamageOverlay());
         add(new EntityESP());

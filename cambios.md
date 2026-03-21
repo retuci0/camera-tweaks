@@ -1,4 +1,4 @@
-# v3.8
+# v3.9
 
 ## novedades
 
@@ -6,14 +6,11 @@
 
 #### módulos nuevos:
 
-- desync de hitbox: exploit chino para meterse en bloques
-- recorrido: muestra tu recorrido
-- retroceso: modifica el retroceso a tomar
+- escaleras veloces: sube escaleras más rápido
+- parkour: salta automáticamente
+- confetti: cambia el color de las partículas del pop del tótem
 
 ### arreglos / mejoras
-
-- rotar, de andamios, ahora solo rota server-side
-- mostrar últimos bloques colocados en andamios
 
 ## problemas reconocidos
 
