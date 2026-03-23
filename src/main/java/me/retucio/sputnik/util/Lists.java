@@ -87,9 +87,23 @@ public class Lists {
         return map;
     }
 
+    @SafeVarargs
+    public static <T> Map<T, Boolean> allTrueExcept(List<T> options, T... exceptions) {
+        Map<T, Boolean> map = allFalse(options);
+        for (T exception : exceptions) map.replace(exception, false);
+        return map;
+    }
+
     public static <T> Map<T, Boolean> allFalse(List<T> options) {
         Map<T, Boolean> map = new HashMap<>();
         for (T option : options) map.put(option, false);
+        return map;
+    }
+
+    @SafeVarargs
+    public static <T> Map<T, Boolean> allFalseExcept(List<T> options, T... exceptions) {
+        Map<T, Boolean> map = allFalse(options);
+        for (T exception : exceptions) map.replace(exception, true);
         return map;
     }
 

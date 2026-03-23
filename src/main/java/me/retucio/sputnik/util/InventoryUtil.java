@@ -1,5 +1,7 @@
 package me.retucio.sputnik.util;
 
+import com.github.retucio.neutrino.EventListener;
+import com.google.common.eventbus.Subscribe;
 import me.retucio.sputnik.event.network.DisconnectEvent;
 import me.retucio.sputnik.event.interact.OpenScreenEvent;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
@@ -332,6 +334,18 @@ public class InventoryUtil {
         return -1;
     }
 
+    public static boolean hasInHotbar(Item item) {
+        List<ItemStack> stacks = findAll(stack -> stack.isOf(item));
+        for (ItemStack stack : stacks) {
+            int slot = mc.player.getInventory().getSlotWithStack(stack);
+            if (slot < HOTBAR_END || slot == OFFHAND_SLOT) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @EventListener
     public static void onOpenScreen(OpenScreenEvent event) {
         if (mc.player == null
                 || event.getScreen() == null
@@ -343,6 +357,7 @@ public class InventoryUtil {
             echestInv = handler.getInventory();
     }
 
+    @EventListener
     public void onDisconnect(DisconnectEvent event) {
         echestInv = null;
     }

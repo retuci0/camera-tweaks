@@ -96,6 +96,8 @@ public class Sputnik implements ClientModInitializer {
         EVENT_BUS.subscribe(NetworkUtil.class);
         EVENT_BUS.subscribe(RenderUtil.class);
 
+        EVENT_BUS.subscribe(BlockIterator.class);
+
         Lists.init();
         Textures.init();
 

@@ -1,4 +1,4 @@
-# v3.9
+# v4.0
 
 ## novedades
 
@@ -6,11 +6,11 @@
 
 #### módulos nuevos:
 
-- escaleras veloces: sube escaleras más rápido
-- parkour: salta automáticamente
-- confetti: cambia el color de las partículas del pop del tótem
+- aura de cristales: hace cpvp por ti (muy mejorable, estoy en ello)
 
 ### arreglos / mejoras
+
+- `$echest` ya funciona y tal
 
 ## problemas reconocidos
 

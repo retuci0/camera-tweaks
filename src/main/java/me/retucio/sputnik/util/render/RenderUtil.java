@@ -94,6 +94,7 @@ public class RenderUtil {
     }
 
     public static void drawBlockFaceOutlines(MatrixStack matrices, BlockPos pos, Direction face, Color color, float lineWidth, boolean cull) {
+        if (lineWidth <= 0) return;
         Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
 
         float minX = (float) (pos.getX() - cameraPos.x);
@@ -295,6 +296,7 @@ public class RenderUtil {
     // cajas
 
     public static void drawOutlineBox(MatrixStack matrices, Box box, Color color, float lineWidth, boolean cull) {
+        if (lineWidth <= 0) return;
         Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
 
         float minX = (float) (box.minX - cameraPos.x);

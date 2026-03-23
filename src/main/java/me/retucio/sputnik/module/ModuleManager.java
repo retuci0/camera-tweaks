@@ -5,10 +5,7 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.module.modules.client.DiscordRPC;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.module.modules.camera.*;
-import me.retucio.sputnik.module.modules.combat.AttributeSwapper;
-import me.retucio.sputnik.module.modules.combat.MaceKill;
-import me.retucio.sputnik.module.modules.combat.ProjectileTrajectories;
-import me.retucio.sputnik.module.modules.combat.SpearKill;
+import me.retucio.sputnik.module.modules.combat.*;
 import me.retucio.sputnik.module.modules.inventory.*;
 import me.retucio.sputnik.module.modules.misc.*;
 import me.retucio.sputnik.module.modules.movement.*;
@@ -40,6 +37,7 @@ public class ModuleManager {
         // añadir los módulos
         addCamera();
         addClient();
+        addCombat();
         addInventory();
         addMisc();
         addMovement();
@@ -67,7 +65,6 @@ public class ModuleManager {
 
 
 
-
     private void addCamera() {
         add(new Autism());
         add(new Freecam());
@@ -81,6 +78,14 @@ public class ModuleManager {
     private void addClient() {
         add(new DiscordRPC());
         add(new HUD());
+    }
+
+    private void addCombat() {
+        add(new AttributeSwapper());
+        add(new CrystalAura());
+        add(new MaceKill());
+        add(new ProjectileTrajectories());
+        add(new SpearKill());
     }
 
     private void addMisc() {
@@ -138,15 +143,12 @@ public class ModuleManager {
     private void addPlayer() {
         add(new AirPlace());
         add(new AntiHunger());
-        add(new AttributeSwapper());
         add(new AutoFish());
         add(new Capes());
         add(new FastUse());
         add(new HandView());
         add(new KeyPearl());
-        add(new MaceKill());
         add(new NoFall());
-        add(new SpearKill());
         add(new WarnLowDurability());
     }
 
@@ -175,7 +177,6 @@ public class ModuleManager {
         add(new ColoredSigns());
         add(new LightOverlay());
         add(new NoMiningInterruptions());
-        add(new ProjectileTrajectories());
         add(new Racist());
         add(new StrongholdTriangulator());
         add(new TimeChanger());

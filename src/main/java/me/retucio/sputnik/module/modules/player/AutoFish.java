@@ -52,7 +52,7 @@ public class AutoFish extends Module {
             0,
             64,
             1
-    ));
+    )).visibility(onlyRecastIfLookingAtWater::getValue);
 
     private final BooleanSetting dontBreak = sgGeneral.add(new BooleanSetting(
             "evitar romper",
@@ -71,8 +71,6 @@ public class AutoFish extends Module {
             onlyRecastIfLookingAtWater.visibility(v);
             recastRaycastDistance.visibility(v);
         });
-
-        onlyRecastIfLookingAtWater.onUpdate(v -> recastRaycastDistance.visibility(v));
     }
 
     @Override
