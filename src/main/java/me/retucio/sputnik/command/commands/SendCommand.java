@@ -3,18 +3,18 @@ package me.retucio.sputnik.command.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
-import me.retucio.sputnik.mixin.accessors.ClientPlayNetworkHandlerAccessor;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.command.CommandSource;
-import net.minecraft.network.encryption.NetworkEncryptionUtils;
-import net.minecraft.network.message.LastSeenMessagesCollector;
-import net.minecraft.network.message.MessageBody;
-import net.minecraft.network.message.MessageSignatureData;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import me.retucio.sputnik.mixin.accessors.ClientPacketListenerAccessor;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.LastSeenMessagesTracker;
+import net.minecraft.network.chat.MessageSignature;
+import net.minecraft.network.chat.SignedMessageBody;
+import net.minecraft.network.protocol.game.ServerboundChatPacket;
+import net.minecraft.util.Crypt;
 
 import java.time.Instant;
 
-// uso principal: protección de coordenadas de ChatPlus, que ni siquiera funciona
+// uso principal: protección de coordenadas de ChatPlus
 public class SendCommand extends Command {
 
     public SendCommand() {
@@ -22,31 +22,35 @@ public class SendCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder.then(argument("message", StringArgumentType.greedyString()).executes(context -> {
             String message = context.getArgument("message", String.class);
 
             if (message != null && !message.isEmpty()) {
                 Instant instant = Instant.now();
-                long salt = NetworkEncryptionUtils.SecureRandomUtil.nextLong();
-                ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+                long salt = Crypt.SaltSupplier.getLong();
+                ClientPacketListener handler = mc.getConnection();
 
                 // obtener últimos mensajes vistos para la firma
-                LastSeenMessagesCollector.LastSeenMessages lastSeenMessages =
-                        ((ClientPlayNetworkHandlerAccessor) handler).getLastSeenMessagesCollector().collect();
+                ClientPacketListenerAccessor listener = ((ClientPacketListenerAccessor) handler);
+                if (listener == null) return 0;
+                LastSeenMessagesTracker tracker = ((ClientPacketListenerAccessor) handler).getLastSeenMessagesTracker();
+                LastSeenMessagesTracker.Update lastSeenMessages = tracker.generateAndApplyUpdate();
 
                 // empacar firma para un chat seguro
-                MessageSignatureData messageSignatureData =
-                        ((ClientPlayNetworkHandlerAccessor) handler).getMessagePacker().pack(
-                                new MessageBody(message, instant, salt, lastSeenMessages.lastSeen())
-                        );
+                MessageSignature messageSignature = ((ClientPacketListenerAccessor) handler)
+                        .getSignedMessageEncoder()
+                        .pack(new SignedMessageBody(
+                                message, instant, salt, lastSeenMessages.lastSeen()
+                        )
+                );
 
                 // enviar paquete para enviar mensaje
-                handler.sendPacket(new ChatMessageC2SPacket(
+                handler.send(new ServerboundChatPacket(
                         message,
                         instant,
                         salt,
-                        messageSignatureData,
+                        messageSignature,
                         lastSeenMessages.update()
                 ));
             }

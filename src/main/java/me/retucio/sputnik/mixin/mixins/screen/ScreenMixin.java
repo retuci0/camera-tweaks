@@ -5,10 +5,10 @@ import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.event.input.ClientClickEvent;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.ClickEvent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.ClickEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,19 +19,20 @@ import static me.retucio.sputnik.Sputnik.mc;
 @Mixin(Screen.class)
 public class ScreenMixin {
 
-    @Inject(method = "handleBasicClickEvent", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
-    private static void handleClientClickEvents(ClickEvent clickEvent, MinecraftClient client, Screen screen, CallbackInfo ci) throws CommandSyntaxException {
-        if (clickEvent instanceof ClientClickEvent event && event.getValue().startsWith(CommandManager.INSTANCE.getPrefix()))
-            CommandManager.dispatch(event.getValue().substring(CommandManager.INSTANCE.getPrefix().length()));
+    @Inject(method = "defaultHandleClickEvent", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    private static void handleClientClickEvents(ClickEvent event, Minecraft minecraft, Screen activeScreen, CallbackInfo ci) throws CommandSyntaxException {
+        if (event instanceof ClientClickEvent e && e.getValue().startsWith(CommandManager.INSTANCE.getPrefix())) {
+            CommandManager.dispatch(e.getValue().substring(CommandManager.INSTANCE.getPrefix().length()));
+        }
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
-    private void renderWatermark(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"))
+    private void renderWatermark(GuiGraphicsExtractor gui, int mouseX, int mouseY, float a, CallbackInfo ci) {
         if (!ConfigManager.hasLoaded()) return;  // para evitar dibujar la marca de agua por defecto
         String watermark = ClientSettingsFrame.guiSettings.watermark.getValue();
         if (watermark == null || watermark.isEmpty()) return;
-        context.drawText(mc.textRenderer, watermark,
-                mc.getWindow().getScaledWidth() - mc.textRenderer.getWidth(watermark) - 2, 2,
+        gui.text(mc.font, watermark,
+                mc.getWindow().getGuiScaledWidth() - mc.font.width(watermark) - 2, 2,
                 ClientSettingsFrame.guiSettings.color.getRGB(), false
         );
     }

@@ -2,7 +2,7 @@ package me.retucio.sputnik.module.modules.player;
 
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.interact.SwitchSlotEvent;
-import me.retucio.sputnik.mixin.accessors.FishingBobberEntityAccessor;
+import me.retucio.sputnik.mixin.accessors.FishingHookAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -10,14 +10,15 @@ import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import java.util.List;
+
 
 // todo: catch delay, seleccionar la mejor caña
 public class AutoFish extends Module {
@@ -82,16 +83,16 @@ public class AutoFish extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.getCameraEntity() == null) return;
+        if (mc.player == null || mc.getCameraEntity() == null || mc.level == null) return;
 
         if (delay >= 0) delay++;
 
-        if (mc.player.isHolding(Items.FISHING_ROD) && mc.player.fishHook == null && autoRecast.getValue()) {
-            HitResult result = mc.getCameraEntity().raycast(recastRaycastDistance.getIntValue(), 0, true);
+        if (mc.player.isHolding(Items.FISHING_ROD) && mc.player.fishing == null && autoRecast.getValue()) {
+            HitResult result = mc.getCameraEntity().pick(recastRaycastDistance.getIntValue(), 0, true);
 
             if (onlyRecastIfLookingAtWater.getValue()) {
                 if (result instanceof BlockHitResult bhr && bhr.getType().equals(HitResult.Type.BLOCK)) {
-                    if (mc.world.getBlockState(bhr.getBlockPos()).isOf(Blocks.WATER) && delay >= recastDelay.getIntValue()) {
+                    if (mc.level.getBlockState(bhr.getBlockPos()).is(Blocks.WATER) && delay >= recastDelay.getIntValue()) {
                         useFishingRod();
                         return;
                     }
@@ -102,14 +103,14 @@ public class AutoFish extends Module {
             }
         }
 
-        if (mc.player.fishHook == null) {
+        if (mc.player.fishing == null) {
             if (delay >= recastDelay.getIntValue() && shouldRecast) {
                 useFishingRod();
             }
             return;
         }
 
-        FishingBobberEntityAccessor fishHook = (FishingBobberEntityAccessor) mc.player.fishHook;
+        FishingHookAccessor fishHook = (FishingHookAccessor) mc.player.fishing;
 
         if (fishHook.caughtFish()) {
             useFishingRod();
@@ -125,8 +126,8 @@ public class AutoFish extends Module {
         int slot = switchToFishingRod();
         if (slot == -1) return;
 
-        ItemStack rod = mc.player.getInventory().getStack(slot);
-        if (rod.getDamage() >= rod.getMaxDamage() - 1 && dontBreak.getValue()) {
+        ItemStack rod = mc.player.getInventory().getItem(slot);
+        if (rod.getDamageValue() >= rod.getMaxDamage() - 1 && dontBreak.getValue()) {
             if (!warned) {
                 ChatUtil.warn("caña a punto de romperse");
                 warned = true;
@@ -134,16 +135,16 @@ public class AutoFish extends Module {
             return;
         }
 
-        mc.doItemUse();
+        mc.startUseItem();
         delay = 0;
         shouldRecast = false;
     }
 
     private int switchToFishingRod() {
-        if (mc.player.getActiveItem().isOf(Items.FISHING_ROD)) return mc.player.getInventory().getSelectedSlot();
-        List<Integer> slots = InventoryUtil.findAllSlots(stack -> stack.isOf(Items.FISHING_ROD));
+        if (mc.player.getActiveItem().is(Items.FISHING_ROD)) return mc.player.getInventory().getSelectedSlot();
+        List<Integer> slots = InventoryUtil.findAllSlots(stack -> stack.is(Items.FISHING_ROD));
         for (int slot : slots) {
-            if (PlayerInventory.isValidHotbarIndex(slot)) {
+            if (Inventory.isHotbarSlot(slot)) {
                 mc.player.getInventory().setSelectedSlot(slot);
                 return slot;
             }

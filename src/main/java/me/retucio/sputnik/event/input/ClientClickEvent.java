@@ -1,12 +1,14 @@
 package me.retucio.sputnik.event.input;
 
 import me.retucio.sputnik.module.modules.misc.ChatPlus;
-import net.minecraft.text.ClickEvent;
+import net.minecraft.network.chat.ClickEvent;
+import org.jspecify.annotations.NonNull;
 
 
 /** este evento es solo para asegurarse de que comandos del mod se puedan ejecutar solo desde el lado del cliente
  * @see ChatPlus#getSendButton
  */
+
 public class ClientClickEvent implements ClickEvent {
 
     private final String value;
@@ -20,7 +22,7 @@ public class ClientClickEvent implements ClickEvent {
     }
 
     @Override
-    public Action getAction() {
+    public @NonNull Action action() {
         return Action.RUN_COMMAND;
     }
 

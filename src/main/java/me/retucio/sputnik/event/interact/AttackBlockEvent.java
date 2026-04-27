@@ -1,8 +1,8 @@
 package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 public class AttackBlockEvent extends Event {
 

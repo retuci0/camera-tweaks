@@ -1,42 +1,35 @@
 package me.retucio.sputnik.util;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 
 import static me.retucio.sputnik.Sputnik.mc;
 
 public class EntityUtil {
 
-    public static Vector3d getEntityVector(Vector3d vector, Entity entity, double tickDelta) {
-        vector.x = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
-        vector.y = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
-        vector.z = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
-        return vector;
-    }
-
     public static Entity getEntityPlayerIsLookingAt() {
-        if (mc.player == null || mc.world == null) return null;
+        if (mc.player == null || mc.level == null) return null;
 
-        float reachDistance = (float) mc.player.getEntityInteractionRange();
+        float reachDistance = (float) mc.player.entityInteractionRange();
 
-        Vec3d cameraPos = mc.player.getCameraPosVec(1.0F);
-        Vec3d rotation = mc.player.getRotationVec(1.0F);
-        Vec3d endPos = cameraPos.add(rotation.x * reachDistance, rotation.y * reachDistance, rotation.z * reachDistance);
+        Vec3 cameraPos = mc.player.getEyePosition(1.0f);
+        Vec3 rotation = mc.player.getViewVector(1.0f);
+        Vec3 endPos = cameraPos.add(rotation.x * reachDistance, rotation.y * reachDistance, rotation.z * reachDistance);
 
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(
+        EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(
                 mc.player,
                 cameraPos,
                 endPos,
-                new Box(cameraPos, endPos),
-                entity -> !entity.isSpectator() && entity.canHit(),
+                new AABB(cameraPos, endPos),
+                entity -> !entity.isSpectator() && entity.isPickable(),
                 reachDistance * reachDistance
         );
 
@@ -44,11 +37,11 @@ public class EntityUtil {
     }
 
     public static boolean hasLineOfSight(Entity viewer, Entity target) {
-        HitResult hitResult = viewer.getEntityWorld().raycast(new RaycastContext(
-                viewer.getEyePos(),
-                target.getEyePos(),
-                RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE,
+        HitResult hitResult = viewer.level().clip(new ClipContext(
+                viewer.getEyePosition(),
+                target.getEyePosition(),
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
                 viewer
         ));
 
@@ -60,31 +53,31 @@ public class EntityUtil {
     }
 
     public static double getYaw(Entity entity) {
-        return getYaw(entity.getEntityPos());
+        return getYaw(entity.position());
     }
 
-    public static double getYaw(Vec3d pos) {
-        return mc.player.getYaw() + MathHelper.wrapDegrees(
+    public static double getYaw(Vec3 pos) {
+        return mc.player.getYRot() + Mth.wrapDegrees(
                 (float) Math.toDegrees(Math.atan2(
-                        pos.getZ() - mc.player.getZ(),
-                        pos.getX() - mc.player.getX())
-                ) - 90f - mc.player.getYaw());
+                        pos.z() - mc.player.getZ(),
+                        pos.x() - mc.player.getX())
+                ) - 90f - mc.player.getYRot());
     }
 
-    public static double getPitch(Vec3d pos) {
-        double diffX = pos.getX() - mc.player.getX();
-        double diffY = pos.getY() - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
-        double diffZ = pos.getZ() - mc.player.getZ();
+    public static double getPitch(Vec3 pos) {
+        double diffX = pos.x() - mc.player.getX();
+        double diffY = pos.y() - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
+        double diffZ = pos.z() - mc.player.getZ();
 
         double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
 
-        return mc.player.getPitch() + MathHelper.wrapDegrees((float) -Math.toDegrees(Math.atan2(diffY, diffXZ)) - mc.player.getPitch());
+        return mc.player.getXRot() + Mth.wrapDegrees((float) -Math.toDegrees(Math.atan2(diffY, diffXZ)) - mc.player.getXRot());
     }
 
     public static double getPitch(Entity entity, Target target) {
         double y;
         if (target == Target.HEAD) y = entity.getEyeY();
-        else if (target == Target.BODY) y = entity.getY() + entity.getHeight() / 2;
+        else if (target == Target.BODY) y = entity.getY() + entity.getBbHeight() / 2;
         else y = entity.getY();
 
         double diffX = entity.getX() - mc.player.getX();
@@ -93,24 +86,24 @@ public class EntityUtil {
 
         double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
 
-        return mc.player.getPitch() + MathHelper.wrapDegrees((float) -Math.toDegrees(Math.atan2(diffY, diffXZ)) - mc.player.getPitch());
+        return mc.player.getXRot() + Mth.wrapDegrees((float) -Math.toDegrees(Math.atan2(diffY, diffXZ)) - mc.player.getXRot());
     }
 
-    public static void lookAt(Vec3d pos) {
+    public static void lookAt(Vec3 pos) {
         lookAtClient(pos);
         lookAtServer(pos);
     }
 
-    public static void lookAtClient(Vec3d pos) {
-        mc.player.setYaw((float) getYaw(pos));
-        mc.player.setPitch((float) getPitch(pos));
+    public static void lookAtClient(Vec3 pos) {
+        mc.player.setYRot((float) getYaw(pos));
+        mc.player.setXRot((float) getPitch(pos));
     }
 
-    public static void lookAtServer(Vec3d pos) {
-        mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
+    public static void lookAtServer(Vec3 pos) {
+        mc.getConnection().send(new ServerboundMovePlayerPacket.Rot(
                 (float) getYaw(pos),
                 (float) getPitch(pos),
-                mc.player.isOnGround(),
+                mc.player.onGround(),
                 mc.player.horizontalCollision
         ));
     }

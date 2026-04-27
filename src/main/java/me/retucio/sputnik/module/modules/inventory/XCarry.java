@@ -4,8 +4,8 @@ import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
-import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
+
 
 public class XCarry extends Module {
 
@@ -18,7 +18,7 @@ public class XCarry extends Module {
     @Override
     public void onEnable() {
         if (mc.player != null) {
-            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.playerScreenHandler.syncId));
+            mc.player.connection.send(new ServerboundContainerClosePacket(mc.player.inventoryMenu.containerId));
         }
         invOpen = false;
         super.onEnable();
@@ -27,7 +27,7 @@ public class XCarry extends Module {
     @Override
     public void onDisable() {
         if (invOpen && mc.player != null) {
-            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.playerScreenHandler.syncId));
+            mc.player.connection.send(new ServerboundContainerClosePacket(mc.player.inventoryMenu.containerId));
         }
         super.onDisable();
     }
@@ -35,8 +35,8 @@ public class XCarry extends Module {
 
     @EventListener
     public void onSendPacket(PacketEvent.Send event) {
-        if (event.getPacket() instanceof CloseHandledScreenC2SPacket packet
-                && packet.getSyncId() == mc.player.playerScreenHandler.syncId) {
+        if (event.getPacket() instanceof ServerboundContainerClosePacket packet
+                && packet.getContainerId() == mc.player.inventoryMenu.containerId) {
             invOpen = true;
             event.cancel();
         }

@@ -1,29 +1,29 @@
 package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
+import me.retucio.sputnik.mixin.mixins.player.MultiPlayerGameModeMixin;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
 
 
 /**
- * @see ClientPlayerInteractionManagerMixin#onBlockPlace
+ * @see MultiPlayerGameModeMixin#onBlockPlace
  */
 public class PlaceBlockEvent extends Event {
 
-    private Hand hand;
+    private InteractionHand hand;
     private BlockHitResult result;
 
-    public PlaceBlockEvent(Hand hand, BlockHitResult result) {
+    public PlaceBlockEvent(InteractionHand hand, BlockHitResult result) {
         this.hand = hand;
         this.result = result;
     }
 
-    public Hand getHand() {
+    public InteractionHand getHand() {
         return hand;
     }
 
-    public void setHand(Hand hand) {
+    public void setHand(InteractionHand hand) {
         this.hand = hand;
     }
 

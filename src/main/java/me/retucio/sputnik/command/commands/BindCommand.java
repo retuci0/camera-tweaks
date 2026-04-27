@@ -8,14 +8,13 @@ import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
-import javax.swing.text.JTextComponent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,19 +28,20 @@ public class BindCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder
                 .then(argument("módulo", ModuleArgumentType.INSTANCE)
                         .executes(ctx -> {
                             Module module = ctx.getArgument("módulo", Module.class);
                             listeningModule = module;
-                            ChatUtil.info("presiona una tecla para asignarla al módulo " + Formatting.GREEN + module.getName());
+                            ChatUtil.info("presiona una tecla para asignarla al módulo " + ChatFormatting.GREEN + module.getName());
                             return SUCCESS;
                         })
                         .then(literal("reset").executes(ctx -> {
                             Module module = ctx.getArgument("módulo", Module.class);
                             module.getBind().reset();
-                            ChatUtil.info("tecla para el módulo " + Formatting.GREEN + module.getName() + " restablecida a " + Formatting.AQUA + KeyUtil.getKeyName(module.getKey()));
+                            ChatUtil.info("tecla para el módulo " + ChatFormatting.GREEN + module.getName()
+                                    + " restablecida a " + ChatFormatting.AQUA + KeyUtil.getKeyName(module.getKey()));
                             return SUCCESS;
                         }))
                 );
@@ -52,16 +52,16 @@ public class BindCommand extends Command {
         KeySetting bind = listeningModule.getBind();
 
         if (ClientSettingsFrame.guiSettings.multipleKeybinds.getValue()) {
-            List<KeyBinding> keys = new ArrayList<>(List.of(mc.options.allKeys));
+            List<KeyMapping> keys = new ArrayList<>(List.of(mc.options.keyMappings));
             keys.removeAll(List.of(mc.options.debugKeys));
 
-            for (KeyBinding kb : keys) {
-                boolean keyAlreadyBound = kb.matchesKey(new KeyInput(key, 0, 0));
+            for (KeyMapping kb : keys) {
+                boolean keyAlreadyBound = kb.matches(new KeyEvent(key, 0, 0));
                 boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
 
                 if (keyAlreadyBound && !allowMultiple) {
                     ChatUtil.warn("esa tecla ya está cogida por "
-                            + Formatting.GREEN + "\"" + I18n.translate(kb.getId()) + "\"");
+                            + ChatFormatting.GREEN + "\"" + I18n.get(kb.getName() + "\""));
                     listeningModule = null;
                     return true;
                 }
@@ -71,8 +71,8 @@ public class BindCommand extends Command {
         if (bind != null) bind.setValue(key);
 
         ChatUtil.info(
-                Text.of("la tecla " + Formatting.AQUA + KeyUtil.getKeyName(key) + Formatting.RESET +
-                        " ha sido asignada al módulo " + Formatting.GREEN + listeningModule.getName())
+                Component.nullToEmpty("la tecla " + ChatFormatting.AQUA + KeyUtil.getKeyName(key) + ChatFormatting.RESET +
+                        " ha sido asignada al módulo " + ChatFormatting.GREEN + listeningModule.getName())
         );
 
         listeningModule = null;

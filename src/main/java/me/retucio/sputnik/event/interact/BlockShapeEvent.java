@@ -1,9 +1,9 @@
 package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockShapeEvent extends Event {
 

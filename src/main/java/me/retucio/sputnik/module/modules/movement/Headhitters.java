@@ -17,6 +17,6 @@ public class Headhitters extends Module {
     @Override
     public void onTick() {
         if (mc.player == null) return;
-        mc.player.jumpingCooldown = delay.getIntValue();
+        mc.player.noJumpDelay = delay.getIntValue();
     }
 }

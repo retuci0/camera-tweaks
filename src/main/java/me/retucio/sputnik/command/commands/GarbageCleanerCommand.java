@@ -3,8 +3,8 @@ package me.retucio.sputnik.command.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 public class GarbageCleanerCommand extends Command {
 
@@ -13,10 +13,10 @@ public class GarbageCleanerCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder.executes(context -> {
             System.gc();
-            ChatUtil.info(Text.of("basura recolectada"));
+            ChatUtil.info(Component.nullToEmpty("basura recolectada"));
             return SUCCESS;
         });
     }

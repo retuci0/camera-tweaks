@@ -6,7 +6,7 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.awt.*;
 
@@ -22,7 +22,7 @@ public class ToggleButton extends SettingButton<BooleanSetting> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         Color color = setting.getValue()
                 ? Colors.enabledToggleButtonColor
@@ -31,10 +31,10 @@ public class ToggleButton extends SettingButton<BooleanSetting> {
         if (isHovered(mouseX, mouseY))
             color = color.brighter();
 
-        ctx.fill(x, y, x + w, y + h, color.getRGB());
+        gui.fill(x, y, x + w, y + h, color.getRGB());
 
         // texto
-        ctx.drawText(mc.textRenderer, setting.getName(), x + 5, y + 3, -1, true);
+        gui.text(mc.font, setting.getName(), x + 5, y + 3, -1, true);
     }
 
     @Override

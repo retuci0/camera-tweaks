@@ -1,28 +1,28 @@
 package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.phys.Vec3;
 
 public class BoatMoveEvent extends Event {
 
-    private final AbstractBoatEntity boat;
-    private Vec3d pos;
+    private final AbstractBoat boat;
+    private Vec3 pos;
 
-    public BoatMoveEvent(AbstractBoatEntity boat, Vec3d pos) {
+    public BoatMoveEvent(AbstractBoat boat, Vec3 pos) {
         this.boat = boat;
         this.pos = pos;
     }
 
-    public AbstractBoatEntity getBoat() {
+    public AbstractBoat getBoat() {
         return boat;
     }
 
-    public Vec3d getPos() {
+    public Vec3 getPos() {
         return pos;
     }
 
-    public void setPos(Vec3d pos) {
+    public void setPos(Vec3 pos) {
         this.pos = pos;
     }
 }

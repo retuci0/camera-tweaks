@@ -1,22 +1,23 @@
 package me.retucio.sputnik.event.network;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.misc.MinecraftClientMixin;
-import net.minecraft.client.world.ClientWorld;
+import me.retucio.sputnik.mixin.mixins.misc.MinecraftMixin;
+import net.minecraft.client.multiplayer.ClientLevel;
 
 
 /**
- * @see MinecraftClientMixin#onJoinWorld
+ * @see MinecraftMixin#onJoinWorld
  */
+
 public class JoinWorldEvent extends Event {
 
-    private final ClientWorld world;
+    private final ClientLevel world;
 
-    public JoinWorldEvent(ClientWorld world) {
+    public JoinWorldEvent(ClientLevel world) {
         this.world = world;
     }
 
-    public ClientWorld getWorld() {
+    public ClientLevel getWorld() {
         return world;
     }
 }

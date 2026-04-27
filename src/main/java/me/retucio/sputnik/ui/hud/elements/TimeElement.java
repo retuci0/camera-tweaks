@@ -3,14 +3,15 @@ package me.retucio.sputnik.ui.hud.elements;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.TextHudElement;
 import me.retucio.sputnik.util.MiscUtil;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
+
 
 public class TimeElement extends TextHudElement {
 
     public TimeElement() {
-        super("time", mc.getWindow().getScaledWidth() - 50, mc.getWindow().getScaledHeight() - mc.textRenderer.fontHeight - 2);
+        super("time", mc.getWindow().getGuiScaledWidth() - 50, mc.getWindow().getGuiScaledHeight() - mc.font.lineHeight - 2);
     }
 
     @Override
@@ -24,10 +25,10 @@ public class TimeElement extends TextHudElement {
     }
 
     @Override
-    public List<Text> getTooltip() {
+    public List<Component> getTooltip() {
         return List.of(
-                Text.literal("hora"),
-                Text.literal("hora y minutos de la zona horaria seleccionada")
+                Component.literal("hora"),
+                Component.literal("hora y minutos de la zona horaria seleccionada")
         );
     }
 }

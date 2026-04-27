@@ -1,13 +1,14 @@
 package me.retucio.sputnik.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.registry.Registries;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
+
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import java.awt.*;
 import java.util.*;
@@ -17,23 +18,23 @@ import static me.retucio.sputnik.util.Colors.*;
 
 public class Lists {
 
-    public static final List<EntityType<?>> entityList = Registries.ENTITY_TYPE.stream().toList();
+    public static final List<EntityType<?>> entityList = BuiltInRegistries.ENTITY_TYPE.stream().toList();
     public static Map<EntityType<?>, String> entityNames;
 
-    public static final List<ParticleType<?>> particleList = Registries.PARTICLE_TYPE.stream().toList();
+    public static final List<ParticleType<?>> particleList = BuiltInRegistries.PARTICLE_TYPE.stream().toList();
     public static Map<ParticleType<?>, String> particleNames;
 
-    public static final List<Item> itemList = Registries.ITEM.stream().toList();
+    public static final List<Item> itemList = BuiltInRegistries.ITEM.stream().toList();
     public static Map<Item, String> itemNames;
 
-    public static final List<Block> blockList = Registries.BLOCK.stream().toList();
+    public static final List<Block> blockList = BuiltInRegistries.BLOCK.stream().toList();
     public static Map<Block, String> blockNames;
 
-    public static final List<SoundEvent> soundList = Registries.SOUND_EVENT.stream().toList();
+    public static final List<SoundEvent> soundList = BuiltInRegistries.SOUND_EVENT.stream().toList();
     public static Map<SoundEvent, String> soundNames;
 
-    public static final List<ScreenHandlerType<?>> screenList = Registries.SCREEN_HANDLER.stream().toList();
-    public static Map<ScreenHandlerType<?>, String> screenNames;
+    public static final List<MenuType<?>> screenList = BuiltInRegistries.MENU.stream().toList();
+    public static Map<MenuType<?>, String> screenNames;
 
     public static final List<Color> colorList = new ArrayList<>();
     public static final List<String> fontList = new ArrayList<>();
@@ -41,31 +42,31 @@ public class Lists {
     // intentar traducir nombres y fallar miserablemente
     public static void init() {
         entityNames = getMapOfLists(entityList,
-                entityList.stream().map(entity -> Text.translatable(entity.getTranslationKey()).getString()).toList());
+                entityList.stream().map(entity -> Component.translatable(entity.getDescriptionId()).getString()).toList());
 
         particleNames = getMapOfLists(particleList,
-                particleList.stream().map(particle -> Text.translatable(
-                        Registries.PARTICLE_TYPE.getId(particle).toShortTranslationKey()).getString()
-                ).toList());
+                particleList.stream().map(particle -> Component.translatable(
+                        BuiltInRegistries.PARTICLE_TYPE.getKey(particle).toShortLanguageKey()
+                ).toString()).toList());
 
         itemNames = getMapOfLists(itemList,
-                itemList.stream().map(item -> Text.translatable(
-                        item.getTranslationKey()).getString()
+                itemList.stream().map(item -> Component.translatable(
+                        item.getDescriptionId()).getString()
                 ).toList());
 
         blockNames = getMapOfLists(blockList,
-                blockList.stream().map(block -> Text.translatable(
-                        block.getTranslationKey()).getString()
+                blockList.stream().map(block -> Component.translatable(
+                        block.getDescriptionId()).getString()
                 ).toList());
 
         soundNames = getMapOfLists(soundList,
-                soundList.stream().map(sound -> Text.translatable(
-                        sound.id().toShortTranslationKey()).getString()
+                soundList.stream().map(sound -> Component.translatable(
+                        sound.location().toShortLanguageKey()).getString()
                 ).toList());
 
         screenNames = getMapOfLists(screenList,
-                screenList.stream().map(screen -> Text.translatable(
-                        Registries.SCREEN_HANDLER.getId(screen).toShortTranslationKey()).getString()
+                screenList.stream().map(screen -> Component.translatable(
+                        BuiltInRegistries.MENU.getKey(screen).toShortLanguageKey()).getString()
                 ).toList());
 
         colorList.addAll(Arrays.asList(

@@ -13,7 +13,7 @@ import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.render.DrawUtil;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.awt.*;
 
@@ -23,12 +23,10 @@ public class ColorPickerFrame extends SettingsFrame {
     private final ColorSetting colorSetting;
     private Color currentColor;
 
-    // Color picker state
     private boolean pickingHue = false;
     private boolean pickingSaturationBrightness = false;
     private boolean pickingAlpha = false;
 
-    // Picker areas
     private int huePickerX, huePickerY, huePickerWidth, huePickerHeight;
     private int saturationBrightnessPickerX, saturationBrightnessPickerY, saturationBrightnessPickerWidth, saturationBrightnessPickerHeight;
     private int alphaPickerX, alphaPickerY, alphaPickerWidth, alphaPickerHeight;
@@ -117,14 +115,16 @@ public class ColorPickerFrame extends SettingsFrame {
     // RENDERIZADO
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         if (colorSetting == null) return;
         updateWidth();
 
         // al parecer este era el problema :/
-        for (Setting<?> setting : dummyModule.getSettings())
-            if (setting instanceof NumberSetting ns) ns.setLocked(
-                    pickingAlpha || pickingHue || pickingSaturationBrightness);
+        for (Setting<?> setting : dummyModule.getSettings()) {
+            if (setting instanceof NumberSetting ns) {
+                ns.setLocked(pickingAlpha || pickingHue || pickingSaturationBrightness);
+            }
+        }
 
         currentColor = colorSetting.getValue();
 
@@ -133,17 +133,17 @@ public class ColorPickerFrame extends SettingsFrame {
         // cabezal
         int centerY = renderY + h / 2;
         int titleX = x + 8;
-        int titleY = centerY - mc.textRenderer.fontHeight / 2;
+        int titleY = centerY - mc.font.lineHeight / 2;
 
         String title = colorSetting.getName();
-        ctx.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB());
-        ctx.drawText(mc.textRenderer, title, titleX, titleY, -1, true);
+        gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB());
+        gui.text(mc.font, title, titleX, titleY, -1, true);
 
         // botón de cerrar
         int closeButtonColor = isCloseButtonHovered(mouseX, mouseY)
                 ? Color.RED.getRGB()
                 : -1;
-        ctx.drawText(mc.textRenderer, "×", x + w - mc.textRenderer.getWidth("×") - 8, titleY, closeButtonColor, true);
+        gui.text(mc.font, "×", x + w - mc.font.width("×") - 8, titleY, closeButtonColor, true);
 
 
         int previewX = x + padding;
@@ -175,9 +175,9 @@ public class ColorPickerFrame extends SettingsFrame {
         int bgY2 = bgY1 + previewHeight + saturationBrightnessPickerHeight + alphaPickerHeight
                 + buttonAreaHeight + (padding * 6) - 11;
 
-        ctx.fill(bgX1, bgY1, bgX2, bgY2, Colors.frameBGColor.getRGB());
+        gui.fill(bgX1, bgY1, bgX2, bgY2, Colors.frameBGColor.getRGB());
 
-        DrawUtil.drawBorder(ctx, previewX, previewY, previewWidth, previewHeight, -1);
+        DrawUtil.drawBorder(gui, previewX, previewY, previewWidth, previewHeight, -1);
 
         if (colorSetting.isRainbow()) {
             float hueStep = 1f / previewWidth;
@@ -186,21 +186,21 @@ public class ColorPickerFrame extends SettingsFrame {
                 float hue = i * hueStep;
                 Color rainbowColor = Color.getHSBColor(hue, colorSetting.getSaturation(), colorSetting.getBrightness());
                 int endX = Math.min(i + stripWidth, previewWidth);
-                ctx.fill(previewX + i, previewY, previewX + endX, previewY + previewHeight,
+                gui.fill(previewX + i, previewY, previewX + endX, previewY + previewHeight,
                         (colorSetting.getA() << 24) | (rainbowColor.getRGB() & 0x00FFFFFF));
             }
         } else {
-            ctx.fill(previewX, previewY, previewX + previewWidth, previewY + previewHeight, currentColor.getRGB());
+            gui.fill(previewX, previewY, previewX + previewWidth, previewY + previewHeight, currentColor.getRGB());
         }
 
         // hex del color actual
         String hexText = colorSetting.isRainbow() ? "gay." : Colors.ARGBtoHex(colorSetting.getA(), colorSetting.getR(), colorSetting.getG(), colorSetting.getB());
-        int hexWidth = mc.textRenderer.getWidth(hexText);
-        ctx.drawText(mc.textRenderer, hexText, x + w / 2 - hexWidth / 2, previewY + previewHeight / 2 - mc.textRenderer.fontHeight / 2, -1, true);
+        int hexWidth = mc.font.width(hexText);
+        gui.text(mc.font, hexText, x + w / 2 - hexWidth / 2, previewY + previewHeight / 2 - mc.font.lineHeight / 2, -1, true);
 
         // utilizar un gradiente combinado, para mejorar la optimización
-        renderSaturationBrightnessGradient(ctx);
-        DrawUtil.drawBorder(ctx, saturationBrightnessPickerX, saturationBrightnessPickerY,
+        renderSaturationBrightnessGradient(gui);
+        DrawUtil.drawBorder(gui, saturationBrightnessPickerX, saturationBrightnessPickerY,
                 saturationBrightnessPickerWidth, saturationBrightnessPickerHeight, -1);
 
         float[] hsb1;
@@ -214,28 +214,28 @@ public class ColorPickerFrame extends SettingsFrame {
 
         int indicatorX = saturationBrightnessPickerX + (int)(hsb1[1] * saturationBrightnessPickerWidth);
         int indicatorY = saturationBrightnessPickerY + (int)((1 - hsb1[2]) * saturationBrightnessPickerHeight);
-        DrawUtil.drawCircle(ctx, indicatorX, indicatorY, 3, -1);
+        DrawUtil.drawCircle(gui, indicatorX, indicatorY, 3, -1);
 
         // gradiente del "hue" (no sé cómo se dice en castellano)
         for (int hy = 0; hy < huePickerHeight; hy += 2) {
             float hue = 1.0f - (hy / (float) huePickerHeight);
             Color hueColor = Color.getHSBColor(hue, 1.0f, 1.0f);
-            ctx.fill(huePickerX, huePickerY + hy, huePickerX + huePickerWidth,
+            gui.fill(huePickerX, huePickerY + hy, huePickerX + huePickerWidth,
                     huePickerY + Math.min(hy + 2, huePickerHeight), hueColor.getRGB());
         }
 
-        DrawUtil.drawBorder(ctx, huePickerX, huePickerY, huePickerWidth, huePickerHeight, -1);
+        DrawUtil.drawBorder(gui, huePickerX, huePickerY, huePickerWidth, huePickerHeight, -1);
 
         if (!colorSetting.isRainbow()) {
             float[] hsb2 = Color.RGBtoHSB(colorSetting.getR(), colorSetting.getG(), colorSetting.getB(), null);
             int hueIndicatorY = huePickerY + (int)((1 - hsb2[0]) * huePickerHeight);
-            DrawUtil.drawCircle(ctx, huePickerX + huePickerWidth / 2, hueIndicatorY, 3, -1);
+            DrawUtil.drawCircle(gui, huePickerX + huePickerWidth / 2, hueIndicatorY, 3, -1);
         }
 
-        renderAlphaGradient(ctx);
-        DrawUtil.drawBorder(ctx, alphaPickerX, alphaPickerY, alphaPickerWidth, alphaPickerHeight, -1);
+        renderAlphaGradient(gui);
+        DrawUtil.drawBorder(gui, alphaPickerX, alphaPickerY, alphaPickerWidth, alphaPickerHeight, -1);
         int alphaIndicatorX = alphaPickerX + (int)((colorSetting.getA() / 255f) * alphaPickerWidth);
-        DrawUtil.drawCircle(ctx, alphaIndicatorX, alphaPickerY + alphaPickerHeight / 2, 3, -1);
+        DrawUtil.drawCircle(gui, alphaIndicatorX, alphaPickerY + alphaPickerHeight / 2, 3, -1);
 
         totalHeight = previewHeight + saturationBrightnessPickerHeight + alphaPickerHeight + (padding * 4) + h;
 
@@ -250,14 +250,14 @@ public class ColorPickerFrame extends SettingsFrame {
             sb.setY(startButtonY);
             sb.setW(w - 8);
             sb.setH(h - h / 4);
-            sb.render(ctx, mouseX, mouseY, delta);
+            sb.render(gui, mouseX, mouseY, delta);
             startButtonY += h;
         }
 
         totalHeight += (visibleButtons.size() * h) + padding;
     }
 
-    private void renderSaturationBrightnessGradient(DrawContext ctx) {
+    private void renderSaturationBrightnessGradient(GuiGraphicsExtractor gui) {
         float hue;
         if (colorSetting.isRainbow()) {
             hue = (System.currentTimeMillis() % (colorSetting.getRainbowSpeed() * 1000L))
@@ -271,7 +271,7 @@ public class ColorPickerFrame extends SettingsFrame {
         for (int sx = 0; sx < saturationBrightnessPickerWidth; sx++) {
             float saturation = sx / (float) saturationBrightnessPickerWidth;
             Color colorAtX = Color.getHSBColor(hue, saturation, 1);
-            ctx.fill(saturationBrightnessPickerX + sx, saturationBrightnessPickerY,
+            gui.fill(saturationBrightnessPickerX + sx, saturationBrightnessPickerY,
                     saturationBrightnessPickerX + sx + 1, saturationBrightnessPickerY + saturationBrightnessPickerHeight,
                     colorAtX.getRGB());
         }
@@ -281,15 +281,15 @@ public class ColorPickerFrame extends SettingsFrame {
             float brightness = (sy / (float) saturationBrightnessPickerHeight);
             int alpha = (int)(brightness * 255);
             Color overlay = new Color(0, 0, 0, alpha);
-            ctx.fill(saturationBrightnessPickerX, saturationBrightnessPickerY + sy,
+            gui.fill(saturationBrightnessPickerX, saturationBrightnessPickerY + sy,
                     saturationBrightnessPickerX + saturationBrightnessPickerWidth, saturationBrightnessPickerY + sy + 1,
                     overlay.getRGB());
         }
     }
 
-    private void renderAlphaGradient(DrawContext ctx) {
+    private void renderAlphaGradient(GuiGraphicsExtractor gui) {
         // dibujar casilleros alternando el tono de gris para el slider de la opacidad
-        DrawUtil.drawCheckerBoard(ctx, alphaPickerX + 1, alphaPickerY, alphaPickerWidth, alphaPickerHeight, 3, 0xFF333333, 0xFF666666);
+        DrawUtil.drawCheckerBoard(gui, alphaPickerX + 1, alphaPickerY, alphaPickerWidth, alphaPickerHeight, 3, 0xFF333333, 0xFF666666);
 
         if (colorSetting != null) {
             int alphaWidth = (int)(alphaPickerWidth * (colorSetting.getA() / 255f));
@@ -303,7 +303,7 @@ public class ColorPickerFrame extends SettingsFrame {
                         new Color(255, 255, 255, alphaValue);
 
                 int stripEndX = Math.min(ax + stripWidth, alphaWidth);
-                ctx.fill(alphaPickerX + ax, alphaPickerY,
+                gui.fill(alphaPickerX + ax, alphaPickerY,
                         alphaPickerX + stripEndX, alphaPickerY + alphaPickerHeight, overlayColor.getRGB());
             }
         }

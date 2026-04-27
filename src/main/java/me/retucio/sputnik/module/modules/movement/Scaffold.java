@@ -12,26 +12,27 @@ import me.retucio.sputnik.module.setting.settings.*;
 
 import me.retucio.sputnik.util.*;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NonNull;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
 
 public class Scaffold extends Module {
 
     private final SettingGroup sgBlocks = addSg(new SettingGroup("bloques", false));
     private final SettingGroup sgBridge = addSg(new SettingGroup("puente", true));
-    private final SettingGroup sgRender = addSg(new SettingGroup("render", false));
+    private final SettingGroup sgRender = addSg(new SettingGroup("renderizado", false));
 
     // todo: arreglar esta puta mierda
     private final BooleanSetting rotate = sgGeneral.add(new BooleanSetting(
@@ -186,7 +187,7 @@ public class Scaffold extends Module {
     )).visibility(showLastPlaced::getValue);
 
 
-    private final BlockPos.Mutable bp = new BlockPos.Mutable();
+    private final BlockPos.MutableBlockPos bp = new BlockPos.MutableBlockPos();
     private final List<PlacedBlock> lastPlacedBlocks = new ArrayList<>();
     private Integer mjY = null;
 
@@ -204,13 +205,13 @@ public class Scaffold extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
-        Vec3d pos = mc.player.getEntityPos();
+        Vec3 pos = mc.player.position();
 
         // extender puente si se está moviendo hacia adelante
-        if (extend.getValue() && isMoving() && mc.player.forwardSpeed > 0) {
-            Vec3d dir = Vec3d.fromPolar(0, mc.player.getYaw()).normalize().multiply(extendDistance.getValue());
+        if (extend.getValue() && isMoving() && mc.player.zza > 0) {
+            Vec3 dir = Vec3.directionFromRotation(0, mc.player.getYRot()).normalize().scale(extendDistance.getValue());
             pos = pos.add(dir.x, 0, dir.z);
         }
 
@@ -228,8 +229,8 @@ public class Scaffold extends Module {
         }
 
         // descender con la tecla de agacharse
-        if (sneakForDown.getValue() && mc.options.sneakKey.isPressed()) {
-            if (mc.world.isAir(bp.withY(bp.getY() - 1))) {
+        if (sneakForDown.getValue() && mc.options.keyShift.isDown()) {
+            if (mc.level.isEmptyBlock(bp.atY(bp.getY() - 1))) {
                 y -= 1;
             }
         }
@@ -239,26 +240,26 @@ public class Scaffold extends Module {
         place(bp);
 
         // colocar bloque encima de la cabeza
-        if (headhitter.getValue() && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
-            place(mc.player.getBlockPos().up(2));
+        if (headhitter.getValue() && mc.options.keyJump.isDown() && !mc.options.keyShift.isDown()) {
+            place(mc.player.blockPosition().above(2));
         }
 
         // poner bloques a los pies del jugador mientras asciende para hacer la torre
         if (tower.getValue()
-                && mc.options.jumpKey.isPressed()
-                && !mc.options.sneakKey.isPressed()
-                && mc.player.getInventory().getSelectedStack().getItem() instanceof BlockItem
-                && !mc.world.isAir(mc.player.getBlockPos().down())) {
-            Vec3d velocity = mc.player.getVelocity();
-            Box playerBox = mc.player.getBoundingBox();
+                && mc.options.keyJump.isDown()
+                && !mc.options.keyShift.isDown()
+                && mc.player.getInventory().getSelectedItem().getItem() instanceof BlockItem
+                && !mc.level.isEmptyBlock(mc.player.blockPosition().below())) {
+            Vec3 velocity = mc.player.getDeltaMovement();
+            AABB playerBox = mc.player.getBoundingBox();
 
-            if (Streams.stream(mc.world.getBlockCollisions(mc.player, playerBox.offset(0, 1, 0))).toList().isEmpty()) {
+            if (Streams.stream(mc.level.getBlockCollisions(mc.player, playerBox.move(0, 1, 0))).toList().isEmpty()) {
                 if (towerWhileMoving.getValue() || !isMoving()) {
-                    velocity = new Vec3d(velocity.x, towerSpeed.getValue(), velocity.z);
+                    velocity = new Vec3(velocity.x, towerSpeed.getValue(), velocity.z);
                 }
-                mc.player.setVelocity(velocity);
+                mc.player.setDeltaMovement(velocity);
             } else {
-                mc.player.setVelocity(velocity.x, Math.ceil(mc.player.getY()) - mc.player.getY(), velocity.z);
+                mc.player.setDeltaMovement(velocity.x, Math.ceil(mc.player.getY()) - mc.player.getY(), velocity.z);
                 mc.player.setOnGround(true);
             }
         }
@@ -271,7 +272,7 @@ public class Scaffold extends Module {
 
         if (!showLastPlaced.getValue()) return;
         for (PlacedBlock block : lastPlacedBlocks) {
-            if (bp.asVector3i().equals(block.pos.asVector3i())) continue;
+            if (bp.toMutable().equals(block.pos.toMutable())) continue;
             if (fillings.getValue()) {
                 Color fc = fade.getValue()
                         ? Colors.withAlpha(fillingColor.getValue(), (int) ((1 - ((float) block.age / (float) block.lifeTime)) * fillingColor.getA()))
@@ -309,7 +310,7 @@ public class Scaffold extends Module {
         if (autoSelectItem.getValue()) {
             List<Integer> slots = InventoryUtil.findAllSlots(this::isValidBlock);
             for (int s : slots) {
-                if (PlayerInventory.isValidHotbarIndex(s)) {
+                if (Inventory.isHotbarSlot(s)) {
                     slot = s;
                     break;
                 }
@@ -326,14 +327,14 @@ public class Scaffold extends Module {
 
         // colocar bloque
         if (NetworkUtil.placeBlock(
-                pos, Hand.MAIN_HAND,
+                pos, InteractionHand.MAIN_HAND,
                 mc.player.getInventory().getSelectedSlot(),
                 rotate.getValue(),
                 false,
                 true,
                 true
         )) {
-            lastPlacedBlocks.add(new PlacedBlock(pos.toImmutable(), lifeTime.getIntValue() * 20));
+            lastPlacedBlocks.add(new PlacedBlock(pos.immutable(), lifeTime.getIntValue() * 20));
         }
     }
 
@@ -350,7 +351,7 @@ public class Scaffold extends Module {
     }
 
     // método helper para ver si un bloque cumple con el filtro
-    private boolean isValidBlock(ItemStack stack) {
+    private boolean isValidBlock(@NonNull ItemStack stack) {
         if (!(stack.getItem() instanceof BlockItem)) return false;
         Block block = ((BlockItem) stack.getItem()).getBlock();
 
@@ -358,20 +359,20 @@ public class Scaffold extends Module {
         if (blocksFilter.is(ListMode.BLACKLIST) && contains)  return false;
         if (blocksFilter.is(ListMode.WHITELIST) && !contains) return false;
 
-        if (!Block.isShapeFullCube(block.getDefaultState().getCollisionShape(mc.world, BlockPos.ORIGIN))) {
+        if (!Block.isShapeFullBlock(block.defaultBlockState().getCollisionShape(mc.level, BlockPos.ZERO))) {
             return false;
         }
 
         if (block instanceof FallingBlock) {
-            return !FallingBlock.canFallThrough(mc.world.getBlockState(mc.player.getBlockPos().down()));
+            return !FallingBlock.isFree(mc.level.getBlockState(mc.player.blockPosition().below()));
         }
 
         return true;
     }
 
     private boolean isMoving() {
-        return mc.player.forwardSpeed  != 0
-            || mc.player.sidewaysSpeed != 0;
+        return mc.player.zza  != 0
+            || mc.player.xxa != 0;
     }
 
     public enum ListMode {

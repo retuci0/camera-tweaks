@@ -7,8 +7,9 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.network.packet.s2c.play.VehicleMoveS2CPacket;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket;
+import net.minecraft.world.phys.Vec3;
+
 
 public class BoatFly extends Module {
 
@@ -52,20 +53,20 @@ public class BoatFly extends Module {
     @EventListener
     private void onBoatMove(BoatMoveEvent event) {
         if (event.getBoat().getControllingPassenger() != mc.player) return;
-        event.getBoat().setYaw(mc.player.getYaw());
+        event.getBoat().setYRot(mc.player.getYRot());
 
-        float yaw = event.getBoat().getYaw();
+        float yaw = event.getBoat().getYRot();
         int dx = 0, dy = 0, dz = 0;
 
-        if (mc.options.rightKey.isPressed()) dx++;
-        if (mc.options.leftKey.isPressed()) dx--;
+        if (mc.options.keyRight.isDown()) dx++;
+        if (mc.options.keyLeft.isDown()) dx--;
 
-        if (mc.options.jumpKey.isPressed()) dy++;
-        if (mc.options.sprintKey.isPressed()) dy--;
+        if (mc.options.keyJump.isDown()) dy++;
+        if (mc.options.keySprint.isDown()) dy--;
         // ctrl para bajar, en vez de shift, porque si no te desmontas
 
-        if (mc.options.backKey.isPressed()) dz++;
-        if (mc.options.forwardKey.isPressed()) dz--;
+        if (mc.options.keyDown.isDown()) dz++;
+        if (mc.options.keyUp.isDown()) dz--;
 
         double speed = this.speed.getValue();
         double sin = Math.sin(Math.toRadians(yaw));
@@ -78,12 +79,12 @@ public class BoatFly extends Module {
         x += speed * dx * -cos;
         z += speed * dx * -sin;
 
-        event.getBoat().setVelocity(new Vec3d(x, y, z));
+        event.getBoat().setDeltaMovement(new Vec3(x, y, z));
     }
 
     @EventListener
     private void onReceivePacket(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof VehicleMoveS2CPacket && cancelPackets.getValue()) {
+        if (event.getPacket() instanceof ServerboundMoveVehiclePacket && cancelPackets.getValue()) {
             event.cancel();
         }
     }

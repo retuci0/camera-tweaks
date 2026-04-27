@@ -1,29 +1,29 @@
 package me.retucio.sputnik.event.network;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.network.ClientConnectionMixin;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.network.DisconnectionInfo;
+import me.retucio.sputnik.mixin.mixins.network.ConnectionMixin;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.network.DisconnectionDetails;
 
 
 /**
- * @see ClientConnectionMixin#onDisconnect
+ * @see ConnectionMixin#onDisconnect
  */
 public class DisconnectEvent extends Event {
 
-    private final DisconnectionInfo info;
-    private final ServerInfo server;
+    private final DisconnectionDetails details;
+    private final ServerData server;
 
-    public DisconnectEvent(DisconnectionInfo info, ServerInfo server) {
-        this.info = info;
+    public DisconnectEvent(DisconnectionDetails details, ServerData server) {
+        this.details = details;
         this.server = server;
     }
 
-    public DisconnectionInfo getInfo() {
-        return info;
+    public DisconnectionDetails getDetails() {
+        return details;
     }
 
-    public ServerInfo getServer() {
+    public ServerData getServer() {
         return server;
     }
 }

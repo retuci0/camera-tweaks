@@ -8,80 +8,79 @@ import me.retucio.sputnik.module.modules.misc.ChatPlus;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.render.NoRender;
 import me.retucio.sputnik.ui.hud.HudRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(InGameHud.class)
+@Mixin(Gui.class)
 public abstract class InGameHudMixin {
 
     @Unique
     NoRender noRender;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void getModules(MinecraftClient client, CallbackInfo ci) {
+    private void getModules(CallbackInfo ci) {
         noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void onRenderHud(DrawContext ctx, RenderTickCounter tc, CallbackInfo ci) {
-        Sputnik.EVENT_BUS.post(new Render2DEvent(ctx, tc));
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void onRenderHud(GuiGraphicsExtractor gui, DeltaTracker dt, CallbackInfo ci) {
+        Sputnik.EVENT_BUS.post(new Render2DEvent(gui, dt));
     }
 
 
     // norender
 
-    @Inject(method = "renderScoreboardSidebar*", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractScoreboardSidebar", at = @At("HEAD"), cancellable = true)
     private void noRenderScoreboard(CallbackInfo ci) {
         if (noRender.isEnabled() && !noRender.scoreboard.getValue()) ci.cancel();
     }
 
-    @Inject(method = "renderTitleAndSubtitle", at = @At("HEAD"), cancellable = true)
-    private void noRenderTitles(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractTitle", at = @At("HEAD"), cancellable = true)
+    private void noRenderTitles(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (noRender.isEnabled() && !noRender.titles.getValue()) ci.cancel();
     }
 
-    @Inject(method = "renderNauseaOverlay", at = @At("HEAD"), cancellable = true)
-    private void noRenderNausea(DrawContext context, float nauseaStrength, CallbackInfo ci) {
+    @Inject(method = "extractConfusionOverlay", at = @At("HEAD"), cancellable = true)
+    private void noRenderNausea(GuiGraphicsExtractor graphics, float strength, CallbackInfo ci) {
         if (noRender.isEnabled() && !noRender.nauseaEffect.getValue()) ci.cancel();
     }
 
-    @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
-    private void noRenderSpyglass(DrawContext context, float scale, CallbackInfo ci) {
+    @Inject(method = "extractSpyglassOverlay", at = @At("HEAD"), cancellable = true)
+    private void noRenderSpyglass(GuiGraphicsExtractor graphics, float scale, CallbackInfo ci) {
         if (noRender.isEnabled() && !noRender.spyglassOverlay.getValue()) ci.cancel();
     }
 
-    @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
-    private void noRenderPortal(DrawContext context, float nauseaStrength, CallbackInfo ci) {
+    @Inject(method = "extractPortalOverlay", at = @At("HEAD"), cancellable = true)
+    private void noRenderPortal(GuiGraphicsExtractor graphics, float alpha, CallbackInfo ci) {
         if (noRender.isEnabled() && !noRender.portalOverlay.getValue()) ci.cancel();
     }
 
-    @Inject(method = "renderOverlay", at = @At("HEAD"), cancellable = true)
-    private void noRenderPumpkinBlur(DrawContext context, Identifier texture, float opacity, CallbackInfo ci) {
+    @Inject(method = "extractTextureOverlay", at = @At("HEAD"), cancellable = true)
+    private void noRenderPumpkinBlur(GuiGraphicsExtractor graphics, Identifier texture, float alpha, CallbackInfo ci) {
         if (noRender.isEnabled() && !noRender.pumpkinOverlay.getValue() && texture.getPath().equals("textures/misc/pumpkinblur.png")) ci.cancel();
     }
 
 
     // otros
 
-    @Inject(method = "render", at = @At("RETURN"))
-    private void renderHUD(DrawContext ctx, RenderTickCounter tc, CallbackInfo ci) {
-        HudRenderer.render(ctx, tc);
+    @Inject(method = "extractRenderState", at = @At("RETURN"))
+    private void renderHUD(GuiGraphicsExtractor gui, DeltaTracker dt, CallbackInfo ci) {
+        HudRenderer.render(gui, dt);
     }
 
-    @ModifyExpressionValue(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/Perspective;isFirstPerson()Z"))
+    @ModifyExpressionValue(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/CameraType;isFirstPerson()Z"))
     private boolean alwaysRenderCrosshairInFreecam(boolean firstPerson) {
         return ModuleManager.INSTANCE.getModuleByClass(Freecam.class).isEnabled() || firstPerson;
     }
 
-    @Inject(method = "clear", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;clear(Z)V"), cancellable = true)
+    @Inject(method = "onDisconnected", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;clearMessages(Z)V"), cancellable = true)
     private void onClear(CallbackInfo ci) {
         ChatPlus chatPlus = ModuleManager.INSTANCE.getModuleByClass(ChatPlus.class);
         if (chatPlus.isEnabled() && chatPlus.keepHistory.getValue()) ci.cancel();

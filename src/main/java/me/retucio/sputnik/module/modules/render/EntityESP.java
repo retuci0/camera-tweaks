@@ -1,6 +1,7 @@
 package me.retucio.sputnik.module.modules.render;
 
 import com.github.retucio.neutrino.EventListener;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -12,9 +13,9 @@ import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.Lists;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+
 
 public class EntityESP extends Module {
 
@@ -78,8 +79,8 @@ public class EntityESP extends Module {
             fillingColor.visibility(filling.isVisible());
         });
 
-        outlines.onUpdate(v -> outlineColor.visibility(v));
-        filling.onUpdate(v -> fillingColor.visibility(v));
+        outlines.onUpdate(outlineColor::visibility);
+        filling.onUpdate(fillingColor::visibility);
     }
 
     @EventListener
@@ -87,8 +88,8 @@ public class EntityESP extends Module {
         if (mode.is(ESPMode.BOX)) drawBoxes(event.getMatrices());
     }
 
-    private void drawBoxes(MatrixStack matrices) {
-        for (Entity entity : mc.world.getEntities()) {
+    private void drawBoxes(PoseStack matrices) {
+        for (Entity entity : mc.level.getEntities().getAll()) {
             if (!entities.isEnabled(entity.getType())) continue;
             if (filling.getValue()) RenderUtil.drawFilledBox(matrices, entity.getBoundingBox(), fillingColor.getValue(), false);
             if (outlines.getValue()) RenderUtil.drawOutlineBox(matrices, entity.getBoundingBox(), outlineColor.getValue(), 2, false);

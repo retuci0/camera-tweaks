@@ -4,9 +4,11 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
+
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
+
 
 public class FastUse extends Module {
 
@@ -61,8 +63,8 @@ public class FastUse extends Module {
                 Category.PLAYER,
                 GLFW.GLFW_KEY_F6);
 
-        items.onUpdate(v -> itemCooldown.visibility(v));
-        blocks.onUpdate(v -> blockCooldown.visibility(v));
+        items.onUpdate(itemCooldown::visibility);
+        blocks.onUpdate(blockCooldown::visibility);
     }
 
     public int getCooldown(ItemStack stack) {

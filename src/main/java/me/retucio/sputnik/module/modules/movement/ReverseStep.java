@@ -4,10 +4,11 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+
 
 public class ReverseStep extends Module {
 
@@ -40,41 +41,41 @@ public class ReverseStep extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
-        if (!mc.player.isOnGround()) {
+        if (!mc.player.onGround()) {
             if (jumping.getValue()) return;
         }
 
-        if ((mc.player.isTouchingWater() || mc.player.isInLava())) {
+        if ((mc.player.isInWater() || mc.player.isInLava())) {
             if (disableInWater.getValue()) return;
         }
 
         double dropHeight = getHeight();
         if (dropHeight > 0 && dropHeight <= height.getValue()) {
-            double dy = (-height.getValue() + mc.player.getVelocity().getY()) * velocity.getValue();
-            mc.player.addVelocity(0, dy, 0);
+            double dy = (-height.getValue() + mc.player.getDeltaMovement().y()) * velocity.getValue();
+            mc.player.push(0, dy, 0);
         }
     }
 
     private double getHeight() {
-        Vec3d start = new Vec3d(mc.player.getX(), mc.player.getY() - 0.1, mc.player.getZ());
-        Vec3d end = new Vec3d(mc.player.getX(), mc.player.getY() - height.getValue() - 1, mc.player.getZ());
+        Vec3 start = new Vec3(mc.player.getX(), mc.player.getY() - 0.1, mc.player.getZ());
+        Vec3 end = new Vec3(mc.player.getX(), mc.player.getY() - height.getValue() - 1, mc.player.getZ());
 
-        RaycastContext context = new RaycastContext(
+        ClipContext context = new ClipContext(
                 start, end,
-                RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.ANY,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.ANY,
                 mc.player
         );
 
-        HitResult hit = mc.world.raycast(context);
+        HitResult hit = mc.level.clip(context);
 
-        if (hit != null && hit.getType() == HitResult.Type.BLOCK) {
+        if (hit.getType() == HitResult.Type.BLOCK) {
             BlockPos hitPos = new BlockPos(
-                    (int) hit.getPos().x,
-                    (int) hit.getPos().y,
-                    (int) hit.getPos().z
+                    (int) hit.getLocation().x,
+                    (int) hit.getLocation().y,
+                    (int) hit.getLocation().z
             );
 
             return mc.player.getY() - (hitPos.getY());

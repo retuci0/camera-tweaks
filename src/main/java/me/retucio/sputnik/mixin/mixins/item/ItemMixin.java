@@ -2,14 +2,14 @@ package me.retucio.sputnik.mixin.mixins.item;
 
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.inventory.ShulkerPeek;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,21 +20,21 @@ import java.util.function.Consumer;
 @Mixin(Item.class)
 public abstract class ItemMixin {
 
-    @Inject(method = "appendTooltip", at = @At("HEAD"))
-    private void onAppendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type, CallbackInfo ci) {
+    @Inject(method = "appendHoverText", at = @At("HEAD"))
+    private void onAppendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag, CallbackInfo ci) {
         ShulkerPeek shulkerPeek = ModuleManager.INSTANCE.getModuleByClass(ShulkerPeek.class);
         if (!shulkerPeek.isEnabled() || !shulkerPeek.showTooltips.getValue()) return;
 
         if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock) {
             if (ShulkerPeek.isShulkerEmpty(stack)) {
-                textConsumer.accept(Text.literal("vacío").formatted(Formatting.GRAY, Formatting.ITALIC));
+                builder.accept(Component.literal("vacío").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             } else {
-                textConsumer.accept(
-                        Text.literal("mantén ")
-                                .append(Text.literal(shulkerPeek.previewKey.getKeyName())
-                                        .formatted(Formatting.GOLD, Formatting.BOLD))
+                builder.accept(
+                        Component.literal("mantén ")
+                                .append(Component.literal(shulkerPeek.previewKey.getKeyName())
+                                        .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD))
                                 .append(" para previsualizar")
-                                .formatted(Formatting.GRAY)
+                                .withStyle(ChatFormatting.GRAY)
                 );
             }
         }

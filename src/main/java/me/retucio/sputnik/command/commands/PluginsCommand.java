@@ -9,10 +9,10 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.util.ChatUtil;
 
-import net.minecraft.client.network.ClientCommandSource;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.command.CommandSource;
-import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,9 +28,9 @@ public class PluginsCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder.executes(context -> {
-            if (mc.isIntegratedServerRunning()) {
+            if (mc.hasSingleplayerServer()) {
                 ChatUtil.error("estás en un solo jugador");
                 return SUCCESS;
             }
@@ -51,12 +51,12 @@ public class PluginsCommand extends Command {
 
     private void findNamespaces() {
         try {
-            ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
-            if (networkHandler == null || networkHandler.getCommandDispatcher() == null) {
+            ClientPacketListener networkHandler = mc.getConnection();
+            if (networkHandler == null) {
                 return;
             }
 
-            RootCommandNode<ClientCommandSource> root = networkHandler.getCommandDispatcher().getRoot();
+            RootCommandNode<ClientSuggestionProvider> root = networkHandler.getCommands().getRoot();
             root.getChildren().forEach(this::checkNodeForPlugins);
 
             if (!plugins.isEmpty()) {
@@ -73,7 +73,7 @@ public class PluginsCommand extends Command {
         }
     }
 
-    private void checkNodeForPlugins(CommandNode<ClientCommandSource> node) {
+    private void checkNodeForPlugins(CommandNode<ClientSuggestionProvider> node) {
         String name = node.getName();
 
         if (name.contains(":")) {
@@ -92,7 +92,7 @@ public class PluginsCommand extends Command {
     private void onPacketReceive(PacketEvent.Receive event) {
         if (!scanning) return;
 
-        if (event.getPacket() instanceof CommandTreeS2CPacket) {
+        if (event.getPacket() instanceof ClientboundCommandsPacket) {
             findNamespaces();
         }
     }

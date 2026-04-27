@@ -5,9 +5,10 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.util.Lists;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+
 
 public class NoMiningInterruptions extends Module {
 
@@ -26,8 +27,8 @@ public class NoMiningInterruptions extends Module {
 
         boolean pickaxe = true;
         if (withPickaxeOnly.getValue())
-            pickaxe = (mc.player.getMainHandStack().isIn(ItemTags.PICKAXES)
-                    || mc.player.getOffHandStack().isIn(ItemTags.PICKAXES));
+            pickaxe = (mc.player.getMainHandItem().is(ItemTags.PICKAXES)
+                    || mc.player.getOffhandItem().is(ItemTags.PICKAXES));
 
         return entities.isEnabled(entity.getType()) && pickaxe;
     }

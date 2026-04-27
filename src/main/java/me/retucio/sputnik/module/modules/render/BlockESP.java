@@ -1,6 +1,7 @@
 package me.retucio.sputnik.module.modules.render;
 
 import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -12,10 +13,11 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.Lists;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.awt.*;
 import java.util.*;
@@ -140,7 +142,7 @@ public class BlockESP extends Module {
 
     @EventListener
     private void onRenderWorld(Render3DEvent event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         // aplicar el intervalo
         if (searchTimer++ >= searchInterval.getIntValue()) {
@@ -148,7 +150,7 @@ public class BlockESP extends Module {
             searchBlocks();
         }
 
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
+        Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
 
         int rendered = 0;
         Iterator<Map.Entry<BlockPos, VoxelShape>> iterator = cachedBlocks.entrySet().iterator();
@@ -164,7 +166,7 @@ public class BlockESP extends Module {
             }
 
             // validación de distancia
-            double distance = Math.sqrt(pos.getSquaredDistance(cameraPos));
+            double distance = Math.sqrt(pos.distSqr(new Vec3i((int) cameraPos.x, (int) cameraPos.y, (int) cameraPos.z)));
             if (distance > radius.getIntValue()) {
                 iterator.remove();
                 continue;
@@ -202,14 +204,14 @@ public class BlockESP extends Module {
     }
 
     private void searchBlocks() {
-        if (mc.player == null || mc.world == null || enabledBlocks.isEmpty()) return;
+        if (mc.player == null || mc.level == null || enabledBlocks.isEmpty()) return;
 
-        BlockPos playerPos = mc.player.getBlockPos();
+        BlockPos playerPos = mc.player.blockPosition();
         int currentRadius = radius.getIntValue();
 
         // si el jugador no se ha movido mucho, omitir la búsqueda
         if (lastPlayerPos != null && lastRadius == currentRadius &&
-                playerPos.getSquaredDistance(lastPlayerPos) < (distanceToMove.getValue() * distanceToMove.getIntValue())) {
+                playerPos.distSqr(lastPlayerPos) < (distanceToMove.getValue() * distanceToMove.getIntValue())) {
             return;
         }
 
@@ -227,7 +229,7 @@ public class BlockESP extends Module {
                 } finally {
                     isSearching = false;
                 }
-            }, "sputnik-blockESP-search").start();
+            }, Sputnik.MOD_ID + "-blockESP-search").start();
         } else {
             performBlockSearch(playerPos, currentRadius);
         }
@@ -243,13 +245,13 @@ public class BlockESP extends Module {
                 for (int z = -radius; z <= radius; z++) {
                     if (x*x + y*y + z*z > radiusSq) continue;
 
-                    BlockPos pos = center.add(x, y, z);
-                    Block block = mc.world.getBlockState(pos).getBlock();
+                    BlockPos pos = center.offset(x, y, z);
+                    Block block = mc.level.getBlockState(pos).getBlock();
 
                     if (enabledBlocks.contains(block)) {
-                        VoxelShape shape = mc.world.getBlockState(pos).getOutlineShape(mc.world, pos);
+                        VoxelShape shape = mc.level.getBlockState(pos).getShape(mc.level, pos);
                         if (!shape.isEmpty()) {
-                            newBlocks.put(pos.toImmutable(), shape);
+                            newBlocks.put(pos.immutable(), shape);
                         }
                     }
                 }
@@ -264,8 +266,8 @@ public class BlockESP extends Module {
     // verificar que el bloque sea válido
     @SuppressWarnings("deprecation")
     private boolean isValidBlock(BlockPos pos) {
-        if (mc.world == null || !mc.world.isChunkLoaded(pos)) return false;
-        Block block = mc.world.getBlockState(pos).getBlock();
+        if (mc.level == null || !mc.level.hasChunkAt(pos)) return false;
+        Block block = mc.level.getBlockState(pos).getBlock();
         return enabledBlocks.contains(block);
     }
 }

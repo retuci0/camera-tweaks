@@ -3,10 +3,10 @@ package me.retucio.sputnik.command.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
-import me.retucio.sputnik.util.interfaces.IChatHud;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.command.CommandSource;
+import me.retucio.sputnik.util.interfaces.IChatComponent;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class PurgeCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder.then(argument("cantidad", IntegerArgumentType.integer(1))
                 .executes(context -> {
                     int amount = IntegerArgumentType.getInteger(context, "cantidad");
@@ -28,10 +28,10 @@ public class PurgeCommand extends Command {
     }
 
     private void purgeMessages(int amount) {
-        ChatHud chatHud = mc.inGameHud.getChatHud();
+        ChatComponent chatHud = mc.gui.getChat();
 
         synchronized (chatHud) {
-            List<ChatHudLine.Visible> visibleMessages = ((IChatHud) chatHud).sputnik$getVisibleMessages();
+            List<GuiMessage.Line> visibleMessages = ((IChatComponent) chatHud).sputnik$getVisibleMessages();
             int toRemove = Math.min(amount, visibleMessages.size());
             for (int i = 0; i < toRemove; i++)
                 visibleMessages.removeFirst();

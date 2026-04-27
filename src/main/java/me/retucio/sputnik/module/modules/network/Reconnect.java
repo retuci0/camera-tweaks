@@ -4,13 +4,15 @@ import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.network.DisconnectEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
-import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
-import net.minecraft.client.network.ServerAddress;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.gui.screens.ConnectScreen;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.TransferState;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+
 
 public class Reconnect extends Module {
 
-    private ServerInfo lastServer = null;
+    private ServerData lastServer = null;
 
     public Reconnect() {
         super("reconectar",
@@ -25,10 +27,10 @@ public class Reconnect extends Module {
 
     public void reconnect() {
         if (lastServer == null) return;
-        ConnectScreen.connect(
+        ConnectScreen.startConnecting(
                 null,
                 mc,
-                ServerAddress.parse(lastServer.address),
+                ServerAddress.parseString(lastServer.ip),
                 lastServer,
                 false,
                 null

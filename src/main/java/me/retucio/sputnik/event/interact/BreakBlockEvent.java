@@ -1,13 +1,14 @@
 package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
-import net.minecraft.util.math.BlockPos;
+import me.retucio.sputnik.mixin.mixins.player.MultiPlayerGameModeMixin;
+import net.minecraft.core.BlockPos;
 
 
 /**
- * @see ClientPlayerInteractionManagerMixin#onBlockBreak
+ * @see MultiPlayerGameModeMixin#onBlockBreak
  */
+
 public class BreakBlockEvent extends Event {
 
     private BlockPos pos;

@@ -1,6 +1,7 @@
 package me.retucio.sputnik.module.modules.combat;
 
 import com.github.retucio.neutrino.EventListener;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -10,23 +11,21 @@ import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.misc.ProjectileInfo;
 import me.retucio.sputnik.util.render.RenderUtil;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.awt.*;
@@ -132,14 +131,14 @@ public class ProjectileTrajectories extends Module {
         renderProjectileTrajectory(event.getMatrices());
     }
 
-    private void renderProjectileTrajectory(MatrixStack matrices) {
-        ItemStack mainHand = mc.player.getMainHandStack();
+    private void renderProjectileTrajectory(PoseStack matrices) {
+        ItemStack mainHand = mc.player.getMainHandItem();
         int handMultiplier = getHandMultiplier();
 
         List<ProjectileInfo> projectileInfoList = ProjectileInfo.getItemsInfo(mainHand);
 
         if (projectileInfoList.isEmpty() && offhand.getValue()) {
-            ItemStack offHand = mc.player.getOffHandStack();
+            ItemStack offHand = mc.player.getOffhandItem();
             handMultiplier = -handMultiplier;
             projectileInfoList = ProjectileInfo.getItemsInfo(offHand);
         }
@@ -149,13 +148,13 @@ public class ProjectileTrajectories extends Module {
         showProjectileTrajectory(matrices, projectileInfoList, handMultiplier);
     }
 
-    private void showProjectileTrajectory(MatrixStack matrices, List<ProjectileInfo> projectileInfoList, int handMultiplier) {
-        float tickProgress = mc.getRenderTickCounter().getTickProgress(false);
-        Vec3d eye = mc.player.getCameraPosVec(tickProgress);
+    private void showProjectileTrajectory(PoseStack matrices, List<ProjectileInfo> projectileInfoList, int handMultiplier) {
+        float tickProgress = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        Vec3 eye = mc.player.getEyePosition(tickProgress);
 
         for (ProjectileInfo projectileInfo : projectileInfoList) {
-            Vec3d startPos = projectileInfo.position() == null ? mc.player.getEyePos() : projectileInfo.position();
-            Vec3d handToEyeDelta = calculateHandToEyeDelta(projectileInfo.offset(), startPos, eye, handMultiplier, tickProgress);
+            Vec3 startPos = projectileInfo.position() == null ? mc.player.getEyePosition() : projectileInfo.position();
+            Vec3 handToEyeDelta = calculateHandToEyeDelta(projectileInfo.offset(), startPos, eye, handMultiplier, tickProgress);
             PreviewImpact previewImpact = calculateTrajectory(startPos, projectileInfo);
 
             renderTargetEffects(matrices, previewImpact);
@@ -163,7 +162,7 @@ public class ProjectileTrajectories extends Module {
         }
     }
 
-    private void renderTargetEffects(MatrixStack matrices, PreviewImpact previewImpact) {
+    private void renderTargetEffects(PoseStack matrices, PreviewImpact previewImpact) {
         if (previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK && previewImpact.impact instanceof BlockHitResult bhr) {
             BlockPos impactPos = bhr.getBlockPos();
             if (fillingTargets.is(TrajectoryTargets.BLOCKS) || fillingTargets.is(TrajectoryTargets.BOTH)) {
@@ -173,7 +172,7 @@ public class ProjectileTrajectories extends Module {
                 RenderUtil.drawBlockOutline(matrices, impactPos, outlineColor.getValue(), outlineWidth.getFloatValue(), false);
             }
         } else if (previewImpact.entity != null) {
-            Box entityBoundingBox = previewImpact.entity.getBoundingBox().expand(previewImpact.entity.getTargetingMargin());
+            AABB entityBoundingBox = previewImpact.entity.getBoundingBox().inflate(previewImpact.entity.getPickRadius());
             if (fillingTargets.is(TrajectoryTargets.ENTITIES) || fillingTargets.is(TrajectoryTargets.BOTH)) {
                 RenderUtil.drawFilledBox(matrices, entityBoundingBox, fillingColor.getValue(), false);
             }
@@ -183,31 +182,31 @@ public class ProjectileTrajectories extends Module {
         }
     }
 
-    private Vec3d calculateHandToEyeDelta(Vec3d offset, Vec3d startPos, Vec3d eye, int handMultiplier, float tickProgress) {
-        if (mc.gameRenderer.getCamera().isThirdPerson()) {
-            offset = offset.multiply(0);
+    private Vec3 calculateHandToEyeDelta(Vec3 offset, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
+        if (mc.gameRenderer.getMainCamera().isDetached()) {
+            offset = offset.scale(0);
         }
 
-        float yaw = (float) Math.toRadians(-mc.player.getYaw(tickProgress));
-        float pitch = (float) Math.toRadians(-mc.player.getPitch(tickProgress));
+        float yaw = (float) Math.toRadians(-mc.player.getYRot(tickProgress));
+        float pitch = (float) Math.toRadians(-mc.player.getXRot(tickProgress));
 
-        Vec3d forward = mc.player.getRotationVec(tickProgress);
-        Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
-        Vec3d right = forward.crossProduct(up).normalize();
+        Vec3 forward = mc.player.getViewVector(tickProgress);
+        Vec3 up = new Vec3(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
+        Vec3 right = forward.cross(up).normalize();
 
-        Vec3d offsetDelta = right.multiply(handMultiplier * offset.x)
-                .add(up.multiply(offset.y))
-                .add(forward.multiply(offset.z));
+        Vec3 offsetDelta = right.scale(handMultiplier * offset.x)
+                .add(up.scale(offset.y))
+                .add(forward.scale(offset.z));
 
         return offsetDelta.add(eye.subtract(startPos));
     }
 
-    private void renderTrajectory(MatrixStack matrices, List<Vec3d> trajectoryPoints, Vec3d handToEyeDelta, boolean hasHit) {
+    private void renderTrajectory(PoseStack matrices, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, boolean hasHit) {
         if (trajectoryPoints.isEmpty()) return;
 
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
+        Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
 
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
         renderTrajectorySegments(matrices, trajectoryPoints, handToEyeDelta);
@@ -216,27 +215,27 @@ public class ProjectileTrajectories extends Module {
             renderImpactPoint(matrices, trajectoryPoints.getLast());
         }
 
-        matrices.pop();
+        matrices.popPose();
     }
 
-    private void renderTrajectorySegments(MatrixStack matrices, List<Vec3d> points, Vec3d handToEyeDelta) {
+    private void renderTrajectorySegments(PoseStack matrices, List<Vec3> points, Vec3 handToEyeDelta) {
         int pointCount = points.size();
 
         for (int i = 0; i < pointCount - 1; i++) {
             double lerpFactor = (pointCount - i) / (double) pointCount;
             double nextLerpFactor = (pointCount - (i + 1)) / (double) pointCount;
 
-            Vec3d lerpedDelta = handToEyeDelta.multiply(lerpFactor);
-            Vec3d nextLerpedDelta = handToEyeDelta.multiply(nextLerpFactor);
+            Vec3 lerpedDelta = handToEyeDelta.scale(lerpFactor);
+            Vec3 nextLerpedDelta = handToEyeDelta.scale(nextLerpFactor);
 
-            Vec3d start = points.get(i).add(lerpedDelta);
-            Vec3d end = points.get(i + 1).add(nextLerpedDelta);
-            Vec3d direction = end.subtract(start);
+            Vec3 start = points.get(i).add(lerpedDelta);
+            Vec3 end = points.get(i + 1).add(nextLerpedDelta);
+            Vec3 direction = end.subtract(start);
 
             if (trajStyle.is(TrajectoryStyle.DASHED)) {
-                direction = direction.multiply(0.5);
+                direction = direction.scale(0.5);
             } else if (trajStyle.is(TrajectoryStyle.DOTTED)) {
-                direction = direction.multiply(0.15);
+                direction = direction.scale(0.15);
             }
 
             Vector3f startVector = new Vector3f((float) start.x, (float) start.y, (float) start.z);
@@ -244,27 +243,27 @@ public class ProjectileTrajectories extends Module {
         }
     }
 
-    private void renderImpactPoint(MatrixStack matrices, Vec3d impactPos) {
+    private void renderImpactPoint(PoseStack matrices, Vec3 impactPos) {
         double radius = 0.1;
         double diameter = 2 * radius;
 
         Vector3f xStart = new Vector3f((float) (impactPos.x - radius), (float) impactPos.y, (float) impactPos.z);
-        RenderUtil.drawVector(matrices, xStart, new Vec3d(diameter, 0, 0), trajColor.getValue(), trajWidth.getFloatValue());
+        RenderUtil.drawVector(matrices, xStart, new Vec3(diameter, 0, 0), trajColor.getValue(), trajWidth.getFloatValue());
 
         Vector3f yStart = new Vector3f((float) impactPos.x, (float) (impactPos.y - radius), (float) impactPos.z);
-        RenderUtil.drawVector(matrices, yStart, new Vec3d(0, diameter, 0), trajColor.getValue(), trajWidth.getFloatValue());
+        RenderUtil.drawVector(matrices, yStart, new Vec3(0, diameter, 0), trajColor.getValue(), trajWidth.getFloatValue());
 
         Vector3f zStart = new Vector3f((float) impactPos.x, (float) impactPos.y, (float) (impactPos.z - radius));
-        RenderUtil.drawVector(matrices, zStart, new Vec3d(0, 0, diameter), trajColor.getValue(), trajWidth.getFloatValue());
+        RenderUtil.drawVector(matrices, zStart, new Vec3(0, 0, diameter), trajColor.getValue(), trajWidth.getFloatValue());
     }
 
-    private PreviewImpact calculateTrajectory(Vec3d startPos, ProjectileInfo projectileInfo) {
-        Vec3d currentPos = startPos;
-        Vec3d prevPos = startPos;
-        Vec3d playerVel = mc.player.isOnGround() ? new Vec3d(mc.player.getVelocity().x, 0,  mc.player.getVelocity().z) : mc.player.getVelocity();
-        Vec3d velocity = projectileInfo.initialVelocity().add(playerVel);
+    private PreviewImpact calculateTrajectory(Vec3 startPos, ProjectileInfo projectileInfo) {
+        Vec3 currentPos = startPos;
+        Vec3 prevPos = startPos;
+        Vec3 playerVel = mc.player.onGround() ? new Vec3(mc.player.getDeltaMovement().x, 0,  mc.player.getDeltaMovement().z) : mc.player.getDeltaMovement();
+        Vec3 velocity = projectileInfo.initialVelocity().add(playerVel);
 
-        List<Vec3d> trajectoryPoints = new ArrayList<>();
+        List<Vec3> trajectoryPoints = new ArrayList<>();
 
         double drag = projectileInfo.drag();
         double gravity = projectileInfo.gravity();
@@ -275,12 +274,12 @@ public class ProjectileTrajectories extends Module {
             for (int order : projectileInfo.order()) {
                 switch (order) {
                     case 0 -> currentPos = currentPos.add(velocity);
-                    case 1 -> velocity = velocity.multiply(drag);
+                    case 1 -> velocity = velocity.scale(drag);
                     case 2 -> velocity = velocity.subtract(0, gravity, 0);
                 }
             }
 
-            Box trajectorySegment = new Box(prevPos, currentPos).expand(1);
+            AABB trajectorySegment = new AABB(prevPos, currentPos).inflate(1);
 
             Optional<Entity> hitEntity = findHitEntity(prevPos, currentPos, trajectorySegment);
 
@@ -296,7 +295,7 @@ public class ProjectileTrajectories extends Module {
                 return new PreviewImpact(currentPos, blockHit, hitEntity.orElse(null), true, trajectoryPoints);
             }
 
-            if (currentPos.y < mc.world.getBottomY() - 20) {
+            if (currentPos.y < mc.level.getMinY() - 20) {
                 break;
             }
 
@@ -306,18 +305,18 @@ public class ProjectileTrajectories extends Module {
         return new PreviewImpact(currentPos, null, null, false, trajectoryPoints);
     }
 
-    private Optional<Entity> findHitEntity(Vec3d start, Vec3d end, Box searchBox) {
-        List<Entity> entities = mc.world.getEntitiesByClass(Entity.class, searchBox, this::isValidTarget);
+    private Optional<Entity> findHitEntity(Vec3 start, Vec3 end, AABB searchBox) {
+        List<Entity> entities = mc.level.getEntitiesOfClass(Entity.class, searchBox, this::isValidTarget);
 
         Entity closest = null;
         double closestDistance = Double.MAX_VALUE;
 
         for (Entity entity : entities) {
-            Box entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
-            Optional<Vec3d> raycastHit = entityBox.raycast(start, end);
+            AABB entityBox = entity.getBoundingBox().inflate(entity.getPickRadius());
+            Optional<Vec3> raycastHit = entityBox.clip(start, end);
 
             if (raycastHit.isPresent()) {
-                double distance = start.squaredDistanceTo(raycastHit.get());
+                double distance = start.distanceToSqr(raycastHit.get());
                 if (distance < closestDistance) {
                     closest = entity;
                     closestDistance = distance;
@@ -331,46 +330,46 @@ public class ProjectileTrajectories extends Module {
     private boolean isValidTarget(Entity entity) {
         return !entity.isSpectator()
                 && entity.isAlive()
-                && !(entity instanceof ProjectileEntity)
+                && !(entity instanceof Projectile)
                 && !(entity instanceof ItemEntity)
-                && !(entity instanceof ExperienceOrbEntity)
-                && !(entity instanceof EnderDragonEntity)
-                && !(entity instanceof ClientPlayerEntity)
-                && !(entity instanceof AreaEffectCloudEntity);
+                && !(entity instanceof ExperienceOrb)
+                && !(entity instanceof EnderDragon)
+                && !(entity instanceof LocalPlayer)
+                && !(entity instanceof AreaEffectCloud);
     }
 
-    private HitResult performRaycast(Vec3d start, Vec3d end) {
-        return mc.world.raycast(
-                new RaycastContext(
+    private HitResult performRaycast(Vec3 start, Vec3 end) {
+        return mc.level.clip(
+                new ClipContext(
                         start,
                         end,
-                        RaycastContext.ShapeType.COLLIDER,
-                        RaycastContext.FluidHandling.NONE,
+                        ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.NONE,
                         mc.player
                 )
         );
     }
 
-    private boolean isInWater(Vec3d start, Vec3d end) {
-        HitResult waterHit = mc.world.raycast(
-                new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER,
-                        RaycastContext.FluidHandling.WATER, mc.player)
+    private boolean isInWater(Vec3 start, Vec3 end) {
+        HitResult waterHit = mc.level.clip(
+                new ClipContext(start, end, ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.WATER, mc.player)
         );
         return waterHit.getType() != HitResult.Type.MISS;
     }
 
-    private boolean handleImpact(HitResult blockHit, Optional<Entity> hitEntity, Vec3d prevPos,
-                                 Vec3d currentPos, List<Vec3d> trajectoryPoints) {
+    private boolean handleImpact(HitResult blockHit, Optional<Entity> hitEntity, Vec3 prevPos,
+                                 Vec3 currentPos, List<Vec3> trajectoryPoints) {
         double blockDistance = blockHit.getType() != HitResult.Type.MISS ?
-                prevPos.squaredDistanceTo(blockHit.getPos()) : Double.MAX_VALUE;
+                prevPos.distanceToSqr(blockHit.getLocation()) : Double.MAX_VALUE;
 
-        double entityDistance = hitEntity.map(entity -> prevPos.squaredDistanceTo(findEntityHitPos(prevPos, currentPos, entity))).orElse(Double.MAX_VALUE);
+        double entityDistance = hitEntity.map(entity -> prevPos.distanceToSqr(findEntityHitPos(prevPos, currentPos, entity))).orElse(Double.MAX_VALUE);
 
         if (blockDistance < entityDistance && blockHit.getType() != HitResult.Type.MISS) {
-            trajectoryPoints.add(blockHit.getPos());
+            trajectoryPoints.add(blockHit.getLocation());
             return true;
         } else if (hitEntity.isPresent()) {
-            Vec3d entityHitPos = findEntityHitPos(prevPos, currentPos, hitEntity.get());
+            Vec3 entityHitPos = findEntityHitPos(prevPos, currentPos, hitEntity.get());
             trajectoryPoints.add(entityHitPos);
             return true;
         }
@@ -378,22 +377,22 @@ public class ProjectileTrajectories extends Module {
         return false;
     }
 
-    private Vec3d findEntityHitPos(Vec3d start, Vec3d end, Entity entity) {
-        Box entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
-        return entityBox.raycast(start, end).orElse(end);
+    private Vec3 findEntityHitPos(Vec3 start, Vec3 end, Entity entity) {
+        AABB entityBox = entity.getBoundingBox().inflate(entity.getPickRadius());
+        return entityBox.clip(start, end).orElse(end);
     }
 
     private int getHandMultiplier() {
-        return mc.options.getMainArm().getValue() == Arm.RIGHT ? 1 : -1;
+        return mc.options.mainHand().get() == HumanoidArm.RIGHT ? 1 : -1;
     }
 
 
     public record PreviewImpact(
-            Vec3d pos,
+            Vec3 pos,
             HitResult impact,
             Entity entity,
             boolean hit,
-            List<Vec3d> points
+            List<Vec3> points
     ) {}
 
     public enum TrajectoryStyle {

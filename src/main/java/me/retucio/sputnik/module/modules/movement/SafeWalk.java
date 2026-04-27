@@ -5,11 +5,12 @@ import me.retucio.sputnik.event.interact.ClipAtLedgeEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+
 
 public class SafeWalk extends Module {
 
@@ -23,33 +24,33 @@ public class SafeWalk extends Module {
 
     @EventListener
     private void onClipAtLedge(ClipAtLedgeEvent event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         if (fallDistance.getValue() > 1) {
-            int surface = mc.world.getWorldChunk(
-                    mc.player.getBlockPos())
-                    .getHeightmap(Heightmap.Type.MOTION_BLOCKING)
-                    .get(mc.player.getBlockX() & 15, mc.player.getBlockZ() & 15);
+            int surface = mc.level.getChunkAt(
+                    mc.player.blockPosition())
+                    .getOrCreateHeightmapUnprimed(Heightmap.Types.MOTION_BLOCKING)
+                    .getFirstAvailable(mc.player.getBlockX() & 15, mc.player.getBlockZ() & 15);
 
             if (mc.player.getBlockY() >= surface)
                 if (mc.player.getBlockY() - surface < fallDistance.getValue()) return;
 
             else {
-                BlockHitResult raycastResult = mc.world.raycast(new RaycastContext(
-                        mc.player.getEntityPos(),
-                        new Vec3d(mc.player.getX(),
-                                mc.world.getBottomY(),
+                BlockHitResult raycastResult = mc.level.clip(new ClipContext(
+                        mc.player.position(),
+                        new Vec3(mc.player.getX(),
+                                mc.level.getMinY(),
                                 mc.player.getZ()),
-                        RaycastContext.ShapeType.COLLIDER,
-                        RaycastContext.FluidHandling.WATER,
+                        ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.WATER,
                         mc.player));
 
                 if (raycastResult.getType() != HitResult.Type.MISS)
-                    if ((int) (mc.player.getY() - raycastResult.getBlockPos().up().getY()) < fallDistance.getValue()) return;
+                    if ((int) (mc.player.getY() - raycastResult.getBlockPos().above().getY()) < fallDistance.getValue()) return;
             }
         }
 
-        if (!mc.player.isSneaking())
+        if (!mc.player.isCrouching())
             event.setClipping(true);
     }
 }

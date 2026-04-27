@@ -82,6 +82,7 @@ public class ModuleManager {
 
     private void addCombat() {
         add(new AttributeSwapper());
+        add(new ChestplateSwitch());
         add(new CrystalAura());
         add(new MaceKill());
         add(new ProjectileTrajectories());

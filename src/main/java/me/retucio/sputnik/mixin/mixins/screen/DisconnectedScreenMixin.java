@@ -3,11 +3,11 @@ package me.retucio.sputnik.mixin.mixins.screen;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.network.Reconnect;
 
-import net.minecraft.client.gui.screen.DisconnectedScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.LinearLayout;
 
+import net.minecraft.client.gui.screens.DisconnectedScreen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,15 +19,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class DisconnectedScreenMixin {
 
     @Shadow @Final
-    private DirectionalLayoutWidget grid;
+    private LinearLayout layout;
 
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/DirectionalLayoutWidget;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;", ordinal = 2, shift = At.Shift.AFTER))
+    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/LinearLayout;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;", ordinal = 2, shift = At.Shift.AFTER))
     private void addReconnectButton(CallbackInfo ci) {
         Reconnect reconnect = ModuleManager.INSTANCE.getModuleByClass(Reconnect.class);
         if (reconnect == null || !reconnect.isEnabled()) return;
 
-        grid.add(ButtonWidget.builder(
-                Text.literal("reconectarse"),
+        layout.addChild(Button.builder(
+                Component.literal("reconectarse"),
                 button -> reconnect.reconnect()
         ).build());
     }

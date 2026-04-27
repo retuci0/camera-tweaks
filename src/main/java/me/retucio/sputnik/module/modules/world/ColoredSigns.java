@@ -5,7 +5,8 @@ import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.StringSetting;
-import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
+
 
 public class ColoredSigns extends Module {
 
@@ -24,9 +25,9 @@ public class ColoredSigns extends Module {
 
     @EventListener
     private void onSendPacket(PacketEvent.Send event) {
-        if (event.getPacket() instanceof UpdateSignC2SPacket packet) {
+        if (event.getPacket() instanceof ServerboundSignUpdatePacket packet) {
             for (int i = 0; i < 4; i++) {
-                packet.getText()[i] = packet.getText()[i].replace(symbol.getValue(), "\247" + "\247a");
+                packet.getLines()[i] = packet.getLines()[i].replace(symbol.getValue(), "\247" + "\247a");
             }
         }
     }

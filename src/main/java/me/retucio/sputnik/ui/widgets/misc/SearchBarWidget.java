@@ -13,10 +13,10 @@ import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.MiscUtil;
 import me.retucio.sputnik.util.render.Textures;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
@@ -56,7 +56,7 @@ public class SearchBarWidget extends Widget {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         if (!ClientSettingsFrame.guiSettings.searchBar.getValue()) return;
 
         Color textFieldColor = isTextFieldHovered(mouseX, mouseY)
@@ -66,14 +66,14 @@ public class SearchBarWidget extends Widget {
         if (focused) textFieldColor = Colors.buttonColor.darker();
 
         // bordes de la barra, para no obstruir la transparencia del campo de texto
-        ctx.fill(x, renderY, x + 20, renderY + h, Colors.mainColor.getRGB());
-        ctx.fill(x, renderY, x + w, renderY + 2, Colors.mainColor.getRGB());
-        ctx.fill(x, renderY + h, x + w, renderY + h - 2, Colors.mainColor.getRGB());
-        ctx.fill(x + w - 20, renderY, x + w, renderY + h, Colors.mainColor.getRGB());
+        gui.fill(x, renderY, x + 20, renderY + h, Colors.mainColor.getRGB());
+        gui.fill(x, renderY, x + w, renderY + 2, Colors.mainColor.getRGB());
+        gui.fill(x, renderY + h, x + w, renderY + h - 2, Colors.mainColor.getRGB());
+        gui.fill(x + w - 20, renderY, x + w, renderY + h, Colors.mainColor.getRGB());
 
-        ctx.fill(x + 20, renderY + 2, x + w - 20, renderY + h - 2, textFieldColor.getRGB());
+        gui.fill(x + 20, renderY + 2, x + w - 20, renderY + h - 2, textFieldColor.getRGB());
 
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, Textures.SEARCH_BAR_FILTER,
+        gui.blit(RenderPipelines.GUI_TEXTURED, Textures.SEARCH_BAR_FILTER,
                 x + w - 35, renderY + h / 2 - 6,
                 0, 0, 12, 12, 12, 12,
                 isFilterButtonHovered(mouseX, mouseY)
@@ -83,21 +83,21 @@ public class SearchBarWidget extends Widget {
 
         // dibujar líneas en la parte agarrable, para indicárselo al usuario
         for (int i = 0; i < 4; i++) {
-            ctx.drawHorizontalLine(x + 4, x + 16, renderY + 3 * i + 5, Color.LIGHT_GRAY.getRGB());
+            gui.horizontalLine(x + 4, x + 16, renderY + 3 * i + 5, Color.LIGHT_GRAY.getRGB());
         }
 
         // texto
-        Text label = Text.literal(focused ? buffer + "_" : (buffer.isEmpty() ? Formatting.ITALIC + "\uD83D\uDD0D buscar..." : buffer.toString()));
-        ctx.drawText(mc.textRenderer, label,
-                x + 24, renderY + h / 2 - mc.textRenderer.fontHeight / 2,
+        Component label = Component.literal(focused ? buffer + "_" : (buffer.isEmpty() ? ChatFormatting.ITALIC + "\uD83D\uDD0D buscar..." : buffer.toString()));
+        gui.text(mc.font, label,
+                x + 24, renderY + h / 2 - mc.font.lineHeight / 2,
                 (buffer.isEmpty() && !focused) ? Color.LIGHT_GRAY.getRGB() : -1, true);
 
         // botón para borrar búsqueda actual
-        ctx.drawText(mc.textRenderer, "×", x + w - mc.textRenderer.getWidth("×") - 6, renderY + (h / 2) - mc.textRenderer.fontHeight / 2,
+        gui.text(mc.font, "×", x + w - mc.font.width("×") - 6, renderY + (h / 2) - mc.font.lineHeight / 2,
                 isClearButtonHovered(mouseX, mouseY) ? Color.RED.getRGB() : -1, true);
 
         if (isFilterButtonHovered(mouseX, mouseY)) {
-            ctx.drawTooltip(mc.textRenderer, Text.of("filtrar por categoría"), mouseX + 7, mouseY + 20);
+            gui.setTooltipForNextFrame(mc.font, Component.literal("filtrar por categoría"), mouseX + 7, mouseY + 20);
         }
     }
 
@@ -167,7 +167,7 @@ public class SearchBarWidget extends Widget {
     public void charTyped(char c) {
         if (!focused) return;
         buffer.append(c);
-        if (mc.textRenderer.getWidth(buffer.toString()) > w - 30) onBackspace();
+        if (mc.font.width(buffer.toString()) > w - 30) onBackspace();
     }
 
     public String getSearchInput() {

@@ -7,7 +7,7 @@ import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -27,7 +27,7 @@ public class SliderButton extends SettingButton<NumberSetting> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         Color bgColor = Colors.buttonColor;
         Color fillingColor = Colors.mainColor;
@@ -37,20 +37,20 @@ public class SliderButton extends SettingButton<NumberSetting> {
             fillingColor = fillingColor.brighter();
         }
 
-        ctx.fill(x, y, x + w, y + h, bgColor.getRGB());
+        gui.fill(x, y, x + w, y + h, bgColor.getRGB());
 
         // calcular cómo de lleno tendría que estar el "slider"
         double percent = (setting.getValue() - setting.getMin()) / (setting.getMax() - setting.getMin());
         int filled = (int) (percent * w);
-        ctx.fill(x, y, x + filled, y + h, fillingColor.getRGB());
+        gui.fill(x, y, x + filled, y + h, fillingColor.getRGB());
 
         String label = setting.getName() + ": " + df.format(setting.getValue());
-        ctx.drawText(mc.textRenderer, label, x + 5, y + 3, -1, true);
+        gui.text(mc.font, label, x + 5, y + 3, -1, true);
 
         // lógica para arrastrar el valor
         if (dragging) {
             double newVal = setting.getMin() + ((mouseX - x) / (double) w) * (setting.getMax() - setting.getMin());
-            newVal = Math.max(setting.getMin(), Math.min(setting.getMax(), newVal));
+            newVal = Math.clamp(newVal, setting.getMin(), setting.getMax());
             newVal = Math.round(newVal / setting.getIncrement()) * setting.getIncrement();
             setting.setValue((float) newVal);
         }

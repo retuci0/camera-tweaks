@@ -10,34 +10,39 @@ import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.*;
+import me.retucio.sputnik.util.misc.BlockIterator;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * @author retucio
  */
+
 public class CrystalAura extends Module {
 
     private final SettingGroup sgPlace = addSg(new SettingGroup("colocar", false));
     private final SettingGroup sgBreak = addSg(new SettingGroup("reventar", false));
     private final SettingGroup sgRender = addSg(new SettingGroup("renderizado", false));
+
 
     private final ListSetting<EntityType<?>> entities = sgGeneral.add(new ListSetting<>(
             "entidades", "entidades a las que atacar",
@@ -71,9 +76,13 @@ public class CrystalAura extends Module {
             "rotar", "rotar para colocar cristales", false
     )).visibility(placeCrystals::getValue);
 
+    private final BooleanSetting placeObsidian = sgPlace.add(new BooleanSetting(
+            "colocar obsidiana", "colocar obsidiana si es necesario", true
+    )).visibility(placeCrystals::getValue);
+
     private final BooleanSetting autoSelect = sgPlace.add(new BooleanSetting(
             "autoseleccionar", "seleccionar cristales automáticamente", true
-    ));
+    )).visibility(placeCrystals::getValue);
 
 
     // ajustes al reventar los cristales
@@ -124,7 +133,6 @@ public class CrystalAura extends Module {
     private int placeTimer = placeDelay.getIntValue();
     private int breakTimer = breakDelay.getIntValue();
 
-
     public CrystalAura() {
         super("aura de cristales",
                 "coloca y revienta cristales del end por ti", Category.COMBAT);
@@ -133,7 +141,7 @@ public class CrystalAura extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.interactionManager == null || mc.world == null || mc.getCameraEntity() == null) return;
+        if (mc.player == null || mc.gameMode == null || mc.level == null || mc.getCameraEntity() == null) return;
 
         if (placeTimer > 0) placeTimer--;
         if (breakTimer > 0) breakTimer--;
@@ -148,11 +156,12 @@ public class CrystalAura extends Module {
         }
     }
 
-    // colocar cristal
+    @SuppressWarnings("deprecation")
+    // colocar cristal (u obsidiana si es necesario)
     private void doPlace() {
         if (placeTimer > 0) return;
 
-        if (!canPlaceCrystal()) {
+        if (!hasCrystal()) {
             bp = null;
             return;
         }
@@ -161,7 +170,7 @@ public class CrystalAura extends Module {
         LivingEntity primaryTarget = null;
         double closestTargetDist = Double.MAX_VALUE;
         for (LivingEntity target : targets) {
-            double dist = mc.player.squaredDistanceTo(target);
+            double dist = mc.player.distanceToSqr(target);
             if (dist < closestTargetDist) {
                 closestTargetDist = dist;
                 primaryTarget = target;
@@ -172,28 +181,41 @@ public class CrystalAura extends Module {
             return;
         }
 
-        final Vec3d targetPos = primaryTarget.getEntityPos();
-        final BlockPos.Mutable[] bestPos = new BlockPos.Mutable[1];
-        final double[] bestDist = { Double.MAX_VALUE };
+        final Vec3 targetPos = primaryTarget.position();
+
+        final BlockPos.MutableBlockPos[] bestExistingPos = new BlockPos.MutableBlockPos[1];
+        final double[] bestExistingDist = { Double.MAX_VALUE };
+        final BlockPos.MutableBlockPos[] bestObbyPlacePos = new BlockPos.MutableBlockPos[1];
+        final double[] bestObbyPlaceDist = { Double.MAX_VALUE };
 
         BlockIterator.register((int) Math.ceil(placeRange.getValue()), (int) Math.ceil(placeRange.getValue()), (pos, state) -> {
-            if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK)) return;
-            if (!mc.world.isAir(pos.add(0, 1, 0))) return;
-
-            // cálculo de mejor distancia
-            double dist = targetPos.squaredDistanceTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-            if (dist < bestDist[0]) {
-                bestDist[0] = dist;
-                if (bestPos[0] == null) bestPos[0] = new BlockPos.Mutable();
-                bestPos[0].set(pos);
+            if ((state.is(Blocks.OBSIDIAN) || state.is(Blocks.BEDROCK)) && mc.level.isEmptyBlock(pos.above())) {
+                double dist = targetPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                if (dist < bestExistingDist[0]) {
+                    bestExistingDist[0] = dist;
+                    if (bestExistingPos[0] == null) bestExistingPos[0] = new BlockPos.MutableBlockPos();
+                    bestExistingPos[0].set(pos);
+                }
+            }
+            //                                                                                                      asegurarse de que no está dentro del bloque
+            if (mc.level.isEmptyBlock(pos) && mc.level.getBlockState(pos.below()).isSolid() && mc.level.isEmptyBlock(pos.above()) && targetPos.distanceTo(pos.getCenter()) > 0.6) {
+                double dist = targetPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                if (dist < bestObbyPlaceDist[0]) {
+                    bestObbyPlaceDist[0] = dist;
+                    if (bestObbyPlacePos[0] == null) bestObbyPlacePos[0] = new BlockPos.MutableBlockPos();
+                    bestObbyPlacePos[0].set(pos);
+                }
             }
         });
 
         BlockIterator.after(() -> {
-            if (bestPos[0] != null) {
-                BlockHitResult result = getBlockInfo(bestPos[0]);
+            if (bestExistingPos[0] != null) {
+                BlockHitResult result = getBlockInfo(bestExistingPos[0]);
                 placeCrystal(result);
-                bp = bestPos[0].toImmutable();  // guardar para el renderizado
+                bp = bestExistingPos[0].immutable();
+            } else if (hasObby() && bestObbyPlacePos[0] != null) {
+                placeObby(bestObbyPlacePos[0]);
+                bp = bestObbyPlacePos[0].immutable();  // mostrar el bloque donde se pondrá el cristal
             } else {
                 bp = null;
             }
@@ -204,64 +226,93 @@ public class CrystalAura extends Module {
 
     private void doBreak() {
         if (breakTimer > 0) return;
-        for (Entity entity : mc.world.getEntities()) {
-            if (!(entity instanceof EndCrystalEntity) || entity.distanceTo(mc.player) > mc.player.getEntityInteractionRange()) continue;
-            if (rotateToBreak.getValue()) EntityUtil.lookAt(entity.getEyePos());
-            mc.interactionManager.attackEntity(mc.player, entity);
+        for (Entity entity : mc.level.getEntities().getAll()) {
+            if (!(entity instanceof EndCrystal) || entity.distanceTo(mc.player) > mc.player.entityInteractionRange()) continue;
+            if (rotateToBreak.getValue()) EntityUtil.lookAt(entity.getEyePosition());
+            mc.gameMode.attack(mc.player, entity);
         }
         breakTimer = breakDelay.getIntValue();
     }
 
     private void placeCrystal(BlockHitResult result) {
-        if (autoSelect.getValue()) {
-            int slot = InventoryUtil.findSlot(stack -> stack.isOf(Items.END_CRYSTAL));
-            if (slot != InventoryUtil.OFFHAND_SLOT) {
-                if (!PlayerInventory.isValidHotbarIndex(slot)) {
-                    InventoryUtil.swapWithHotbar(slot, mc.player.getInventory().getSelectedSlot());
-                } else {
-                    mc.player.getInventory().setSelectedSlot(slot);
-                }
-            }
-        }
+        doAutoSelect(Items.END_CRYSTAL);
 
-        Hand hand;
-        if (mc.player.getMainHandStack().isOf(Items.END_CRYSTAL)) {
-            hand = Hand.MAIN_HAND;
-        } else if (mc.player.getOffHandStack().isOf(Items.END_CRYSTAL)) {
-            hand = Hand.OFF_HAND;
+        InteractionHand hand;
+        if (mc.player.getMainHandItem().is(Items.END_CRYSTAL)) {
+            hand = InteractionHand.MAIN_HAND;
+        } else if (mc.player.getOffhandItem().is(Items.END_CRYSTAL)) {
+            hand = InteractionHand.OFF_HAND;
         } else {
             return;
         }
 
-        if (rotateToPlace.getValue()) EntityUtil.lookAt(result.getBlockPos().toCenterPos());
-        mc.interactionManager.sendSequencedPacket(mc.world, (sequence) -> new PlayerInteractBlockC2SPacket(hand, result, sequence));
+        if (rotateToPlace.getValue()) EntityUtil.lookAt(result.getBlockPos().getCenter());
+        mc.gameMode.startPrediction(mc.level, (sequence) -> new ServerboundUseItemOnPacket(hand, result, sequence));
     }
 
-    // encontrar blancos
+    private void placeObby(BlockPos pos) {
+        doAutoSelect(Items.OBSIDIAN);
+
+        InteractionHand hand;
+        if (mc.player.getMainHandItem().is(Items.OBSIDIAN)) {
+            hand = InteractionHand.MAIN_HAND;
+        } else if (mc.player.getOffhandItem().is(Items.OBSIDIAN)) {
+            hand = InteractionHand.OFF_HAND;
+        } else {
+            return;
+        }
+
+        BlockPos supportPos = pos.below();
+        BlockHitResult result = new BlockHitResult(Vec3.atCenterOf(supportPos), Direction.UP, supportPos, false);
+
+        if (rotateToPlace.getValue()) EntityUtil.lookAt(pos.getCenter());
+        mc.gameMode.startPrediction(mc.level, (sequence) -> new ServerboundUseItemOnPacket(hand, result, sequence));
+    }
+
+    private void doAutoSelect(Item item) {
+        int slot = InventoryUtil.findSlot(stack -> stack.is(item));
+        if (slot != InventoryUtil.OFFHAND_SLOT) {
+            if (!Inventory.isHotbarSlot(slot)) {
+                InventoryUtil.swapWithHotbar(slot, mc.player.getInventory().getSelectedSlot());
+            } else {
+                mc.player.getInventory().setSelectedSlot(slot);
+            }
+        }
+    }
+
+    private boolean hasObby() {
+        if (!placeObsidian.getValue()) return false;
+        if (autoSelect.getValue()) {
+            return InventoryUtil.findSlot(stack -> stack.is(Items.OBSIDIAN)) != -1;
+        } else {
+            return InventoryUtil.hasInHotbar(Items.OBSIDIAN);
+        }
+    }
+
     private void findTargets() {
         targets.clear();
-        for (Entity e : mc.world.getEntities()) {
+        for (Entity e : mc.level.getEntities().getAll()) {
             if (!(e instanceof LivingEntity entity)) continue;
-            if (!entity.isAlive() || entity.isInCreativeMode() || entity.equals(mc.player)) continue;
+            if (!entity.isAlive() || entity.hasInfiniteMaterials() || entity.equals(mc.player)) continue;
             if (!entities.isEnabled(entity.getType())) continue;
-            if (entity.squaredDistanceTo(mc.player) > targetRange.getValue() * targetRange.getValue()) continue;
+            if (entity.distanceToSqr(mc.player) > targetRange.getValue() * targetRange.getValue()) continue;
             targets.add(entity);
         }
     }
 
     private BlockHitResult getBlockInfo(BlockPos pos) {
-        Vec3d start = new Vec3d(mc.player.getX(), mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()), mc.player.getZ());
-        Vec3d end;
+        Vec3 start = new Vec3(mc.player.getX(), mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()), mc.player.getZ());
+        Vec3 end;
 
         for (Direction side : Direction.values()) {
-            end = new Vec3d(
-                    pos.getX() + 0.5 + side.getVector().getX() * 0.5,
-                    pos.getY() + 0.5 + side.getVector().getY() * 0.5,
-                    pos.getZ() + 0.5 + side.getVector().getZ() * 0.5
+            end = new Vec3(
+                    pos.getX() + 0.5 + side.getUnitVec3().x() * 0.5,
+                    pos.getY() + 0.5 + side.getUnitVec3().y() * 0.5,
+                    pos.getZ() + 0.5 + side.getUnitVec3().z() * 0.5
             );
 
-            BlockHitResult result = mc.world.raycast(new RaycastContext(
-                    start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player
+            BlockHitResult result = mc.level.clip(new ClipContext(
+                    start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, mc.player
             ));
 
             if (result != null && result.getType() == HitResult.Type.BLOCK && result.getBlockPos().equals(pos)) {
@@ -273,9 +324,9 @@ public class CrystalAura extends Module {
         return new BlockHitResult(start, side, pos, false);
     }
 
-    private boolean canPlaceCrystal() {
+    private boolean hasCrystal() {
         if (autoSelect.getValue()) {
-            return InventoryUtil.findSlot(stack -> stack.isOf(Items.END_CRYSTAL)) != -1;
+            return InventoryUtil.findSlot(stack -> stack.is(Items.END_CRYSTAL)) != -1;
         } else {
             return InventoryUtil.hasInHotbar(Items.END_CRYSTAL);
         }
@@ -283,13 +334,12 @@ public class CrystalAura extends Module {
 
     @EventListener
     private void onRenderWorld(Render3DEvent event) {
-        if (bp != null) {
-            if (outlines.getValue()) {
-                RenderUtil.drawBlockOutline(event.getMatrices(), bp, outlineColor.getValue(), outlineWidth.getFloatValue(), false);
-            }
-            if (fillings.getValue()) {
-                RenderUtil.drawBlockFilled(event.getMatrices(), bp, fillingColor.getValue(), false);
-            }
+        if (bp == null) return;
+        if (outlines.getValue()) {
+            RenderUtil.drawBlockOutline(event.getMatrices(), bp, outlineColor.getValue(), outlineWidth.getFloatValue(), false);
+        }
+        if (fillings.getValue()) {
+            RenderUtil.drawBlockFilled(event.getMatrices(), bp, fillingColor.getValue(), false);
         }
     }
 }

@@ -2,12 +2,13 @@ package me.retucio.sputnik.ui.hud.elements;
 
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.ImageHudElement;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.List;
+
 
 public class TotemsElement extends ImageHudElement {
 
@@ -24,7 +25,7 @@ public class TotemsElement extends ImageHudElement {
     }
 
     @Override
-    public void renderInGame(DrawContext ctx, float delta, HUD hud) {
+    public void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud) {
         if (!isVisible()) return;
 
         int count = 0;
@@ -37,11 +38,11 @@ public class TotemsElement extends ImageHudElement {
             count = 69;
         }
 
-        drawItem(ctx, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
+        drawItem(gui, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
     }
 
     @Override
-    public void renderInEditor(DrawContext ctx, HUD hud) {
+    public void renderInEditor(GuiGraphicsExtractor gui, HUD hud) {
         int count = 0;
         if (mc.player != null) {
             for (ItemStack stack : mc.player.getInventory()) {
@@ -52,25 +53,25 @@ public class TotemsElement extends ImageHudElement {
             count = 69;
         }
 
-        drawEditorBackground(ctx);
-        drawItem(ctx, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
+        drawEditorBackground(gui);
+        drawItem(gui, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
     }
 
     @Override
-    public List<Text> getTooltip() {
-        return List.of(Text.of("totems disponibles"));
+    public List<Component> getTooltip() {
+        return List.of(Component.literal("totems disponibles"));
     }
 
-    private void drawItem(DrawContext ctx, ItemStack stack, int count) {
-        ctx.drawItem(stack, x, y);
+    private void drawItem(GuiGraphicsExtractor gui, ItemStack stack, int count) {
+        gui.item(stack, x, y);
         if (count > 1) {
-            ctx.drawStackOverlay(mc.textRenderer, stack, x, y);
+            gui.itemDecorations(mc.font, stack, x, y);
         } else {
             String text = String.valueOf(count);
             int textX = x + 10;
             int textY = y + 9;
-            ctx.drawText(
-                    mc.textRenderer,
+            gui.text(
+                    mc.font,
                     text,
                     textX,
                     textY,

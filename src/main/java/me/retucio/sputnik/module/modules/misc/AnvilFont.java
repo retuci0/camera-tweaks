@@ -4,10 +4,10 @@ import me.retucio.sputnik.mixin.accessors.AnvilScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
-import net.minecraft.client.gui.screen.ingame.AnvilScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.components.EditBox;
 
 import me.retucio.sputnik.module.modules.misc.AnvilFont.CustomFont.CharMap;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -74,20 +74,20 @@ public class AnvilFont extends Module {
 
     @Override
     public void onTick() {
-        if (mc.currentScreen == null) return;
+        if (mc.screen == null) return;
 
-        if (mc.currentScreen instanceof AnvilScreen) {
-            TextFieldWidget nameField = ((AnvilScreenAccessor) mc.currentScreen).getNameField();
+        if (mc.screen instanceof AnvilScreen) {
+            EditBox nameField = ((AnvilScreenAccessor) mc.screen).getNameField();
 
             if (fontMode.getValue() != FontMode.NORMAL)
-                text = fonts.get(fontMode.getIndex()).replace(nameField.getText());
+                text = fonts.get(fontMode.getIndex()).replace(nameField.getValue());
             else
-                text = nameField.getText();
+                text = nameField.getValue();
 
-            if (!text.equals(nameField.getText()))
-                nameField.setText(text);
+            if (!text.equals(nameField.getValue()))
+                nameField.setValue(text);
 
-            ((AnvilScreenAccessor) mc.currentScreen).setNameField(nameField);
+            ((AnvilScreenAccessor) mc.screen).setNameField(nameField);
         }
     }
 

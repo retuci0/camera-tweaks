@@ -1,11 +1,11 @@
 package me.retucio.sputnik.module.modules.inventory;
 
-import me.retucio.sputnik.mixin.mixins.player.ClientPlayerEntityMixin;
+import me.retucio.sputnik.mixin.mixins.player.LocalPlayerMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 
 /** continúa en:
- * @see ClientPlayerEntityMixin
+ * @see LocalPlayerMixin
  */
 
 public class PortalGUI extends Module {

@@ -1,13 +1,14 @@
 package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
-import net.minecraft.entity.Entity;
+import me.retucio.sputnik.mixin.mixins.player.MultiPlayerGameModeMixin;
+import net.minecraft.world.entity.Entity;
 
 
 /**
- * @see ClientPlayerInteractionManagerMixin#onAttackEntity
+ * @see MultiPlayerGameModeMixin#onAttackEntity
  */
+
 public class AttackEntityEvent extends Event {
 
     private final Entity entity;

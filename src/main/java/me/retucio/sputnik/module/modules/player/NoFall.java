@@ -11,20 +11,20 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
 import me.retucio.sputnik.util.Lists;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -90,38 +90,38 @@ public class NoFall extends Module {
     @Override
     public void onTick() {
         if (mc.player == null
-                || mc.world == null
+                || mc.level == null
                 || mc.getCameraEntity() == null
-                || mc.interactionManager == null)
+                || mc.gameMode == null)
             return;
 
-        if (mc.player.isOnGround()) {
+        if (mc.player.onGround()) {
             placed = false;
             shouldUse = false;
         }
 
         if (shouldUse) {
-            mc.doItemUse();
+            mc.startUseItem();
         }
 
         if (mode.is(NoFallMode.CLUTCH)
                 && mc.player.fallDistance >= distance.getValue()
-                && !mc.player.isOnGround()
+                && !mc.player.onGround()
                 && !placed) {
 
             if (center.getValue()) {
-                Vec3d diff = mc.player.getEntityPos().subtract(mc.player.getBlockPos().toCenterPos());
-                if (diff.lengthSquared() > 10e-3) {
-                    Vec3d impulse = new Vec3d(-diff.x * 0.05, 0, -diff.z * 0.05);
-                    mc.player.addVelocity(impulse.x, impulse.y, impulse.z);
+                Vec3 diff = mc.player.position().subtract(mc.player.blockPosition().getCenter());
+                if (diff.lengthSqr() > 10e-3) {
+                    Vec3 impulse = new Vec3(-diff.x * 0.05, 0, -diff.z * 0.05);
+                    mc.player.push(impulse.x, impulse.y, impulse.z);
                 }
             }
 
-            HitResult result = mc.getCameraEntity().raycast(3, 0, true);
+            HitResult result = mc.getCameraEntity().pick(3, 0, true);
             if (result instanceof BlockHitResult bhr) {
                 BlockPos pos = bhr.getBlockPos();
-                while (mc.world.getBlockState(pos).isOf(Blocks.AIR)) {
-                    pos = pos.down();
+                while (mc.level.getBlockState(pos).is(Blocks.AIR)) {
+                    pos = pos.below();
                 }
                 if (isSafeBlock(pos)) return;
 
@@ -140,9 +140,9 @@ public class NoFall extends Module {
                 }
 
                 // mirar abajo
-                mc.player.setPitch(180);
+                mc.player.setXRot(180);
 
-                int slot = mc.player.getInventory().getSlotWithStack(mlgItem);
+                int slot = mc.player.getInventory().findSlotMatchingItem(mlgItem);
                 mc.player.getInventory().setSelectedSlot(slot);
 
                 // usar bloque
@@ -153,8 +153,8 @@ public class NoFall extends Module {
                 }
 
                 // usar ítem
-                ActionResult didPlace = mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                if (didPlace.isAccepted())
+                InteractionResult didPlace = mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
+                if (didPlace.consumesAction())
                     placed = true;
             }
         }
@@ -163,13 +163,13 @@ public class NoFall extends Module {
     @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (mc.player == null
-                || mc.getNetworkHandler() == null
+                || mc.getConnection() == null
                 || !mode.is(NoFallMode.PACKET)
-                || mc.player.getAbilities().creativeMode
+                || mc.player.getAbilities().instabuild
                 || mc.player.fallDistance < distance.getValue())
             return;
 
-        if (event.getPacket() instanceof PlayerMoveC2SPacket packet) {
+        if (event.getPacket() instanceof ServerboundMovePlayerPacket packet) {
             if (!packet.isOnGround()) {
                 if (mc.player.fallDistance >= 3) {
                     event.cancel();
@@ -180,12 +180,12 @@ public class NoFall extends Module {
     }
 
     private void sendOnGroundPacket() {
-        mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
+        mc.getConnection().send(new ServerboundMovePlayerPacket.PosRot(
                 mc.player.getX(),
                 mc.player.getY(),
                 mc.player.getZ(),
-                mc.player.getYaw(),
-                mc.player.getPitch(),
+                mc.player.getYRot(),
+                mc.player.getXRot(),
                 true,
                 mc.player.horizontalCollision
         ));
@@ -193,8 +193,8 @@ public class NoFall extends Module {
 
     private ItemStack getMlgItem() {
         for (Item item : items.getEnabledOptions()) {
-            ItemStack stack = InventoryUtil.find(itemStack -> itemStack.isOf(item));
-            if (stack != null && PlayerInventory.isValidHotbarIndex(mc.player.getInventory().getSlotWithStack(stack))) {
+            ItemStack stack = InventoryUtil.findStack(itemStack -> itemStack.is(item));
+            if (stack != null && Inventory.isHotbarSlot(mc.player.getInventory().findSlotMatchingItem(stack))) {
                 return stack;
             }
         }
@@ -202,7 +202,7 @@ public class NoFall extends Module {
     }
 
     private boolean isSafeBlock(BlockPos pos) {
-        return safeBlocks.contains(mc.world.getBlockState(pos).getBlock());
+        return safeBlocks.contains(mc.level.getBlockState(pos).getBlock());
     }
 
     private enum NoFallMode {

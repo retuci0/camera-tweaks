@@ -1,35 +1,35 @@
 package me.retucio.sputnik.util;
 
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.network.PacketEvent;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.listener.PacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class NetworkUtil {
 
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final Minecraft mc = Minecraft.getInstance();
 
     // tps
     private static final List<Float> tpsHistory = new ArrayList<>();
@@ -52,9 +52,10 @@ public class NetworkUtil {
         estimatedTPS = sum / tpsHistory.size();
     }
 
+    @EventListener
     public void onReceivePacket(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket packet) {
-            long currentWorldTime = packet.time();
+        if (event.getPacket() instanceof ClientboundSetTimePacket packet) {
+            long currentWorldTime = packet.gameTime();
             long currentRealTime = System.currentTimeMillis();
 
             if (lastWorldTime != -1L && lastRealTime != -1L) {
@@ -63,7 +64,7 @@ public class NetworkUtil {
 
                 if (elapsedRealTime > 0) {
                     float tps = (float) elapsedWorldTicks / (elapsedRealTime / 1000.0f);
-                    tps = Math.max(0.1f, Math.min(20.0f, tps));
+                    tps = Math.clamp(tps, 0.1f, 20.0f);
                     updateTPS(tps);
                 }
             }
@@ -75,40 +76,41 @@ public class NetworkUtil {
 
 
     public static void sendPacketNoEvent(Packet<?> packet) {
-        mc.getNetworkHandler().getConnection().sendImmediately(packet, null, true);
+        mc.getConnection().getConnection().sendPacket(packet, null, true);
     }
 
     public static void receivePacketNoEvent(Packet<?> packet) {
-        receivePacketNoEvent(packet, mc.getNetworkHandler().getConnection().getPacketListener());
+        receivePacketNoEvent(packet, mc.getConnection().getConnection().getPacketListener());
     }
 
     public static void receivePacketNoEvent(Packet<?> packet, PacketListener listener) {
-        ClientConnection.handlePacket(packet, listener);
+        Connection.genericsFtw(packet, listener);
     }
 
-    public static void interactBlock(BlockHitResult blockHitResult, Hand hand, boolean swing) {
-        boolean wasSneaking = mc.player.isSneaking();
-        mc.player.setSneaking(false);
+    public static void interactBlock(BlockHitResult blockHitResult, InteractionHand hand, boolean swing) {
+        boolean wasSneaking = mc.player.isCrouching();
+        mc.player.setShiftKeyDown(false);
 
-        ActionResult result = mc.interactionManager.interactBlock(mc.player, hand, blockHitResult);
+        InteractionResult result = mc.gameMode.useItemOn(mc.player, hand, blockHitResult);
 
-        if (result.isAccepted()) {
-            if (swing) mc.player.swingHand(hand);
-            else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(hand));
+        if (result.consumesAction()) {
+            if (swing) mc.player.swing(hand);
+            else mc.getConnection().send(new ServerboundSwingPacket(hand));
         }
 
-        mc.player.setSneaking(wasSneaking);
+        mc.player.setShiftKeyDown(wasSneaking);
     }
 
-    public static boolean placeBlock(BlockPos blockPos, Hand hand, int slot, boolean rotate, boolean swingHand, boolean checkEntities, boolean swapBack) {
+    public static boolean placeBlock(BlockPos blockPos, InteractionHand hand, int slot, boolean rotate,
+                                     boolean swingHand, boolean checkEntities, boolean swapBack) {
         if (slot < 0 || slot > 8) return false;
 
         Block toPlace = Blocks.OBSIDIAN;
-        ItemStack i = hand == Hand.MAIN_HAND ? mc.player.getInventory().getStack(slot) : mc.player.getOffHandStack();
+        ItemStack i = hand == InteractionHand.MAIN_HAND ? mc.player.getInventory().getItem(slot) : mc.player.getOffhandItem();
         if (i.getItem() instanceof BlockItem blockItem) toPlace = blockItem.getBlock();
         if (!canPlaceBlock(blockPos, checkEntities, toPlace)) return false;
 
-        Vec3d hitPos = Vec3d.ofCenter(blockPos);
+        Vec3 hitPos = Vec3.atCenterOf(blockPos);
 
         BlockPos neighbour;
         Direction side = getClosestSide(blockPos);
@@ -117,8 +119,8 @@ public class NetworkUtil {
             side = Direction.UP;
             neighbour = blockPos;
         } else {
-            neighbour = blockPos.offset(side);
-            hitPos = hitPos.add(side.getOffsetX() * 0.5, side.getOffsetY() * 0.5, side.getOffsetZ() * 0.5);
+            neighbour = blockPos.relative(side);
+            hitPos = hitPos.add(side.getStepX() * 0.5, side.getStepY() * 0.5, side.getStepZ() * 0.5);
         }
 
         BlockHitResult bhr = new BlockHitResult(hitPos, side.getOpposite(), neighbour, false);
@@ -141,25 +143,25 @@ public class NetworkUtil {
 
     public static boolean canPlaceBlock(BlockPos blockPos, boolean checkEntities, Block block) {
         if (blockPos == null) return false;
-        if (!World.isValid(blockPos)) return false;
-        if (!mc.world.getBlockState(blockPos).isReplaceable()) return false;
-        return !checkEntities || mc.world.canPlace(block.getDefaultState(), blockPos, ShapeContext.absent());
+        if (!Level.isInSpawnableBounds(blockPos)) return false;
+        if (!mc.level.getBlockState(blockPos).canBeReplaced()) return false;
+        return !checkEntities || mc.level.isUnobstructed(block.defaultBlockState(), blockPos, CollisionContext.empty());
     }
 
     public static Direction getClosestSide(BlockPos blockPos) {
-        Vec3d lookVec = blockPos.toCenterPos().subtract(mc.player.getEyePos());
+        Vec3 lookVec = blockPos.getCenter().subtract(mc.player.getEyePosition());
         double bestRelevancy = -Double.MAX_VALUE;
         Direction bestSide = null;
 
         for (Direction side : Direction.values()) {
-            BlockPos neighbor = blockPos.offset(side);
-            BlockState state = mc.world.getBlockState(neighbor);
+            BlockPos neighbor = blockPos.relative(side);
+            BlockState state = mc.level.getBlockState(neighbor);
 
             if (state.isAir()) continue;
 
             if (!state.getFluidState().isEmpty()) continue;
 
-            double relevancy = side.getAxis().choose(lookVec.getX(), lookVec.getY(), lookVec.getZ()) * side.getDirection().offset();
+            double relevancy = side.getAxis().choose(lookVec.x(), lookVec.y(), lookVec.z()) * side.getAxisDirection().getStep();
             if (relevancy > bestRelevancy) {
                 bestRelevancy = relevancy;
                 bestSide = side;

@@ -7,7 +7,7 @@ import me.retucio.sputnik.event.TickEvent;
 import me.retucio.sputnik.ui.screen.PreviewScreen;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 // accede a los contenidos de tu enderchest
 public class EnderChestCommand extends Command {
@@ -19,7 +19,7 @@ public class EnderChestCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder.executes(ctx -> {
             mc.execute(() -> {
                 if (mc.player == null) return;

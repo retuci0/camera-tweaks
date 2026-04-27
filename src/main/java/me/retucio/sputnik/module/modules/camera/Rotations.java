@@ -6,7 +6,7 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 
 /**
  * @author retucio
@@ -30,15 +30,15 @@ public class Rotations extends Module {
     public void onTick() {
         if (mc.player == null) return;
 
-        mc.player.setYaw(yaw.getFloatValue());
-        mc.player.setPitch(pitch.getFloatValue());
+        mc.player.setYRot(yaw.getFloatValue());
+        mc.player.setXRot(pitch.getFloatValue());
 
         if (serverSide.getValue())
-            mc.player.networkHandler.sendPacket(
-                    new PlayerMoveC2SPacket.LookAndOnGround(
+            mc.player.connection.send(
+                    new ServerboundMovePlayerPacket.Rot(
                         yaw.getFloatValue(),
                         pitch.getFloatValue(),
-                        mc.player.isOnGround(),
+                        mc.player.onGround(),
                         mc.player.horizontalCollision
                     )
             );

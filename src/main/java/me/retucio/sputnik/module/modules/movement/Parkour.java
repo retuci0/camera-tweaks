@@ -5,8 +5,8 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.stream.Stream;
 
@@ -45,19 +45,19 @@ public class Parkour extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
-        if (!(mc.player.isSprinting() || mc.options.sprintKey.isPressed()) && onlyWhenSprinting.getValue()) return;
-        if ((mc.player.isSneaking() || mc.options.sneakKey.isPressed()) && dontWhenSneaking.getValue()) return;
+        if (!(mc.player.isSprinting() || mc.options.keySprint.isDown()) && onlyWhenSprinting.getValue()) return;
+        if ((mc.player.isCrouching() || mc.options.keyShift.isDown()) && dontWhenSneaking.getValue()) return;
 
-        if(!mc.player.isOnGround() || mc.options.jumpKey.isPressed()) return;
+        if(!mc.player.onGround() || mc.options.keyJump.isDown()) return;
 
-        Box box = mc.player.getBoundingBox();
-        Box adjustedBox = box.offset(0, -0.5, 0).expand(-offset.getValue(), 0, -offset.getValue());
+        AABB box = mc.player.getBoundingBox();
+        AABB adjustedBox = box.move(0, -0.5, 0).inflate(-offset.getValue(), 0, -offset.getValue());
 
-        Stream<VoxelShape> blockCollisions = Streams.stream(mc.world.getBlockCollisions(mc.player, adjustedBox));
+        Stream<VoxelShape> blockCollisions = Streams.stream(mc.level.getBlockCollisions(mc.player, adjustedBox));
         if (blockCollisions.findAny().isPresent()) return;
 
-        mc.player.jump();
+        mc.player.jumpFromGround();
     }
 }

@@ -6,12 +6,13 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.client.gui.hud.ClientBossBar;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.network.chat.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
+
 
 public class BossbarStack extends Module {
 
@@ -35,7 +36,7 @@ public class BossbarStack extends Module {
     ));
 
 
-    private final Map<ClientBossBar, Integer> bossBarMap = new WeakHashMap<>();
+    private final Map<LerpingBossEvent, Integer> bossBarMap = new WeakHashMap<>();
 
     public BossbarStack() {
         super("apilar bossbars",
@@ -46,11 +47,11 @@ public class BossbarStack extends Module {
     @EventListener
     private void onRenderBossText(RenderBossbarEvent.BossText event) {
         if (hideNames.getValue()) {
-            event.setName(Text.empty());
+            event.setName(Component.empty());
             return;
         } else if (bossBarMap.isEmpty() || !stackBars.getValue()) return;
 
-        ClientBossBar bar = event.getBossBar();
+        LerpingBossEvent bar = event.getBossBar();
         Integer amount = bossBarMap.get(bar);
         bossBarMap.remove(bar);
 
@@ -66,7 +67,7 @@ public class BossbarStack extends Module {
     @EventListener
     private void onRenderBossBars(RenderBossbarEvent.BossIterator event) {
         if (stackBars.getValue()) {
-            HashMap<String, ClientBossBar> chosenBarMap = new HashMap<>();
+            HashMap<String, LerpingBossEvent> chosenBarMap = new HashMap<>();
             event.getIterator().forEachRemaining(bar -> {
                 String name = bar.getName().getString();
                 if (chosenBarMap.containsKey(name))

@@ -5,9 +5,10 @@ import me.retucio.sputnik.event.interact.UseItemEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
 
 // "pedido prestado" de: https://github.com/meanwhile131/elytra-infinite
 public class InfiniteElytra extends Module {
@@ -72,7 +73,7 @@ public class InfiniteElytra extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null || !mc.player.isGliding()) {
+        if (mc.player == null || mc.level == null || !mc.player.isFallFlying()) {
             state = FlyState.NOT_FLYING;
             return;
         }
@@ -82,7 +83,7 @@ public class InfiniteElytra extends Module {
             pitch = pitchDown.getFloatValue();
         } else if (state == FlyState.PITCHING_DOWN) {
             pitch += Math.min(pitchDown.getFloatValue() - pitch, pitchDownSpeed.getFloatValue());
-            boolean movingDownwards = mc.player.getVelocity().y <= 0 && mc.player.getY() > lowestY;
+            boolean movingDownwards = mc.player.getDeltaMovement().y <= 0 && mc.player.getY() > lowestY;
 
             if (pitch >= pitchDown.getFloatValue() || movingDownwards) {
                 pitch = pitchDown.getFloatValue();
@@ -91,34 +92,34 @@ public class InfiniteElytra extends Module {
         } else if (state == FlyState.GLIDING_DOWN) {
             boolean willCollide = willCollideWhileGliding(ticksCollisionLookAhead.getIntValue());
 
-            if (willCollide || mc.player.getVelocity().horizontalLengthSquared() > Math.pow(pitchUpVelocity.getFloatValue(), 2)) {
+            if (willCollide || mc.player.getDeltaMovement().horizontalDistanceSqr() > Math.pow(pitchUpVelocity.getFloatValue(), 2)) {
                 pitch = pitchUp.getFloatValue();
                 state = FlyState.PITCHING_DOWN;
                 lowestY = mc.player.getY();
             }
         }
 
-        mc.player.setPitch(pitch);
+        mc.player.setXRot(pitch);
     }
 
     @EventListener
     private void onUseItem(UseItemEvent event) {
         if (mc.player == null) return;
-        if (mc.player.getStackInHand(event.getHand()).getItem() == Items.FIREWORK_ROCKET && !mc.player.isSpectator() && mc.player.isGliding()) {
+        if (mc.player.getItemInHand(event.getHand()).getItem() == Items.FIREWORK_ROCKET && !mc.player.isSpectator() && mc.player.isFallFlying()) {
             pitch = pitchUp.getFloatValue();
-            mc.player.setPitch(pitch);
+            mc.player.setXRot(pitch);
             state = FlyState.PITCHING_DOWN;
             lowestY = mc.player.getY();
         }
     }
 
     private boolean willCollideWhileGliding(int ticks) {
-        Vec3d velocity = mc.player.getVelocity();
-        Box boundingBox = mc.player.getBoundingBox();
+        Vec3 velocity = mc.player.getDeltaMovement();
+        AABB boundingBox = mc.player.getBoundingBox();
         for (int i = 0; i < ticks; i++) {
-            velocity = mc.player.calcGlidingVelocity(velocity);
-            boundingBox = boundingBox.offset(velocity);
-            if (!mc.world.isSpaceEmpty(null, boundingBox, true)) {
+            velocity = mc.player.updateFallFlyingMovement(velocity);
+            boundingBox = boundingBox.move(velocity);
+            if (!mc.level.noCollision(null, boundingBox, true)) {
                 return true;
             }
         }

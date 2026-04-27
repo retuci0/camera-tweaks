@@ -8,11 +8,10 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
 import me.retucio.sputnik.ui.widgets.Frame;
 import me.retucio.sputnik.util.Colors;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class ModuleFrame extends Frame<ModuleButton> {
 
     public boolean extended;
 
-    public MinecraftClient mc = MinecraftClient.getInstance();
+    public Minecraft mc = Minecraft.getInstance();
 
     public ModuleFrame(int x, int y, int w, int h) {
         super("módulos", x, y, w, h);
@@ -33,7 +32,6 @@ public class ModuleFrame extends Frame<ModuleButton> {
         int offset = h;
         for (Module module : ModuleManager.INSTANCE.getModules()) {
             buttons.add(new ModuleButton(module, this, offset));
-            updateWidth();
             offset += h;
         }
     }
@@ -41,31 +39,30 @@ public class ModuleFrame extends Frame<ModuleButton> {
     @Override
     protected void updateWidth() {
         // asegurarse de que todos los botones caben en el marco, haciendo que la anchura se ajuste al texto más largo
-        if (mc.textRenderer == null) return;
 
-        int maxWidth = mc.textRenderer.getWidth(title);
+        int maxWidth = mc.font.width(title);
         for (ModuleButton button : buttons) {
             String text = button.getModule().getName();
-            int textWidth = mc.textRenderer.getWidth(text);
+            int textWidth = mc.font.width(text);
             maxWidth = Math.max(maxWidth, textWidth);
         }
         this.w = maxWidth + 22;
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         updateWidth();
-        ctx.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB()); // cabeza del marco
+        gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB()); // cabeza del marco
 
         // título del marco
-        ctx.drawText(mc.textRenderer, Text.literal(Formatting.BOLD + title),
+        gui.text(mc.font, Component.literal(ChatFormatting.BOLD + title),
                 x + 8,
-                renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
+                renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
 
-        ctx.drawText(mc.textRenderer, extended ? "-" : "+",
-                x + w - mc.textRenderer.getWidth("+") - 8,  // '+' y '-' tienen la misma anchura, o sea que no importa cuál use
-                renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
+        gui.text(mc.font, extended ? "-" : "+",
+                x + w - mc.font.width("+") - 8,  // '+' y '-' tienen la misma anchura, o sea que no importa cuál use
+                renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
 
         List<ModuleButton> visibleButtons = buttons.stream()
@@ -75,7 +72,7 @@ public class ModuleFrame extends Frame<ModuleButton> {
         // dibujar sus módulos solo si está extendido
         if (extended) {
             totalHeight = visibleButtons.size() * h + 3;
-            ctx.fill(  // fondo para los botones
+            gui.fill(  // fondo para los botones
                     x, renderY + h + 1,
                     x + w, renderY + h + totalHeight,
                     Colors.frameBGColor.getRGB());
@@ -84,7 +81,7 @@ public class ModuleFrame extends Frame<ModuleButton> {
             int buttonY =  renderY + h + 1;
             for (ModuleButton moduleButton : visibleButtons) {
                 moduleButton.setOffset(buttonY - renderY);
-                moduleButton.render(ctx, mouseX, mouseY, delta);
+                moduleButton.render(gui, mouseX, mouseY, delta);
                 buttonY += h;
             }
         } else {
@@ -135,12 +132,6 @@ public class ModuleFrame extends Frame<ModuleButton> {
         if (isHovered(mouseX, mouseY))
             Sputnik.EVENT_BUS.post(new ModuleFrameEvent.Move());
     }
-
-    @Override
-    public void mouseDragged(int mouseX, int mouseY) {}
-
-    @Override
-    public void onKey(int key, int action) {}
 
     // actualizar la posición al arrastrar el marco
     public void updatePosition(double mouseX, double mouseY) {

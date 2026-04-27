@@ -1,20 +1,20 @@
 package me.retucio.sputnik.module.modules.misc;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.input.ClientClickEvent;
-import me.retucio.sputnik.mixin.mixins.io.ScreenshotRecorderMixin;
+import me.retucio.sputnik.mixin.mixins.io.ScreenshotMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -27,7 +27,7 @@ import java.io.IOException;
 
 
 /** continúa en:
- * @see ScreenshotRecorderMixin
+ * @see ScreenshotMixin
  */
 
 public class ScreenshotPlus extends Module {
@@ -52,7 +52,7 @@ public class ScreenshotPlus extends Module {
     }
 
     public void sendScreenshotMessage() {
-        MutableText baseText = Text.literal("captura de pantalla tomada\n");
+        MutableComponent baseText = Component.literal("captura de pantalla tomada\n");
         if (saveButton.getValue() && !defaultAction.is(ScreenshotActions.SAVE)) baseText.append(getSaveButton().append(" "));
         if (copyButton.getValue()) baseText.append(getCopyButton().append(" "));
         if (openButton.getValue() && defaultAction.is(ScreenshotActions.SAVE)) baseText.append(getOpenButton().append(" "));
@@ -68,7 +68,7 @@ public class ScreenshotPlus extends Module {
             BufferedImage bufferedImage = new BufferedImage(nativeImage.getWidth(), nativeImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
             for (int x = 0; x < nativeImage.getWidth(); x++)
                 for (int y = 0; y < nativeImage.getHeight(); y++)
-                    bufferedImage.setRGB(x, y, nativeImage.getColorArgb(x, y));
+                    bufferedImage.setRGB(x, y, nativeImage.getPixel(x, y));
 
             ScreenshotPlus.TransferableImage trans = new TransferableImage(bufferedImage);
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans, null);
@@ -84,11 +84,11 @@ public class ScreenshotPlus extends Module {
     }
 
     public void saveScreenshot(NativeImage image) throws IOException {
-        image.writeTo(screenshotFile);
-        ChatUtil.info(Text.literal("captura guardada como: ").append(
-                Text.literal(screenshotFile.getName())
-                        .formatted(Formatting.UNDERLINE)
-                        .styled(style -> style.withClickEvent(new ClickEvent.OpenFile(screenshotFile.getAbsoluteFile())))
+        image.writeToFile(screenshotFile);
+        ChatUtil.info(Component.literal("captura guardada como: ").append(
+                Component.literal(screenshotFile.getName())
+                        .withStyle(ChatFormatting.UNDERLINE)
+                        .withStyle(style -> style.withClickEvent(new ClickEvent.OpenFile(screenshotFile.getAbsoluteFile())))
                 )
         );
     }
@@ -128,16 +128,16 @@ public class ScreenshotPlus extends Module {
     // botones para el mensaje
 
     @SuppressWarnings("DataFlowIssue")
-    private MutableText getSaveButton() {
-        MutableText button = Text.literal("[GUARDAR]");
-        MutableText hintBaseText = Text.literal("");
+    private MutableComponent getSaveButton() {
+        MutableComponent button = Component.literal("[GUARDAR]");
+        MutableComponent hintBaseText = Component.literal("");
 
-        MutableText hintMsg = Text.literal(ScreenshotActions.SAVE.toString());
-        hintMsg.setStyle(hintBaseText.getStyle().withFormatting(Formatting.GRAY));
+        MutableComponent hintMsg = Component.literal(ScreenshotActions.SAVE.toString());
+        hintMsg.setStyle(hintBaseText.getStyle().applyFormat(ChatFormatting.GRAY));
         hintBaseText.append(hintMsg);
 
         button.setStyle(button.getStyle()
-                .withFormatting(Formatting.BOLD, Formatting.GOLD)
+                .applyFormats(ChatFormatting.BOLD, ChatFormatting.GOLD)
                 .withClickEvent(new ClientClickEvent(CommandManager.getCommandByName("guardarcaptura").toString()))
                 .withHoverEvent(new HoverEvent.ShowText(hintBaseText)));
 
@@ -145,32 +145,32 @@ public class ScreenshotPlus extends Module {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    private MutableText getCopyButton() {
-        MutableText button = Text.literal("[COPIAR]");
-        MutableText hintBaseText = Text.literal("");
+    private MutableComponent getCopyButton() {
+        MutableComponent button = Component.literal("[COPIAR]");
+        MutableComponent hintBaseText = Component.literal("");
 
-        MutableText hintMsg = Text.literal(ScreenshotActions.COPY.toString());
-        hintMsg.setStyle(hintBaseText.getStyle().withFormatting(Formatting.GRAY));
+        MutableComponent hintMsg = Component.literal(ScreenshotActions.COPY.toString());
+        hintMsg.setStyle(hintBaseText.getStyle().withColor(ChatFormatting.GRAY));
         hintBaseText.append(hintMsg);
 
         button.setStyle(button.getStyle()
-                .withFormatting(Formatting.BOLD, Formatting.AQUA)
+                .applyFormats(ChatFormatting.BOLD, ChatFormatting.AQUA)
                 .withClickEvent(new ClientClickEvent(CommandManager.getCommandByName("copiarcaptura").toString()))
                 .withHoverEvent(new HoverEvent.ShowText(hintBaseText)));
 
         return button;
     }
 
-    private MutableText getOpenButton() {
-        MutableText button = Text.literal("[ABRIR]");
-        MutableText hintBaseText = Text.literal("");
+    private MutableComponent getOpenButton() {
+        MutableComponent button = Component.literal("[ABRIR]");
+        MutableComponent hintBaseText = Component.literal("");
 
-        MutableText hintMsg = Text.literal("abrir archivo de imagen");
-        hintMsg.setStyle(hintBaseText.getStyle().withFormatting(Formatting.GRAY));
+        MutableComponent hintMsg = Component.literal("abrir archivo de imagen");
+        hintMsg.setStyle(hintBaseText.getStyle().applyFormats(ChatFormatting.GRAY));
         hintBaseText.append(hintMsg);
 
         button.setStyle(button.getStyle()
-                .withFormatting(Formatting.BOLD, Formatting.GRAY)
+                .applyFormats(ChatFormatting.BOLD, ChatFormatting.GRAY)
                 .withClickEvent(new ClickEvent.OpenFile(screenshotFile))
                 .withHoverEvent(new HoverEvent.ShowText(hintBaseText)));
 
@@ -178,16 +178,16 @@ public class ScreenshotPlus extends Module {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    private MutableText getDiscardButton() {
-        MutableText button = Text.literal("[DESCARTAR]");
-        MutableText hintBaseText = Text.literal("");
+    private MutableComponent getDiscardButton() {
+        MutableComponent button = Component.literal("[DESCARTAR]");
+        MutableComponent hintBaseText = Component.literal("");
 
-        MutableText hintMsg = Text.literal(ScreenshotActions.NONE.toString());
-        hintMsg.setStyle(hintBaseText.getStyle().withFormatting(Formatting.GRAY));
+        MutableComponent hintMsg = Component.literal(ScreenshotActions.NONE.toString());
+        hintMsg.setStyle(hintBaseText.getStyle().applyFormats(ChatFormatting.GRAY));
         hintBaseText.append(hintMsg);
 
         button.setStyle(button.getStyle()
-                .withFormatting(Formatting.BOLD, Formatting.DARK_RED)
+                .applyFormats(ChatFormatting.BOLD, ChatFormatting.DARK_RED)
                 .withClickEvent(new ClientClickEvent(CommandManager.getCommandByName("purgar").toString("1")))
                 .withHoverEvent(new HoverEvent.ShowText(hintBaseText)));
 

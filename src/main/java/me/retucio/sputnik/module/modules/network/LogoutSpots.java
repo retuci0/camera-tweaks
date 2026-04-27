@@ -1,6 +1,7 @@
 package me.retucio.sputnik.module.modules.network;
 
 import com.github.retucio.neutrino.EventListener;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.retucio.sputnik.event.network.AddEntityEvent;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
@@ -13,15 +14,14 @@ import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.MiscUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.phys.AABB;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -48,8 +48,8 @@ public class LogoutSpots extends Module {
     private final BooleanSetting dummy = sgMisc.add(new BooleanSetting("monigote", "spawnear un monigote para marcar la posición", true));
 
     private final List<LogoutEntry> players = new ArrayList<>();
-    private final List<PlayerListEntry> lastPlayerList = new ArrayList<>();
-    private final List<PlayerEntity> lastPlayers = new ArrayList<>();
+    private final List<PlayerInfo> lastPlayerList = new ArrayList<>();
+    private final List<Player> lastPlayers = new ArrayList<>();
 
     private int timer;
     private DimensionType lastDimension;
@@ -76,15 +76,15 @@ public class LogoutSpots extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.getNetworkHandler() != null) {
+        if (mc.getConnection() != null) {
             lastPlayerList.clear();
-            lastPlayerList.addAll(mc.getNetworkHandler().getPlayerList());
+            lastPlayerList.addAll(mc.getConnection().getOnlinePlayers());
         }
 
         updateLastPlayers();
 
         timer = 10;
-        if (mc.world != null) lastDimension = mc.world.getDimension();
+        if (mc.level != null) lastDimension = mc.level.dimensionType();
 
         super.onEnable();
     }
@@ -102,22 +102,22 @@ public class LogoutSpots extends Module {
 
     @Override
     public void onTick() {
-        if (mc.world == null || mc.getNetworkHandler() == null) return;
+        if (mc.level == null || mc.getConnection() == null) return;
 
-        if (mc.getNetworkHandler().getPlayerList().size() != lastPlayerList.size()) {
-            for (PlayerListEntry entry : lastPlayerList) {
-                boolean stillOnline = mc.getNetworkHandler().getPlayerList().stream()
+        if (mc.getConnection().getOnlinePlayers().size() != lastPlayerList.size()) {
+            for (PlayerInfo entry : lastPlayerList) {
+                boolean stillOnline = mc.getConnection().getOnlinePlayers().stream()
                         .anyMatch(playerEntry -> playerEntry.getProfile().id().equals(entry.getProfile().id()));
 
                 if (stillOnline) continue;
 
                 // encontrar al jugador que se ha desconectado
-                for (PlayerEntity player : lastPlayers) {
-                    if (player.getUuid().equals(entry.getProfile().id())) {
+                for (Player player : lastPlayers) {
+                    if (player.getUUID().equals(entry.getProfile().id())) {
                         LogoutEntry logoutEntry = new LogoutEntry(player);
 
-                        if (mc.world != null && !mc.world.hasEntity(logoutEntry.dummy) && dummy.getValue())
-                            mc.world.addEntity(logoutEntry.dummy);
+                        if (mc.level != null && !mc.level.isTickingEntity(logoutEntry.dummy) && dummy.getValue())
+                            mc.level.addEntity(logoutEntry.dummy);
 
                         addLogoutSpot(logoutEntry);
                         break;
@@ -126,7 +126,7 @@ public class LogoutSpots extends Module {
             }
 
             lastPlayerList.clear();
-            lastPlayerList.addAll(mc.getNetworkHandler().getPlayerList());
+            lastPlayerList.addAll(mc.getConnection().getOnlinePlayers());
             updateLastPlayers();
         }
 
@@ -138,12 +138,12 @@ public class LogoutSpots extends Module {
         }
 
         // borrar todos los logout spots al cambiar de dimensión
-        DimensionType currentDimension = mc.world.getDimension();
+        DimensionType currentDimension = mc.level.dimensionType();
         if (currentDimension != lastDimension) {
             for (LogoutEntry entry : players) {
                 if (entry.dummy != null) {
                     entry.dummy.remove(Entity.RemovalReason.KILLED);
-                    entry.dummy.onRemoved();
+                    entry.dummy.onClientRemoval();
                 }
             }
             players.clear();
@@ -153,13 +153,13 @@ public class LogoutSpots extends Module {
 
     @EventListener
     private void onEntityAdded(AddEntityEvent event) {
-        if (event.getEntity() instanceof PlayerEntity player) {
+        if (event.getEntity() instanceof Player player) {
             for (LogoutEntry entry : players) {
-                if (entry.uuid.equals(player.getUuid())) {
-                    if (entry.dummy != null && mc.world != null) {
-                        if (mc.world.getEntityById(entry.dummy.getId()) != null) {
+                if (entry.uuid.equals(player.getUUID())) {
+                    if (entry.dummy != null && mc.level != null) {
+                        if (mc.level.getEntity(entry.dummy.getId()) != null) {
                             entry.dummy.remove(Entity.RemovalReason.KILLED);
-                            entry.dummy.onRemoved();
+                            entry.dummy.onClientRemoval();
                         }
                     }
                     players.remove(entry);
@@ -171,7 +171,7 @@ public class LogoutSpots extends Module {
 
     @EventListener
     private void onWorldRender(Render3DEvent event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         for (LogoutEntry entry : players)
             entry.renderBox(event.getMatrices());
@@ -180,10 +180,10 @@ public class LogoutSpots extends Module {
     private void addLogoutSpot(LogoutEntry entry) {
         for (LogoutEntry e : players) {
             if (e.uuid.equals(entry.uuid)) {
-                if (e.dummy != null && mc.world != null) {
-                    if (mc.world.getEntityById(e.dummy.getId()) != null) {
+                if (e.dummy != null && mc.level != null) {
+                    if (mc.level.getEntity(e.dummy.getId()) != null) {
                         e.dummy.remove(Entity.RemovalReason.KILLED);
-                        e.dummy.onRemoved();
+                        e.dummy.onClientRemoval();
                     }
                 }
                 players.remove(e);
@@ -195,11 +195,11 @@ public class LogoutSpots extends Module {
     }
 
     private void updateLastPlayers() {
-        if (mc.world == null) return;
+        if (mc.level == null) return;
 
         lastPlayers.clear();
-        for (Entity entity : mc.world.getEntities())
-            if (entity instanceof PlayerEntity player && player != mc.player)
+        for (Entity entity : mc.level.getEntities().getAll())
+            if (entity instanceof Player player && player != mc.player)
                 lastPlayers.add(player);
     }
 
@@ -207,7 +207,7 @@ public class LogoutSpots extends Module {
         for (LogoutEntry entry : players) {
             if (entry.dummy != null) {
                 entry.dummy.remove(Entity.RemovalReason.KILLED);
-                entry.dummy.onRemoved();
+                entry.dummy.onClientRemoval();
             }
         }
     }
@@ -223,45 +223,45 @@ public class LogoutSpots extends Module {
         public final String logoutTime;
 
         public final String dummyName;
-        public final OtherClientPlayerEntity dummy;
+        public final RemotePlayer dummy;
 
-        public LogoutEntry(PlayerEntity player) {
-            this.halfWidth = player.getWidth() / 2;
+        public LogoutEntry(Player player) {
+            this.halfWidth = player.getBbWidth() / 2;
             this.x = player.getX() - halfWidth;
             this.y = player.getY();
             this.z = player.getZ() - halfWidth;
 
-            Box box = player.getBoundingBox();
-            this.xWidth = box.getLengthX();
-            this.zWidth = box.getLengthZ();
-            this.height = box.getLengthY();
+            AABB box = player.getBoundingBox();
+            this.xWidth = box.getXsize();
+            this.zWidth = box.getYsize();
+            this.height = box.getZsize();
 
-            this.uuid = player.getUuid();
+            this.uuid = player.getUUID();
             this.name = player.getName().getString();
             this.logoutTime = MiscUtil.getCurrentFormattedTime();
 
             this.dummyName = name + " (" + logoutTime + ")";
             this.dummy = ModuleManager.INSTANCE.getModuleByClass(FakePlayer.class).addPlayer(player, dummyName);
 
-            this.dummy.updatePositionAndAngles(x + halfWidth, y, z + halfWidth,
-                    player.getYaw(), player.getPitch());
+            this.dummy.absSnapTo(x + halfWidth, y, z + halfWidth,
+                    player.getYRot(), player.getXRot());
         }
 
-        public void renderBox(MatrixStack matrices) {
+        public void renderBox(PoseStack matrices) {
             if (fullHeight.getValue()) {
                 if (outlines.getValue())
-                    RenderUtil.drawOutlineBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), outlineColor.getValue(), lineWidth.getFloatValue(), true);
+                    RenderUtil.drawOutlineBox(matrices, new AABB(x, y, z, x + xWidth, y + height, z + zWidth), outlineColor.getValue(), lineWidth.getFloatValue(), true);
                 if (filling.getValue())
-                    RenderUtil.drawFilledBox(matrices, new Box(x, y, z, x + xWidth, y + height, z + zWidth), fillingColor.getValue(), true);
+                    RenderUtil.drawFilledBox(matrices, new AABB(x, y, z, x + xWidth, y + height, z + zWidth), fillingColor.getValue(), true);
             } else {
                 if (outlines.getValue()) {
                     RenderUtil.drawBlockFaceOutlines(matrices,
-                            BlockPos.ofFloored(x + halfWidth, y, z + halfWidth),
+                            BlockPos.containing(x + halfWidth, y, z + halfWidth),
                             Direction.UP, outlineColor.getValue(), lineWidth.getFloatValue(), true);
                 }
                 if (filling.getValue()) {
                     RenderUtil.drawBlockFaceFilled(matrices,
-                            BlockPos.ofFloored(x + halfWidth, y, z + halfWidth),
+                            BlockPos.containing(x + halfWidth, y, z + halfWidth),
                             Direction.UP, fillingColor.getValue(), 0.001f, true);
                 }
             }

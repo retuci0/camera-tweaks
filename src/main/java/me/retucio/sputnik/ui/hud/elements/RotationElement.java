@@ -3,36 +3,40 @@ package me.retucio.sputnik.ui.hud.elements;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.TextHudElement;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
+
 
 public class RotationElement extends TextHudElement {
 
     public RotationElement() {
-        super("rotation", mc.getWindow().getScaledWidth() - mc.textRenderer.getWidth("180º 180º (N)"), mc.getWindow().getScaledHeight() - mc.textRenderer.fontHeight);
+        super("rotation",
+                mc.getWindow().getGuiScaledWidth() - mc.font.width("180° 180° (N)"),
+                mc.getWindow().getGuiScaledHeight() - mc.font.lineHeight
+        );
     }
 
     @Override
     public String getText(float delta, HUD hud) {
         if (mc.player == null) return getPreviewText();
-        return String.format("%.2f", mc.player.getYaw() % 360) + "º " + String.format("%.2f", mc.player.getPitch()) + "º (" + getDirection() + ")";
+        return String.format("%.2f", mc.player.getYRot() % 360) + "° " + String.format("%.2f", mc.player.getXRot()) + "° (" + getDirection() + ")";
     }
 
     @Override
     public String getPreviewText() {
         if (mc.player == null)
-            return "69º 69º (W)";
-        return getText(mc.getRenderTickCounter().getDynamicDeltaTicks(), ModuleManager.INSTANCE.getModuleByClass(HUD.class));
+            return "69° 69° (W)";
+        return getText(mc.getDeltaTracker().getGameTimeDeltaTicks(), ModuleManager.INSTANCE.getModuleByClass(HUD.class));
     }
 
     @Override
-    public List<Text> getTooltip() {
+    public List<Component> getTooltip() {
         return List.of();
     }
 
     private String getDirection() {
-        return switch (mc.player.getHorizontalFacing()) {
+        return switch (mc.player.getDirection()) {
             case NORTH -> "N";
             case SOUTH -> "S";
             case EAST -> "E";

@@ -6,13 +6,11 @@ import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.render.Nametags;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,36 +27,36 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
     Nametags nametags;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void getModules(EntityRendererFactory.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
+    private void getModules(CallbackInfo ci) {
         nametags = ModuleManager.INSTANCE.getModuleByClass(Nametags.class);
     }
 
-    @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;getCameraEntity()Lnet/minecraft/entity/Entity;"))
-    private Entity hasLabelGetCameraEntityProxy(Entity cameraEntity) {
-        return ModuleManager.INSTANCE.getModuleByClass(Freecam.class).isEnabled() ? null : cameraEntity;
+    @ModifyExpressionValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getCameraEntity()Lnet/minecraft/world/entity/Entity;"))
+    private Entity hasLabelGetCameraEntityProxy(Entity original) {
+        return ModuleManager.INSTANCE.getModuleByClass(Freecam.class).isEnabled() ? null : original;
     }
 
-    @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSneaky()Z"))
+    @ModifyExpressionValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDiscrete()Z"))
     private boolean renderSneakingPlayerNametags(boolean original) {
         return (nametags.isEnabled() && nametags.alwaysVisible.getValue()) || original;
     }
 
-    @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z"))
+    @ModifyExpressionValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean renderInvisPlayerNametags(boolean original) {
         if (nametags.isEnabled() && nametags.alwaysVisible.getValue()) return false;
         else return original;
     }
 
-    @ModifyReturnValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At("RETURN"))
+    @ModifyReturnValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At("RETURN"))
     private boolean shouldRenderPlayerNametag(boolean original, @Local(argsOnly = true) T livingEntity) {
-        if (nametags.isEnabled() && livingEntity instanceof PlayerEntity)
+        if (nametags.isEnabled() && livingEntity instanceof Player)
             return nametags.entities.isEnabled(EntityType.PLAYER) && original;
         return original;
     }
 
-    @Inject(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At("RETURN"), cancellable = true)
     private void renderSelfNametag(T livingEntity, double d, CallbackInfoReturnable<Boolean> cir) {
-        if (livingEntity instanceof PlayerEntity player) {
+        if (livingEntity instanceof Player player) {
             if (player == mc.player && nametags.showSelf.getValue()) {
                 cir.setReturnValue(true);
                 cir.cancel();

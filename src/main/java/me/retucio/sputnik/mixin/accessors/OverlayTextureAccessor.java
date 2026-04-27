@@ -1,7 +1,7 @@
 package me.retucio.sputnik.mixin.accessors;
 
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface OverlayTextureAccessor {
 
     @Mutable @Accessor("texture")
-    void setTexture(NativeImageBackedTexture texture);
+    void setTexture(DynamicTexture texture);
 }

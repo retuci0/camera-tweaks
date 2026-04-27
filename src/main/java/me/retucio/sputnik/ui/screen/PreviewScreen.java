@@ -4,30 +4,32 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.module.modules.inventory.ShulkerPeek;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.Colors;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import org.jspecify.annotations.NonNull;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class PreviewScreen extends Screen {
 
-    private static final Identifier TEXTURE = Identifier.of(Sputnik.MOD_ID, "textures/gui/preview.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Sputnik.MOD_ID, "textures/gui/preview.png");
 
     private int x, y;
     private final int bgWidth = 176;
     private final int bgHeight = 78;
 
     private final Color color;
-    private final Text title;
+    private final Component title;
     private final List<ItemStack> inventory;
     private final Screen parent;
     private final PreviewType type;
@@ -35,24 +37,25 @@ public class PreviewScreen extends Screen {
     private int focusedSlot;
 
     public PreviewScreen(ItemStack shulker, Screen parent) {
-        super(Text.literal("previsualización del shulker"));
+        super(Component.literal("previsualización del shulker"));
         this.color = ShulkerPeek.SHULKER_COLORS.get(shulker.getItem());
-        this.title = shulker.getName();
-        this.inventory = shulker.get(DataComponentTypes.CONTAINER).stream().toList();
+        this.title = shulker.getHoverName();
+        this.inventory = shulker.get(DataComponents.CONTAINER).allItemsCopyStream().toList();
         this.parent = parent;
         this.type = PreviewType.SHULKER;
     }
 
-    public PreviewScreen(Inventory inventory, Screen parent) {
-        super(Text.literal("echest"));
+    public PreviewScreen(Container inventory, Screen parent) {
+        super(Component.literal("echest"));
         this.color = Colors.PURPLE;
-        this.title = Text.of("echest");
+        this.title = Component.literal("echest");
         this.inventory = new ArrayList<>();
         this.parent = parent;
         this.type = PreviewType.ECHEST;
 
-        for (int i = 0; i < inventory.size(); i++)
-            this.inventory.add(inventory.getStack(i));
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            this.inventory.add(inventory.getItem(i));
+        }
     }
 
     @Override
@@ -62,32 +65,33 @@ public class PreviewScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.render(ctx, mouseX, mouseY, delta);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(gui, mouseX, mouseY, delta);
 
-        this.renderBackground(ctx, mouseX, mouseY, delta);
-        this.renderItems(ctx, inventory, x + 8, y + 18);
+        this.extractBackground(gui, mouseX, mouseY, delta);
+        this.renderItems(gui, inventory, x + 8, y + 18);
 
         int selectedSlot = getSlot(mouseX, mouseY);
-        if (selectedSlot > -1 && selectedSlot < inventory.size() && !inventory.get(selectedSlot).isOf(Items.AIR))
-            renderTooltip(ctx, inventory.get(selectedSlot), mouseX, mouseY);
+        if (selectedSlot > -1 && selectedSlot < inventory.size() && !inventory.get(selectedSlot).is(Items.AIR)) {
+            renderTooltip(gui, inventory.get(selectedSlot), mouseX, mouseY);
+        }
         focusedSlot = selectedSlot;
     }
 
     @Override
-    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        ctx.fill(0, 0, width, height, Colors.hudEditorScreenBackgroundColor.getRGB());
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0, 0, bgWidth, bgHeight, 256, 256, color.getRGB());
-        ctx.drawText(textRenderer, title, x + 8, y + 6, Colors.instructionsTextColor.getRGB(), false);
+    public void extractBackground(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
+        gui.fill(0, 0, width, height, Colors.hudEditorScreenBackgroundColor.getRGB());
+        gui.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0, 0, bgWidth, bgHeight, 256, 256, color.getRGB());
+        gui.text(font, title, x + 8, y + 6, Colors.instructionsTextColor.getRGB(), false);
     }
 
-    private void renderItems(DrawContext context, List<ItemStack> inventory, int x, int y) {
+    private void renderItems(GuiGraphicsExtractor gui, List<ItemStack> inventory, int x, int y) {
         int baseX = x;
         int count = 0;
         for (ItemStack item : inventory) {
             count++;
-            context.drawItem(item, x, y);
-            context.drawStackOverlay(textRenderer, item, x, y);
+            gui.item(item, x, y);
+            gui.itemDecorations(font, item, x, y);
             x += 18;
             if (count % 9 == 0) {
                 x = baseX;
@@ -109,22 +113,22 @@ public class PreviewScreen extends Screen {
         return slotX + slotY * 9;
     }
 
-    private void renderTooltip(DrawContext ctx, ItemStack stack, int x, int y) {
-        ctx.drawItemTooltip(textRenderer, stack, x, y);
+    private void renderTooltip(GuiGraphicsExtractor gui, ItemStack stack, int x, int y) {
+        gui.setTooltipForNextFrame(font, stack, x, y);
     }
 
     @Override
-    public void close() {
-        client.setScreen(parent);
+    public void onClose() {
+        minecraft.setScreen(parent);
     }
 
     @Override
-    public void applyBlur(DrawContext ctx) {
-        if (ClientSettingsFrame.guiSettings.blur.getValue()) super.applyBlur(ctx);
+    public void extractBlurredBackground(@NonNull GuiGraphicsExtractor gui) {
+        if (ClientSettingsFrame.guiSettings.blur.getValue()) super.extractBlurredBackground(gui);
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 

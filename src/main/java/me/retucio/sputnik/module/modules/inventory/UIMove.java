@@ -7,10 +7,10 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.Lists;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.MenuType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,15 +18,15 @@ import java.util.List;
 
 public class UIMove extends Module {
 
-    public ListSetting<ScreenHandlerType<?>> screens = sgGeneral.add(new ListSetting<>("interfaces", "interfaces en las que te podrás mover",
+    public ListSetting<MenuType<?>> screens = sgGeneral.add(new ListSetting<>("interfaces", "interfaces en las que te podrás mover",
             Lists.screenList, Lists.allTrue(Lists.screenList), Lists.screenNames));
 
-    private List<KeyBinding> movementKeys;
+    private List<KeyMapping> movementKeys;
 
-    private final ScreenHandlerType<?> inventoryHandlerType = ScreenHandlerType.register(
-            "player_inventory", GenericContainerScreenHandler::createGeneric9x3);
-    private final ScreenHandlerType<?> clickGuiHandlerType = ScreenHandlerType.register(
-            "sputnik_clickgui", GenericContainerScreenHandler::createGeneric9x3);  // 9x3 porque no importa (creo)
+    private final MenuType<?> inventoryHandlerType = MenuType.register(
+            "player_inventory", ChestMenu::threeRows);
+    private final MenuType<?> clickGuiHandlerType = MenuType.register(
+            "sputnik_clickgui", ChestMenu::threeRows);  // 9x3 porque no importa (creo)
 
     public UIMove() {
         super("moverse en interfaz",
@@ -42,13 +42,13 @@ public class UIMove extends Module {
     @Override
     public void onEnable() {
         movementKeys = Arrays.asList(
-                mc.options.forwardKey,
-                mc.options.backKey,
-                mc.options.leftKey,
-                mc.options.rightKey,
-                mc.options.jumpKey,
-                mc.options.sneakKey,
-                mc.options.sprintKey);
+                mc.options.keyUp,
+                mc.options.keyDown,
+                mc.options.keyLeft,
+                mc.options.keyRight,
+                mc.options.keyJump,
+                mc.options.keyShift,
+                mc.options.keySprint);
         super.onEnable();
     }
 
@@ -60,15 +60,15 @@ public class UIMove extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.options == null || mc.currentScreen == null) return;
+        if (mc.player == null || mc.screen == null) return;
 
-        ScreenHandlerType<?> handler = null;
-        if (mc.currentScreen == ClickGUI.INSTANCE)
+        MenuType<?> handler = null;
+        if (mc.screen == ClickGUI.INSTANCE)
             handler = clickGuiHandlerType;
 
-        if (mc.currentScreen instanceof HandledScreen<?> screen) {
+        if (mc.screen instanceof AbstractContainerScreen<?> screen) {
             try {
-                handler = screen.getScreenHandler().getType();
+                handler = screen.getMenu().getType();
             } catch (UnsupportedOperationException e) {
                 handler = inventoryHandlerType;
             }
@@ -76,15 +76,15 @@ public class UIMove extends Module {
 
         if (handler == null || !screens.isEnabled(handler)) return;
 
-        for (KeyBinding kb : movementKeys) {
-            kb.setPressed(KeyUtil.isKeyDown(KeyUtil.getKey(kb)));
+        for (KeyMapping kb : movementKeys) {
+            kb.setDown(KeyUtil.isKeyDown(KeyUtil.getKey(kb)));
         }
     }
 
     private void unpress() {
         if (movementKeys == null) return;
-        for (KeyBinding kb : movementKeys) {
-            kb.setPressed(false);
+        for (KeyMapping kb : movementKeys) {
+            kb.setDown(false);
         }
     }
 }

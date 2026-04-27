@@ -7,10 +7,11 @@ import me.retucio.sputnik.mixin.accessors.AbstractSignEditScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+
 
 public class AutoSign extends Module {
 
@@ -39,20 +40,20 @@ public class AutoSign extends Module {
         if (event.getScreen() instanceof AbstractSignEditScreen screen && text != null && mc != null && mc.player != null) {
             event.cancel();
             SignBlockEntity sign = ((AbstractSignEditScreenAccessor) screen).getBlockEntity();
-            fillText(sign.getPos(), sign.isPlayerFacingFront(mc.player), text);
+            fillText(sign.getBlockPos(), sign.isFacingFrontText(mc.player), text);
         }
     }
 
     @EventListener
     private void onSendPacket(PacketEvent.Send event) {
-        if (event.getPacket() instanceof UpdateSignC2SPacket packet) {
-            if (text == null) text = packet.getText().clone();
-            else System.arraycopy(text, 0, packet.getText(), 0, 4);
+        if (event.getPacket() instanceof ServerboundSignUpdatePacket packet) {
+            if (text == null) text = packet.getLines().clone();
+            else System.arraycopy(text, 0, packet.getLines(), 0, 4);
         }
     }
 
     private void fillText(BlockPos blockPos, boolean front, String[] text) {
-        mc.getNetworkHandler().sendPacket(new UpdateSignC2SPacket(
+        mc.getConnection().send(new ServerboundSignUpdatePacket(
             blockPos, front, text[0], text[1], text[2], text[3]
         ));
     }

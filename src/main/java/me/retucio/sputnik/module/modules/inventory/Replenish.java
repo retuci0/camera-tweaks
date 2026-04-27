@@ -10,11 +10,11 @@ import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.InventoryUtil;
 import me.retucio.sputnik.util.Lists;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,16 +91,16 @@ public class Replenish extends Module {
     private void onUseItem(UseItemEvent event) {
         if (mc.player == null) return;
 
-        Hand hand = event.getHand();
+        InteractionHand hand = event.getHand();
         int usedSlot = getSlotFromHand(hand);
         if (usedSlot == -1) return;
 
-        ItemStack usedStack = hand == Hand.MAIN_HAND ? mc.player.getMainHandStack() : mc.player.getOffHandStack();
+        ItemStack usedStack = hand == InteractionHand.MAIN_HAND ? mc.player.getMainHandItem() : mc.player.getOffhandItem();
         if (usedStack.isEmpty()) return;
 
         if (excludedItems.isEnabled(usedStack.getItem())) return;
-        if (!unstackable.getValue() && usedStack.getMaxCount() == 1) return;
-        if (!offhand.getValue() && hand == Hand.OFF_HAND) return;
+        if (!unstackable.getValue() && usedStack.getMaxStackSize() == 1) return;
+        if (!offhand.getValue() && hand == InteractionHand.OFF_HAND) return;
 
         pendingTasks.remove(usedSlot);
         pendingTasks.put(usedSlot, new ReplenishTask(usedSlot, usedStack.getItem(), tickDelay.getIntValue()));
@@ -113,36 +113,31 @@ public class Replenish extends Module {
 
     private void executeReplenish(int slot, Item item) {
         if (mc.player == null) return;
-        PlayerInventory inv = mc.player.getInventory();
+        Inventory inv = mc.player.getInventory();
 
-        // Get current stack in the slot
-        ItemStack currentStack = inv.getStack(slot);
-        if (currentStack.isEmpty() || !currentStack.isOf(item)) {
-            return; // item changed or slot empty – abort
+        ItemStack currentStack = inv.getItem(slot);
+        if (currentStack.isEmpty() || !currentStack.is(item)) {
+            return;
         }
 
-        // Check threshold
         if (currentStack.getCount() > minCount.getIntValue()) {
-            return; // still above threshold
+            return;
         }
 
-        // Find another stack of the same item in the inventory (excluding the used slot and possibly offhand)
         List<Integer> excludeSlots = new ArrayList<>();
         excludeSlots.add(slot);
         if (!offhand.getValue()) {
             excludeSlots.add(InventoryUtil.OFFHAND_SLOT);
         }
 
-        PlayerScreenHandler handler = mc.player.playerScreenHandler;
+        InventoryMenu handler = mc.player.inventoryMenu;
         int sourceContainerSlot = -1;
 
-        // Iterate over all player inventory slots (0-40)
         for (int playerIndex = 0; playerIndex <= 40; playerIndex++) {
             if (excludeSlots.contains(playerIndex)) continue;
 
-            ItemStack stack = inv.getStack(playerIndex);
-            if (!stack.isEmpty() && stack.isOf(item) && ItemStack.areItemsAndComponentsEqual(stack, currentStack)) {
-                // Found a match, convert to container slot
+            ItemStack stack = inv.getItem(playerIndex);
+            if (!stack.isEmpty() && stack.is(item) && ItemStack.isSameItemSameComponents(stack, currentStack)) {
                 int containerSlot = InventoryUtil.getContainerSlotByPlayerIndex(handler, playerIndex);
                 if (containerSlot != -1) {
                     sourceContainerSlot = containerSlot;
@@ -151,18 +146,17 @@ public class Replenish extends Module {
             }
         }
 
-        if (sourceContainerSlot == -1) return; // no source found
+        if (sourceContainerSlot == -1) return;
 
-        // Target container slot is the used slot
         int targetContainerSlot = InventoryUtil.getContainerSlotByPlayerIndex(handler, slot);
         if (targetContainerSlot == -1) return;
 
         InventoryUtil.swapSlots(sourceContainerSlot, targetContainerSlot, handler);
     }
 
-    private int getSlotFromHand(Hand hand) {
+    private int getSlotFromHand(InteractionHand hand) {
         if (mc.player == null) return -1;
-        if (hand == Hand.MAIN_HAND) {
+        if (hand == InteractionHand.MAIN_HAND) {
             return mc.player.getInventory().getSelectedSlot();
         } else {
             return InventoryUtil.OFFHAND_SLOT;  // 40

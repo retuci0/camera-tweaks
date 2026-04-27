@@ -6,16 +6,17 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.EntityUtil;
-import net.minecraft.entity.EyeOfEnderEntity;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.projectile.EyeOfEnder;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 
 // https://benwoodworth.com/minecraft/stronghold-calculator/index.js
 public class StrongholdTriangulator extends Module {
@@ -29,12 +30,12 @@ public class StrongholdTriangulator extends Module {
     private boolean firstEyeThrown;
     private boolean secondEyeThrown;
 
-    private Vec3d a;
-    private Vec3d b;
+    private Vec3 a;
+    private Vec3 b;
     private float alpha;
     private float beta;
 
-    // usar un ejecutor retrasado para esperar a que el ojo de ender adquiera su ángulo
+    // usar un ejecutor programado (no retrasado jajsj) para esperar a que el ojo de ender adquiera su ángulo
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Override
@@ -53,17 +54,17 @@ public class StrongholdTriangulator extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         if (firstEyeThrown && secondEyeThrown) {
             StrongholdResult result = getIntersection();
 
             if (result != null) {
                 if (result.errorMessage == null) {
-                    ChatUtil.info(Text.literal("stronghold aproximadamente en: "
-                            + Formatting.GREEN
+                    ChatUtil.info(Component.literal("stronghold aproximadamente en: "
+                            + ChatFormatting.GREEN
                             + String.format("%.2f, %.2f", result.x, result.z)
-                            + Formatting.RESET
+                            + ChatFormatting.RESET
                     ));
                 } else {
                     ChatUtil.error(result.errorMessage);
@@ -78,40 +79,36 @@ public class StrongholdTriangulator extends Module {
 
     @EventListener
     private void onAddEntity(AddEntityEvent event) {
-        if (mc.player == null || mc.world == null) return;
-        if (mc.player.getStackInHand(Hand.MAIN_HAND).getItem() != Items.ENDER_EYE) return;
+        if (mc.player == null || mc.level == null) return;
+        if (mc.player.getItemInHand(InteractionHand.MAIN_HAND).getItem() != Items.ENDER_EYE) return;
 
-        if (event.getEntity() instanceof EyeOfEnderEntity eye) {
-            Vec3d throwPos = mc.player.getEntityPos();
+        if (event.getEntity() instanceof EyeOfEnder eye) {
+            Vec3 throwPos = mc.player.position();
             int entityId = eye.getId();
 
             scheduler.schedule(() -> {
                 // ejecutar en el hilo principal
                 mc.execute(() -> {
-                    EyeOfEnderEntity currentEye = findEyeEntity(entityId);
+                    EyeOfEnder currentEye = findEyeEntity(entityId);
                     if (currentEye != null) {
-                        Vec3d eyeTargetPos = eye.getEntityPos();
+                        Vec3 eyeTargetPos = eye.position();
 
-                        if (eyeTargetPos != null) {
-                            float yaw = (float) EntityUtil.getYaw(eyeTargetPos);
+                        float yaw = (float) EntityUtil.getYaw(eyeTargetPos);
 
-                            if (!firstEyeThrown) {
-                                a = throwPos;
-                                alpha = yaw;
-                                firstEyeThrown = true;
-                                ChatUtil.info("primer ojo registrado: "
-                                        + String.format("%.1f, %.1f (%.1f°)", a.x, a.z, alpha));
-                                ChatUtil.info("ahora muévete unos 200 bloques en una dirección distinta a la del ojo para lanzar el segundo");
-                                ChatUtil.info("cuanta más distancia te separes, más preciso será el resultado");
-                            } else if (!secondEyeThrown) {
-                                b = throwPos;
-                                beta = yaw;
-                                secondEyeThrown = true;
-                                ChatUtil.info("segundo ojo registrado: " +
-                                        String.format("%.1f, %.1f (%.1f°)", b.x, b.z, beta));
-                            }
-                        } else {
-                            ChatUtil.error("upsi dupsi");
+                        if (!firstEyeThrown) {
+                            a = throwPos;
+                            alpha = yaw;
+                            firstEyeThrown = true;
+                            ChatUtil.info("primer ojo registrado: "
+                                    + String.format("%.1f, %.1f (%.1f°)", a.x, a.z, alpha));
+                            ChatUtil.info("ahora muévete unos 200 bloques en una dirección distinta a la del ojo para lanzar el segundo");
+                            ChatUtil.info("cuanta más distancia te separes, más preciso será el resultado");
+                        } else if (!secondEyeThrown) {
+                            b = throwPos;
+                            beta = yaw;
+                            secondEyeThrown = true;
+                            ChatUtil.info("segundo ojo registrado: " +
+                                    String.format("%.1f, %.1f (%.1f°)", b.x, b.z, beta));
                         }
                     }
                 });
@@ -119,9 +116,9 @@ public class StrongholdTriangulator extends Module {
         }
     }
 
-    private EyeOfEnderEntity findEyeEntity(int entityId) {
-        if (mc.world == null) return null;
-        return (EyeOfEnderEntity) mc.world.getEntityById(entityId);
+    private EyeOfEnder findEyeEntity(int entityId) {
+        if (mc.level == null) return null;
+        return (EyeOfEnder) mc.level.getEntity(entityId);
     }
 
     private StrongholdResult getIntersection() {

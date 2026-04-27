@@ -8,11 +8,11 @@ import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.resources.language.I18n;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -30,16 +30,16 @@ public class BindButton extends SettingButton<KeySetting> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         int bgColor = isHovered(mouseX, mouseY)
                 ? Colors.buttonColor.brighter().getRGB()
                 : Colors.buttonColor.getRGB();
-        ctx.fill(x, y, x + w, y + h, bgColor);
+        gui.fill(x, y, x + w, y + h, bgColor);
 
         // texto
         String label = setting.getName() + ": " + (listening ? "..." : setting.getKeyName());
-        ctx.drawText(mc.textRenderer, label, x + 5, y + 3, -1, true);
+        gui.text(mc.font, label, x + 5, y + 3, -1, true);
     }
 
     @Override
@@ -48,15 +48,15 @@ public class BindButton extends SettingButton<KeySetting> {
 
         if (hovered && ClickGUI.INSTANCE.trySelect(this)) {
             if (listening) {
-                List<KeyBinding> keys = new ArrayList<>(List.of(mc.options.allKeys));
+                List<KeyMapping> keys = new ArrayList<>(List.of(mc.options.keyMappings));
                 keys.removeAll(List.of(mc.options.debugKeys));
                 boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
 
-                for (KeyBinding bind : keys) {
-                    if (bind.matchesKey(new KeyInput(button, 0, 0))) {
+                for (KeyMapping bind : keys) {
+                    if (bind.matches(new KeyEvent(button, 0, 0))) {
                         if (!allowMultiple) {
                             ChatUtil.warn("esa tecla ya está cogida por "
-                                    + Formatting.GREEN + "\"" + I18n.translate(bind.getId()) + "\"");
+                                    + ChatFormatting.GREEN + "\"" + I18n.get(bind.getName()) + "\"");
                             listening = false;
                             return;
                         }
@@ -85,16 +85,16 @@ public class BindButton extends SettingButton<KeySetting> {
         if (key == GLFW.GLFW_KEY_ESCAPE) {
             setting.setValue(GLFW.GLFW_KEY_UNKNOWN);
         } else {
-            List<KeyBinding> keys = new ArrayList<>(List.of(mc.options.allKeys));
+            List<KeyMapping> keys = new ArrayList<>(List.of(mc.options.keyMappings));
             keys.removeAll(List.of(mc.options.debugKeys));
-            for (KeyBinding bind : keys) {
+            for (KeyMapping bind : keys) {
                 // no permitir usar la misma tecla para varias acciones, si el ajuste para esto está activado
-                boolean keyAlreadyBound = bind.matchesKey(new KeyInput(key, 0, 0));
+                boolean keyAlreadyBound = bind.matches(new KeyEvent(key, 0, 0));
                 boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
 
                 if (keyAlreadyBound && !allowMultiple) {
                     ChatUtil.warn("esa tecla ya está cogida por "
-                            + Formatting.GREEN + "\"" + I18n.translate(bind.getId()) + "\"");
+                            + ChatFormatting.GREEN + "\"" + I18n.get(bind.getName()) + "\"");
                     listening = false;
                     return;
                 }

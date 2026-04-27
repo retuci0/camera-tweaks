@@ -1,14 +1,14 @@
 package me.retucio.sputnik.module.modules.camera;
 
-import me.retucio.sputnik.mixin.accessors.StatusEffectInstanceAccessor;
+import me.retucio.sputnik.mixin.accessors.MobEffectInstanceAccessor;
 import me.retucio.sputnik.mixin.mixins.render.LightmapTextureManagerMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.registry.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -57,18 +57,18 @@ public class Fullbright extends Module {
     public void onTick() {
         if (mc.player == null || !mode.getValue().equals(Modes.POTION)) return;
 
-        if (mc.player.hasStatusEffect(Registries.STATUS_EFFECT.getEntry(StatusEffects.NIGHT_VISION.value()))) {
-            StatusEffectInstance instance = mc.player.getStatusEffect(Registries.STATUS_EFFECT.getEntry(StatusEffects.NIGHT_VISION.value()));
-            if (instance != null && instance.getDuration() < 5200) ((StatusEffectInstanceAccessor) instance).setDuration(5200);
+        if (mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()))) {
+            MobEffectInstance instance = mc.player.getEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()));
+            if (instance != null && instance.getDuration() < 5200) ((MobEffectInstanceAccessor) instance).setDuration(5200);
         } else {
-            mc.player.addStatusEffect(new StatusEffectInstance(Registries.STATUS_EFFECT.getEntry(StatusEffects.NIGHT_VISION.value()), 69, 0));
+            mc.player.addEffect(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()), 69, 0));
         }
     }
 
     private void disableNightVision() {
         if (mc.player == null) return;
-        if (mc.player.hasStatusEffect(Registries.STATUS_EFFECT.getEntry(StatusEffects.NIGHT_VISION.value())))
-            mc.player.removeStatusEffect(Registries.STATUS_EFFECT.getEntry(StatusEffects.NIGHT_VISION.value()));
+        if (mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value())))
+            mc.player.removeEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()));
     }
 
 

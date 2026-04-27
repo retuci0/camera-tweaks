@@ -1,26 +1,27 @@
 package me.retucio.sputnik.cape;
 
 import me.retucio.sputnik.Sputnik;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
+import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class Cape {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
 
     private final String name;
     private final Identifier id;
     private NativeImage img;
-    private NativeImageBackedTexture texture;
+    private DynamicTexture texture;
 
     public Cape(String name) {
         this.name = name;
-        this.id = Identifier.of(Sputnik.MOD_ID, "textures/capes/" + name + ".png");
+        this.id = Identifier.fromNamespaceAndPath(Sputnik.MOD_ID, "textures/capes/" + name + ".png");
     }
 
     public void load() {
@@ -28,7 +29,7 @@ public class Cape {
     }
 
     public NativeImage loadTexture(Identifier id) {
-        try (InputStream inputStream = mc.getResourceManager().getResource(id).get().getInputStream()) {
+        try (InputStream inputStream = mc.getResourceManager().getResource(id).get().open()) {
             return NativeImage.read(inputStream);
         } catch (IOException e) {
             Sputnik.LOGGER.error("ups: {}", e.getMessage());
@@ -37,8 +38,8 @@ public class Cape {
     }
 
     public void register() {
-        texture = new NativeImageBackedTexture(null, img);
-        mc.getTextureManager().registerTexture(id, texture);
+        texture = new DynamicTexture(null, img);
+        mc.getTextureManager().register(id, texture);
         img = null;
     }
 
@@ -50,7 +51,7 @@ public class Cape {
         return id;
     }
 
-    public NativeImageBackedTexture getTexture() {
+    public DynamicTexture getTexture() {
         return texture;
     }
 

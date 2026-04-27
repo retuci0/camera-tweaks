@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+	id "net.fabricmc.fabric-loom" version "${loom_version}"
     id 'maven-publish'
 }
 
@@ -23,18 +23,15 @@ dependencies {
     // mc
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 
-	// mappings
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-
 	// fabric & su api
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// sistema de eventos
-	include(modImplementation  "com.github.retuci0:neutrino:${project.neutrino_version}")
+	include(implementation  "com.github.retuci0:neutrino:${project.neutrino_version}")
 
     // rpc de discord
-    include(modImplementation "dev.firstdark.discordrpc:discord-rpc:1.0.3")
+    include(implementation "dev.firstdark.discordrpc:discord-rpc:1.0.3")
 }
 
 loom {
@@ -50,12 +47,12 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {

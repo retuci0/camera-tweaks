@@ -39,7 +39,7 @@ public class Fonts extends Module {
 
     private void reload() {
         if (mc.getResourceManager() != null && reload.getValue()) {
-            mc.reloadResources();
+            mc.reloadResourcePacks();
         }
     }
 

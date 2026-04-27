@@ -7,8 +7,8 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.option.Perspective;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.CameraType;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 /** continúa en:
@@ -31,7 +31,7 @@ public class Freelook extends Module {
 
     private float yaw;
     private float pitch;
-    private Perspective prevPerspective;
+    private CameraType prevPerspective;
 
     public Freelook() {
         super("perspectiva libre",
@@ -50,20 +50,20 @@ public class Freelook extends Module {
     public void onEnable() {
         if (mc.player == null) return;
 
-        yaw = mc.player.getYaw();
-        pitch = mc.player.getPitch();
+        yaw = mc.player.getYRot();
+        pitch = mc.player.getXRot();
 
-        prevPerspective = mc.options.getPerspective();
-        if (prevPerspective != Perspective.THIRD_PERSON_BACK)
-            mc.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+        prevPerspective = mc.options.getCameraType();
+        if (prevPerspective != CameraType.THIRD_PERSON_BACK)
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        if (mc.options.getPerspective() != prevPerspective)
-            mc.options.setPerspective(prevPerspective);
+        if (mc.options.getCameraType() != prevPerspective)
+            mc.options.setCameraType(prevPerspective);
         super.onDisable();
     }
 
@@ -80,23 +80,23 @@ public class Freelook extends Module {
                         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_UP)) pitch -= 0.5f;
                         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_DOWN)) pitch += 0.5f;
                     } case CAMERA -> {
-                        float yaw = mc.player.getYaw();
-                        float pitch = mc.player.getPitch();
+                        float yaw = mc.player.getYRot();
+                        float pitch = mc.player.getXRot();
 
                         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT)) yaw -= 0.5f;
                         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_RIGHT)) yaw += 0.5f;
                         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_UP)) pitch -= 0.5f;
                         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_DOWN)) pitch += 0.5f;
 
-                        mc.player.setYaw(yaw);
-                        mc.player.setPitch(pitch);
+                        mc.player.setYRot(yaw);
+                        mc.player.setXRot(pitch);
                     }
                 }
             }
         }
 
-        mc.player.setPitch(MathHelper.clamp(mc.player.getPitch(), -90, 90));
-        pitch = MathHelper.clamp(pitch, -90, 90);
+        mc.player.setXRot(Mth.clamp(mc.player.getXRot(), -90, 90));
+        pitch = Mth.clamp(pitch, -90, 90);
     }
 
     public float getYaw() {

@@ -2,10 +2,11 @@ package me.retucio.sputnik.ui.hud;
 
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.widgets.Widget;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
+
 
 public abstract class HudElement extends Widget {
 
@@ -21,9 +22,9 @@ public abstract class HudElement extends Widget {
         this.visible = true;
     }
 
-    public abstract void renderInGame(DrawContext ctx, float delta, HUD hud);
-    public abstract void renderInEditor(DrawContext ctx, HUD hud);
-    public abstract List<Text> getTooltip();
+    public abstract void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud);
+    public abstract void renderInEditor(GuiGraphicsExtractor gui, HUD hud);
+    public abstract List<Component> getTooltip();
 
     public String getId() { return id; }
 

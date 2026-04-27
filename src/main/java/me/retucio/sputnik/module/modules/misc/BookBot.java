@@ -10,17 +10,18 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.module.setting.settings.StringSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
-import net.minecraft.client.font.TextHandler;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.WritableBookContentComponent;
-import net.minecraft.component.type.WrittenBookContentComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.BookUpdateC2SPacket;
-import net.minecraft.text.*;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.game.ServerboundEditBookPacket;
+import net.minecraft.server.network.Filterable;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.WritableBookContent;
+import net.minecraft.world.item.component.WrittenBookContent;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.PrimitiveIterator;
 import java.util.Random;
@@ -100,20 +101,20 @@ public class BookBot extends Module {
         if (mc.player == null) return;
 
         Predicate<ItemStack> bookPredicate = stack -> {
-            WritableBookContentComponent component = stack.get(DataComponentTypes.WRITABLE_BOOK_CONTENT);
+            WritableBookContent component = stack.get(DataComponents.WRITABLE_BOOK_CONTENT);
             return stack.getItem() == Items.WRITABLE_BOOK && (component == null || component.pages().isEmpty());
         };
 
-        ItemStack book = InventoryUtil.find(bookPredicate);
+        ItemStack book = InventoryUtil.findStack(bookPredicate);
         if (book == null) {
             ChatUtil.warn("no se encontró ningún libro");
             toggle();
             return;
         }
 
-        if (mc.player.getMainHandStack() != book) {
+        if (mc.player.getMainHandItem() != book) {
             InventoryUtil.swapWithHotbar(
-                    mc.player.getInventory().getSlotWithStack(book),
+                    mc.player.getInventory().findSlotMatchingItem(book),
                     mc.player.getInventory().getSelectedSlot()
             );
         }
@@ -144,10 +145,10 @@ public class BookBot extends Module {
 
     private void writeBook(PrimitiveIterator.OfInt chars) {
         ArrayList<String> pages = new ArrayList<>();
-        ArrayList<RawFilteredPair<Text>> filteredPages = new ArrayList<>();
+        ArrayList<Filterable<Component>> filteredPages = new ArrayList<>();
         int maxPages = this.pages.getIntValue();
 
-        TextHandler.WidthRetriever widthRetriever = mc.textRenderer.getTextHandler().widthRetriever;
+        StringSplitter.WidthProvider widthRetriever = mc.font.getSplitter().widthProvider;
         int pageIndex = 0;
         int lineIndex = 0;
         final StringBuilder page = new StringBuilder();
@@ -177,7 +178,7 @@ public class BookBot extends Module {
             }
 
             if (lineIndex == 14) {
-                filteredPages.add(RawFilteredPair.of(Text.of(page.toString())));
+                filteredPages.add(Filterable.passThrough(Component.nullToEmpty(page.toString())));
                 pages.add(page.toString());
                 page.setLength(0);
                 pageIndex++;
@@ -187,7 +188,7 @@ public class BookBot extends Module {
         }
 
         if (!page.isEmpty() && pageIndex < maxPages) {
-            filteredPages.add(RawFilteredPair.of(Text.of(page.toString())));
+            filteredPages.add(Filterable.passThrough(Component.nullToEmpty(page.toString())));
             pages.add(page.toString());
         }
 
@@ -198,51 +199,19 @@ public class BookBot extends Module {
         createBook(pages, filteredPages);
     }
 
-    private void processLinesToPages(List<StringVisitable> lines, ArrayList<String> pages, ArrayList<RawFilteredPair<Text>> filteredPages, int maxPages) {
-        int pageIndex = 0;
-        int lineIndex = 0;
-        StringBuilder currentPage = new StringBuilder();
-
-        for (StringVisitable line : lines) {
-            String lineText = line.getString();
-
-            if (!currentPage.isEmpty()) {
-                currentPage.append('\n');
-            }
-
-            currentPage.append(lineText);
-            lineIndex++;
-
-            if (lineIndex == 14) {
-                filteredPages.add(RawFilteredPair.of(Text.of(currentPage.toString())));
-                pages.add(currentPage.toString());
-                currentPage.setLength(0);
-                pageIndex++;
-                lineIndex = 0;
-
-                if (pageIndex == maxPages) break;
-            }
-        }
-
-        if (!currentPage.isEmpty() && pageIndex < maxPages) {
-            filteredPages.add(RawFilteredPair.of(Text.of(currentPage.toString())));
-            pages.add(currentPage.toString());
-        }
-    }
-
-    private void createBook(ArrayList<String> pages, ArrayList<RawFilteredPair<Text>> filteredPages) {
+    private void createBook(ArrayList<String> pages, ArrayList<Filterable<Component>> filteredPages) {
         String title = name.getValue();
         if (count.getValue() && bookCount != 0) title += " #" + bookCount;
 
-        mc.player.getMainHandStack().set(DataComponentTypes.WRITTEN_BOOK_CONTENT, new WrittenBookContentComponent(
-                RawFilteredPair.of(title),
+        mc.player.getMainHandItem().set(DataComponents.WRITTEN_BOOK_CONTENT, new WrittenBookContent(
+                Filterable.passThrough(title),
                 mc.player.getGameProfile().name(),
                 0,
                 filteredPages,
                 true
         ));
 
-        mc.player.networkHandler.sendPacket(new BookUpdateC2SPacket(
+        mc.player.connection.send(new ServerboundEditBookPacket(
                 mc.player.getInventory().getSelectedSlot(),
                 pages,
                 sign.getValue()

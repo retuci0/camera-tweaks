@@ -7,8 +7,8 @@ import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.render.DrawUtil;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,31 +23,35 @@ public class ColorButton extends SettingButton<ColorSetting> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         Color bgColor = isHovered(mouseX, mouseY)
                 ? Colors.buttonColor.brighter()
                 : Colors.buttonColor;
 
-        ctx.fill(x, y, x + w, y + h, bgColor.getRGB());
+        gui.fill(x, y, x + w, y + h, bgColor.getRGB());
 
         // prev. del color
         int previewSize = h - 6;
         int previewX = x + 5;
         int previewY = y + 3;
 
-        DrawUtil.drawBorder(ctx, previewX - 1, previewY - 1, previewSize + 2, previewSize + 2, Colors.withAlpha(Colors.getOppositeColor(setting.getValue(), true), 255).getRGB());
-        ctx.fill(previewX, previewY, previewX + previewSize, previewY + previewSize, setting.getValue().getRGB());
+        DrawUtil.drawBorder(gui,
+                previewX - 1, previewY - 1, previewSize + 2, previewSize + 2,
+                Colors.withAlpha(Colors.getOppositeColor(setting.getValue(), true), 255).getRGB()
+        );
+
+        gui.fill(previewX, previewY, previewX + previewSize, previewY + previewSize, setting.getValue().getRGB());
 
         // texto
         String label = setting.getName();
         int textX = previewX + previewSize + 5;
-        ctx.drawText(mc.textRenderer, label, textX, y + 3, -1, true);
+        gui.text(mc.font, label, textX, y + 3, -1, true);
 
         // valor actual
         String valueText = setting.isRainbow() ? "gay." : Colors.ARGBtoHex(setting.getA(), setting.getR(), setting.getG(), setting.getB());
-        int valueWidth = mc.textRenderer.getWidth(valueText);
-        ctx.drawText(mc.textRenderer, valueText, x + w - valueWidth - 5, y + 3, -1, true);
+        int valueWidth = mc.font.width(valueText);
+        gui.text(mc.font, valueText, x + w - valueWidth - 5, y + 3, -1, true);
     }
 
     @Override
@@ -67,13 +71,13 @@ public class ColorButton extends SettingButton<ColorSetting> {
     }
 
     @Override
-    public void drawTooltip(DrawContext ctx, int mouseX, int mouseY) {
+    public void drawTooltip(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
         if (isHovered(mouseX, mouseY)) {
-            List<Text> tooltip = new ArrayList<>();
-            tooltip.add(Text.of(setting.getDescription()));
+            List<Component> tooltip = new ArrayList<>();
+            tooltip.add(Component.literal(setting.getDescription()));
             tooltip.add(setting.getTooltipText());
 
-            ctx.drawTooltip(mc.textRenderer, tooltip, mouseX, mouseY + 20);
+            ctx.setComponentTooltipForNextFrame(mc.font, tooltip, mouseX, mouseY + 20);
         }
     }
 }

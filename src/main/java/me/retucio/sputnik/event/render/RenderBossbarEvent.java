@@ -2,9 +2,10 @@ package me.retucio.sputnik.event.render;
 
 import com.github.retucio.neutrino.Event;
 import me.retucio.sputnik.mixin.mixins.hud.BossBarHudMixin;
-import net.minecraft.client.gui.hud.ClientBossBar;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.network.chat.MutableComponent;
 
+import java.awt.*;
 import java.util.Iterator;
 
 
@@ -17,27 +18,27 @@ public class RenderBossbarEvent {
 
     public static class BossText extends Event {
 
-        private ClientBossBar bossBar;
-        private Text name;
+        private LerpingBossEvent bossBar;
+        private MutableComponent name;
 
-        public BossText(ClientBossBar bossBar, Text name) {
+        public BossText(LerpingBossEvent bossBar, MutableComponent name) {
             this.bossBar = bossBar;
             this.name = name;
         }
 
-        public ClientBossBar getBossBar() {
+        public LerpingBossEvent getBossBar() {
             return bossBar;
         }
 
-        public void setBossBar(ClientBossBar bossBar) {
+        public void setBossBar(LerpingBossEvent bossBar) {
             this.bossBar = bossBar;
         }
 
-        public Text getName() {
+        public MutableComponent getName() {
             return name;
         }
 
-        public void setName(Text name) {
+        public void setName(MutableComponent name) {
             this.name = name;
         }
     }
@@ -61,17 +62,17 @@ public class RenderBossbarEvent {
 
     public static class BossIterator extends Event {
 
-        private Iterator<ClientBossBar> iterator;
+        private Iterator<LerpingBossEvent> iterator;
 
-        public BossIterator(Iterator<ClientBossBar> iterator) {
+        public BossIterator(Iterator<LerpingBossEvent> iterator) {
             this.iterator = iterator;
         }
 
-        public Iterator<ClientBossBar> getIterator() {
+        public Iterator<LerpingBossEvent> getIterator() {
             return iterator;
         }
 
-        public void setIterator(Iterator<ClientBossBar> iterator) {
+        public void setIterator(Iterator<LerpingBossEvent> iterator) {
             this.iterator = iterator;
         }
     }

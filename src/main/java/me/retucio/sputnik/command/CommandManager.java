@@ -5,8 +5,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.command.commands.*;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.CommandSource;
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ public class CommandManager {
     private String prefix = "$";
 
     public static final List<Command> commands = new ArrayList<>();
-    public static final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
+    public static final CommandDispatcher<SharedSuggestionProvider> dispatcher = new CommandDispatcher<>();
 
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final Minecraft mc = Minecraft.getInstance();
 
     public CommandManager() {
         registerCommands();
@@ -68,7 +68,7 @@ public class CommandManager {
     }
 
     public static void dispatch(String message) throws CommandSyntaxException {
-        dispatcher.execute(message, Objects.requireNonNull(mc.getNetworkHandler()).getCommandSource());
+        dispatcher.execute(message, Objects.requireNonNull(mc.getConnection()).getSuggestionsProvider());
     }
 
     public static Command getCommandByName(String name) {

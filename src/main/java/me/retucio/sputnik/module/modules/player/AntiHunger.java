@@ -4,8 +4,9 @@ import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+
 
 public class AntiHunger extends Module {
 
@@ -16,26 +17,26 @@ public class AntiHunger extends Module {
     @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (mc.player == null) return;
-        if (mc.player.hasVehicle() || mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) return;
+        if (mc.player.isPassenger() || mc.player.isInWater() || mc.player.isUnderWater()) return;
 
-        if (event.getPacket() instanceof ClientCommandC2SPacket packet) {
-            if (packet.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) {
+        if (event.getPacket() instanceof ServerboundPlayerCommandPacket packet) {
+            if (packet.getAction() == ServerboundPlayerCommandPacket.Action.START_SPRINTING) {
                 event.cancel();
-                if (mc.player.isGliding()) {
-                    mc.player.stopGliding();
+                if (mc.player.isFallFlying()) {
+                    mc.player.stopFallFlying();
                 }
             }
         }
 
-        if (event.getPacket() instanceof PlayerMoveC2SPacket packet
+        if (event.getPacket() instanceof ServerboundMovePlayerPacket packet
                 && packet.isOnGround()
                 && mc.player.fallDistance <= 0
-                && !mc.interactionManager.isBreakingBlock()) {
+                && !mc.gameMode.isDestroying()) {
             event.cancel();
-            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
-                    mc.player.getEntityPos(),
-                    mc.player.getYaw(),
-                    mc.player.getPitch(),
+            mc.getConnection().send(new ServerboundMovePlayerPacket.PosRot(
+                    mc.player.position(),
+                    mc.player.getYRot(),
+                    mc.player.getXRot(),
                     false,
                     mc.player.horizontalCollision
             ));

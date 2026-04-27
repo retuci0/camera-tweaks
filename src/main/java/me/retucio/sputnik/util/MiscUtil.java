@@ -4,8 +4,9 @@ import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.TickEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -18,19 +19,20 @@ import java.util.List;
 
 import static me.retucio.sputnik.Sputnik.mc;
 
+
 public class MiscUtil {
 
     public static Screen screen;
 
     @EventListener
     public static void onTick(TickEvent.Post event) {
-        if (screen != null && mc.currentScreen == null) {
+        if (screen != null && mc.screen == null) {
             mc.setScreen(screen);
             screen = null;
         }
     }
 
-    public static void copyVector(Vector3d destination, Vec3d source) {
+    public static void copyVector(Vector3d destination, Vec3 source) {
         destination.x = source.x;
         destination.y = source.y;
         destination.z = source.z;
@@ -83,8 +85,8 @@ public class MiscUtil {
     }
 
     public static String getPasteContent(int maxLength) {
-        if (maxLength == -1) return mc.keyboard.getClipboard();
-        return mc.keyboard.getClipboard().substring(0, Math.min(maxLength, mc.keyboard.getClipboard().length()));
+        if (maxLength == -1) return mc.keyboardHandler.getClipboard();
+        return mc.keyboardHandler.getClipboard().substring(0, Math.min(maxLength, mc.keyboardHandler.getClipboard().length()));
     }
 
     public static void backspace(StringBuilder buffer) {
@@ -102,11 +104,13 @@ public class MiscUtil {
     }
 
 
-    public static Vec3d vec3dOf(Vector3f v) {
-        return new Vec3d(v.x, v.y, v.z);
+    public static Vec3 vec3dOf(Vector3f v) {
+        return new Vec3(v.x, v.y, v.z);
     }
 
-    public static Vector3f vec3fOf(Vec3d v) {
+    public static Vector3f vec3fOf(Vec3 v) {
         return new Vector3f((float) v.x, (float) v.y, (float) v.z);
     }
+
+    public static Vec3i vec3iOf(Vec3 v) { return new Vec3i((int) v.x, (int) v.y, (int) v.z); }
 }

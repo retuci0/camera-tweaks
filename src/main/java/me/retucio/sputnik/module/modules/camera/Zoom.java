@@ -60,13 +60,11 @@ public class Zoom extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.options == null) return;
-
-        prevSmoothCam = mc.options.smoothCameraEnabled;
-        prevMouseSens = mc.options.getMouseSensitivity().getValue();
-        prevFov = mc.options.getFov().getValue();
-        prevHUD = mc.options.hudHidden;
-        mc.options.hudHidden = !showHUD.getValue();
+        prevSmoothCam = mc.options.smoothCamera;
+        prevMouseSens = mc.options.sensitivity().get();
+        prevFov = mc.options.fov().get();
+        prevHUD = mc.options.hideGui;
+        mc.options.hideGui = !showHUD.getValue();
 
         value = defaultZoom.getValue();
 
@@ -75,22 +73,21 @@ public class Zoom extends Module {
 
     @Override
     public void onDisable() {
-        if (mc.options == null) return;
+        mc.options.smoothCamera = prevSmoothCam;
+        mc.options.sensitivity().set(prevMouseSens);
+        mc.options.hideGui = prevHUD;
 
-        mc.options.smoothCameraEnabled = prevSmoothCam;
-        mc.options.getMouseSensitivity().setValue(prevMouseSens);
-        mc.options.hudHidden = prevHUD;
-
-        mc.worldRenderer.scheduleTerrainUpdate();
+        mc.levelRenderer.needsUpdate();
 
         super.onDisable();
     }
 
     @Override
     public void onTick() {
-        mc.options.smoothCameraEnabled = smoothCam.getValue();
-        if (!smoothCam.getValue())
-            mc.options.getMouseSensitivity().setValue(prevMouseSens * mouseSensMultiplier.getValue());
+        mc.options.smoothCamera = smoothCam.getValue();
+        if (!smoothCam.getValue()) {
+            mc.options.sensitivity().set(prevMouseSens * mouseSensMultiplier.getValue());
+        }
     }
 
     @EventListener
@@ -108,7 +105,7 @@ public class Zoom extends Module {
     private void onGetFov(GetFOVEvent event) {
         event.setFov((float) (event.getFov() / value));
 
-        if (prevFov != event.getFov()) mc.worldRenderer.scheduleTerrainUpdate();
+        if (prevFov != event.getFov()) mc.levelRenderer.needsUpdate();
         prevFov = event.getFov();
     }
 }

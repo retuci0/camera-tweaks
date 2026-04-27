@@ -1,6 +1,7 @@
 package me.retucio.sputnik.module.modules.world;
 
 import com.github.retucio.neutrino.EventListener;
+import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -8,17 +9,20 @@ import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
+import me.retucio.sputnik.util.MiscUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.block.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.LightType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 public class LightOverlay extends Module {
 
@@ -26,7 +30,9 @@ public class LightOverlay extends Module {
     private final SettingGroup sgColors = addSg(new SettingGroup("colores", true));
     private final SettingGroup sgOptimization = addSg(new SettingGroup("optimización", true));
 
+
     // detección
+
     private final NumberSetting radius = sgDetection.add(new NumberSetting(
             "radio",
             "radio a tener en cuenta al renderizar superposición",
@@ -46,7 +52,9 @@ public class LightOverlay extends Module {
             "mostrar superposición a través de bloques para poder verla desde fuera del agua", false));
 
 
+
     // optimización, porque iba como la mierda
+
     private final NumberSetting updateInterval = sgOptimization.add(new NumberSetting(
             "intervalo de búsqueda",
             "cada cuántos ticks actualizar la búsqueda de bloques",
@@ -67,7 +75,9 @@ public class LightOverlay extends Module {
             "actualizar solo los bloques nuevos / eliminados en lugar de recalcular todo",
             true));
 
+
     // colores
+
     private final ColorSetting lightColor = sgColors.add(new ColorSetting(
             "color de la luz",
             "color de los bloques con luz",
@@ -80,6 +90,7 @@ public class LightOverlay extends Module {
 
 
     // caché y estado
+
     private final Set<BlockPos> cachedBlocks = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final Set<BlockPos> blocksToRender = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private BlockPos lastPlayerPos = null;
@@ -88,7 +99,9 @@ public class LightOverlay extends Module {
     private int updateTimer = 0;
     private boolean isSearching = false;
 
+
     // para actualizaciones incrementales
+
     private int incrementalLayer = 0;
     private boolean fullRescanNeeded = false;
 
@@ -97,7 +110,7 @@ public class LightOverlay extends Module {
                 "te muestra el nivel de luz en bloques, para prevenir mob spawns",
                 Category.WORLD);
 
-        onWater.onUpdate(v -> dontCullWater.visibility(v));
+        onWater.onUpdate(dontCullWater::visibility);
     }
 
     @Override
@@ -125,7 +138,7 @@ public class LightOverlay extends Module {
     @SuppressWarnings("deprecation")
     @EventListener
     private void onRenderWorld(Render3DEvent event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         // actualización periódica
         if (updateTimer++ >= updateInterval.getIntValue()) {
@@ -134,14 +147,14 @@ public class LightOverlay extends Module {
         }
 
         // renderizado
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
+        Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
         int radiusValue = radius.getIntValue();
         double radiusSq = radiusValue * radiusValue;
 
         // actualizar lista de renderizado basado en distancia
         blocksToRender.clear();
         for (BlockPos pos : cachedBlocks) {
-            double distanceSq = pos.getSquaredDistance(cameraPos);
+            double distanceSq = pos.distSqr(MiscUtil.vec3iOf(cameraPos));
             if (distanceSq <= radiusSq) {
                 blocksToRender.add(pos);
             }
@@ -149,15 +162,15 @@ public class LightOverlay extends Module {
 
         // renderizar bloques visibles
         for (BlockPos block : blocksToRender) {
-            if (!mc.world.isChunkLoaded(block)) continue;
+            if (!mc.level.hasChunkAt(block)) continue;
 
-            BlockState state = mc.world.getBlockState(block);
-            BlockState aboveState = mc.world.getBlockState(block.up());
+            BlockState state = mc.level.getBlockState(block);
+            BlockState aboveState = mc.level.getBlockState(block.above());
 
             if (!isValidSpawnSurface(block, state, aboveState)) continue;
 
             // nivel de luz
-            int light = mc.world.getLightLevel(LightType.BLOCK, block.up());
+            int light = mc.level.getBrightness(LightLayer.BLOCK, block.above());
 
             // color
             Color color;
@@ -174,15 +187,15 @@ public class LightOverlay extends Module {
             }
 
             // renderizar
-            boolean shouldCull = !(onWater.getValue() && aboveState.isOf(Blocks.WATER) && dontCullWater.getValue());
+            boolean shouldCull = !(onWater.getValue() && aboveState.is(Blocks.WATER) && dontCullWater.getValue());
             RenderUtil.drawBlockFaceFilled(event.getMatrices(), block, Direction.UP, color, 0.001f, shouldCull);
         }
     }
 
     private void updateBlocks() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
-        BlockPos playerPos = mc.player.getBlockPos();
+        BlockPos playerPos = mc.player.blockPosition();
         int currentRadius = radius.getIntValue();
         int currentYRadius = yRadius.getIntValue();
 
@@ -191,7 +204,7 @@ public class LightOverlay extends Module {
                 lastRadius != currentRadius ||
                 lastYRadius != currentYRadius ||
                 (lastPlayerPos != null &&
-                        playerPos.getSquaredDistance(lastPlayerPos) > (movementThreshold.getValue() * movementThreshold.getValue()));
+                        playerPos.distSqr(lastPlayerPos) > (movementThreshold.getValue() * movementThreshold.getValue()));
 
         if (!needsUpdate && incrementalUpdates.getValue() && incrementalLayer >= 0) {
             // actualización incremental de una sola capa
@@ -220,7 +233,7 @@ public class LightOverlay extends Module {
                 } finally {
                     isSearching = false;
                 }
-            }, "sputnik-lightoverlay-search").start();
+            }, Sputnik.MOD_ID + "-lightoverlay-search").start();
         } else {
             performFullBlockSearch(playerPos, currentRadius, currentYRadius);
         }
@@ -231,24 +244,24 @@ public class LightOverlay extends Module {
         Set<BlockPos> newBlocks = new HashSet<>();
         int radiusSq = radius * radius;
 
-        int minY = Math.max(mc.world.getBottomY(), center.getY() - yRadius);
-        int maxY = Math.min(mc.world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, mc.player.getBlockPos()) - 1, center.getY() + yRadius);
+        int minY = Math.max(mc.level.getMinY(), center.getY() - yRadius);
+        int maxY = Math.min(mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, mc.player.blockPosition()) - 1, center.getY() + yRadius);
 
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
                 if (x*x + z*z > radiusSq) continue;
 
                 for (int y = minY; y <= maxY; y++) {
-                    BlockPos pos = center.add(x, y - center.getY(), z);
+                    BlockPos pos = center.offset(x, y - center.getY(), z);
 
                     // nuh uh si el chunk no está cargado
-                    if (!mc.world.isChunkLoaded(pos)) continue;
+                    if (!mc.level.hasChunkAt(pos)) continue;
 
-                    BlockState state = mc.world.getBlockState(pos);
-                    BlockState aboveState = mc.world.getBlockState(pos.up());
+                    BlockState state = mc.level.getBlockState(pos);
+                    BlockState aboveState = mc.level.getBlockState(pos.above());
 
                     if (isValidSpawnSurface(pos, state, aboveState)) {
-                        newBlocks.add(pos.toImmutable());
+                        newBlocks.add(pos.immutable());
                     }
                 }
             }
@@ -267,8 +280,8 @@ public class LightOverlay extends Module {
 
         int currentX = center.getX() - radius + incrementalLayer;
         int radiusSq = radius * radius;
-        int minY = Math.max(mc.world.getBottomY(), center.getY() - yRadius);
-        int maxY = Math.min(mc.world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, mc.player.getBlockPos()) - 1, center.getY() + yRadius);
+        int minY = Math.max(mc.level.getMinY(), center.getY() - yRadius);
+        int maxY = Math.min(mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, mc.player.blockPosition()) - 1, center.getY() + yRadius);
 
         // buscar en una columna específica (x fijo, variar z)
         for (int z = -radius; z <= radius; z++) {
@@ -278,15 +291,15 @@ public class LightOverlay extends Module {
             for (int y = minY; y <= maxY; y++) {
                 BlockPos pos = new BlockPos(currentX, y, center.getZ() + z);
 
-                if (!mc.world.isChunkLoaded(pos)) continue;
+                if (!mc.level.hasChunkAt(pos)) continue;
 
-                BlockState state = mc.world.getBlockState(pos);
-                BlockState aboveState = mc.world.getBlockState(pos.up());
+                BlockState state = mc.level.getBlockState(pos);
+                BlockState aboveState = mc.level.getBlockState(pos.above());
 
                 boolean isValid = isValidSpawnSurface(pos, state, aboveState);
 
                 if (isValid) {
-                    cachedBlocks.add(pos.toImmutable());
+                    cachedBlocks.add(pos.immutable());
                 } else {
                     cachedBlocks.remove(pos);
                 }
@@ -317,7 +330,7 @@ public class LightOverlay extends Module {
     }
 
     private boolean isValidSpawnSurface(BlockPos pos, BlockState state, BlockState aboveState) {
-        if (state.isAir() || !state.isOpaque() || !state.isFullCube(mc.world, pos)) {
+        if (state.isAir() || !state.canOcclude() || !state.isCollisionShapeFullBlock(mc.level, pos)) {
             return false;
         }
 
@@ -325,15 +338,15 @@ public class LightOverlay extends Module {
 
         if (aboveState.isAir()) return true;
         if (aboveBlock == Blocks.WATER && onWater.getValue()) return true;
-        if (aboveBlock instanceof PlantBlock) return true;
+        if (aboveBlock instanceof VegetationBlock) return true;
 
         if (aboveBlock instanceof SlabBlock ||
-                aboveBlock instanceof StairsBlock ||
+                aboveBlock instanceof StairBlock ||
                 aboveBlock instanceof ButtonBlock ||
                 aboveBlock instanceof CarpetBlock ||
                 aboveBlock instanceof PressurePlateBlock ||
-                aboveBlock instanceof PaneBlock ||
-                aboveBlock instanceof TrapdoorBlock ||
+                aboveBlock instanceof IronBarsBlock ||
+                aboveBlock instanceof TrapDoorBlock ||
                 aboveBlock instanceof FenceBlock ||
                 aboveBlock instanceof WallBlock ||
                 aboveBlock instanceof AnvilBlock ||
@@ -354,6 +367,6 @@ public class LightOverlay extends Module {
             return false;
         }
 
-        return !aboveState.isOpaque() || !aboveState.isFullCube(mc.world, pos.up());
+        return !aboveState.canOcclude() || !aboveState.isCollisionShapeFullBlock(mc.level, pos.above());
     }
 }

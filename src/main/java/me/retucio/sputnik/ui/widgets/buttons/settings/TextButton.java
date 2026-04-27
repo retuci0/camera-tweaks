@@ -7,7 +7,7 @@ import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.MiscUtil;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.lwjgl.glfw.GLFW;
 
 
@@ -25,16 +25,16 @@ public class TextButton extends SettingButton<StringSetting> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         int bgColor = isHovered(mouseX, mouseY)
                 ? Colors.buttonColor.brighter().getRGB()
                 : Colors.buttonColor.getRGB();
-        ctx.fill(x, y, x + w, y + h, bgColor);
+        gui.fill(x, y, x + w, y + h, bgColor);
 
         // texto
         String label = setting.getName() + ": " + (typing ? buffer + "_" : setting.getValue());
-        ctx.drawText(mc.textRenderer, label, x + 5, y + 3, -1, true);
+        gui.text(mc.font, label, x + 5, y + 3, -1, true);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TextButton extends SettingButton<StringSetting> {
                 typing = true;
                 buffer.setLength(0);
                 buffer.append(setting.getValue());  // precargar valor anterior
-            } else if (button == 1 && mc.isShiftPressed()) {
+            } else if (button == 1 && KeyUtil.isShiftDown()) {
                 typing = false;
                 setting.reset();
             }
@@ -88,7 +88,10 @@ public class TextButton extends SettingButton<StringSetting> {
     private void charTyped(char c) {
         if (!typing) return;
         buffer.append(c);
-        if (mc.textRenderer.getWidth(setting.getName() + ": " + buffer + "_") > w - 8) onBackspace();
+
+        if (mc.font.width(setting.getName() + ": " + buffer + "_") > w - 8) {
+            onBackspace();
+        }
     }
 
     public boolean isFocused() {

@@ -2,16 +2,16 @@ package me.retucio.sputnik.module.modules.movement;
 
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.network.PacketEvent;
-import me.retucio.sputnik.mixin.accessors.EntityVelocityUpdateS2CPacketAccessor;
-import me.retucio.sputnik.mixin.accessors.ExplosionS2CPacketAccessor;
+import me.retucio.sputnik.mixin.accessors.ClientboundSetEntityMotionPacketAccessor;
+import me.retucio.sputnik.mixin.accessors.ClientboundExplodePacketAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.protocol.game.ClientboundExplodePacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
@@ -78,15 +78,15 @@ public class Velocity extends Module {
 
     @EventListener
     private void onReceivePacket(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof ExplosionS2CPacket explosionPacket && !explosions.getValue()) {
-            explosionPacket.playerKnockback().ifPresent(kb -> ((ExplosionS2CPacketAccessor) (Object) explosionPacket).setKnockback(Optional.of(new Vec3d(
+        if (event.getPacket() instanceof ClientboundExplodePacket explosionPacket && !explosions.getValue()) {
+            explosionPacket.playerKnockback().ifPresent(kb -> ((ClientboundExplodePacketAccessor) (Object) explosionPacket).setKnockback(Optional.of(new Vec3(
                     kb.x * xPercentage.getValue() / 100,
                     kb.y * yPercentage.getValue() / 100,
                     kb.z * zPercentage.getValue() / 100
             ))));
-        } else if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket velocityPacket) {
-            Vec3d kb = velocityPacket.getVelocity();
-            ((EntityVelocityUpdateS2CPacketAccessor) velocityPacket).setVelocity(new Vec3d(
+        } else if (event.getPacket() instanceof ClientboundSetEntityMotionPacket velocityPacket) {
+            Vec3 kb = velocityPacket.movement();
+            ((ClientboundSetEntityMotionPacketAccessor) (Object) velocityPacket).setVelocity(new Vec3(
                     kb.x * xPercentage.getValue() / 100,
                     kb.y * yPercentage.getValue() / 100,
                     kb.z * zPercentage.getValue() / 100

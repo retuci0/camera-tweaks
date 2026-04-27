@@ -10,12 +10,13 @@ import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.awt.*;
+
 
 public class BreakingProgress extends Module {
 
@@ -43,30 +44,30 @@ public class BreakingProgress extends Module {
 
     @EventListener
     private void onRenderWorld(Render3DEvent event) {
-        if (mc.interactionManager == null || mc.world == null) return;
-        if (!(mc.crosshairTarget instanceof BlockHitResult hitResult)) return;
+        if (mc.gameMode == null || mc.level == null) return;
+        if (!(mc.hitResult instanceof BlockHitResult hitResult)) return;
         BlockPos pos = hitResult.getBlockPos();
 
-        int breakingProgress = mc.interactionManager.getBlockBreakingProgress();
+        int breakingProgress = mc.gameMode.getDestroyStage();
         if (breakingProgress <= 0) return;
         float progress = breakingProgress / 10f;
 
-        VoxelShape shape = mc.world.getBlockState(pos).getOutlineShape(mc.world, pos);
+        VoxelShape shape = mc.level.getBlockState(pos).getShape(mc.level, pos);
         if (shape.isEmpty()) return;
 
-        Box box = shape.getBoundingBox().offset(pos);
+        AABB box = shape.bounds().move(pos);
 
         float shrinkFactor = breakMode.is(BreakMode.INWARDS)
                 ? 1f - progress
                 : progress;
 
-        Box scaledBox = scaleBox(box, shrinkFactor);
+        AABB scaledBox = scaleBox(box, shrinkFactor);
 
         if (outlines.getValue()) RenderUtil.drawOutlineBox(event.getMatrices(), scaledBox, outlineColor.getValue(), lineWidth.getFloatValue(), false);
         if (fillings.getValue()) RenderUtil.drawFilledBox(event.getMatrices(), scaledBox, fillingColor.getValue(), false);
     }
 
-    private static Box scaleBox(Box box, float shrinkFactor) {
+    private static AABB scaleBox(AABB box, float shrinkFactor) {
         double centerX = (box.minX + box.maxX) / 2;
         double centerY = (box.minY + box.maxY) / 2;
         double centerZ = (box.minZ + box.maxZ) / 2;
@@ -75,7 +76,7 @@ public class BreakingProgress extends Module {
         double shrunkY = (box.maxY - box.minY) / 2 * shrinkFactor;
         double shrunkZ = (box.maxZ - box.minZ) / 2 * shrinkFactor;
 
-        return new Box(
+        return new AABB(
                 centerX - shrunkX, centerY - shrunkY, centerZ - shrunkZ,
                 centerX + shrunkX, centerY + shrunkZ, centerZ + shrunkZ
         );

@@ -4,25 +4,26 @@ import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.TextHudElement;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
+
 
 public class CoordsElement extends TextHudElement {
 
     public CoordsElement() {
-        super("coords", 2, mc.getWindow().getScaledHeight() - mc.textRenderer.fontHeight);
+        super("coords", 2, mc.getWindow().getGuiScaledHeight() - mc.font.lineHeight);
     }
 
     @Override
     public String getText(float delta, HUD hud) {
         Freecam freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
-        Vec3d pos = freecam != null && freecam.isEnabled()
-                ? new Vec3d(freecam.getX(delta), freecam.getY(delta), freecam.getZ(delta))
+        Vec3 pos = freecam != null && freecam.isEnabled()
+                ? new Vec3(freecam.getX(delta), freecam.getY(delta), freecam.getZ(delta))
                 : mc.player == null
-                    ? new Vec3d(67, 67, 67)
-                    : mc.player.getEntityPos();
+                    ? new Vec3(67, 67, 67)
+                    : mc.player.position();
 
         String overworldCoords = (int) pos.x + " " + (int) pos.y + " " + (int) pos.z;
         String netherCoords = (int) pos.x / 8 + " " + (int) pos.y / 8 + " " + (int) pos.z / 8;
@@ -39,15 +40,15 @@ public class CoordsElement extends TextHudElement {
     @Override
     public String getPreviewText() {
         return getText(
-                mc.getRenderTickCounter().getDynamicDeltaTicks(),
+                mc.getDeltaTracker().getGameTimeDeltaTicks(),
                 ModuleManager.INSTANCE.getModuleByClass(HUD.class));
     }
 
     @Override
-    public List<Text> getTooltip() {
+    public List<Component> getTooltip() {
         return List.of(
-                Text.literal(getId()),
-                Text.literal("te muestra tu posición XYZ en el mundo")
+                Component.literal(getId()),
+                Component.literal("te muestra tu posición XYZ en el mundo")
         );
     }
 }

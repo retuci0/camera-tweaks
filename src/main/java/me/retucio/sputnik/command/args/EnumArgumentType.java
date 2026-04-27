@@ -7,15 +7,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 public class EnumArgumentType<T extends Enum<T>> implements ArgumentType<T> {
 
-    private static final DynamicCommandExceptionType NO_SUCH_TYPE = new DynamicCommandExceptionType((value) -> Text.of(" argumento inválido: " + value));
+    private static final DynamicCommandExceptionType NO_SUCH_TYPE = new DynamicCommandExceptionType((value) -> Component.nullToEmpty(" argumento inválido: " + value));
 
     private final T[] values;
 
@@ -41,6 +41,6 @@ public class EnumArgumentType<T extends Enum<T>> implements ArgumentType<T> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(Arrays.stream(this.values).map(e -> e.toString().toLowerCase()), builder);
+        return SharedSuggestionProvider.suggest(Arrays.stream(this.values).map(e -> e.toString().toLowerCase()), builder);
     }
 }

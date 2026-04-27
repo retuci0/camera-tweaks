@@ -2,7 +2,7 @@ package me.retucio.sputnik.module.modules.inventory;
 
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.input.KeyEvent;
-import me.retucio.sputnik.mixin.accessors.HandledScreenAccessor;
+import me.retucio.sputnik.mixin.accessors.AbstractContainerScreenAccessor;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -10,17 +10,16 @@ import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.ui.screen.PreviewScreen;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.Colors;
-
 import me.retucio.sputnik.util.InventoryUtil;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -70,7 +69,7 @@ public class ShulkerPeek extends Module {
         }
 
         if (event.getAction() == GLFW.GLFW_REPEAT) {
-            if (mc.currentScreen instanceof PreviewScreen preview) {
+            if (mc.screen instanceof PreviewScreen preview) {
                 if (preview.getType() != PreviewScreen.PreviewType.SHULKER)
                     openPreviewScreen();
             } else openPreviewScreen();
@@ -78,20 +77,20 @@ public class ShulkerPeek extends Module {
         }
 
         if (event.getAction() == GLFW.GLFW_RELEASE) {
-            if (mc.currentScreen instanceof PreviewScreen preview)
-                preview.close();
+            if (mc.screen instanceof PreviewScreen preview)
+                preview.onClose();
         }
     }
 
     private void openPreviewScreen() {
         ItemStack stack;
 
-        if (mc.currentScreen instanceof PreviewScreen previewScreen) {
+        if (mc.screen instanceof PreviewScreen previewScreen) {
             int focusedSlot = previewScreen.getFocusedSlot();
             if (focusedSlot == -1) return;
             stack = previewScreen.getInventory().get(focusedSlot);
-        } else if (mc.currentScreen instanceof HandledScreen<?> handledScreen) {
-            stack = ((HandledScreenAccessor) handledScreen).getFocusedSlot().getStack();
+        } else if (mc.screen instanceof AbstractContainerScreen<?> handledScreen) {
+            stack = ((AbstractContainerScreenAccessor) handledScreen).getHoveredSlot().getItem();
         } else return;
 
         if (stack.getItem() == Items.ENDER_CHEST) {
@@ -99,12 +98,12 @@ public class ShulkerPeek extends Module {
                 ChatUtil.warn("abre un enderchest primero");
                 return;
             }
-            mc.setScreen(new PreviewScreen(InventoryUtil.getEchestInv(), mc.currentScreen));
+            mc.setScreen(new PreviewScreen(InventoryUtil.getEchestInv(), mc.screen));
             return;
         }
 
         else if (isShulkerEmpty(stack)) return;
-        mc.setScreen(new PreviewScreen(stack, mc.currentScreen));
+        mc.setScreen(new PreviewScreen(stack, mc.screen));
     }
 
     public static boolean isShulkerEmpty(ItemStack stack) {
@@ -112,9 +111,10 @@ public class ShulkerPeek extends Module {
         if (!(stack.getItem() instanceof BlockItem blockItem)) return true;
         if (!(blockItem.getBlock() instanceof ShulkerBoxBlock)) return true;
 
-        ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
+        ItemContainerContents container = stack.get(DataComponents.CONTAINER);
         if (container == null) return true;
 
-        return container.stream().allMatch(ItemStack::isEmpty);
+        // .stream()?
+        return container.allItemsCopyStream().allMatch(ItemStack::isEmpty);
     }
 }

@@ -6,10 +6,10 @@ import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +24,17 @@ public class CycleButton<E extends Enum<E>> extends SettingButton<EnumSetting<E>
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         int bgColor = isHovered(mouseX, mouseY)
                 ? Colors.buttonColor.brighter().getRGB()
                 : Colors.buttonColor.getRGB();
 
-        ctx.fill(x, y, x + w, y + h, bgColor);
+        gui.fill(x, y, x + w, y + h, bgColor);
 
         // texto del botón: nombre + valor de texto del enum
         String label = setting.getName() + ": " + setting.getValue().toString();
-        ctx.drawText(mc.textRenderer, label, x + 5, y + 3, -1, true);
+        gui.text(mc.font, label, x + 5, y + 3, -1, true);
     }
 
 
@@ -54,27 +54,27 @@ public class CycleButton<E extends Enum<E>> extends SettingButton<EnumSetting<E>
     }
 
     @Override
-    public void drawTooltip(DrawContext ctx, int mouseX, int mouseY) {
+    public void drawTooltip(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
         if (isHovered(mouseX, mouseY)) {
-            Screen currentScreen = mc.currentScreen;
+            Screen currentScreen = mc.screen;
 
             if (currentScreen != null) {
-                if (mc.isShiftPressed()) {
+                if (KeyUtil.isShiftDown()) {
                     // lista de opciones disponibles
-                    List<Text> lines = new ArrayList<>();
-                    lines.add(Text.literal("modos disponibles:"));
+                    List<Component> lines = new ArrayList<>();
+                    lines.add(Component.literal("modos disponibles:"));
 
                     for (Enum<?> val : setting.getValues()) {
                         if (val == setting.getValue())
-                            lines.add(Text.literal("> " + val.toString() + " <").formatted(Formatting.GREEN));
+                            lines.add(Component.literal("> " + val.toString() + " <").withStyle(ChatFormatting.GREEN));
                         else
-                            lines.add(Text.literal(val.toString()));
+                            lines.add(Component.literal(val.toString()));
                     }
 
-                    ctx.drawTooltip(mc.textRenderer, lines, mouseX, mouseY + 20);
+                    ctx.setComponentTooltipForNextFrame(mc.font, lines, mouseX, mouseY + 20);
                 } else {
                     // descripción normal del ajuste
-                    ctx.drawTooltip(Text.of(setting.getDescription()), mouseX, mouseY + 20);
+                    ctx.setTooltipForNextFrame(Component.literal(setting.getDescription()), mouseX, mouseY + 20);
                 }
             }
         }

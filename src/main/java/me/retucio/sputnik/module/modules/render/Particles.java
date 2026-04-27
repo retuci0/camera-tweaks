@@ -6,14 +6,15 @@ import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.Lists;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 
 public class Particles extends Module {
 
@@ -26,8 +27,8 @@ public class Particles extends Module {
             .toList();
 
     Map<SimpleParticleType, String> particleNames = Lists.getMapOfLists(particleList,
-            particleList.stream().map(particle -> Text.translatable(
-                    Registries.PARTICLE_TYPE.getId(particle).toShortTranslationKey()).getString())
+            particleList.stream().map(particle -> Component.translatable(
+                    BuiltInRegistries.PARTICLE_TYPE.getKey(particle).toShortLanguageKey()).getString())
                     .toList());
 
     private final ListSetting<SimpleParticleType> particles = sgGeneral.add(new ListSetting<>(
@@ -121,7 +122,7 @@ public class Particles extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         tickCounter++;
         if (tickCounter < spawnInterval.getIntValue()) {
@@ -132,7 +133,7 @@ public class Particles extends Module {
         List<SimpleParticleType> enabledParticles = particles.getEnabledOptions();
         if (enabledParticles.isEmpty()) return;
 
-        Vec3d basePos = new Vec3d(
+        Vec3 basePos = new Vec3(
                 mc.player.getX(),
                 mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()),
                 mc.player.getZ()
@@ -143,14 +144,14 @@ public class Particles extends Module {
                     random.nextInt(enabledParticles.size())
             );
 
-            Vec3d pos = getPos(basePos);
-            Vec3d vel = getVel();
+            Vec3 pos = getPos(basePos);
+            Vec3 vel = getVel();
 
-            double yaw = Math.toRadians(mc.player.getYaw());
+            double yaw = Math.toRadians(mc.player.getYRot());
             double offX = offsetX.getValue() * Math.cos(yaw) - offsetZ.getValue() * Math.sin(yaw);
             double offZ = offsetX.getValue() * Math.sin(yaw) + offsetZ.getValue() * Math.cos(yaw);
 
-            mc.world.addParticleClient(
+            mc.level.addParticle(
                     particle,
                     pos.x + offX,
                     pos.y + offsetY.getValue(),
@@ -160,24 +161,24 @@ public class Particles extends Module {
         }
     }
 
-    private Vec3d getPos(Vec3d basePos) {
+    private Vec3 getPos(Vec3 basePos) {
         double randX = (random.nextDouble() - 0.5) * 2 * positionRandomness.getValue();
         double randY = (random.nextDouble() - 0.5) * 2 * positionRandomness.getValue();
         double randZ = (random.nextDouble() - 0.5) * 2 * positionRandomness.getValue();
 
-        return new Vec3d(
+        return new Vec3(
                 basePos.x + (random.nextDouble() - 0.5) * spreadX.getValue() + randX,
                 basePos.y + (random.nextDouble() - 0.5) * spreadY.getValue() + randY,
                 basePos.z + (random.nextDouble() - 0.5) * spreadZ.getValue() + randZ
         );
     }
 
-    private Vec3d getVel() {
+    private Vec3 getVel() {
         double randX = (random.nextDouble() - 0.5) * 2 * velocityRandomness.getValue();
         double randY = (random.nextDouble() - 0.5) * 2 * velocityRandomness.getValue();
         double randZ = (random.nextDouble() - 0.5) * 2 * velocityRandomness.getValue();
 
-        return new Vec3d(
+        return new Vec3(
                 (random.nextDouble() - 0.5) * velocity.getValue() + randX,
                 (random.nextDouble() - 0.5) * velocity.getValue() + randY,
                 (random.nextDouble() - 0.5) * velocity.getValue() + randZ

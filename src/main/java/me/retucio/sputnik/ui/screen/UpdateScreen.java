@@ -1,26 +1,24 @@
 package me.retucio.sputnik.ui.screen;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.util.VersionChecker;
+import me.retucio.sputnik.util.misc.VersionChecker;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.client.gui.widget.SimplePositioningWidget;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.net.URI;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+
 
 public class UpdateScreen extends Screen {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
-    private final DirectionalLayoutWidget grid = DirectionalLayoutWidget.vertical();
+    private final Minecraft mc = Minecraft.getInstance();
+    private final LinearLayout grid = LinearLayout.vertical();
 
     private final URI updateLink = URI.create(FabricLoader.getInstance()
             .getModContainer(Sputnik.MOD_ID)
@@ -32,46 +30,46 @@ public class UpdateScreen extends Screen {
             + "/releases/latest"
     );
 
-    private final Text outdatedText = Text.of("version desactualizada: " + Sputnik.MOD_VERSION);
-    private final Text updateText = Text.of("descarga la última versión (" + VersionChecker.getLatestVersion() + ") desde aquí:");
+    private final Component outdatedText = Component.literal("version desactualizada: " + Sputnik.MOD_VERSION);
+    private final Component updateText = Component.literal("descarga la última versión (" + VersionChecker.getLatestVersion() + ") desde aquí:");
 
-    private final ButtonWidget idgafButton = ButtonWidget.builder(
-            Text.of("me la pela"),
-            button -> this.close()
+    private final Button idgafButton = Button.builder(
+            Component.literal("me la pela"),
+            button -> this.onClose()
     ).build();
 
-    private final ButtonWidget updateButton = ButtonWidget.builder(
-            Text.of("CLIC AQUÍ"),
-    button -> handleOpenUri(mc, this, updateLink)
+    private final Button updateButton = Button.builder(
+            Component.literal("CLIC AQUÍ"),
+    button -> clickUrlAction(mc, this, updateLink)
     ).build();
 
 
     public UpdateScreen() {
-        super(Text.literal(Formatting.BOLD + "actualizar"));
+        super(Component.literal(ChatFormatting.BOLD + "actualizar"));
     }
 
     @Override
     protected void init() {
         super.init();
-        this.grid.getMainPositioner().alignHorizontalCenter().margin(10);
+        this.grid.defaultCellSetting().alignHorizontallyCenter().padding(10);
 
-        this.grid.add(new TextWidget(this.title, this.textRenderer));
-        this.grid.add(new TextWidget(outdatedText, this.textRenderer));
-        this.grid.add(new TextWidget(updateText, this.textRenderer));
+        this.grid.addChild(new StringWidget(this.title, this.font));
+        this.grid.addChild(new StringWidget(outdatedText, this.font));
+        this.grid.addChild(new StringWidget(updateText, this.font));
 
-        this.grid.getMainPositioner().margin(2);
+        this.grid.defaultCellSetting().padding(2);
 
-        this.grid.add(updateButton);
-        this.grid.add(idgafButton);
+        this.grid.addChild(updateButton);
+        this.grid.addChild(idgafButton);
 
-        this.grid.refreshPositions();
-        this.grid.forEachChild(this::addDrawableChild);
-        this.refreshWidgetPositions();
+        this.grid.arrangeElements();
+        this.grid.visitWidgets(this::addRenderableWidget);
+        this.repositionElements();
     }
 
     @Override
-    protected void refreshWidgetPositions() {
-        SimplePositioningWidget.setPos(this.grid, this.getNavigationFocus());
+    protected void repositionElements() {
+        FrameLayout.centerInRectangle(this.grid, this.getRectangle());
     }
 
     @Override
@@ -80,7 +78,7 @@ public class UpdateScreen extends Screen {
     }
 
     @Override
-    public boolean canInterruptOtherScreen() {
+    public boolean canInterruptWithAnotherScreen() {
         return true;
     }
 }

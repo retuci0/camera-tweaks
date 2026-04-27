@@ -11,7 +11,7 @@ import me.retucio.sputnik.ui.widgets.buttons.*;
 import me.retucio.sputnik.ui.widgets.Frame;
 import me.retucio.sputnik.util.Colors;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -38,14 +38,14 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         updateWidth();
 
         // cabezal
         int centerX = x + w / 2;
         int centerY = renderY + h / 2;
         int titleX = x + 2 * PADDING;
-        int titleY = centerY - mc.textRenderer.fontHeight / 2;
+        int titleY = centerY - mc.font.lineHeight / 2;
 
         int headerColor = module.isEnabled()
                 ? Colors.enabledToggleButtonColor.getRGB()
@@ -55,9 +55,9 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
                 ? Color.RED.getRGB()
                 : -1;
 
-        ctx.fill(x, renderY, x + w, renderY + h, headerColor);
-        ctx.drawText(mc.textRenderer, title, titleX, titleY, -1, true);
-        ctx.drawText(mc.textRenderer, "×", x + w - mc.textRenderer.getWidth("×") - 2 * PADDING, titleY, closeButtonColor, true);
+        gui.fill(x, renderY, x + w, renderY + h, headerColor);
+        gui.text(mc.font, title, titleX, titleY, -1, true);
+        gui.text(mc.font, "×", x + w - mc.font.width("×") - 2 * PADDING, titleY, closeButtonColor, true);
 
         // filtrar botones visibles
         visibleButtons = buttons.stream()
@@ -68,7 +68,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
         List<String> descLines = wrapDescription(module.getDescription(), w - 2 * PADDING);
         int lineSpacing = 2;
 
-        int descHeight = descLines.size() * mc.textRenderer.fontHeight + (descLines.size() - 1) * lineSpacing;
+        int descHeight = descLines.size() * mc.font.lineHeight + (descLines.size() - 1) * lineSpacing;
         int descBoxTop = renderY + h + PADDING;
         int descBoxBottom = descBoxTop + descHeight + PADDING * 2;
 
@@ -98,10 +98,10 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
         }
 
         // fondo del marco
-        ctx.fill(x, descBoxTop - PADDING + 1, x + w, descBoxTop + totalHeight, Colors.frameBGColor.getRGB());
+        gui.fill(x, descBoxTop - PADDING + 1, x + w, descBoxTop + totalHeight, Colors.frameBGColor.getRGB());
 
         // fondo de la descripción
-        ctx.fill(x + PADDING, descBoxTop, x + w - PADDING, descBoxBottom, Colors.buttonColor.getRGB());
+        gui.fill(x + PADDING, descBoxTop, x + w - PADDING, descBoxBottom, Colors.buttonColor.getRGB());
 
         // restablecer currentY
         currentY = descBoxBottom + PADDING;
@@ -114,9 +114,9 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
                         ? Colors.buttonColor.brighter().getRGB()
                         : Colors.buttonColor.getRGB();
 
-                ctx.fill(x + PADDING, currentY, x + w - PADDING, currentY + h, groupHeaderColor);
-                ctx.drawText(mc.textRenderer, group.getName(), x + PADDING * 2, currentY + (h - mc.textRenderer.fontHeight) / 2, -1, true);
-                ctx.drawText(mc.textRenderer, group.isExtended() ? "-" : "+", x + w - 4 * PADDING, currentY + (h - mc.textRenderer.fontHeight) / 2, -1, true);
+                gui.fill(x + PADDING, currentY, x + w - PADDING, currentY + h, groupHeaderColor);
+                gui.text(mc.font, group.getName(), x + PADDING * 2, currentY + (h - mc.font.lineHeight) / 2, -1, true);
+                gui.text(mc.font, group.isExtended() ? "-" : "+", x + w - 4 * PADDING, currentY + (h - mc.font.lineHeight) / 2, -1, true);
 
                 currentY += h + PADDING;
 
@@ -130,7 +130,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
                             sb.setY(currentY);
                             sb.setW(w - PADDING * 4);
                             sb.setH(h - h / 4);
-                            sb.render(ctx, mouseX, mouseY, delta);
+                            sb.render(gui, mouseX, mouseY, delta);
 
                             if (j < groupButtons.size() - 1) {
                                 currentY += (h - h / 4) + PADDING;
@@ -148,16 +148,16 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
         int firstLineY = descBoxTop + ((descBoxBottom - descBoxTop) - descHeight) / 2;
         for (int i = 0; i < descLines.size(); i++) {
             String line = descLines.get(i);
-            int lineX = centerX - mc.textRenderer.getWidth(line) / 2;
-            int lineY = firstLineY + i * (mc.textRenderer.fontHeight + lineSpacing);
-            ctx.drawText(mc.textRenderer, line, lineX, lineY, -1, true);
+            int lineX = centerX - mc.font.width(line) / 2;
+            int lineY = firstLineY + i * (mc.font.lineHeight + lineSpacing);
+            gui.text(mc.font, line, lineX, lineY, -1, true);
         }
     }
 
     @Override
-    public void drawTooltips(DrawContext ctx, int mouseX, int mouseY) {
+    public void drawTooltips(GuiGraphicsExtractor gui, int mouseX, int mouseY) {
         for (SettingButton<?> sb : visibleButtons)
-            sb.drawTooltip(ctx, mouseX, mouseY);
+            sb.drawTooltip(gui, mouseX, mouseY);
     }
 
     @Override
@@ -215,9 +215,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
     @Override
     public void updateWidth() {
         // asegurarse de que todos los botones caben en el marco, haciendo que la anchura se ajuste al texto más largo
-        if (mc.textRenderer == null) return;
-
-        int maxWidth = mc.textRenderer.getWidth(title);
+        int maxWidth = mc.font.width(title);
         for (SettingButton<?> button : buttons) {
             String text = button.getSetting().getName();
 
@@ -226,15 +224,16 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
                 case CycleButton<?> cycleButton -> text += ": " + cycleButton.getSetting().getValue();
                 case BindButton bindButton -> text += ": " + bindButton.getSetting().getKeyName();
                 case TextButton textButton -> text += ": " + textButton.getSetting().getValue();
+                case ColorButton colorButton -> text += colorButton.getSetting().getTooltipText();
                 default -> {}
             }
 
-            int textWidth = mc.textRenderer.getWidth(text);
+            int textWidth = mc.font.width(text);
             maxWidth = Math.max(maxWidth, textWidth);
         }
 
         for (SettingGroup group : settingGroups) {
-            int groupTextWidth = mc.textRenderer.getWidth("▶ " + group.getName());
+            int groupTextWidth = mc.font.width(group.getName() + " +");
             maxWidth = Math.max(maxWidth, groupTextWidth);
         }
 
@@ -251,8 +250,8 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
     public int getGroupHeaderY(int groupIndex) {
         int currentY = renderY + h + PADDING;
         List<String> descLines = wrapDescription(module.getDescription(), w - 2 * PADDING);
-        int descHeight = descLines.size() * mc.textRenderer.fontHeight + (descLines.size() - 1) * 2;
-        currentY += descHeight + 3 * PADDING; // descBoxBottom + padding
+        int descHeight = descLines.size() * mc.font.lineHeight + (descLines.size() - 1) * 2;
+        currentY += descHeight + 3 * PADDING;  // descBoxBottom + padding
 
         // iterar hasta llegar al grupo deseado
         int currentIndex = 0;
@@ -354,14 +353,13 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
 
     private List<String> wrapDescription(String text, int maxWidth) {
         List<String> lines = new ArrayList<>();
-        if (mc.textRenderer == null) return lines;
 
         String[] words = text.split(" ");
         StringBuilder line = new StringBuilder();
 
         for (String word : words) {
             String testLine = line.isEmpty() ? word : line + " " + word;
-            if (mc.textRenderer.getWidth(testLine) > maxWidth - 2 * PADDING) {
+            if (mc.font.width(testLine) > maxWidth - 2 * PADDING) {
                 if (!line.isEmpty()) lines.add(line.toString());
                 line = new StringBuilder(word);
             } else {
@@ -378,7 +376,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
     }
 
     protected boolean isCloseButtonHovered(double mouseX, double mouseY) {
-        return mouseX > x + w - mc.textRenderer.getWidth("×") - 3 * PADDING && mouseX < x + w - PADDING
+        return mouseX > x + w - mc.font.width("×") - 3 * PADDING && mouseX < x + w - PADDING
                 && mouseY > renderY + PADDING && mouseY < renderY + h - PADDING;
     }
 

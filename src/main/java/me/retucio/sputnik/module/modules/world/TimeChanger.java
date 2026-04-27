@@ -3,18 +3,18 @@ package me.retucio.sputnik.module.modules.world;
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.mixin.mixins.render.SkyRendererMixin;
-import me.retucio.sputnik.mixin.mixins.world.ClientWorldPropertiesMixin;
+import me.retucio.sputnik.mixin.mixins.world.ClientLevelDataMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 
 
 /** continúa en:
- * @see ClientWorldPropertiesMixin
+ * @see ClientLevelDataMixin
  * @see SkyRendererMixin
  */
 
@@ -42,28 +42,28 @@ public class TimeChanger extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.world == null) return;
-        realTime = mc.world.getTime();
+        if (mc.level == null) return;
+        realTime = mc.level.getGameTime();
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        if (mc.world == null) return;
-        mc.world.getLevelProperties().setTimeOfDay(realTime);
+        if (mc.level == null) return;
+        mc.level.getLevelData().setGameTime(realTime);
         super.onDisable();
     }
 
     @Override
     public void onTick() {
-        if (mc.world == null) return;
-        mc.world.getLevelProperties().setTimeOfDay(time.getLongValue());
+        if (mc.level == null) return;
+        mc.level.getLevelData().setGameTime(time.getLongValue());
     }
 
     @EventListener
     private void onPacketReceive(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket packet) {
-            realTime = packet.timeOfDay();
+        if (event.getPacket() instanceof ClientboundSetTimePacket packet) {
+            realTime = packet.gameTime();
             event.cancel();
         }
     }

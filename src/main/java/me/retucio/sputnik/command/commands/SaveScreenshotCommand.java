@@ -5,7 +5,7 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.misc.ScreenshotPlus;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ public class SaveScreenshotCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder.executes(ctx -> {
             ScreenshotPlus screenshotPlus = ModuleManager.INSTANCE.getModuleByClass(ScreenshotPlus.class);
 

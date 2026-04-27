@@ -1,24 +1,26 @@
 package me.retucio.sputnik.event.render;
 
 import com.github.retucio.neutrino.Event;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
+
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+
 
 public class Render2DEvent extends Event {
 
-    private final DrawContext ctx;
-    private final RenderTickCounter tc;
+    private final GuiGraphicsExtractor gui;
+    private final DeltaTracker dt;
 
-    public Render2DEvent(DrawContext ctx, RenderTickCounter tc) {
-        this.ctx = ctx;
-        this.tc = tc;
+    public Render2DEvent(GuiGraphicsExtractor gui, DeltaTracker dt) {
+        this.gui = gui;
+        this.dt = dt;
     }
 
-    public DrawContext getCtx() {
-        return ctx;
+    public GuiGraphicsExtractor getGui() {
+        return gui;
     }
 
-    public RenderTickCounter getTc() {
-        return tc;
+    public DeltaTracker getDt() {
+        return dt;
     }
 }

@@ -2,10 +2,10 @@ package me.retucio.sputnik.ui.hud.elements;
 
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.TextHudElement;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
+
 
 public class FpsElement extends TextHudElement {
 
@@ -15,24 +15,19 @@ public class FpsElement extends TextHudElement {
 
     @Override
     public String getText(float delta, HUD hud) {
-        return "FPS: " + mc.getCurrentFps();
+        return "FPS: " + mc.getFps();
     }
 
     @Override
     public String getPreviewText() {
-        return "FPS: " + mc.getCurrentFps();
+        return "FPS: " + mc.getFps();
     }
 
     @Override
-    public List<Text> getTooltip() {
+    public List<Component> getTooltip() {
         return List.of(
-                Text.literal("FPS"),
-                Text.literal("te muestra los fotogramas por segundo a los que corre el juego")
+                Component.literal("FPS"),
+                Component.literal("te muestra los fotogramas por segundo a los que corre el juego")
         );
-    }
-
-    @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        
     }
 }

@@ -1,11 +1,10 @@
 package me.retucio.sputnik.ui.widgets.buttons;
 
 import me.retucio.sputnik.module.setting.Setting;
-import me.retucio.sputnik.ui.widgets.Frame;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.ui.widgets.Button;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
 // clase base para los botones de los ajustes
 public abstract class SettingButton<S extends Setting<?>> extends Button {
@@ -20,9 +19,9 @@ public abstract class SettingButton<S extends Setting<?>> extends Button {
     // dibujar "tooltips" (cajitas de texto bajo el puntero del ratón)
     // con la descripción para asistir al usuario en el caso de que tenga down
     @Override
-    public void drawTooltip(DrawContext ctx, int mouseX, int mouseY) {
+    public void drawTooltip(GuiGraphicsExtractor gui, int mouseX, int mouseY) {
         if (isHovered(mouseX, mouseY))
-            ctx.drawTooltip(Text.of(setting.getDescription()), mouseX, mouseY + 20);
+            gui.setTooltipForNextFrame(Component.literal(setting.getDescription()), mouseX, mouseY + 20);
     }
 
     @Override

@@ -8,7 +8,7 @@ import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.util.Colors;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class ClientSettingsFrame extends SettingsFrame {
 
@@ -21,25 +21,25 @@ public class ClientSettingsFrame extends SettingsFrame {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         updateWidth();
 
         // botones, fondo, etc.
         if (extended) {
-            super.render(ctx, mouseX, mouseY, delta);
+            super.render(gui, mouseX, mouseY, delta);
         }
 
         // cabezal
-        ctx.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB());
+        gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB());
 
-        ctx.drawText(mc.textRenderer, title,
+        gui.text(mc.font, title,
                 x + 8,
-                renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
+                renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
 
-        ctx.drawText(mc.textRenderer, extended ? "-" : "+",
-                x + w - mc.textRenderer.getWidth("+") - 8,
-                renderY + (h / 2) - (mc.textRenderer.fontHeight / 2),
+        gui.text(mc.font, extended ? "-" : "+",
+                x + w - mc.font.width("+") - 8,
+                renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
 
     }
@@ -84,8 +84,8 @@ public class ClientSettingsFrame extends SettingsFrame {
     }
 
     @Override
-    public void drawTooltips(DrawContext ctx, int mouseX, int mouseY) {
+    public void drawTooltips(GuiGraphicsExtractor gui, int mouseX, int mouseY) {
         if (!extended) return;
-        super.drawTooltips(ctx, mouseX, mouseY);
+        super.drawTooltips(gui, mouseX, mouseY);
     }
 }

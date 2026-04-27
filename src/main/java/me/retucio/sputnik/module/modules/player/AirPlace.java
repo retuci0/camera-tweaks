@@ -16,18 +16,17 @@ import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.NetworkUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 
 
 public class AirPlace extends Module {
 
     private final SettingGroup sgScroll = addSg(new SettingGroup("scrolleo", true));
-    private final SettingGroup sgRender = addSg(new SettingGroup("render", true));
+    private final SettingGroup sgRender = addSg(new SettingGroup("extractRenderState", true));
 
 
     // general
@@ -56,7 +55,7 @@ public class AirPlace extends Module {
             0.1
     ));
 
-    // render
+    // extractRenderState
     private final BooleanSetting outlines = sgRender.add(new BooleanSetting(
             "contorno",
             "renderizar contorno de la caja de prev.",
@@ -102,18 +101,18 @@ public class AirPlace extends Module {
     @Override
     public void onTick() {
         if (rangeValue == null) rangeValue = range.getIntValue();
-        if (mc.player == null || mc.world == null || mc.interactionManager == null || mc.getCameraEntity() == null) return;
-        result = mc.getCameraEntity().raycast(rangeValue, 0, false);
+        if (mc.player == null || mc.level == null || mc.gameMode == null || mc.getCameraEntity() == null) return;
+        result = mc.getCameraEntity().pick(rangeValue, 0, false);
     }
 
     @EventListener
     private void onUseItem(UseItemEvent event) {
         if (!(result instanceof BlockHitResult bhr) || !(event.getStack().getItem() instanceof BlockItem)) return;
-        Vec3d hitPos = Vec3d.ofCenter(bhr.getBlockPos());
+        Vec3 hitPos = Vec3.atCenterOf(bhr.getBlockPos());
 
         BlockHitResult result = new BlockHitResult(
-                hitPos, mc.player.getMovementDirection().getOpposite(), bhr.getBlockPos(), false);
-        if (mc.player.canPlaceOn(bhr.getBlockPos(), bhr.getSide().getOpposite(), event.getStack()) && range.isValid(rangeValue))
+                hitPos, mc.player.getMotionDirection().getOpposite(), bhr.getBlockPos(), false);
+        if (mc.player.mayUseItemAt(bhr.getBlockPos(), bhr.getDirection().getOpposite(), event.getStack()) && range.isValid(rangeValue))
             NetworkUtil.interactBlock(result, event.getHand(), true);
     }
 
@@ -134,9 +133,9 @@ public class AirPlace extends Module {
     @EventListener
     private void onRenderWorld(Render3DEvent event) {
         if (!(result instanceof BlockHitResult bhr)
-                || (mc.crosshairTarget != null
-                && mc.crosshairTarget.getType() != HitResult.Type.MISS)
-                || !mc.world.getBlockState(bhr.getBlockPos()).isReplaceable())
+                || (mc.hitResult != null
+                && mc.hitResult.getType() != HitResult.Type.MISS)
+                || !mc.level.getBlockState(bhr.getBlockPos()).canBeReplaced())
             return;
 
         if (outlines.getValue())

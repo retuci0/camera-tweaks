@@ -13,11 +13,11 @@ public class Dolphin extends Module {
     public void onTick() {
         if (mc.player == null) return;
 
-        if (mc.player.isTouchingWater()) {
+        if (mc.player.isInWater()) {
             mc.player.setSwimming(true);
 
-            if (mc.player.isSwimming() && mc.player.isSubmergedInWater()) {
-                mc.player.jump();
+            if (mc.player.isSwimming() && mc.player.isUnderWater()) {
+                mc.player.jumpFromGround();
             }
         }
     }

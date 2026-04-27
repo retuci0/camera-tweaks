@@ -1,12 +1,14 @@
 package me.retucio.sputnik.mixin.mixins.render;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import me.retucio.sputnik.event.render.GetFOVEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freelook;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.camera.PerspectivePlus;
-import net.minecraft.client.render.Camera;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,6 +19,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
+import static me.retucio.sputnik.Sputnik.EVENT_BUS;
+
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
@@ -34,7 +39,7 @@ public abstract class CameraMixin {
     Freelook freelook;
 
     @Shadow
-    private boolean thirdPerson;
+    private boolean detached;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void getModules(CallbackInfo ci) {
@@ -44,20 +49,24 @@ public abstract class CameraMixin {
     }
 
     @Inject(method = "update", at = @At("HEAD"))
-    private void onUpdateHead(World area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
-        this.tickDelta = tickDelta;
+    private void onUpdateHead(DeltaTracker deltaTracker, CallbackInfo ci) {
+        this.tickDelta = deltaTracker.getGameTimeDeltaTicks();
     }
 
+    @ModifyReturnValue(method = "getFov", at = @At("RETURN"))
+    private float modifyFov(float original) {
+        return EVENT_BUS.post(new GetFOVEvent(original)).getFov();
+    }
 
     // perspectiva
 
-    @ModifyVariable(method = "clipToSpace", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    @ModifyVariable(method = "getMaxZoom", at = @At("HEAD"), argsOnly = true, name = "cameraDist")
     private float modifyClipToSpace(float distance) {
         if (freecam.isEnabled()) return 0;
         return perspectivePlus.isEnabled() ? (float) perspectivePlus.getDistance() : distance;
     }
 
-    @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getMaxZoom", at = @At("HEAD"), cancellable = true)
     private void onClipToSpace(float distance, CallbackInfoReturnable<Float> cir) {
         if (perspectivePlus.isEnabled() && perspectivePlus.clip.getValue())
             cir.setReturnValue(distance);
@@ -67,12 +76,11 @@ public abstract class CameraMixin {
     // cámara libre
 
     @Inject(method = "update", at = @At("TAIL"))
-    private void onUpdateTail(World area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickProgress, CallbackInfo ci) {
-        if (freecam.isEnabled())
-            this.thirdPerson = true;
+    private void onUpdateTail(final DeltaTracker dt, CallbackInfo ci) {
+        if (freecam.isEnabled()) this.detached = true;
     }
 
-    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V"))
+    @ModifyArgs(method = "alignWithEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V"))
     private void onUpdateSetPosArgs(Args args) {
         if (freecam.isEnabled()) {
             args.set(0, freecam.getX(tickDelta));
@@ -81,7 +89,7 @@ public abstract class CameraMixin {
         }
     }
 
-    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V"))
+    @ModifyArgs(method = "alignWithEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V"))
     private void onUpdateSetRotationArgs(Args args) {
         if (freecam.isEnabled()) {
             args.set(0, freecam.getYaw(tickDelta));

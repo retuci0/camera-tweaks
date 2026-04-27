@@ -7,7 +7,7 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.ModuleArgumentType;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.SharedSuggestionProvider;
 import me.retucio.sputnik.module.Module;
 
 public class ConfigCommand extends Command {
@@ -17,7 +17,7 @@ public class ConfigCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder
                 .then(argument("módulo", ModuleArgumentType.INSTANCE)
                         .executes(ctx -> {
@@ -38,20 +38,20 @@ public class ConfigCommand extends Command {
     }
 
 
-    private void openSf(CommandContext<CommandSource> ctx) {
+    private void openSf(CommandContext<SharedSuggestionProvider> ctx) {
         Module module = ctx.getArgument("módulo", Module.class);
         mc.setScreen(ClickGUI.INSTANCE);
 
         if (ClickGUI.INSTANCE.isSettingsFrameOpen(module)) return;
 
         SettingsFrame sf = ClickGUI.INSTANCE.getSfOfModule(module);
-        int x = mc.getWindow().getScaledWidth() / 2 - sf.getW() / 2;
+        int x = mc.getWindow().getGuiScaledWidth() / 2 - sf.getW() / 2;
         int y = 67;
 
         ClickGUI.INSTANCE.openSettingsFrame(module, x, y);
     }
 
-    private void openSfWithPos(CommandContext<CommandSource> ctx, int x, int y) {
+    private void openSfWithPos(CommandContext<SharedSuggestionProvider> ctx, int x, int y) {
         Module module = ctx.getArgument("módulo", Module.class);
         mc.setScreen(ClickGUI.INSTANCE);
 

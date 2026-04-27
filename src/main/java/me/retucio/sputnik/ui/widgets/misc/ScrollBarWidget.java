@@ -4,9 +4,10 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.ui.widgets.Widget;
 import me.retucio.sputnik.util.Colors;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.awt.*;
+
 
 public class ScrollBarWidget extends Widget {
 
@@ -22,13 +23,13 @@ public class ScrollBarWidget extends Widget {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         if (contentHeight <= windowHeight || !ClientSettingsFrame.guiSettings.scrollBar.getValue()) return;
 
-        int trackX1 = mc.getWindow().getScaledWidth() - 10;
+        int trackX1 = mc.getWindow().getGuiScaledWidth() - 10;
         int trackX2 = trackX1 + 10;
 
-        ctx.fill(trackX1, 0, trackX2, windowHeight, Colors.buttonColor.getRGB());
+        gui.fill(trackX1, 0, trackX2, windowHeight, Colors.buttonColor.getRGB());
 
         int thumbHeight = getThumbHeight();
         int thumbY = getThumbY();
@@ -39,7 +40,7 @@ public class ScrollBarWidget extends Widget {
 
         if (dragging) thumbColor = Colors.mainColor.darker();
 
-        ctx.fill(trackX1 + 1, thumbY + 1, trackX2 - 1, thumbY + thumbHeight - 1, thumbColor.getRGB());
+        gui.fill(trackX1 + 1, thumbY + 1, trackX2 - 1, thumbY + thumbHeight - 1, thumbColor.getRGB());
     }
 
     @Override
@@ -80,7 +81,7 @@ public class ScrollBarWidget extends Widget {
 
     private boolean isThumbHovered(double mouseX, double mouseY) {
         if (!ClickGUI.INSTANCE.canSelect(this)) return false;
-        int trackX1 = mc.getWindow().getScaledWidth() - 10;
+        int trackX1 = mc.getWindow().getGuiScaledWidth() - 10;
         int trackX2 = trackX1 + 10;
         int thumbY = getThumbY();
         int thumbHeight = getThumbHeight();
@@ -91,7 +92,7 @@ public class ScrollBarWidget extends Widget {
         if (contentHeight <= windowHeight)
             scrollOffset = 0;
         else
-            scrollOffset = Math.max(0, Math.min(contentHeight - windowHeight, scrollOffset));
+            scrollOffset = Math.clamp(scrollOffset, 0, contentHeight - windowHeight);
     }
 
     private int getThumbY() {

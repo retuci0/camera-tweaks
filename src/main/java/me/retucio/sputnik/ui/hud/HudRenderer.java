@@ -4,21 +4,21 @@ import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.elements.*;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 public class HudRenderer {
 
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final Minecraft mc = Minecraft.getInstance();
 
     private static final List<HudElement> elements = new ArrayList<>();
     private static boolean initialized = false;
@@ -79,26 +79,26 @@ public class HudRenderer {
         return hud.color.getValue();
     }
 
-    public static void drawSnappedText(DrawContext ctx, String text, int x, int y, int color, boolean shadow) {
-        int textWidth = mc.textRenderer.getWidth(text);
-        int screenWidth = mc.getWindow().getScaledWidth();
-        int screenHeight = mc.getWindow().getScaledHeight();
+    public static void drawSnappedText(GuiGraphicsExtractor gui, String text, int x, int y, int color, boolean shadow) {
+        int textWidth = mc.font.width(text);
+        int screenWidth = mc.getWindow().getGuiScaledWidth();
+        int screenHeight = mc.getWindow().getGuiScaledHeight();
 
         boolean snapRight = x > screenWidth / 2;
         int drawX = snapRight ? x + (textWidth + 2) - textWidth : x;
 
-        drawX = Math.max(0, Math.min(drawX, screenWidth - textWidth));
-        y = Math.max(0, Math.min(y, screenHeight - mc.textRenderer.fontHeight));
+        drawX = Math.clamp(drawX, 0, screenWidth - textWidth);
+        y = Math.clamp(y, 0, screenHeight - mc.font.lineHeight);
 
-        ctx.drawText(mc.textRenderer, text, drawX, y, color, shadow);
+        gui.text(mc.font, text, drawX, y, color, shadow);
     }
 
-    public static void render(DrawContext ctx, RenderTickCounter tickCounter) {
+    public static void render(GuiGraphicsExtractor gui, DeltaTracker dt) {
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
 
         for (HudElement element : elements) {
             if (element.isVisible() && !shouldSkipRendering()) {
-                element.renderInGame(ctx, tickCounter.getDynamicDeltaTicks(), hud);
+                element.renderInGame(gui, dt.getGameTimeDeltaTicks(), hud);
             }
         }
     }
@@ -108,12 +108,12 @@ public class HudRenderer {
         return ModuleManager.INSTANCE == null
                 || mc.player == null
                 || mc.getCameraEntity() == null
-                || mc.currentScreen instanceof TitleScreen
-                || mc.options.hudHidden
+                || mc.screen instanceof TitleScreen
+                || mc.options.hideGui
                 || !hud.isEnabled()
-                || (mc.debugHudEntryList.isF3Enabled() && !hud.showOnF3.getValue())
-                || (mc.currentScreen instanceof ChatScreen && !hud.showOnChat.getValue())
-                || mc.currentScreen instanceof HudEditorScreen;
+                || (mc.debugEntries.isOverlayVisible() && !hud.showOnF3.getValue())
+                || (mc.screen instanceof ChatScreen && !hud.showOnChat.getValue())
+                || mc.screen instanceof HudEditorScreen;
     }
 
     public static List<HudElement> getElements() {

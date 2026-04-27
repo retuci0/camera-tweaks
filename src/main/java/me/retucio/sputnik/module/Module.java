@@ -10,7 +10,7 @@ import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.module.setting.Setting;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Method;
@@ -37,7 +37,7 @@ public class Module {
     protected final List<SettingGroup> sgs = new ArrayList<>();
     protected final SettingGroup sgGeneral = addSg(new SettingGroup("general", true));
 
-    protected MinecraftClient mc = MinecraftClient.getInstance();
+    protected Minecraft mc = Minecraft.getInstance();
 
 
     public Module(String name, String description, Category category) {

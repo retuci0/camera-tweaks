@@ -1,21 +1,27 @@
 package me.retucio.sputnik.mixin.mixins.render;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
+import com.llamalad7.mixinextras.sugar.Local;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.render.NoRender;
-import net.minecraft.block.enums.CameraSubmersionType;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.fog.FogModifier;
-import net.minecraft.client.render.fog.FogRenderer;
-import net.minecraft.entity.Entity;
+
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.fog.FogRenderer;
+import net.minecraft.client.renderer.fog.environment.FogEnvironment;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.material.FogType;
+
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
 
 @Mixin(FogRenderer.class)
 public abstract class FogRendererMixin {
@@ -28,31 +34,36 @@ public abstract class FogRendererMixin {
         noRender = ModuleManager.INSTANCE.getModuleByClass(NoRender.class);
     }
 
-    @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/fog/FogModifier;shouldApply(Lnet/minecraft/block/enums/CameraSubmersionType;Lnet/minecraft/entity/Entity;)Z"))
-    private boolean noRenderFogs(FogModifier instance, CameraSubmersionType cameraSubmersionType, Entity entity) {
-        if (!noRender.isEnabled()) return instance.shouldApply(cameraSubmersionType, entity);
+    @Redirect(method = "setupFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/fog/environment/FogEnvironment;isApplicable(Lnet/minecraft/world/level/material/FogType;Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean noRenderFogs(FogEnvironment instance, FogType fogType, Entity entity) {
+        if (!noRender.isEnabled()) return instance.isApplicable(fogType, entity);
         String className = instance.getClass().getSimpleName();
 
         if ((className.equals("BlindnessEffectFogModifier") && !noRender.blindnessEffect.getValue())
                 || (className.equals("DarknessEffectFogModifier") && !noRender.darknessEffect.getValue())
                 || ((className.equals("LavaFogModifier") || className.equals("WaterFogModifier")
-                        || className.equals("PowederSnowFogModifier")) && !noRender.fluidOverlay.getValue()))
+                    || className.equals("PowederSnowFogModifier")) && !noRender.fluidOverlay.getValue()))
+        {
             return false;
+        }
 
-        return instance.shouldApply(cameraSubmersionType, entity);
+        return instance.isApplicable(fogType, entity);
     }
 
-    @ModifyReturnValue(method = "getFogColor", at = @At("RETURN"))
-    private Vector4f modifyLavaFog(Vector4f original, Camera camera) {
+    @ModifyArgs(method = "computeFogColor", at = @At(value = "INVOKE", target = "Lorg/joml/Vector4f;set(FFFF)Lorg/joml/Vector4f;"))
+    private void modifyLavaFog(Args args, @Local(argsOnly = true, name = "dest") Vector4f original, @Local(argsOnly = true, name = "camera") Camera camera) {
         if (noRender.isEnabled() && !noRender.fluidOverlay.getValue() &&
-                (camera.getSubmersionType() == CameraSubmersionType.LAVA
-                        || camera.getSubmersionType() == CameraSubmersionType.WATER))
-            return new Vector4f(original.x, original.y, original.z, 0f);
-
-        return original;
+                (camera.getFluidInCamera() == FogType.LAVA
+                        || camera.getFluidInCamera() == FogType.WATER))
+        {
+            args.set(0, original.x);
+            args.set(1, original.y);
+            args.set(2, original.z);
+            args.set(3, 0);
+        }
     }
 
-    @ModifyExpressionValue(method = "getFogColor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getUnderwaterVisibility()F"))
+    @ModifyExpressionValue(method = "computeFogColor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getWaterVision()F"))
     private float noRenderUnderwaterFog(float original) {
         return (noRender.isEnabled() && !noRender.fluidOverlay.getValue()) ? 0 : original;
     }

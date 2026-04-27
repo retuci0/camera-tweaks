@@ -8,9 +8,8 @@ import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.Colors;
-import me.retucio.sputnik.util.MiscUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class Breadcrumbs extends Module {
     ));
 
     private final List<Breadcrumb> crumbs = new ArrayList<>();
-    private Vec3d lastPos = null;
+    private Vec3 lastPos = null;
 
     public Breadcrumbs() {
         super("recorrido", "muestra tu recorrido", Category.RENDER);
@@ -85,17 +84,18 @@ public class Breadcrumbs extends Module {
         }
 
         if (lastPos != null) {
-            crumbs.add(new Breadcrumb(lastPos, mc.player.getEntityPos(), (int) (lifeTime.getValue() * 20)));
+            crumbs.add(new Breadcrumb(lastPos, mc.player.position(), (int) (lifeTime.getValue() * 20)));
         }
-        lastPos = mc.player.getEntityPos();
+
+        lastPos = mc.player.position();
     }
 
 
     private static class Breadcrumb {
-        Vec3d from, to;
+        Vec3 from, to;
         int lifeTime, age;
 
-        public Breadcrumb(Vec3d from, Vec3d to, int lifeTime) {
+        public Breadcrumb(Vec3 from, Vec3 to, int lifeTime) {
             this.from = from;
             this.to = to;
             this.lifeTime = lifeTime;

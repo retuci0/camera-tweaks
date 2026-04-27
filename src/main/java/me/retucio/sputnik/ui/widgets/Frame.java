@@ -1,9 +1,10 @@
 package me.retucio.sputnik.ui.widgets;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public abstract class Frame<B extends Button> extends Widget  {
 
@@ -23,8 +24,8 @@ public abstract class Frame<B extends Button> extends Widget  {
         this.title = title;
     }
 
-    public void drawTooltips(DrawContext ctx, int mouseX, int mouseY) {
-        for (Button button : visibleButtons) button.drawTooltip(ctx, mouseX, mouseY);
+    public void drawTooltips(GuiGraphicsExtractor gui, int mouseX, int mouseY) {
+        for (Button button : visibleButtons) button.drawTooltip(gui, mouseX, mouseY);
     }
 
     protected abstract void updateWidth();

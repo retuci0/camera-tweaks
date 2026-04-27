@@ -1,6 +1,6 @@
 # jenny's mod 2 100% real
 
-mod para Minecraft Fabric 1.21.11 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
+mod para Minecraft Fabric 26.1 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
 
 ## instalación
 
@@ -10,7 +10,7 @@ mod para Minecraft Fabric 1.21.11 que añade algunas cosas QOL, mayormente relac
 3. descargar el .jar
 4. moverlo a tu directorio de mods (probablemente `%appdata%/.minecraft/mods`)
 
-asegúrate de tener una version de Minecraft y Fabric compatibles con el mod (MC `1.21.11`; Fabric `0.17.3`)
+asegúrate de tener una version de Minecraft y Fabric compatibles con el mod (MC `26.1`; Fabric `0.18.5`)
 es posible que haya problemas al usarlo junto a otros mods, especialmente junto a otros clientes, pues pueden conflictar entre ellos.
 
 ### para frikis de 200 de iq

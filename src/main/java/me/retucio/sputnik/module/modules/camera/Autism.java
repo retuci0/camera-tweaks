@@ -6,7 +6,7 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 
 
 /**
@@ -40,25 +40,25 @@ public class Autism extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.getNetworkHandler() == null) return;
+        if (mc.player == null || mc.getConnection() == null) return;
 
         if (direction.is(RotationDirection.CLOCKWISE))
             yaw += interval.getFloatValue();
         if (direction.is(RotationDirection.COUNTERCLOCKWISE))
             yaw -= interval.getFloatValue();
 
-        mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
+        mc.getConnection().send(new ServerboundMovePlayerPacket.Rot(
                 yaw,
-                mc.player.getPitch(),
-                mc.player.isOnGround(),
+                mc.player.getXRot(),
+                mc.player.onGround(),
                 mc.player.horizontalCollision
         ));
     }
 
     @EventListener
     private void onPacketSend(PacketEvent.Send event) {
-        if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround packet
-                && packet.getYaw(yaw) != yaw) event.cancel();
+        if (event.getPacket() instanceof ServerboundMovePlayerPacket.Rot packet
+                && packet.getYRot(yaw) != yaw) event.cancel();
     }
 
     private enum RotationDirection {

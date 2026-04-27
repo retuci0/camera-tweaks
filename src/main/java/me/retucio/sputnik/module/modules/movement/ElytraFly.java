@@ -3,10 +3,10 @@ package me.retucio.sputnik.module.modules.movement;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 
 
 public class ElytraFly extends Module {
@@ -26,19 +26,19 @@ public class ElytraFly extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || !mc.player.isGliding() || !wearingElytra()) return;
+        if (mc.player == null || !mc.player.isFallFlying() || !wearingElytra()) return;
 
-        float yaw = mc.player.getYaw();
+        float yaw = mc.player.getYRot();
         int dx = 0, dy = 0, dz = 0;
 
-        if (mc.options.rightKey.isPressed()) dx++;
-        if (mc.options.leftKey.isPressed()) dx--;
+        if (mc.options.keyRight.isDown()) dx++;
+        if (mc.options.keyLeft.isDown()) dx--;
 
-        if (mc.options.jumpKey.isPressed()) dy++;
-        if (mc.options.sneakKey.isPressed()) dy--;
+        if (mc.options.keyJump.isDown()) dy++;
+        if (mc.options.keyShift.isDown()) dy--;
 
-        if (mc.options.backKey.isPressed()) dz++;
-        if (mc.options.forwardKey.isPressed()) dz--;
+        if (mc.options.keyDown.isDown()) dz++;
+        if (mc.options.keyUp.isDown()) dz--;
 
         double speed = this.speed.getValue();
         double sin = Math.sin(Math.toRadians(yaw));
@@ -51,11 +51,11 @@ public class ElytraFly extends Module {
         x += speed * dx * -cos;
         z += speed * dx * -sin;
 
-        mc.player.setVelocity(new Vec3d(x, y, z));
+        mc.player.setDeltaMovement(new Vec3(x, y, z));
     }
 
     private boolean wearingElytra() {
-        ItemStack equippedStack = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-        return equippedStack != null && equippedStack.getItem() == Items.ELYTRA;
+        ItemStack equippedStack = mc.player.getItemBySlot(EquipmentSlot.CHEST);
+        return equippedStack.getItem() == Items.ELYTRA;
     }
 }

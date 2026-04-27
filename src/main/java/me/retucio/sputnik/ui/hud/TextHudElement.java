@@ -2,7 +2,7 @@ package me.retucio.sputnik.ui.hud;
 
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.util.Colors;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 
 public abstract class TextHudElement extends HudElement {
@@ -15,39 +15,39 @@ public abstract class TextHudElement extends HudElement {
     public abstract String getPreviewText();
 
     @Override
-    public void renderInGame(DrawContext ctx, float delta, HUD hud) {
+    public void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud) {
         String text = getText(delta, hud);
         int color = hud != null ? hud.color.getValue().getRGB() : -1;
         boolean shadow = hud != null && hud.shadow.getValue();
-        HudRenderer.drawSnappedText(ctx, text, x, y, color, shadow);
+        HudRenderer.drawSnappedText(gui, text, x, y, color, shadow);
     }
 
     @Override
-    public void renderInEditor(DrawContext ctx, HUD hud) {
+    public void renderInEditor(GuiGraphicsExtractor gui, HUD hud) {
         String previewText = getPreviewText();
-        w = mc.textRenderer.getWidth(previewText);
-        h = mc.textRenderer.fontHeight;
+        w = mc.font.width(previewText);
+        h = mc.font.lineHeight;
 
-        drawEditorBackground(ctx);
+        drawEditorBackground(gui);
 
         int color = hud != null ? hud.color.getValue().getRGB() : -1;
         boolean shadow = hud != null && hud.shadow.getValue();
-        HudRenderer.drawSnappedText(ctx, previewText, x, y, color, shadow);
+        HudRenderer.drawSnappedText(gui, previewText, x, y, color, shadow);
     }
 
-    protected void drawEditorBackground(DrawContext ctx) {
+    protected void drawEditorBackground(GuiGraphicsExtractor gui) {
         int bgColor = visible ? Colors.visibleHudElementColor.getRGB() : Colors.disabledHudElementColor.getRGB();
         int outlineColor = HudEditorScreen.INSTANCE != null && HudEditorScreen.INSTANCE.isSelected(this)
                 ? Colors.selectedHudElementOutlineColor.getRGB()
                 : Colors.unselectedHudElementOutlineColor.getRGB();
 
         // fondo
-        ctx.fill(x - 1, y - 1, x + w + 1, y + h + 1, bgColor);
+        gui.fill(x - 1, y - 1, x + w + 1, y + h + 1, bgColor);
 
         // contorno
-        ctx.fill(x - 1, y - 1, x + w + 1, y, outlineColor);
-        ctx.fill(x - 1, y + h, x + w + 1, y + h + 1, outlineColor);
-        ctx.fill(x - 1, y, x, y + h, outlineColor);
-        ctx.fill(x + w, y, x + w + 1, y + h, outlineColor);
+        gui.fill(x - 1, y - 1, x + w + 1, y, outlineColor);
+        gui.fill(x - 1, y + h, x + w + 1, y + h + 1, outlineColor);
+        gui.fill(x - 1, y, x, y + h, outlineColor);
+        gui.fill(x + w, y, x + w + 1, y + h, outlineColor);
     }
 }

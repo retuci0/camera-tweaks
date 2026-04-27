@@ -5,14 +5,14 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.sputnik.LoadModuleManagerEvent;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 
 // cosas útiles relacionadas al chat
 public class ChatUtil {
 
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final Minecraft mc = Minecraft.getInstance();
     private static String prefix = getDefaultPrefix();
 
     public static void onLoadModuleManager(LoadModuleManagerEvent event) {
@@ -21,7 +21,7 @@ public class ChatUtil {
 
     public static void simulateChatMessage(String message) {
         if (message.startsWith("/")) {
-            mc.player.networkHandler.sendChatCommand(message.substring(1));
+            mc.player.connection.sendCommand(message.substring(1));
         } else if (message.startsWith(CommandManager.INSTANCE.getPrefix())) {
             try {
                 CommandManager.dispatch(message.substring(CommandManager.INSTANCE.getPrefix().length()));
@@ -29,59 +29,50 @@ public class ChatUtil {
                 ChatUtil.error(e.getMessage());
             }
         } else {
-            mc.player.networkHandler.sendChatMessage(message);
+            mc.player.connection.sendChat(message);
         }
     }
 
 
     public static void addMessage(String text) {
-        addMessage(Text.of(text));
+        addMessage(Component.nullToEmpty(text));
     }
 
-    public static void addMessage(Text text) {
-        if (mc.inGameHud == null || !Sputnik.settingsApplied) return;
-        mc.inGameHud.getChatHud().addMessage(text);
+    public static void addMessage(Component text) {
+        if (!Sputnik.settingsApplied) return;
+        mc.gui.getChat().addClientSystemMessage(text);
     }
 
     public static void addMessageWithPrefix(String text) {
-        addMessageWithPrefix(Text.of(text));
+        addMessageWithPrefix(Component.nullToEmpty(text));
     }
 
-    public static void addMessageWithPrefix(Text text) {
-        addMessage(Text.literal(getPrefix() + Formatting.RESET).append(text));
+    public static void addMessageWithPrefix(Component text) {
+        addMessage(Component.literal(getPrefix() + ChatFormatting.RESET).append(text));
     }
 
     public static void info(String text) {
-        addMessage(Text.literal(getPrefix() + Formatting.RESET + text));
+        addMessage(Component.literal(getPrefix() + ChatFormatting.RESET + text));
     }
 
-    public static void info(Text text) {
-        addMessage(Text.literal(getPrefix() + Formatting.RESET).append(text));
+    public static void info(Component text) {
+        addMessage(Component.literal(getPrefix() + ChatFormatting.RESET).append(text));
     }
 
     public static void warn(String text) {
-        addMessage(Text.literal(getPrefix() + Formatting.YELLOW + text));
+        addMessage(Component.literal(getPrefix() + ChatFormatting.YELLOW + text));
     }
 
-    public static void warn(Text text) {
-        addMessage(Text.literal(getPrefix() + Formatting.YELLOW).append(text));
+    public static void warn(Component text) {
+        addMessage(Component.literal(getPrefix() + ChatFormatting.YELLOW).append(text));
     }
 
     public static void error(String text) {
-        addMessage(Text.literal(getPrefix() + Formatting.RED + text));
+        addMessage(Component.literal(getPrefix() + ChatFormatting.RED + text));
     }
 
-    public static void error(Text text) {
-        addMessage(Text.literal(getPrefix() + Formatting.RED).append(text));
-    }
-
-    public static void sendServerMessage(String text) {
-        sendServerMessage(Text.of(text));
-    }
-
-    public static void sendServerMessage(Text text) {
-        if (mc.player == null) return;
-        mc.player.sendMessage(text, false);
+    public static void error(Component text) {
+        addMessage(Component.literal(getPrefix() + ChatFormatting.RED).append(text));
     }
 
     public static String getPrefix() {

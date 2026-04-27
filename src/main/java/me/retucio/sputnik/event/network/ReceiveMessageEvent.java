@@ -1,41 +1,43 @@
 package me.retucio.sputnik.event.network;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.hud.ChatHudMixin;
-import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.text.Text;
+import me.retucio.sputnik.mixin.mixins.hud.ChatComponentMixin;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
+import net.minecraft.network.chat.Component;
+
 
 /**
- * @see ChatHudMixin#onAddMessage
+ * @see ChatComponentMixin#onAddMessage
  */
+
 public class ReceiveMessageEvent extends Event {
 
-    private Text text;
-    private MessageIndicator indicator;
+    private Component text;
+    private GuiMessageTag tag;
     private final int id;
     private boolean modified = false;
 
-    public ReceiveMessageEvent(Text text, MessageIndicator indicator, int id) {
+    public ReceiveMessageEvent(Component text, GuiMessageTag tag, int id) {
         this.text = text;
-        this.indicator =  indicator;
+        this.tag =  tag;
         this.id = id;
     }
 
-    public Text getMessage() {
+    public Component getMessage() {
         return text;
     }
 
-    public MessageIndicator getIndicator() {
-        return indicator;
+    public GuiMessageTag getTag() {
+        return tag;
     }
 
-    public void setMessage(Text message) {
+    public void setMessage(Component message) {
         this.text = message;
         this.modified = true;
     }
 
-    public void setIndicator(MessageIndicator indicator) {
-        this.indicator = indicator;
+    public void setTag(GuiMessageTag tag) {
+        this.tag = tag;
         this.modified = true;
     }
 

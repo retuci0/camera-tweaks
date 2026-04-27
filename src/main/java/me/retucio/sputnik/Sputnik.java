@@ -32,6 +32,8 @@ import me.retucio.sputnik.ui.widgets.Button;
 
 import me.retucio.sputnik.util.*;
 import me.retucio.sputnik.util.KeyUtil;
+import me.retucio.sputnik.util.misc.BlockIterator;
+import me.retucio.sputnik.util.misc.VersionChecker;
 import me.retucio.sputnik.util.render.DrawUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
 
@@ -40,13 +42,13 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
 import net.minecraft.SharedConstants;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
-import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.client.gui.screen.ingame.AnvilScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractCommandBlockEditScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,7 +62,7 @@ public class Sputnik implements ClientModInitializer {
     public static final EventBus EVENT_BUS = new EventBus();
     public static final Logger LOGGER = LogManager.getLogger(Sputnik.class);
     public static final long LAUNCH_TIME = System.currentTimeMillis();
-    public static MinecraftClient mc;
+    public static Minecraft mc;
 
     // id y versión
     public static final String MOD_ID = "sputnik";
@@ -81,7 +83,7 @@ public class Sputnik implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        mc = MinecraftClient.getInstance();
+        mc = Minecraft.getInstance();
         ConfigManager.load();
 
         VersionChecker.check();
@@ -99,7 +101,6 @@ public class Sputnik implements ClientModInitializer {
         EVENT_BUS.subscribe(BlockIterator.class);
 
         Lists.init();
-        Textures.init();
 
         CapeManager.INSTANCE = new CapeManager();
         EVENT_BUS.post(new LoadCapeManagerEvent());
@@ -110,11 +111,13 @@ public class Sputnik implements ClientModInitializer {
         CommandManager.INSTANCE = new CommandManager();
         EVENT_BUS.post(new LoadCommandManagerEvent());
 
-        ClickGUI.INSTANCE = new ClickGUI();
-        HudEditorScreen.INSTANCE = new HudEditorScreen();
-        EVENT_BUS.post(new LoadClickGUIEvent());
-
-        mc.execute(HudRenderer::init);
+        mc.execute(() -> {
+            Textures.init();
+            ClickGUI.INSTANCE = new ClickGUI();
+            HudEditorScreen.INSTANCE = new HudEditorScreen();
+            EVENT_BUS.post(new LoadClickGUIEvent());
+            HudRenderer.init();
+        });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             EVENT_BUS.post(new ShutdownEvent());
@@ -169,7 +172,7 @@ public class Sputnik implements ClientModInitializer {
 
     // se ocupa de la lógica de encendido y apagado de los módulos
     private void handleModuleToggle(int key, boolean anyFocused) {
-        if (mc.currentScreen != null && mc.currentScreen != ClickGUI.INSTANCE) return;
+        if (mc.screen != null && mc.screen != ClickGUI.INSTANCE) return;
 
         for (Module module : ModuleManager.INSTANCE.getModules()) {
             if (key != module.getKey() || anyFocused || KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) continue;  // evitar interrumpir combinaciones de teclas del F3
@@ -196,11 +199,11 @@ public class Sputnik implements ClientModInitializer {
         if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused || isOnTypingScreen())
             return;
 
-        if (mc.currentScreen != ClickGUI.INSTANCE) {
-            prevScreen = mc.currentScreen;
+        if (mc.screen != ClickGUI.INSTANCE) {
+            prevScreen = mc.screen;
             mc.setScreen(ClickGUI.INSTANCE);
         } else {
-            ClickGUI.INSTANCE.close();
+            ClickGUI.INSTANCE.onClose();
             mc.setScreen(prevScreen);
         }
     }
@@ -210,22 +213,22 @@ public class Sputnik implements ClientModInitializer {
         HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
         if (key != hud.editorKey.getValue() || anyFocused || isOnTypingScreen()) return;
 
-        if (mc.currentScreen != HudEditorScreen.INSTANCE) {
+        if (mc.screen != HudEditorScreen.INSTANCE) {
             if (!hud.isEnabled()) {
                 ChatUtil.warn("HUD está desactivado, lumbreras");
                 return;
             }
-            prevScreen = mc.currentScreen;
+            prevScreen = mc.screen;
             mc.setScreen(HudEditorScreen.INSTANCE);
         } else {
-            HudEditorScreen.INSTANCE.close();
+            HudEditorScreen.INSTANCE.onClose();
             mc.setScreen(prevScreen);
         }
     }
 
     // se ocupa de apagar los módulos que tengan configurado hacerlo tras soltar su tecla
     private void handleModuleRelease(int key) {
-        if (mc.currentScreen != null && mc.currentScreen != ClickGUI.INSTANCE) return;
+        if (mc.screen != null && mc.screen != ClickGUI.INSTANCE) return;
 
         for (Module module : ModuleManager.INSTANCE.getEnabledModules())
             if (module.shouldToggleOnBindRelease() && key == module.getKey())
@@ -233,10 +236,10 @@ public class Sputnik implements ClientModInitializer {
     }
 
     private boolean isOnTypingScreen() {
-                return mc.currentScreen instanceof ChatScreen
-                || mc.currentScreen instanceof AnvilScreen
-                || mc.currentScreen instanceof AbstractSignEditScreen
-                || mc.currentScreen instanceof AbstractCommandBlockScreen;
+                return mc.screen instanceof ChatScreen
+                || mc.screen instanceof AnvilScreen
+                || mc.screen instanceof AbstractSignEditScreen
+                || mc.screen instanceof AbstractCommandBlockEditScreen;
     }
 
     @EventListener
@@ -245,7 +248,7 @@ public class Sputnik implements ClientModInitializer {
         if (VersionChecker.shouldShowScreen && event.getScreen() instanceof TitleScreen) {
             event.cancel();
             VersionChecker.shouldShowScreen = false;
-            mc.execute(() -> mc.currentScreen = new UpdateScreen());
+            mc.execute(() -> mc.screen = new UpdateScreen());
         }
     }
 
@@ -255,6 +258,6 @@ public class Sputnik implements ClientModInitializer {
     }
 
     public static String getVersionName() {
-        return MOD_ID + "_v" + MOD_VERSION + "_" + SharedConstants.getGameVersion().name();
+        return MOD_ID + "_v" + MOD_VERSION + "_" + SharedConstants.getCurrentVersion().name();
     }
 }

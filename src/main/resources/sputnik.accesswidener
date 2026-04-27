@@ -1,60 +1,41 @@
-accessWidener   v2  named
+accessWidener   v2  official
 
 # red
-accessible field net/minecraft/client/network/DataQueryHandler expectedTransactionId I
-accessible field net/minecraft/network/ClientConnection queuedTasks Ljava/util/Queue;
-accessible method net/minecraft/network/ClientConnection handleQueuedTasks ()V
-accessible method net/minecraft/network/ClientConnection sendImmediately (Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V
-accessible method net/minecraft/network/ClientConnection handlePacket (Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;)V
-accessible method net/minecraft/client/world/ClientWorld getPendingUpdateManager ()Lnet/minecraft/client/network/PendingUpdateManager;
-accessible method net/minecraft/client/network/ClientPlayerInteractionManager sendSequencedPacket (Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V
-accessible class net/minecraft/client/network/ClientCommonNetworkHandler$ConfirmServerResourcePackScreen
-accessible class net/minecraft/client/network/ClientCommonNetworkHandler$ConfirmServerResourcePackScreen$Pack
+accessible method net/minecraft/network/Connection genericsFtw (Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;)V
+accessible method net/minecraft/network/Connection sendPacket (Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V
+accessible method net/minecraft/client/gui/screens/ConnectScreen connect (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/multiplayer/resolver/ServerAddress;Lnet/minecraft/client/multiplayer/ServerData;Lnet/minecraft/client/multiplayer/TransferState;)V
+accessible method net/minecraft/client/multiplayer/MultiPlayerGameMode startPrediction (Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V
+
+accessible class net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl$PackConfirmScreen
+accessible class net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl$PackConfirmScreen$PendingRequest
 
 # texto
-accessible method net/minecraft/client/font/FontManager getStorageInternal (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
-accessible class net/minecraft/client/font/TextRenderer$Drawer
-accessible field net/minecraft/client/font/TextHandler widthRetriever Lnet/minecraft/client/font/TextHandler$WidthRetriever;
+accessible class net/minecraft/client/gui/Font$PreparedTextBuilder
+accessible field net/minecraft/client/StringSplitter widthProvider Lnet/minecraft/client/StringSplitter$WidthProvider;
 
 # chat
-accessible class net/minecraft/client/gui/hud/ChatHud$Interactable
-accessible class net/minecraft/client/gui/hud/ChatHud$LineConsumer
+accessible class net/minecraft/client/gui/components/ChatComponent$DrawingFocusedGraphicsAccess
+accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V
 
 # entidad
-accessible field net/minecraft/entity/LivingEntity jumpingCooldown I
-accessible method net/minecraft/entity/Entity setFlag (IZ)V
-accessible method net/minecraft/entity/player/PlayerEntity canGlide ()Z
-accessible method net/minecraft/entity/LivingEntity calcGlidingVelocity (Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;
+accessible method net/minecraft/client/multiplayer/ClientLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+accessible method net/minecraft/world/entity/EntityReference resolve (Lnet/minecraft/world/level/entity/UniquelyIdentifyable;Ljava/lang/Class;)Lnet/minecraft/world/level/entity/UniquelyIdentifyable;
+accessible field net/minecraft/world/entity/LivingEntity noJumpDelay I
+accessible method net/minecraft/world/entity/LivingEntity updateFallFlyingMovement (Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;
 
 # partícula
-accessible field net/minecraft/client/particle/BillboardParticle alpha F
-accessible field net/minecraft/client/particle/Particle velocityMultiplier F
-accessible field net/minecraft/client/particle/BillboardParticle scale F
-accessible field net/minecraft/client/particle/Particle gravityStrength F
-accessible field net/minecraft/client/particle/Particle collidesWithWorld Z
-accessible class net/minecraft/client/particle/ParticleSpriteManager$SpriteAwareFactory
-accessible class net/minecraft/client/particle/ParticleSpriteManager$SimpleSpriteProvider
+accessible field net/minecraft/client/particle/SingleQuadParticle alpha F
+accessible field net/minecraft/client/particle/SingleQuadParticle quadSize F
+accessible field net/minecraft/client/particle/Particle friction F
+accessible field net/minecraft/client/particle/Particle gravity F
+accessible field net/minecraft/client/particle/Particle hasPhysics Z
 
 # renderizado 3d
-accessible field net/minecraft/client/render/WorldRenderer worldRenderState Lnet/minecraft/client/render/state/WorldRenderState;
-accessible method net/minecraft/client/render/RenderLayer <init> (Ljava/lang/String;Lnet/minecraft/client/render/RenderSetup;)V
-accessible method net/minecraft/client/render/GameRenderer getProjectionMatrix (F)Lorg/joml/Matrix4f;
-accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder withSnippet (Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;)V
+accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)V
 
 # misc.
-accessible field net/minecraft/client/MinecraftClient resourceManager Lnet/minecraft/resource/ReloadableResourceManagerImpl;
-accessible field net/minecraft/client/texture/TextureManager textures Ljava/util/Map;
-accessible method net/minecraft/client/MinecraftClient doItemUse ()V
-
-accessible class net/minecraft/entity/projectile/FishingBobberEntity$State
-
-accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
-accessible method net/minecraft/client/gui/screen/ingame/HandledScreen handleHotbarKeyPressed (Lnet/minecraft/client/input/KeyInput;)Z
-
-accessible method net/minecraft/client/Keyboard onKey (JILnet/minecraft/client/input/KeyInput;)V
-accessible class net/minecraft/client/MinecraftClient$LoadingContext
-
-accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket type Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler;
-accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket entityId I
-accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
-accessible method net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler getType ()Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType;
+accessible class net/minecraft/world/entity/projectile/FishingHook$FishHookState
+accessible method net/minecraft/client/Minecraft startUseItem ()V
+accessible method net/minecraft/client/KeyboardHandler keyPress (JILnet/minecraft/client/input/KeyEvent;)V
+accessible method net/minecraft/client/renderer/entity/layers/WingsLayer getPlayerElytraTexture (Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)Lnet/minecraft/resources/Identifier;
+accessible method net/minecraft/world/inventory/MenuType register (Ljava/lang/String;Lnet/minecraft/world/inventory/MenuType$MenuSupplier;)Lnet/minecraft/world/inventory/MenuType;

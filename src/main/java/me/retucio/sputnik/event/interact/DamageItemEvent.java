@@ -2,7 +2,7 @@ package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
 import me.retucio.sputnik.mixin.mixins.item.ItemStackMixin;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 
 /**

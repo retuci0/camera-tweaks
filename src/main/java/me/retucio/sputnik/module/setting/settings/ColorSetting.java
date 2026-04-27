@@ -2,7 +2,7 @@ package me.retucio.sputnik.module.setting.settings;
 
 import me.retucio.sputnik.module.setting.Setting;
 import me.retucio.sputnik.util.Colors;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -227,9 +227,9 @@ public class ColorSetting extends Setting<Color> {
         return getValue().getRGB();
     }
 
-    public Text getTooltipText() {
-        if (rainbow) return Text.literal("arcoíris");
-        return Text.literal(Colors.getFormatting(value) + Colors.ARGBtoHex(a, r, g, b));
+    public Component getTooltipText() {
+        if (rainbow) return Component.literal("arcoíris");
+        return Component.literal(Colors.getFormatting(value) + Colors.ARGBtoHex(a, r, g, b));
     }
 
     public void reset() {

@@ -3,9 +3,10 @@ package me.retucio.sputnik.ui.hud.elements;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.ImageHudElement;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
+
 
 public class DynoElement extends ImageHudElement {
 
@@ -13,8 +14,8 @@ public class DynoElement extends ImageHudElement {
 
     public DynoElement() {
         super("dyno",
-                mc.getWindow().getScaledWidth() - 100,
-                mc.getWindow().getScaledHeight() - 100);
+                mc.getWindow().getGuiScaledWidth() - 100,
+                mc.getWindow().getGuiScaledHeight() - 100);
         reloadTexture();
     }
 
@@ -32,10 +33,10 @@ public class DynoElement extends ImageHudElement {
     }
 
     @Override
-    public List<Text> getTooltip() {
+    public List<Component> getTooltip() {
         return List.of(
-                Text.literal("dinosaurio: " + dyno),
-                Text.literal("que viva el autismo joder")
+                Component.literal("dinosaurio: " + dyno),
+                Component.literal("que viva el autismo joder")
         );
     }
 }

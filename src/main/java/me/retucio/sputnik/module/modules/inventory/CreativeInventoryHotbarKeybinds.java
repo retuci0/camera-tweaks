@@ -1,12 +1,12 @@
 package me.retucio.sputnik.module.modules.inventory;
 
-import me.retucio.sputnik.mixin.mixins.screen.CreativeInventoryScreenMixin;
+import me.retucio.sputnik.mixin.mixins.screen.CreativeModeInventoryScreenMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 
 
 /** continúa en
- * @see CreativeInventoryScreenMixin
+ * @see CreativeModeInventoryScreenMixin
  *
  * @author retucio
  */

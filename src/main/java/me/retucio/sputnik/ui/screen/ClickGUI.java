@@ -25,13 +25,14 @@ import me.retucio.sputnik.ui.widgets.misc.SearchBarWidget;
 import me.retucio.sputnik.util.KeyUtil;
 
 import me.retucio.sputnik.util.MiscUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -41,10 +42,11 @@ import java.util.Optional;
 
 import static me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame.guiSettings;
 
+
 // interfaz gráfica, se abre con el shift derecho por defecto. aquí se encuentran los módulos y sus ajustes
 public class ClickGUI extends Screen {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
     public static ClickGUI INSTANCE;
 
     private boolean anyFocused;
@@ -61,21 +63,21 @@ public class ClickGUI extends Screen {
     private final List<Widget> miscWidgets = Arrays.asList(scrollBar, searchBar);
 
     public ClickGUI() {
-        super(Text.of("interfaz"));
+        super(Component.nullToEmpty("interfaz"));
         settingsFrames.add(guiSettingsFrame);
         Sputnik.EVENT_BUS.subscribe(this);
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        scrollBar.setWindowHeight(mc.getWindow().getScaledHeight());
+    public void extractRenderState(@NonNull GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
+        scrollBar.setWindowHeight(mc.getWindow().getGuiScaledHeight());
         scrollBar.setContentHeight(calculateContentHeight());
-        scrollBar.render(ctx, mouseX, mouseY, delta);
+        scrollBar.render(gui, mouseX, mouseY, delta);
 
         int scrollOffset = scrollBar.getScrollOffset();
 
         searchBar.updateRenderY(scrollOffset);
-        searchBar.render(ctx, mouseX, mouseY, delta);
+        searchBar.render(gui, mouseX, mouseY, delta);
         searchBar.updatePosition(mouseX, mouseY);
 
         // actualizar la posición de renderizado vertical de los marcos cada tick
@@ -85,27 +87,27 @@ public class ClickGUI extends Screen {
 
         // renderizar el marco de los ajustes de cada módulo que lo tenga abierto. se abre haciendo clic derecho sobre el módulo
         for (SettingsFrame sf : settingsFrames.reversed()) {
-            sf.render(ctx, mouseX, mouseY, delta);
+            sf.render(gui, mouseX, mouseY, delta);
             sf.updatePosition(mouseX, mouseY);
         }
 
         // renderizar el marco de los módulos
-        modulesFrame.render(ctx, mouseX, mouseY, delta);
+        modulesFrame.render(gui, mouseX, mouseY, delta);
         modulesFrame.updatePosition(mouseX, mouseY);
 
         for (SettingsFrame sf : settingsFrames)
-            sf.drawTooltips(ctx, mouseX, mouseY);
+            sf.drawTooltips(gui, mouseX, mouseY);
 
         filterSearchResults();
 
-        renderBottomGradient(ctx, scrollOffset);
+        renderBottomGradient(gui, scrollOffset);
 
-        super.render(ctx, mouseX, mouseY, delta);
+        super.extractRenderState(gui, mouseX, mouseY, delta);
     }
 
     // renderizar un gradiente negro leve en la parte inferior de la pantalla si el contenido excede el límite inferior de la pantalla, para indicarlo visualmente
-    private void renderBottomGradient(DrawContext ctx, int scrollOffset) {
-        int screenHeight = mc.getWindow().getScaledHeight();
+    private void renderBottomGradient(GuiGraphicsExtractor ctx, int scrollOffset) {
+        int screenHeight = mc.getWindow().getGuiScaledHeight();
         int totalContentHeight = calculateContentHeight();
 
         if (scrollOffset + screenHeight < totalContentHeight) {
@@ -116,7 +118,7 @@ public class ClickGUI extends Screen {
                 float alpha = (float) y / gradientHeight;
                 int color = (int) (alpha * 0.7 * 255) << 24;
 
-                ctx.fill(0, startY + y, mc.getWindow().getScaledWidth(), startY + y + 1, color);
+                ctx.fill(0, startY + y, mc.getWindow().getGuiScaledWidth(), startY + y + 1, color);
             }
         }
     }
@@ -130,7 +132,7 @@ public class ClickGUI extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         miscWidgets.forEach(w -> w.mouseClicked(
                 (int) click.x(),
                 (int) click.y(),
@@ -146,7 +148,7 @@ public class ClickGUI extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(Click click) {
+    public boolean mouseReleased(MouseButtonEvent click) {
         miscWidgets.forEach(w -> w.mouseReleased(
                 (int) click.x(),
                 (int) click.y(),
@@ -161,7 +163,7 @@ public class ClickGUI extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+    public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
         miscWidgets.forEach(w -> w.mouseDragged(
                 (int) click.x(),
                 (int) click.y()));
@@ -186,9 +188,9 @@ public class ClickGUI extends Screen {
     @EventListener
     public void onMouseMiddleButton(MouseClickEvent event) {
         // mover todos los marcos a un punto visible al presionar shift + la rueda del ratón
-        if (Sputnik.mc.currentScreen != this || event.getButton() != 2 || !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) return;
+        if (Sputnik.mc.screen != this || event.getButton() != 2 || !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) return;
 
-        int h = Sputnik.mc.getWindow().getScaledHeight();
+        int h = Sputnik.mc.getWindow().getGuiScaledHeight();
         int minY = Math.min(modulesFrame.getY(), settingsFrames.stream().mapToInt(Frame::getY).min().orElse(modulesFrame.getY()));
         int maxY = Math.max(modulesFrame.getY() + modulesFrame.getH(), settingsFrames.stream().mapToInt(sf -> sf.getY() + sf.getH()).max().orElse(modulesFrame.getY() + modulesFrame.getH()));
         int correction = minY < 0 ? -minY + 4 : (maxY > h ? h - maxY - 4 : 0);
@@ -272,8 +274,8 @@ public class ClickGUI extends Screen {
     // abrir un marco donde se encuentran los ajustes del módulo deseado
     public void openSettingsFrame(Module module, int x, int y) {
         // asegurarse de que no se sale de la pantalla
-        x = Math.clamp(x, 0, mc.getWindow().getScaledWidth() - 80);
-        y = Math.clamp(y, 0, mc.getWindow().getScaledHeight() - 120);
+        x = Math.clamp(x, 0, mc.getWindow().getGuiScaledWidth() - 80);
+        y = Math.clamp(y, 0, mc.getWindow().getGuiScaledHeight() - 120);
 
         SettingsFrame frame = new SettingsFrame(module, x, y, 100, 20);
         settingsFrames.add(frame);
@@ -354,18 +356,18 @@ public class ClickGUI extends Screen {
     // métodos del súper
 
     @Override
-    public void close() {  // evitar que al reabrir la interfaz sin previamente haber soltado el clic, se sigan arrastrando objetos
+    public void onClose() {  // evitar que al reabrir la interfaz sin previamente haber soltado el clic, se sigan arrastrando objetos
         modulesFrame.mouseReleased(0, 0, 0);
         settingsFrames.forEach(sf -> sf.mouseReleased(0, 0, 0));
         scrollBar.mouseReleased(0, 0, 0);
         searchBar.mouseReleased(0, 0, 0);
 
         unselect(selected);
-        super.close();
+        super.onClose();
     }
 
-    @Override
-    public boolean shouldPause() {
+
+    public boolean isPauseScreen() {
         // no pausar el juego cuando se abre la interfaz
         return false;
     }
@@ -376,8 +378,8 @@ public class ClickGUI extends Screen {
     }
 
     @Override
-    protected void applyBlur(DrawContext ctx) {
-        if (guiSettings.blur.getValue()) super.applyBlur(ctx);
+    protected void extractBlurredBackground(GuiGraphicsExtractor ctx) {
+        if (guiSettings.blur.getValue()) super.extractBlurredBackground(ctx);
     }
 
 

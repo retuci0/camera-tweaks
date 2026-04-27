@@ -8,7 +8,7 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -23,18 +23,18 @@ public class WaitCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder
-                .then(argument("delay", IntegerArgumentType.integer(0))
-                    .then(argument("comando", StringArgumentType.greedyString())
-                        .executes(ctx -> {
-                            int delay = ctx.getArgument("delay", Integer.class);
-                            String command = ctx.getArgument("comando", String.class);
+            .then(argument("delay", IntegerArgumentType.integer(0))
+                .then(argument("comando", StringArgumentType.greedyString())
+                    .executes(ctx -> {
+                        int delay = ctx.getArgument("delay", Integer.class);
+                        String command = ctx.getArgument("comando", String.class);
 
-                            DELAYED_EXECUTOR.schedule(() -> ChatUtil.simulateChatMessage(command), delay, TimeUnit.MILLISECONDS);
-                            return SUCCESS;
-                       })
-                    )
-                );
+                        DELAYED_EXECUTOR.schedule(() -> ChatUtil.simulateChatMessage(command), delay, TimeUnit.MILLISECONDS);
+                        return SUCCESS;
+                   })
+                )
+            );
     }
 }

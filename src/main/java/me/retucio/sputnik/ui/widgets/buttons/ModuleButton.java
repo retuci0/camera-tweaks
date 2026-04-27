@@ -5,8 +5,9 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.ModuleFrame;
 import me.retucio.sputnik.ui.widgets.Button;
 import me.retucio.sputnik.util.Colors;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+
 
 // clase para el botón para cada módulo
 public class ModuleButton extends Button {
@@ -20,25 +21,26 @@ public class ModuleButton extends Button {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        ctx.fill( // dibujar el contorno del botón
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
+        gui.fill( // dibujar el contorno del botón
                 parent.getX() + 2, parent.getRenderY() + offset + 3,
                 parent.getX() + parent.getW() - 2 , parent.getRenderY() + height + offset,
                 determineColor(mouseX, mouseY));
 
-        ctx.drawText( // dibujar el nombre del módulo
-                mc.textRenderer, module.getName(),
-                parent.getX() + 5, parent.getRenderY() + offset + (height / 2) - (mc.textRenderer.fontHeight / 2) + 2,
+        gui.text( // dibujar el nombre del módulo
+                mc.font, module.getName(),
+                parent.getX() + 5, parent.getRenderY() + offset + (height / 2) - (mc.font.lineHeight / 2) + 2,
                 -1, true);
 
         // dibujar "tooltips" (cajas de texto) al pasar el puntero encima del botón, para mostrar su descripción
-        if (isHovered(mouseX, mouseY))
-            drawTooltip(ctx, mouseX, mouseY);
+        if (isHovered(mouseX, mouseY)) {
+            drawTooltip(gui, mouseX, mouseY);
+        }
     }
 
     @Override
-    public void drawTooltip(DrawContext ctx, int mouseX, int mouseY) {
-        ctx.drawTooltip(Text.of(module.getDescription()), mouseX, mouseY + 20);
+    public void drawTooltip(GuiGraphicsExtractor gui, int mouseX, int mouseY) {
+        gui.setTooltipForNextFrame(Component.literal(module.getDescription()), mouseX, mouseY + 20);
     }
 
     @Override

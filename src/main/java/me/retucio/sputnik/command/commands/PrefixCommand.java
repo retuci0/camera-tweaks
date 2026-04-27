@@ -5,9 +5,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 // también se puede hacer desde los ajustes de la interfaz
 public class PrefixCommand extends Command {
@@ -17,12 +17,12 @@ public class PrefixCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder
             .then(argument("prefijo", StringArgumentType.word()).executes(ctx -> {
                 String prefix = ctx.getArgument("prefijo", String.class);
                 ClientSettingsFrame.guiSettings.commandPrefix.setValue(prefix);
-                ChatUtil.info(Text.literal("prefijo cambiado a " + Formatting.AQUA + prefix));
+                ChatUtil.info(Component.literal("prefijo cambiado a " + ChatFormatting.AQUA + prefix));
                 return SUCCESS;
             }));
     }

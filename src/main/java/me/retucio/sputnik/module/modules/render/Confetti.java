@@ -10,6 +10,7 @@ import me.retucio.sputnik.util.Colors;
  * continúa en:
  * @see me.retucio.sputnik.mixin.mixins.world.TotemParticleMixin
  */
+
 public class Confetti extends Module {
 
     public ColorSetting color1 = sgGeneral.add(new ColorSetting(

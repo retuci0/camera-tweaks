@@ -1,12 +1,11 @@
 package me.retucio.sputnik.util;
 
 import me.retucio.sputnik.mixin.accessors.KeyBindingAccessor;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.input.KeyEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.im.InputContext;
 import java.util.Locale;
 
@@ -16,16 +15,16 @@ import static me.retucio.sputnik.Sputnik.mc;
 public class KeyUtil {
 
     public static int getKeyAction(int key) {
-        return GLFW.glfwGetKey(mc.getWindow().getHandle(), key);
+        return GLFW.glfwGetKey(mc.getWindow().handle(), key);
     }
 
-    public static boolean isKeyDown(KeyBinding key) {
+    public static boolean isKeyDown(KeyMapping key) {
         return isKeyDown(getKey(key));
     }
 
     public static boolean isKeyDown(int key) {
         return GLFW.glfwGetKey(
-                mc.getWindow().getHandle(),
+                mc.getWindow().handle(),
                 key) != GLFW.GLFW_RELEASE;
     }
 
@@ -34,12 +33,12 @@ public class KeyUtil {
                 || isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
-    public static int getKey(KeyBinding kb) {
-        return ((KeyBindingAccessor) kb).getBoundKey().getCode();
+    public static int getKey(KeyMapping kb) {
+        return ((KeyBindingAccessor) kb).getKey().getValue();
     }
 
     public static boolean isCapsLockOn() throws HeadlessException {
-        return Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+        return Toolkit.getDefaultToolkit().getLockingKeyState(java.awt.event.KeyEvent.VK_CAPS_LOCK);
     }
 
     public static void pressKey(int key, int action) {
@@ -47,10 +46,10 @@ public class KeyUtil {
     }
 
     public static void pressKey(int key, int action, int scancode, int modifiers) {
-        mc.keyboard.onKey(
-                mc.getWindow().getHandle(),
+        mc.keyboardHandler.keyPress(
+                mc.getWindow().handle(),
                 action,
-                new KeyInput(
+                new KeyEvent(
                         key,
                         scancode,
                         modifiers

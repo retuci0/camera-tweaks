@@ -1,9 +1,9 @@
 package me.retucio.sputnik.module.modules.render;
 
 import me.retucio.sputnik.mixin.mixins.hud.InGameHudMixin;
-import me.retucio.sputnik.mixin.mixins.network.ClientPlayNetworkHandlerMixin;
+import me.retucio.sputnik.mixin.mixins.network.ClientPacketListenerMixin;
 import me.retucio.sputnik.mixin.mixins.render.*;
-import me.retucio.sputnik.mixin.mixins.world.ParticleManagerMixin;
+import me.retucio.sputnik.mixin.mixins.world.ParticleEngineMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -11,20 +11,20 @@ import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.util.Lists;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.particles.ParticleType;
 
 /** continúa en:
- * @see ClientPlayNetworkHandlerMixin
+ * @see ClientPacketListenerMixin
  * @see FogRendererMixin
  * @see GameRendererMixin
  * @see InGameHudMixin
- * @see InGameOverlayRendererMixin
- * @see ParticleManagerMixin
- * @see StatusEffectFogModifierMixin
- * @see StuckArrowsFeatureRendererMixin
- * @see TextRendererDrawerMixin
- * @see WeatherRenderingMixin
+ * @see ScreenEffectRendererMixin
+ * @see ParticleEngineMixin
+ * @see MobEffectFogEnvironmentMixin
+ * @see ArrowLayerMixin
+ * @see PreparedTextBuilderMixin
+ * @see WeatherEffectRendererMixin
  */
 
 public class NoRender extends Module {
@@ -66,7 +66,7 @@ public class NoRender extends Module {
     public final BooleanSetting stuckArrows = sgMisc.add(new BooleanSetting("flechas clavadas", "renderizar flechas clavadas en jugadores", false));
 
     public NoRender() {
-        super("no render",
+        super("no extractRenderState",
                 "customiza qué se renderiza y qué no",
                 Category.RENDER);
     }
@@ -93,6 +93,6 @@ public class NoRender extends Module {
         private final String name;
         Colors(String name) { this.name = name; }
         @Override public String toString() { return name; }
-        public Formatting toFormatting() { return (Formatting.byColorIndex(this.ordinal())); }
+        public ChatFormatting toFormatting() { return ChatFormatting.getById(this.ordinal()); }
     }
 }

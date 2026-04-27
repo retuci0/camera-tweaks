@@ -1,12 +1,12 @@
 package me.retucio.sputnik.ui.widgets;
 
 import me.retucio.sputnik.ui.screen.ClickGUI;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public abstract class Widget {
 
-    protected static final MinecraftClient mc = MinecraftClient.getInstance();
+    protected static final Minecraft mc = Minecraft.getInstance();
 
     protected int x, y, w, h;
 
@@ -18,7 +18,7 @@ public abstract class Widget {
     }
 
 
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {}
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {}
 
 
     // input

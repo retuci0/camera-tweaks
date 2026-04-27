@@ -2,12 +2,13 @@ package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
 
 // https://github.com/InLieuOfLuna/elytra-recast/
 public class ElytraBounce extends Module {
@@ -18,36 +19,35 @@ public class ElytraBounce extends Module {
 
     public boolean bounce() {
         if (canUseElytra() && canBounce()) {
-            if (mc.getNetworkHandler() != null)
-                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
+            if (mc.getConnection() != null)
+                mc.getConnection().send(new ServerboundPlayerCommandPacket(
                         mc.player,
-                        ClientCommandC2SPacket
-                                .Mode.START_FALL_FLYING)
-                );
+                        ServerboundPlayerCommandPacket
+                                .Action.START_FALL_FLYING
+                ));
             return true;
-
         } else {
             return false;
         }
     }
 
     public boolean canUseElytra() {
-        if (mc.player.input.playerInput.jump()
+        if (mc.player.input.keyPresses.jump()
                 && !mc.player.getAbilities().flying
-                && !mc.player.hasVehicle()
-                && !mc.player.isClimbing()) {
-            ItemStack stack = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            return stack.isOf(Items.ELYTRA) && LivingEntity.canGlideWith(stack, EquipmentSlot.CHEST);
+                && !mc.player.isPassenger()
+                && !mc.player.onClimbable()) {
+            ItemStack stack = mc.player.getItemBySlot(EquipmentSlot.CHEST);
+            return stack.is(Items.ELYTRA) && LivingEntity.canGlideUsing(stack, EquipmentSlot.CHEST);
         } else {
             return false;
         }
     }
 
     public boolean canBounce() {
-        if (!mc.player.isTouchingWater() && !mc.player.hasStatusEffect(StatusEffects.LEVITATION)) {
-            ItemStack stack = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            if (stack.isOf(Items.ELYTRA) && LivingEntity.canGlideWith(stack, EquipmentSlot.CHEST)) {
-                mc.player.startGliding();
+        if (!mc.player.isInWater() && !mc.player.hasEffect(MobEffects.LEVITATION)) {
+            ItemStack stack = mc.player.getItemBySlot(EquipmentSlot.CHEST);
+            if (stack.is(Items.ELYTRA) && LivingEntity.canGlideUsing(stack, EquipmentSlot.CHEST)) {
+                mc.player.startFallFlying();
                 return true;
             } else
                 return false;

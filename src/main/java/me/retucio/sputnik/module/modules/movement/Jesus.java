@@ -8,12 +8,13 @@ import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+
 
 public class Jesus extends Module {
 
@@ -65,10 +66,10 @@ public class Jesus extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
         Entity entity = mc.player.getRootVehicle();
 
-        if (entity.isSneaking() && allowSneaking.getValue()) {
+        if (entity.isCrouching() && allowSneaking.getValue()) {
             return;
         }
 
@@ -78,20 +79,20 @@ public class Jesus extends Module {
 
         if (!mode.is(JesusMode.VIBRATE)) return;
 
-        if (isSubmerged(entity.getEntityPos().add(new Vec3d(0, 0.3, 0)))) {
-            entity.setVelocity(entity.getVelocity().x, 0.08, entity.getVelocity().z);
+        if (isSubmerged(entity.position().add(new Vec3(0, 0.3, 0)))) {
+            entity.setDeltaMovement(entity.getDeltaMovement().x, 0.08, entity.getDeltaMovement().z);
         }
 
-        else if (isSubmerged(entity.getEntityPos().add(new Vec3d(0, 0.1, 0)))) {
-            entity.setVelocity(entity.getVelocity().x, 0.05, entity.getVelocity().z);
+        else if (isSubmerged(entity.position().add(new Vec3(0, 0.1, 0)))) {
+            entity.setDeltaMovement(entity.getDeltaMovement().x, 0.05, entity.getDeltaMovement().z);
         }
 
-        else if (isSubmerged(entity.getEntityPos().add(new Vec3d(0, 0.05, 0)))) {
-            entity.setVelocity(entity.getVelocity().x, 0.01, entity.getVelocity().z);
+        else if (isSubmerged(entity.position().add(new Vec3(0, 0.05, 0)))) {
+            entity.setDeltaMovement(entity.getDeltaMovement().x, 0.01, entity.getDeltaMovement().z);
         }
 
-        else if (isSubmerged(entity.getEntityPos())) {
-            entity.setVelocity(entity.getVelocity().x, -0.005, entity.getVelocity().z);
+        else if (isSubmerged(entity.position())) {
+            entity.setDeltaMovement(entity.getDeltaMovement().x, -0.005, entity.getDeltaMovement().z);
             entity.setOnGround(true);
         }
     }
@@ -103,22 +104,22 @@ public class Jesus extends Module {
         if (event.getState().getBlock() == Blocks.POWDER_SNOW && !powderedSnow.getValue()) return;
         if (mode.getValue() == JesusMode.SOLID)
             if (event.getState().getBlock() == Blocks.POWDER_SNOW
-                    && !mc.player.isSneaking()
+                    && !mc.player.isCrouching()
                     && mc.player.getY() > event.getPos().getY() + 1) {
-                event.setShape(VoxelShapes.cuboid(0, 0, 0, 1, 1.01, 1));
-            } else if (!mc.world.getFluidState(event.getPos()).isEmpty()
-                    && !mc.player.isSneaking()
-                    && !mc.player.isTouchingWater()
+                event.setShape(Shapes.box(0, 0, 0, 1, 1.01, 1));
+            } else if (!mc.level.getFluidState(event.getPos()).isEmpty()
+                    && !mc.player.isCrouching()
+                    && !mc.player.isInWater()
                     && mc.player.getY() >= event.getPos().getY() + 0.9) {
-                event.setShape(VoxelShapes.cuboid(0, 0, 0, 1, 0.9, 1));
+                event.setShape(Shapes.box(0, 0, 0, 1, 0.9, 1));
         }
     }
 
-    private boolean isSubmerged(Vec3d pos) {
-        BlockPos blockPos = BlockPos.ofFloored(pos);
-        FluidState state = mc.world.getFluidState(blockPos);
+    private boolean isSubmerged(Vec3 pos) {
+        BlockPos blockPos = BlockPos.containing(pos);
+        FluidState state = mc.level.getFluidState(blockPos);
 
-        return !state.isEmpty() && pos.y - blockPos.getY() <= state.getHeight();
+        return !state.isEmpty() && pos.y - blockPos.getY() <= state.getOwnHeight();
     }
 
     private enum JesusMode {

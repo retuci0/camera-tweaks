@@ -4,14 +4,15 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.TextHudElement;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
+
 
 public class UptimeElement extends TextHudElement {
 
     public UptimeElement() {
-        super("uptime", mc.getWindow().getScaledWidth() - 50, mc.getWindow().getScaledHeight() - 2 * (mc.textRenderer.fontHeight + 2));
+        super("uptime", mc.getWindow().getGuiScaledWidth() - 50, mc.getWindow().getGuiScaledHeight() - 2 * (mc.font.lineHeight + 2));
     }
 
     @Override
@@ -27,11 +28,11 @@ public class UptimeElement extends TextHudElement {
 
     @Override
     public String getPreviewText() {
-        return getText(mc.getRenderTickCounter().getDynamicDeltaTicks(), ModuleManager.INSTANCE.getModuleByClass(HUD.class));
+        return getText(mc.getDeltaTracker().getGameTimeDeltaTicks(), ModuleManager.INSTANCE.getModuleByClass(HUD.class));
     }
 
     @Override
-    public List<Text> getTooltip() {
-        return List.of(Text.of("tiempo jugando"));
+    public List<Component> getTooltip() {
+        return List.of(Component.literal("tiempo jugando"));
     }
 }

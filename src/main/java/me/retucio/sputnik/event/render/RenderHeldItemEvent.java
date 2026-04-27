@@ -1,37 +1,38 @@
 package me.retucio.sputnik.event.render;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.render.HeldItemRendererMixin;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Hand;
+import com.mojang.blaze3d.vertex.PoseStack;
+import me.retucio.sputnik.mixin.mixins.render.ItemInHandRendererMixin;
+import net.minecraft.world.InteractionHand;
 
 
 /**
- * @see HeldItemRendererMixin#onRenderItem
+ * @see ItemInHandRendererMixin#onRenderItem
  */
+
 public class RenderHeldItemEvent extends Event {
 
-    private MatrixStack matrices;
-    private Hand hand;
+    private PoseStack matrices;
+    private InteractionHand hand;
 
-    public RenderHeldItemEvent(MatrixStack matrices, Hand hand) {
+    public RenderHeldItemEvent(PoseStack matrices, InteractionHand hand) {
         this.matrices = matrices;
         this.hand = hand;
     }
 
-    public MatrixStack getMatrices() {
+    public PoseStack getMatrices() {
         return matrices;
     }
 
-    public void setMatrices(MatrixStack matrices) {
+    public void setMatrices(PoseStack matrices) {
         this.matrices = matrices;
     }
 
-    public Hand getHand() {
+    public InteractionHand getHand() {
         return hand;
     }
 
-    public void setHand(Hand hand) {
+    public void setHand(InteractionHand hand) {
         this.hand = hand;
     }
 }

@@ -1,40 +1,42 @@
 package me.retucio.sputnik.event.render;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.render.WorldRendererMixin;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import me.retucio.sputnik.mixin.mixins.render.LevelRendererMixin;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 
 
 /**
- * @see WorldRendererMixin#render
+ * @see LevelRendererMixin#renderLevel
  */
+
 public class Render3DEvent extends Event {
 
-    private final MatrixStack matrices;
-    private final RenderTickCounter tc;
-    private final Camera camera;
+    private final PoseStack matrices;
+    private final DeltaTracker dt;
+    private final CameraRenderState cameraState;
 
-    public Render3DEvent(MatrixStack matrices, RenderTickCounter tc, Camera camera) {
+    public Render3DEvent(PoseStack matrices, DeltaTracker dt, CameraRenderState cameraState) {
         this.matrices = matrices;
-        this.tc = tc;
-        this.camera = camera;
+        this.dt = dt;
+        this.cameraState = cameraState;
     }
 
-    public MatrixStack getMatrices() {
+    public PoseStack getMatrices() {
         return matrices;
     }
 
-    public RenderTickCounter getTickCounter() {
-        return tc;
+    public DeltaTracker getDeltaTracker() {
+        return dt;
     }
 
-    public Camera getCamera() {
-        return camera;
+    public CameraRenderState getCamera() {
+        return cameraState;
     }
 
     public float getTickDelta() {
-        return tc.getDynamicDeltaTicks();
+        return dt.getGameTimeDeltaTicks();
     }
 }

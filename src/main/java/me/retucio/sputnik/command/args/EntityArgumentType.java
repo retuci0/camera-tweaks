@@ -9,9 +9,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import me.retucio.sputnik.util.EntityUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +25,7 @@ public class EntityArgumentType implements ArgumentType<Entity> {
 
     public static final EntityArgumentType INSTANCE = new EntityArgumentType();
     private static final DynamicCommandExceptionType NO_SUCH_ENTITY = new DynamicCommandExceptionType(
-            name -> Text.literal("Entidad \"" + name + "\" no encontrada"));
+            name -> Component.literal("Entidad \"" + name + "\" no encontrada"));
 
     private static final Collection<String> EXAMPLES = List.of(
             "AdlerHitdolf",
@@ -42,7 +42,7 @@ public class EntityArgumentType implements ArgumentType<Entity> {
     public Entity parse(StringReader reader) throws CommandSyntaxException {
         String argument = reader.readString();
 
-        if (mc.world == null)
+        if (mc.level == null)
             throw NO_SUCH_ENTITY.create(argument);
 
         if (argument.startsWith("@"))
@@ -83,13 +83,13 @@ public class EntityArgumentType implements ArgumentType<Entity> {
     }
 
     private Entity findNearestPlayer() throws CommandSyntaxException {
-        PlayerEntity nearest = null;
+        Player nearest = null;
         double nearestDistance = Double.MAX_VALUE;
 
-        for (PlayerEntity player : mc.world.getPlayers()) {
+        for (Player player : mc.level.players()) {
             if (player == mc.player) continue;
 
-            double distance = mc.player.squaredDistanceTo(player);
+            double distance = mc.player.distanceToSqr(player);
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearest = player;
@@ -103,7 +103,7 @@ public class EntityArgumentType implements ArgumentType<Entity> {
     }
 
     private Entity findRandomPlayer() throws CommandSyntaxException {
-        List<PlayerEntity> players = new ArrayList<>(mc.world.getPlayers());
+        List<Player> players = new ArrayList<>(mc.level.players());
         if (players.isEmpty()) throw NO_SUCH_ENTITY.create("@r");
 
         players.remove(mc.player);
@@ -116,8 +116,8 @@ public class EntityArgumentType implements ArgumentType<Entity> {
     private Entity parseEntitySelector(String selector) throws CommandSyntaxException {
         if (selector.equals("@e")) {
             List<Entity> entities = new ArrayList<>();
-            for (Entity entity : mc.world.getEntities())
-                if (!(entity instanceof PlayerEntity))
+            for (Entity entity : mc.level.getEntities().getAll())
+                if (!(entity instanceof Player))
                     entities.add(entity);
 
             if (entities.isEmpty()) throw NO_SUCH_ENTITY.create(selector);
@@ -141,8 +141,8 @@ public class EntityArgumentType implements ArgumentType<Entity> {
     private Entity findEntityByType(String type) throws CommandSyntaxException {
         List<Entity> matchingEntities = new ArrayList<>();
 
-        for (Entity entity : mc.world.getEntities()) {
-            String entityType = entity.getType().getTranslationKey();
+        for (Entity entity : mc.level.getEntities().getAll()) {
+            String entityType = entity.getType().getDescriptionId();
             if (entityType.contains(type.toLowerCase().replace("minecraft:", "")))
                 matchingEntities.add(entity);
         }
@@ -153,7 +153,7 @@ public class EntityArgumentType implements ArgumentType<Entity> {
         double nearestDistance = Double.MAX_VALUE;
 
         for (Entity entity : matchingEntities) {
-            double distance = mc.player.squaredDistanceTo(entity);
+            double distance = mc.player.distanceToSqr(entity);
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearest = entity;
@@ -164,15 +164,15 @@ public class EntityArgumentType implements ArgumentType<Entity> {
     }
 
     private Entity findEntityByUUID(UUID uuid) throws CommandSyntaxException {
-        for (Entity entity : mc.world.getEntities())
-            if (entity.getUuid().equals(uuid))
+        for (Entity entity : mc.level.getEntities().getAll())
+            if (entity.getUUID().equals(uuid))
                 return entity;
 
         throw NO_SUCH_ENTITY.create(uuid.toString());
     }
 
-    private PlayerEntity findPlayerByName(String name) throws CommandSyntaxException {
-        for (PlayerEntity player : mc.world.getPlayers())
+    private Player findPlayerByName(String name) throws CommandSyntaxException {
+        for (Player player : mc.level.players())
             if (player.getName().getString().equalsIgnoreCase(name))
                 return player;
 
@@ -181,8 +181,8 @@ public class EntityArgumentType implements ArgumentType<Entity> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        if (mc.world != null)
-            for (PlayerEntity player : mc.world.getPlayers())
+        if (mc.level != null)
+            for (Player player : mc.level.players())
                 builder.suggest(player.getName().getString());
 
 
@@ -192,7 +192,7 @@ public class EntityArgumentType implements ArgumentType<Entity> {
 
         Entity lookingAt = EntityUtil.getEntityPlayerIsLookingAt();
         if (lookingAt != null)
-            builder.suggest(lookingAt.getUuid().toString());
+            builder.suggest(lookingAt.getUUID().toString());
 
         return builder.buildFuture();
     }

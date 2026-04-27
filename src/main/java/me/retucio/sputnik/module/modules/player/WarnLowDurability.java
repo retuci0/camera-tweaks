@@ -8,13 +8,13 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.module.setting.settings.OptionSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.Lists;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class WarnLowDurability extends Module {
     private final BooleanSetting playSound = sgWarn.add(new BooleanSetting("reproducir sonido", "reproducir un sonido para alertar al usuario", true));
 
     private final OptionSetting<SoundEvent> sound = sgSound.add(new OptionSetting<>("sonido", "qué sonido reproducir",
-            Lists.soundList, SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), Lists.soundNames));
+            Lists.soundList, SoundEvents.NOTE_BLOCK_BELL.value(), Lists.soundNames));
     private final NumberSetting volume = sgSound.add(new NumberSetting("volumen", "volumen del sonido", 70, 0, 125, 1));
     private final NumberSetting pitch = sgSound.add(new NumberSetting("frecuencia", "altura del sonido", 70, 0, 125, 1));
 
@@ -53,27 +53,27 @@ public class WarnLowDurability extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
-        ItemStack stack = mc.player.getStackInHand(Hand.MAIN_HAND);
+        if (mc.player == null || mc.level == null) return;
+        ItemStack stack = mc.player.getItemInHand(InteractionHand.MAIN_HAND);
         if (warned.contains(stack)) return;
 
-        float percentage = (1 - (float) stack.getDamage() / stack.getMaxDamage()) * 100;
+        float percentage = (1 - (float) stack.getDamageValue() / stack.getMaxDamage()) * 100;
 
         if (percentage <= limitPercentage.getValue() && percentage < prevPercentage) {
             if (playSound.getValue())
-                mc.world.playSound(mc.player, mc.player.getBlockPos(),
+                mc.level.playSound(mc.player, mc.player.blockPosition(),
                         sound.getValue(),
-                        SoundCategory.AMBIENT,
+                        SoundSource.AMBIENT,
                         toExponential(volume),
                         toExponential(pitch)
                 );
 
             if (message.getValue()) {
                 String customName = stack.getCustomName() == null ? "" : " \"" + stack.getCustomName().getString() + "\"";
-                Text text = Text.literal(Formatting.AQUA + stack.getItemName().getString()
-                        + Formatting.GREEN + customName + Formatting.RESET
-                        + " a " + Formatting.GOLD + ((int) percentage + "") + "%"
-                        + Formatting.RESET + " de durabilidad");
+                Component text = Component.literal(ChatFormatting.AQUA + stack.getItemName().getString()
+                        + ChatFormatting.GREEN + customName + ChatFormatting.RESET
+                        + " a " + ChatFormatting.GOLD + ((int) percentage + "") + "%"
+                        + ChatFormatting.RESET + " de durabilidad");
                 ChatUtil.warn(text);
             }
 

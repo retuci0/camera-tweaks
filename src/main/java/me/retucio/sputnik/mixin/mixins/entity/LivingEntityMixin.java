@@ -5,12 +5,12 @@ import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.movement.ElytraBounce;
 import me.retucio.sputnik.module.modules.movement.Step;
 import me.retucio.sputnik.module.modules.movement.Velocity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.retucio.sputnik.Sputnik.mc;
 
+
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
 
@@ -28,50 +29,49 @@ public abstract class LivingEntityMixin {
     @Unique private boolean awaitingElytra = false;
 
     @Shadow
-    public abstract boolean isGliding();
+    public abstract boolean isFallFlying();
 
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "tickMovement", at = @At("TAIL"))
+    @Inject(method = "aiStep", at = @At("TAIL"))
     private void recastIfLanded(CallbackInfo ci) {
-        ElytraBounce bounce = ModuleManager.INSTANCE.getModuleByClass(ElytraBounce.class);
+        ElytraBounce ebounce = ModuleManager.INSTANCE.getModuleByClass(ElytraBounce.class);
 
-        if (!((Object) this instanceof ClientPlayerEntity)
+        if (!((Object) this instanceof LocalPlayer)
                 || mc.player == null
-                || bounce == null)
+                || ebounce == null)
             return;
 
-        boolean elytra = isGliding();
+        boolean elytra = isFallFlying();
 
         if (awaitingElytra) {
             if (elytra) awaitingElytra = false;
-
         } else if (!elytra && prevElytra) {
-            mc.getSoundManager().stopSounds(SoundEvents.ITEM_ELYTRA_FLYING.id(), SoundCategory.PLAYERS);
-            bounce.bounce();
-            awaitingElytra = bounce.canUseElytra();
+            mc.getSoundManager().stop(SoundEvents.ELYTRA_FLYING.location(), SoundSource.PLAYERS);  // armor equip elytra??
+            ebounce.bounce();
+            awaitingElytra = ebounce.canUseElytra();
         }
 
         prevElytra = elytra;
     }
 
 
-    @Inject(method = "getStepHeight", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "maxUpStep", at = @At("RETURN"), cancellable = true)
     private void step(CallbackInfoReturnable<Float> cir) {
         Step step = ModuleManager.INSTANCE.getModuleByClass(Step.class);
         if (step.isEnabled()) cir.setReturnValue(step.height.getFloatValue());
     }
 
-    @Inject(method = "takeKnockback", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V"), cancellable = true)
-    private void onTakeKb(double strength, double x, double z, CallbackInfo ci, @Local(ordinal = 0) Vec3d vec3d, @Local(ordinal = 1) Vec3d vec3d2) {
+    @Inject(method = "knockback", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V"), cancellable = true)
+    private void onTakeKb(double strength, double x, double z, CallbackInfo ci, @Local(name = "deltaMovement") Vec3 dm, @Local(name = "deltaVector") Vec3 dv) {
         Velocity velocity = ModuleManager.INSTANCE.getModuleByClass(Velocity.class);
         if (!velocity.isEnabled() || velocity.hits.getValue()) return;
-        boolean onGround = ((LivingEntity) (Object) this).isOnGround();
+        boolean onGround = ((LivingEntity) (Object) this).onGround();
 
-        double kbX = (velocity.xPercentage.getValue() / 100) * (vec3d.x / 2 - vec3d2.x);
-        double kbY = (velocity.yPercentage.getValue() / 100) * ((onGround ? Math.min(0.4, vec3d.y / 2 + strength) : vec3d.y));
-        double kbZ = (velocity.zPercentage.getValue() / 100) * (vec3d.z / 2 - vec3d2.z);
+        double kbX = (velocity.xPercentage.getValue() / 100) * (dm.x / 2 - dv.x);
+        double kbY = (velocity.yPercentage.getValue() / 100) * ((onGround ? Math.min(0.4, dm.y / 2 + strength) : dm.y));
+        double kbZ = (velocity.zPercentage.getValue() / 100) * (dm.z / 2 - dv.z);
 
         ci.cancel();
-        ((Entity) (Object) this).addVelocity(kbX, kbY, kbZ);
+        ((Entity) (Object) this).addDeltaMovement(new Vec3(kbX, kbY, kbZ));
     }
 }

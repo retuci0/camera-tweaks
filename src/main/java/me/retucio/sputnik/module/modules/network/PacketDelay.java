@@ -9,12 +9,10 @@ import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.NetworkUtil;
-
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.listener.PacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
-import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -47,7 +45,7 @@ public class PacketDelay extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null || mc.getNetworkHandler() == null) {
+        if (mc.player == null || mc.level == null || mc.getConnection() == null) {
             delayedPackets.clear();
             return;
         }
@@ -71,8 +69,8 @@ public class PacketDelay extends Module {
     @EventListener
     private void onPacketSend(PacketEvent.Send event) {
         if (directions.is(Directions.S2C)
-                || mc.player == null || mc.world == null || mc.getNetworkHandler() == null
-                || (event.getPacket() instanceof KeepAliveC2SPacket && !packets.is(Packets.OTHERS)))
+                || mc.player == null || mc.level == null || mc.getConnection() == null
+                || (event.getPacket() instanceof ServerboundKeepAlivePacket && !packets.is(Packets.OTHERS)))
             return;
 
         event.cancel();
@@ -81,20 +79,22 @@ public class PacketDelay extends Module {
                 event.getPacket(),
                 System.currentTimeMillis() + delay.getLongValue(),
                 true,
-                mc.getNetworkHandler().getConnection().getPacketListener()
+                mc.getConnection().getConnection().getPacketListener()
         ));
     }
 
     @EventListener
     private void onPacketReceive(PacketEvent.Receive event) {
-        if (mc.player == null || mc.world == null
-                || mc.getNetworkHandler() == null || mc.getNetworkHandler().getConnection() == null
-                || (event.getPacket() instanceof KeepAliveS2CPacket && !packets.is(Packets.OTHERS)))
+        if (mc.player == null || mc.level == null
+                || mc.getConnection() == null
+                || event.getPacket() instanceof ServerboundKeepAlivePacket
+                    && !packets.is(Packets.OTHERS)) {
             return;
+        }
 
         event.cancel();
 
-        ClientConnection connection = mc.getNetworkHandler().getConnection();
+        Connection connection = mc.getConnection().getConnection();
 
         delayedPackets.add(new DelayedPacket(
                 event.getPacket(),
@@ -111,12 +111,12 @@ public class PacketDelay extends Module {
     }
 
     private void processDelayedPacket(DelayedPacket delayedPacket) {
-        if (mc.getNetworkHandler() == null) return;
+        if (mc.getConnection() == null) return;
 
         if (delayedPacket.isOutgoing()) {
             NetworkUtil.sendPacketNoEvent(delayedPacket.packet());
         } else {
-            if (delayedPacket.packetListener != null && mc.getNetworkHandler().getConnection() != null) {
+            if (delayedPacket.packetListener != null) {
                 NetworkUtil.receivePacketNoEvent(delayedPacket.packet(), delayedPacket.packetListener());
             } else {
                 NetworkUtil.receivePacketNoEvent(delayedPacket.packet());

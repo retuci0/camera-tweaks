@@ -1,7 +1,6 @@
 package me.retucio.sputnik.module.modules.render;
 
 import com.github.retucio.neutrino.EventListener;
-import com.ibm.icu.impl.TimeZoneGenericNames;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -13,14 +12,14 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.Lists;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.Map;
+
 
 public class Tracers extends Module {
 
@@ -94,10 +93,10 @@ public class Tracers extends Module {
 
     @EventListener
     private void onRenderWorld(Render3DEvent event) {
-        for (Entity entity : mc.world.getEntities()) {
+        for (Entity entity : mc.level.getEntities().getAll()) {
             Color color = getColor(entity);
             if (color == null) continue;
-            Vec3d interpolatedPos = entity.getLerpedPos(event.getTickDelta()).add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
+            Vec3 interpolatedPos = entity.getPosition(event.getTickDelta()).add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
             RenderUtil.drawTracer(event.getMatrices(), interpolatedPos, color, lineWidth.getFloatValue());
         }
     }
@@ -105,9 +104,9 @@ public class Tracers extends Module {
     private Color getColor(Entity entity) {
         if (!entities.isEnabled(entity.getType())) return null;
         if (!self.getValue() && mc.player == entity) return null;
-        if (entity instanceof PlayerEntity) return playerColor.getValue();
+        if (entity instanceof Player) return playerColor.getValue();
 
-        return switch (entity.getType().getSpawnGroup()) {
+        return switch (entity.getType().getCategory()) {
             case CREATURE -> animalsColor.getValue().getAlpha() > 0 ? animalsColor.getValue() : null;
             case MONSTER -> monstersColor.getValue().getAlpha() > 0 ? monstersColor.getValue() : null;
             case AMBIENT, WATER_AMBIENT -> ambientColor.getValue().getAlpha() > 0 ? ambientColor.getValue() : null;

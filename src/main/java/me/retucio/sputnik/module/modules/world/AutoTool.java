@@ -11,17 +11,18 @@ import me.retucio.sputnik.util.InventoryUtil;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.MiscUtil;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ToolComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 public class AutoTool extends Module {
 
@@ -59,7 +60,7 @@ public class AutoTool extends Module {
 
     public AutoTool() {
         super("auto herramienta", "cambia a la herramienta adecuada automáticamente", Category.WORLD);
-        switchBack.onUpdate(v -> switchBackDelaySetting.visibility(v));
+        switchBack.onUpdate(switchBackDelaySetting::visibility);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class AutoTool extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.player.getInventory() == null) return;
+        if (mc.player == null) return;
 
         if (startedMining && delaySetting.getIntValue() > 0) {
             delay++;
@@ -116,8 +117,8 @@ public class AutoTool extends Module {
     }
 
     private void handle(int key, int action) {
-        if (mc.player == null || mc.player.getInventory() == null) return;
-        if (key != KeyUtil.getKey(mc.options.attackKey)) return;
+        if (mc.player == null) return;
+        if (key != KeyUtil.getKey(mc.options.keyAttack)) return;
 
         if (action == GLFW.GLFW_PRESS) {
             onStartMining();
@@ -157,26 +158,26 @@ public class AutoTool extends Module {
     }
 
     private void selectFastestTool() {
-        if (mc.player == null || mc.getCameraEntity() == null || mc.world == null) return;
+        if (mc.player == null || mc.getCameraEntity() == null || mc.level == null) return;
 
-        HitResult result = mc.getCameraEntity().raycast(mc.player.getBlockInteractionRange(), 0, false);
+        HitResult result = mc.getCameraEntity().pick(mc.player.blockInteractionRange(), 0, false);
         if (result.getType() == HitResult.Type.MISS || !(result instanceof BlockHitResult bhr)) return;
-        BlockState state = mc.world.getBlockState(bhr.getBlockPos());
+        BlockState state = mc.level.getBlockState(bhr.getBlockPos());
 
-        List<ItemStack> tools = InventoryUtil.find(DataComponentTypes.TOOL);
+        List<ItemStack> tools = InventoryUtil.findAllStacks(stack -> stack.has(DataComponents.TOOL));
         if (tools.isEmpty()) return;
 
         Map<Float, ItemStack> speeds = new HashMap<>();
         for (ItemStack tool : tools) {
-            ToolComponent toolComponent = tool.get(DataComponentTypes.TOOL);
+            Tool toolComponent = tool.get(DataComponents.TOOL);
             if (toolComponent != null) {
-                speeds.put(toolComponent.getSpeed(state), tool);
+                speeds.put(toolComponent.getMiningSpeed(state), tool);
             }
         }
 
         Float fastestSpeed = MiscUtil.getHighest(speeds.keySet().stream().toList());
         ItemStack fastestTool = speeds.get(fastestSpeed);
-        int slot = mc.player.getInventory().getSlotWithStack(fastestTool);
+        int slot = mc.player.getInventory().findSlotMatchingItem(fastestTool);
 
         if (slot != -1) {
             if (switchBack.getValue()) prevSlot = mc.player.getInventory().getSelectedSlot();

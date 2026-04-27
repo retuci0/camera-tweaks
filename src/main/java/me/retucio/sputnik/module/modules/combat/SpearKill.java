@@ -4,13 +4,13 @@ import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Comparator;
 import java.util.List;
@@ -49,33 +49,33 @@ public class SpearKill extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
-        if (isHoldingSpear() && mc.options.useKey.isPressed()) {
+        if (isHoldingSpear() && mc.options.keyUse.isDown()) {
             heldTicks++;
             if (crosshairTarget == null) crosshairTarget = getTarget();
             if (crosshairTarget == null) return;
 
             if (!crosshairTarget.isAlive()) return;
             if (!(crosshairTarget instanceof LivingEntity)) return;
-            if (onlyPlayers.getValue() && !(crosshairTarget instanceof PlayerEntity)) return;
+            if (onlyPlayers.getValue() && !(crosshairTarget instanceof Player)) return;
 
-            Vec3d playerPos = mc.player.getEyePos();
-            Vec3d targetPos = crosshairTarget.getBoundingBox().getCenter();
-            Vec3d toTarget = targetPos.subtract(playerPos).normalize();
+            Vec3 playerPos = mc.player.getEyePosition();
+            Vec3 targetPos = crosshairTarget.getBoundingBox().getCenter();
+            Vec3 toTarget = targetPos.subtract(playerPos).normalize();
 
             float yaw = (float) (Math.toDegrees(Math.atan2(toTarget.z, toTarget.x)) - 90.0);
             float pitch = (float) -Math.toDegrees(Math.asin(toTarget.y));
 
-            mc.player.setYaw(yaw);
-            mc.player.setHeadYaw(yaw);
-            mc.player.setPitch(pitch);
+            mc.player.setYRot(yaw);
+            mc.player.setYHeadRot(yaw);
+            mc.player.setXRot(pitch);
 
             if (heldTicks >= 10) {
                 double lungeSpeed = speed.getValue();
-                Vec3d viewDir = Vec3d.fromPolar(mc.player.getPitch(), mc.player.getYaw());
+                Vec3 viewDir = Vec3.directionFromRotation(mc.player.getXRot(), mc.player.getYRot());
                 mc.player.setSprinting(true);
-                mc.player.setVelocity(viewDir.multiply(lungeSpeed));
+                mc.player.setDeltaMovement(viewDir.scale(lungeSpeed));
             }
         } else {
             heldTicks = 0;
@@ -85,38 +85,38 @@ public class SpearKill extends Module {
 
     private boolean isHoldingSpear() {
         return mc.player.isHolding(
-                stack -> stack.streamTags().anyMatch(
+                stack -> stack.tags().anyMatch(
                         tag -> tag.equals(ItemTags.SPEARS)
                 )
         );
     }
 
     private Entity getTarget() {
-        if (mc.player == null || mc.world == null) return null;
+        if (mc.player == null || mc.level == null) return null;
 
         double maxRange = 256;
-        Vec3d eyePos = mc.player.getEyePos();
-        Vec3d lookVec = mc.player.getRotationVec(1f);
+        Vec3 eyePos = mc.player.getEyePosition();
+        Vec3 lookVec = mc.player.getViewVector(1f);
 
-        HitResult blockHit = mc.world.raycast(new RaycastContext(eyePos,
-                eyePos.add(lookVec.multiply(maxRange)), RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE, mc.player));
+        HitResult blockHit = mc.level.clip(new ClipContext(eyePos,
+                eyePos.add(lookVec.scale(maxRange)), ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE, mc.player));
         double rayLength = blockHit.getType() == HitResult.Type.MISS ? maxRange :
-                eyePos.distanceTo(blockHit.getPos());
+                eyePos.distanceTo(blockHit.getLocation());
 
-        List<Entity> candidates = mc.world.getOtherEntities(mc.player,
-                mc.player.getBoundingBox().stretch(lookVec.multiply(rayLength)),
+        List<Entity> candidates = mc.level.getEntities(mc.player,
+                mc.player.getBoundingBox().expandTowards(lookVec.scale(rayLength)),
                 e -> e instanceof LivingEntity && e.isAlive() && e != mc.player);
 
         candidates.sort(Comparator.comparingDouble(e ->
-                eyePos.squaredDistanceTo(e.getBoundingBox().getCenter())));
+                eyePos.distanceToSqr(e.getBoundingBox().getCenter())));
 
         double coneAngle = 0.999;
         for (Entity e : candidates) {
             if (eyePos.distanceTo(e.getBoundingBox().getCenter()) > rayLength) break;
-            Vec3d toEntity = e.getBoundingBox().getCenter().subtract(eyePos).normalize();
-            if (lookVec.dotProduct(toEntity) > coneAngle &&
-                    (!onlyPlayers.getValue() || e instanceof PlayerEntity)) {
+            Vec3 toEntity = e.getBoundingBox().getCenter().subtract(eyePos).normalize();
+            if (lookVec.dot(toEntity) > coneAngle &&
+                    (!onlyPlayers.getValue() || e instanceof Player)) {
                 return e;
             }
         }

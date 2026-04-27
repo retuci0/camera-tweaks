@@ -10,8 +10,8 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.util.MiscUtil;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +22,7 @@ public class ModuleArgumentType implements ArgumentType<Module> {
     public static final ModuleArgumentType INSTANCE = new ModuleArgumentType();
 
     private static final DynamicCommandExceptionType UNKNOWN_MODULE = new DynamicCommandExceptionType(
-            name -> Text.literal("módulo \"" + name + "\" no encontrado"));
+            name -> Component.literal("módulo \"" + name + "\" no encontrado"));
 
     private static final Collection<String> examples = ModuleManager.INSTANCE.getModules()
             .stream().limit(3).map(module -> module.getName().replace(" ", "_")).toList();
@@ -37,7 +37,7 @@ public class ModuleArgumentType implements ArgumentType<Module> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(ModuleManager.INSTANCE.getModules()
+        return SharedSuggestionProvider.suggest(ModuleManager.INSTANCE.getModules()
                 .stream().map(module -> MiscUtil.removeAccentMarks(module.getName().replace(" ", "_"))), builder);
     }
 
@@ -46,7 +46,7 @@ public class ModuleArgumentType implements ArgumentType<Module> {
         return examples;
     }
 
-    public static Module get(CommandContext<CommandSource> ctx) {
+    public static Module get(CommandContext<SharedSuggestionProvider> ctx) {
         return ctx.getArgument("módulo", Module.class);
     }
 }

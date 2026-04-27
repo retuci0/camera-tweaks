@@ -5,16 +5,18 @@ import com.google.gson.Gson;
 import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
+import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.util.ChatUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import org.lwjgl.glfw.GLFW;
 import java.util.Collection;
 
 
@@ -33,6 +35,12 @@ public class BlockInfo extends Module {
             CopyMode.COMMAND
     ));
 
+    private final BooleanSetting withLiquids = sgGeneral.add(new BooleanSetting(
+            "líquidos",
+            "también incluir líquidos en el raycast",
+            false
+    ));
+
     public BlockInfo() {
         super("info. de bloque",
                 "muestra el contenido nbt del bloque al que se está apuntando",
@@ -41,24 +49,25 @@ public class BlockInfo extends Module {
 
     @EventListener
     private void onKey(KeyEvent event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
         if (event.getKey() != key.getValue() || event.getAction() != GLFW.GLFW_PRESS) return;
 
-        HitResult result = mc.player.getCrosshairTarget(
-                mc.getRenderTickCounter().getTickProgress(false),
-                mc.getCameraEntity()
+        HitResult result = mc.player.pick(
+                mc.player.blockInteractionRange(),
+                mc.getDeltaTracker().getGameTimeDeltaTicks(),
+                withLiquids.getValue()
         );
 
-        if (result == null) {
+        if (result.getType() == HitResult.Type.MISS) {
             ChatUtil.warn("no estás apuntando a ningún bloque");
             return;
         }
 
         if (result instanceof BlockHitResult blockHitResult) {
-            BlockState state = mc.world.getBlockState(blockHitResult.getBlockPos());
+            BlockState state = mc.level.getBlockState(blockHitResult.getBlockPos());
             Collection<Property<?>> data = state.getProperties();
             for (Property<?> property : data) {
-                ChatUtil.info(property.getName() + ": " + state.get(property));
+                ChatUtil.info(property.getName() + ": " + state.getValue(property));
             }
             copy(blockHitResult, data);
         } else {
@@ -68,11 +77,11 @@ public class BlockInfo extends Module {
 
     private void copy(BlockHitResult result, Collection<Property<?>> data) {
         String json = new Gson().toJson(data);
-        String name = mc.world.getBlockState(result.getBlockPos()).getBlock().getTranslationKey();
-        Vec3d pos = result.getPos();
+        String name = mc.level.getBlockState(result.getBlockPos()).getBlock().getDescriptionId();
+        Vec3 pos = result.getLocation();
         switch (copy.getValue()) {
-            case JSON -> mc.keyboard.setClipboard(json);
-            case COMMAND -> mc.keyboard.setClipboard(
+            case JSON -> mc.keyboardHandler.setClipboard(json);
+            case COMMAND -> mc.keyboardHandler.setClipboard(
                     String.format("/setblock %f %f %f %s %s", pos.x, pos.y, pos.z, name, json));
         }
     }

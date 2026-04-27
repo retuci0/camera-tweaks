@@ -3,16 +3,17 @@ package me.retucio.sputnik.module.modules.world;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.util.EntityUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.EndermanEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.EnderMan;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Racist extends Module {
 
     private int lookTimer;
-    private final List<EndermanEntity> lookedEndermen = new ArrayList<>();
+    private final List<EnderMan> lookedEndermen = new ArrayList<>();
 
     public Racist() {
         super("racismo",
@@ -28,10 +29,10 @@ public class Racist extends Module {
 
     @Override
     public void onTick() {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
-        for (Entity entity : mc.world.getEntities()) {
-            if (!(entity instanceof EndermanEntity enderman)) continue;
+        for (Entity entity : mc.level.getEntities().getAll()) {
+            if (!(entity instanceof EnderMan enderman)) continue;
 
             if (shouldLookAt(enderman)) {
                 lookAtEnderman(enderman);
@@ -45,16 +46,16 @@ public class Racist extends Module {
         lookTimer++;
     }
 
-    private boolean shouldLookAt(EndermanEntity enderman) {
+    private boolean shouldLookAt(EnderMan enderman) {
         return !(lookedEndermen.contains(enderman)) && lookTimer >= 10
                 && EntityUtil.hasLineOfSight(mc.player, enderman);
     }
 
-    private void lookAtEnderman(EndermanEntity enderman) {
+    private void lookAtEnderman(EnderMan enderman) {
         double yaw = EntityUtil.getYaw(enderman);
         double pitch = EntityUtil.getPitch(enderman, EntityUtil.Target.HEAD);
 
-        mc.player.setYaw((float) yaw);
-        mc.player.setPitch((float) pitch);
+        mc.player.setYRot((float) yaw);
+        mc.player.setXRot((float) pitch);
     }
 }

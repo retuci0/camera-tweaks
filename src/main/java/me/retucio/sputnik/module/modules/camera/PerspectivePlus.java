@@ -9,6 +9,7 @@ import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
+import net.minecraft.client.CameraType;
 import org.lwjgl.glfw.GLFW;
 
 
@@ -58,8 +59,8 @@ public class PerspectivePlus extends Module {
 
     @EventListener
     private void onMouseScroll(MouseScrollEvent event) {
-        if (mc.options.getPerspective() == net.minecraft.client.option.Perspective.FIRST_PERSON
-            || mc.currentScreen != null || scrollSens.getValue() <= 0) return;
+        if (mc.options.getCameraType() == CameraType.FIRST_PERSON
+            || mc.screen != null || scrollSens.getValue() <= 0) return;
 
         if (scrollKey.isDown()) {
             distance -= event.getVertical() / 4 * (scrollSens.getValue() * distance);

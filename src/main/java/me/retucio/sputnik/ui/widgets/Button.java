@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.widgets;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public abstract class Button extends Widget {
 
@@ -14,7 +14,7 @@ public abstract class Button extends Widget {
     }
 
 
-    public abstract void drawTooltip(DrawContext ctx, int mouseX, int mouseY);
+    public abstract void drawTooltip(GuiGraphicsExtractor gui, int mouseX, int mouseY);
 
     public int getOffset() {
         return offset;

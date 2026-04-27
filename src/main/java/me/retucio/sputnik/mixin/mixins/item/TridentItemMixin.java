@@ -3,16 +3,17 @@ package me.retucio.sputnik.mixin.mixins.item;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.movement.TridentBoost;
-import net.minecraft.item.TridentItem;
+import net.minecraft.world.item.TridentItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
+
 @Mixin(TridentItem.class)
 public abstract class TridentItemMixin {
 
-    @ModifyArgs(method = "onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;addVelocity(DDD)V"))
+    @ModifyArgs(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;push(DDD)V"))
     private void modifyVelocity(Args args) {
         TridentBoost tridentBoost = ModuleManager.INSTANCE.getModuleByClass(TridentBoost.class);
         if (!tridentBoost.isEnabled()) return;
@@ -21,13 +22,13 @@ public abstract class TridentItemMixin {
         args.set(2, (double) args.get(2) * tridentBoost.multiplier.getValue());
     }
 
-    @ModifyExpressionValue(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isTouchingWaterOrRain()Z"))
+    @ModifyExpressionValue(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isInWaterOrRain()Z"))
     private boolean allowUseOutOfWaterPre(boolean original) {
         TridentBoost tridentBoost = ModuleManager.INSTANCE.getModuleByClass(TridentBoost.class);
         return (tridentBoost.outOfWater.getValue() && tridentBoost.isEnabled()) || original;
     }
 
-    @ModifyExpressionValue(method = "onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isTouchingWaterOrRain()Z"))
+    @ModifyExpressionValue(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isInWaterOrRain()Z"))
     private boolean allowUseOutOfWaterPost(boolean original) {
         TridentBoost tridentBoost = ModuleManager.INSTANCE.getModuleByClass(TridentBoost.class);
         return (tridentBoost.outOfWater.getValue() && tridentBoost.isEnabled()) || original;

@@ -1,11 +1,11 @@
 package me.retucio.sputnik.event.input;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.io.KeyboardMixin;
+import me.retucio.sputnik.mixin.mixins.io.KeyboardHandlerMixin;
 
 
 /**
- * @see KeyboardMixin#onKeyPress
+ * @see KeyboardHandlerMixin#onKeyPress
  */
 public class KeyEvent extends Event {
 

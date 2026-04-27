@@ -5,7 +5,7 @@ import com.google.gson.JsonParser;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.mixin.mixins.entity.EntityMixin;
 import me.retucio.sputnik.mixin.mixins.entity.ItemEntityMixin;
-import me.retucio.sputnik.mixin.mixins.player.PlayerEntityMixin;
+import me.retucio.sputnik.mixin.mixins.player.PlayerMixin;
 import me.retucio.sputnik.mixin.mixins.render.LivingEntityRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -14,18 +14,19 @@ import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.util.Lists;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LazyEntityReference;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.TntEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.item.Item;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.entity.EntityQueriable;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.entity.UUIDLookup;
+import net.minecraft.world.level.entity.UniquelyIdentifyable;
 
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -36,11 +37,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 /** continúa en:
  * @see EntityMixin
  * @see ItemEntityMixin
  * @see LivingEntityRendererMixin
- * @see PlayerEntityMixin
+ * @see PlayerMixin
  */
 
 public class Nametags extends Module {
@@ -97,39 +99,39 @@ public class Nametags extends Module {
     }
 
     // literalmente cómo lo calcula Minecraft
-    public String getArrowDamage(PersistentProjectileEntity arrow) {
+    public String getArrowDamage(AbstractArrow arrow) {
         if (mc.player == null) return "0";
 
         double initialDamage = 2;
-        double velocity = arrow.getVelocity().length();
-        DamageSource damageSource = arrow.getDamageSources().arrow(arrow, arrow.getOwner());
+        double velocity = arrow.getDeltaMovement().length();
+        DamageSource damageSource = arrow.damageSources().arrow(arrow, arrow.getOwner());
 
-        if (arrow.getWeaponStack() != null && arrow.getEntityWorld() instanceof ServerWorld world)
-            initialDamage = EnchantmentHelper.getDamage(world, arrow.getWeaponStack(), mc.player, damageSource, (float) initialDamage);
+        if (arrow.getWeaponItem() != null && arrow.level() instanceof ServerLevel world)
+            initialDamage = EnchantmentHelper.modifyDamage(world, arrow.getWeaponItem(), mc.player, damageSource, (float) initialDamage);
 
-        int finalDamage = MathHelper.ceil(MathHelper.clamp(velocity * initialDamage, 0, 2.147483647E9));
+        int finalDamage = Mth.ceil(Mth.clamp(velocity * initialDamage, 0, 2.147483647E9));
 
         long bonus = 0;
-        if (arrow.isCritical()) bonus = finalDamage / 2 - 1;
+        if (arrow.isCritArrow()) bonus = finalDamage / 2 - 1;
 
         if (healthMode.is(HealthMode.HEARTS)) finalDamage /= 2;
         return finalDamage + (bonus > 0 ? " ~ " + (finalDamage + bonus) : "");
     }
 
-    public String getTntPrimeTime(TntEntity tnt) {
+    public String getTntPrimeTime(PrimedTnt tnt) {
         return String.format("%.2f\"", ((float) tnt.getFuse() / 20));
     }
 
     @SuppressWarnings("deprecation")
-    public String getOwnerName(LazyEntityReference<LivingEntity> owner) {
+    public String getOwnerName(EntityReference<LivingEntity> owner) {
         // si el dueño está en línea (de manera segura)
-        if (mc.world instanceof EntityQueriable<?> queriableWorld) {
+        if (mc.level instanceof UniquelyIdentifyable queriableWorld) {  // UUIDLookup<?> ??
             LivingEntity ownerEntity = owner.resolve(queriableWorld, LivingEntity.class);
-            if (ownerEntity instanceof PlayerEntity playerEntity) return playerEntity.getName().getString();
+            if (ownerEntity instanceof Player playerEntity) return playerEntity.getName().getString();
         }
 
         // mirar si ya está en la caché
-        UUID uuid = owner.getUuid();
+        UUID uuid = owner.getUUID();
         String cachedName = cache.get(uuid);
         if (cachedName != null) return cachedName;
 

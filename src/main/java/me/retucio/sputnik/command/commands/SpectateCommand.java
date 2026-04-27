@@ -6,8 +6,8 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.EntityArgumentType;
 import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.util.EntityUtil;
-import net.minecraft.command.CommandSource;
-import net.minecraft.entity.Entity;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.world.entity.Entity;
 import org.lwjgl.glfw.GLFW;
 
 public class SpectateCommand extends Command {
@@ -17,7 +17,7 @@ public class SpectateCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder
                 .executes(ctx -> {  // If no argument, use the entity player is looking at
                     mc.execute(() -> {
@@ -40,7 +40,7 @@ public class SpectateCommand extends Command {
 
     @EventListener
     public void onKey(KeyEvent event) {
-        if (mc.getCameraEntity() != mc.player && mc.currentScreen == null
+        if (mc.getCameraEntity() != mc.player && mc.screen == null
                 && event.getKey() == GLFW.GLFW_KEY_ESCAPE && event.getAction() != GLFW.GLFW_RELEASE ) {
             event.cancel();
             mc.setCameraEntity(mc.player);

@@ -5,7 +5,7 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.ModuleArgumentType;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 // porque usar el ratón es más lento que escribir, a menos que tengas toque con el teclado como yo
 public class ToggleCommand extends Command {
@@ -15,7 +15,7 @@ public class ToggleCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+    public void build(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
         builder
                 .then(literal("todos")
                         .then(literal("on")

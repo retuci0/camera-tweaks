@@ -1,14 +1,14 @@
 package me.retucio.sputnik.event.network;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.network.ClientConnectionMixin;
-import net.minecraft.network.packet.Packet;
+import me.retucio.sputnik.mixin.mixins.network.ConnectionMixin;
+import net.minecraft.network.protocol.Packet;
 
 
 /**
- * @see ClientConnectionMixin#onSendPacketPre
- * @see ClientConnectionMixin#onSendPacketPost
- * @see ClientConnectionMixin#onReceivePacket
+ * @see ConnectionMixin#onSendPacketPre
+ * @see ConnectionMixin#onSendPacketPost
+ * @see ConnectionMixin#onReceivePacket
  */
 public class PacketEvent {
 

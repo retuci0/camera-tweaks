@@ -10,8 +10,8 @@ import me.retucio.sputnik.event.network.ChunkOcclusionEvent;
 import me.retucio.sputnik.event.network.DisconnectEvent;
 import me.retucio.sputnik.event.network.PacketEvent;
 import me.retucio.sputnik.mixin.mixins.entity.EntityMixin;
-import me.retucio.sputnik.mixin.mixins.io.KeyInputMixin;
-import me.retucio.sputnik.mixin.mixins.player.ClientPlayerInteractionManagerMixin;
+import me.retucio.sputnik.mixin.mixins.io.KeyboardInputMixin;
+import me.retucio.sputnik.mixin.mixins.player.MultiPlayerGameModeMixin;
 import me.retucio.sputnik.mixin.mixins.render.*;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -22,31 +22,25 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.MiscUtil;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.client.option.Perspective;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
-import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
 /** continúa en:
  * @see CameraMixin
- * @see ChunkBorderDebugRendererMixin
- * @see ClientPlayerInteractionManagerMixin
+ * @see ChunkBorderRendererMixin
+ * @see MultiPlayerGameModeMixin
  * @see EntityMixin
  * @see GameRendererMixin
- * @see KeyInputMixin
+ * @see KeyboardInputMixin
  * @see LivingEntityRendererMixin
- * @see WorldRendererMixin
+ * @see LevelRendererMixin
  *
  * @author retucio
  */
@@ -78,7 +72,7 @@ public class Freecam extends Module {
     private float prevYaw, prevPitch;
 
     private final Vector3d pos = new Vector3d();
-    private Perspective perspective;
+    private CameraType perspective;
     private double fovScale, speed;
     private boolean forward, backward, right, left, up, down, crouching, viewBobbing;
     private float yaw, pitch;
@@ -94,26 +88,26 @@ public class Freecam extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.player == null || mc.options == null) return;
+        if (mc.player == null) return;
 
-        fovScale = mc.options.getFovEffectScale().getValue();
-        viewBobbing = mc.options.getBobView().getValue();
+        fovScale = mc.options.fovEffectScale().get();
+        viewBobbing = mc.options.bobView().get();
 
         if (staticView.getValue()) {
-            mc.options.getFovEffectScale().setValue(0D);
-            mc.options.getBobView().setValue(false);
+            mc.options.fovEffectScale().set(0D);
+            mc.options.bobView().set(false);
         }
 
-        yaw = mc.player.getYaw();
-        pitch = mc.player.getPitch();
-        perspective = mc.options.getPerspective();
+        yaw = mc.player.getYRot();
+        pitch = mc.player.getXRot();
+        perspective = mc.options.getCameraType();
 
         speed = speedSetting.getValue();
 
-        MiscUtil.copyVector(pos, mc.gameRenderer.getCamera().getCameraPos());
-        MiscUtil.copyVector(prevPos, mc.gameRenderer.getCamera().getCameraPos());
+        MiscUtil.copyVector(pos, mc.gameRenderer.getMainCamera().position());
+        MiscUtil.copyVector(prevPos, mc.gameRenderer.getMainCamera().position());
 
-        if (mc.options.getPerspective() == Perspective.THIRD_PERSON_FRONT) {
+        if (mc.options.getCameraType() == CameraType.THIRD_PERSON_FRONT) {
             yaw += 180;
             pitch *= -1;
         }
@@ -121,42 +115,41 @@ public class Freecam extends Module {
         prevYaw = yaw;
         prevPitch = pitch;
 
-        crouching = mc.options.sneakKey.isPressed();
+        crouching = mc.options.keyShift.isDown();
 
-        forward = KeyUtil.isKeyDown(mc.options.forwardKey);
-        backward = KeyUtil.isKeyDown(mc.options.backKey);
-        right = KeyUtil.isKeyDown(mc.options.rightKey);
-        left = KeyUtil.isKeyDown(mc.options.leftKey);
-        up = KeyUtil.isKeyDown(mc.options.jumpKey);
-        down = KeyUtil.isKeyDown(mc.options.sneakKey);
+        forward = KeyUtil.isKeyDown(mc.options.keyUp);
+        backward = KeyUtil.isKeyDown(mc.options.keyDown);
+        right = KeyUtil.isKeyDown(mc.options.keyRight);
+        left = KeyUtil.isKeyDown(mc.options.keyLeft);
+        up = KeyUtil.isKeyDown(mc.options.keyJump);
+        down = KeyUtil.isKeyDown(mc.options.keyShift);
 
         unpress();
-        if (reloadChunks.getValue()) mc.worldRenderer.reload();
+        if (reloadChunks.getValue()) mc.levelRenderer.allChanged();
 
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        if (reloadChunks.getValue()) mc.execute(mc.worldRenderer::reload);
+        if (reloadChunks.getValue()) mc.execute(mc.levelRenderer::allChanged);
 
-        mc.options.setPerspective(perspective);
+        mc.options.setCameraType(perspective);
         crouching = false;
 
         if (staticView.getValue()) {
-            mc.options.getFovEffectScale().setValue(fovScale);
-            mc.options.getBobView().setValue(viewBobbing);
+            mc.options.fovEffectScale().set(fovScale);
+            mc.options.bobView().set(viewBobbing);
         }
 
         // para no flaggear el anticheat, cancelar cualquier acción dejada a medias estando en modo libre
         if (cancelActionPackets.getValue()) {
-            if (mc.interactionManager != null)
-                mc.interactionManager.cancelBlockBreaking();
-
-            if (mc.options != null) {
-                mc.options.attackKey.setPressed(false);
-                mc.options.useKey.setPressed(false);
+            if (mc.gameMode != null) {
+                mc.gameMode.stopDestroyBlock();
             }
+
+            mc.options.keyAttack.setDown(false);
+            mc.options.keyUse.setDown(false);
         }
 
         super.onDisable();
@@ -166,14 +159,14 @@ public class Freecam extends Module {
     public void onTick() {
         if (mc.getCameraEntity() == null || perspective == null) return;
 
-        mc.getCameraEntity().noClip = mc.getCameraEntity().isInsideWall();
-        if (!perspective.isFirstPerson()) mc.options.setPerspective(Perspective.FIRST_PERSON);
+        mc.getCameraEntity().noPhysics = mc.getCameraEntity().isInWall();
+        if (!perspective.isFirstPerson()) mc.options.setCameraType(CameraType.FIRST_PERSON);
 
-        Vec3d forward = Vec3d.fromPolar(0, yaw);
-        Vec3d right = Vec3d.fromPolar(0, yaw + 90);
+        Vec3 forward = Vec3.directionFromRotation(0, yaw);
+        Vec3 right = Vec3.directionFromRotation(0, yaw + 90);
         double dx = 0, dy = 0, dz = 0;
 
-        double speedMultiplier = speed * (KeyUtil.isKeyDown(mc.options.sprintKey) ? 1 : 0.5);
+        double speedMultiplier = speed * (KeyUtil.isKeyDown(mc.options.keySprint) ? 1 : 0.5);
 
         boolean zMovement = false;
         if (this.forward) {
@@ -215,10 +208,10 @@ public class Freecam extends Module {
         if (event.getStage() != Event.Stage.PRE) return;
 
         Packet<?> packet = event.getPacket();
-        if (packet instanceof PlayerActionC2SPacket
-                || packet instanceof PlayerInteractBlockC2SPacket
-                || packet instanceof PlayerInteractItemC2SPacket
-                || packet instanceof HandSwingC2SPacket) {
+        if (packet instanceof ServerboundPlayerActionPacket
+                || packet instanceof ServerboundUseItemOnPacket
+                || packet instanceof ServerboundUseItemPacket
+                || packet instanceof ServerboundSwingPacket) {
             event.cancel();
         }
     }
@@ -226,29 +219,29 @@ public class Freecam extends Module {
     @EventListener
     private void onKey(KeyEvent event) {
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
-        if (mc.currentScreen != null) return;
+        if (mc.screen != null) return;
 
-        KeyInput key = new KeyInput(event.getKey(), event.getScancode(), 0);
+        net.minecraft.client.input.KeyEvent key = new net.minecraft.client.input.KeyEvent(event.getKey(), event.getScancode(), 0);
 
         boolean shouldCancel = true;
-        if (mc.options.forwardKey.matchesKey(key)) {
+        if (mc.options.keyUp.matches(key)) {
             forward = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.forwardKey.setPressed(false);
-        } else if (mc.options.backKey.matchesKey(key)) {
+            mc.options.keyUp.setDown(false);
+        } else if (mc.options.keyDown.matches(key)) {
             backward = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.backKey.setPressed(false);
-        } else if (mc.options.rightKey.matchesKey(key)) {
+            mc.options.keyDown.setDown(false);
+        } else if (mc.options.keyRight.matches(key)) {
             right = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.rightKey.setPressed(false);
-        } else if (mc.options.leftKey.matchesKey(key)) {
+            mc.options.keyRight.setDown(false);
+        } else if (mc.options.keyLeft.matches(key)) {
             left = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.leftKey.setPressed(false);
-        } else if (mc.options.jumpKey.matchesKey(key)) {
+            mc.options.keyLeft.setDown(false);
+        } else if (mc.options.keyJump.matches(key)) {
             up = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.jumpKey.setPressed(false);
-        } else if (mc.options.sneakKey.matchesKey(key)) {
+            mc.options.keyJump.setDown(false);
+        } else if (mc.options.keyShift.matches(key)) {
             down = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.sneakKey.setPressed(false);
+            mc.options.keyShift.setDown(false);
         } else {
             shouldCancel = false;
         }
@@ -259,29 +252,29 @@ public class Freecam extends Module {
     @EventListener
     private void onMouseClick(MouseClickEvent event) {  // por si el restrasado del usuario usa el ratón para moverse
         if (KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) return;
-        if (mc.currentScreen != null) return;
+        if (mc.screen != null) return;
 
-        Click click = new Click(0, 0, new MouseInput(event.getButton(), 0));
+        MouseButtonEvent click = new MouseButtonEvent(0, 0, new MouseButtonInfo(event.getButton(), 0));
 
         boolean shouldCancel = true;
-        if (mc.options.forwardKey.matchesMouse(click)) {
+        if (mc.options.keyUp.matchesMouse(click)) {
             forward = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.forwardKey.setPressed(false);
-        } else if (mc.options.backKey.matchesMouse(click)) {
+            mc.options.keyUp.setDown(false);
+        } else if (mc.options.keyDown.matchesMouse(click)) {
             backward = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.backKey.setPressed(false);
-        } else if (mc.options.rightKey.matchesMouse(click)) {
+            mc.options.keyDown.setDown(false);
+        } else if (mc.options.keyRight.matchesMouse(click)) {
             right = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.rightKey.setPressed(false);
-        } else if (mc.options.leftKey.matchesMouse(click)) {
+            mc.options.keyRight.setDown(false);
+        } else if (mc.options.keyLeft.matchesMouse(click)) {
             left = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.leftKey.setPressed(false);
-        } else if (mc.options.jumpKey.matchesMouse(click)) {
+            mc.options.keyLeft.setDown(false);
+        } else if (mc.options.keyJump.matchesMouse(click)) {
             up = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.jumpKey.setPressed(false);
-        } else if (mc.options.sneakKey.matchesMouse(click)) {
+            mc.options.keyJump.setDown(false);
+        } else if (mc.options.keyShift.matchesMouse(click)) {
             down = event.getAction() != GLFW.GLFW_RELEASE;
-            mc.options.sneakKey.setPressed(false);
+            mc.options.keyShift.setDown(false);
         } else {
             shouldCancel = false;
         }
@@ -291,7 +284,7 @@ public class Freecam extends Module {
 
     @EventListener
     private void onMouseScroll(MouseScrollEvent event) {
-        if (scrollSens.getValue() > 0 && mc.currentScreen == null && scrollKey.isDown()) {
+        if (scrollSens.getValue() > 0 && mc.screen == null && scrollKey.isDown()) {
             speed += event.getVertical() / 4 * (scrollSens.getValue() * speed);
             if (speed < 0.1) speed = 0.1;
             event.cancel();
@@ -312,10 +305,10 @@ public class Freecam extends Module {
     private void onPacketReceive(PacketEvent.Receive event) {
         if (mc.player == null) return;  // el jugador probablemente nunca sea nulo bajo estas circunstancias pero quién sabe
 
-        if (event.getPacket() instanceof DeathMessageS2CPacket packet) {
+        if (event.getPacket() instanceof ClientboundPlayerCombatKillPacket packet) {
             if (mc.player.getId() == packet.playerId())
                 toggle();
-        } else if (event.getPacket() instanceof HealthUpdateS2CPacket packet) {
+        } else if (event.getPacket() instanceof ClientboundSetHealthPacket packet) {
             if (mc.player.getHealth() - packet.getHealth() > 0 && toggleOnDamage.getValue()) {
                 ChatUtil.info("cámara libre se ha desactivado porque has recibido daño");
                 toggle();
@@ -361,16 +354,16 @@ public class Freecam extends Module {
         yaw += (float) deltaX;
         pitch += (float) deltaY;
 
-        pitch = MathHelper.clamp(pitch, -90, 90);
+        pitch = Mth.clamp(pitch, -90, 90);
     }
 
     private void unpress() {
-        mc.options.forwardKey.setPressed(false);
-        mc.options.backKey.setPressed(false);
-        mc.options.rightKey.setPressed(false);
-        mc.options.leftKey.setPressed(false);
-        mc.options.jumpKey.setPressed(false);
-        mc.options.sneakKey.setPressed(false);
+        mc.options.keyUp.setDown(false);
+        mc.options.keyDown.setDown(false);
+        mc.options.keyRight.setDown(false);
+        mc.options.keyLeft.setDown(false);
+        mc.options.keyJump.setDown(false);
+        mc.options.keyShift.setDown(false);
     }
 
     private void stopMoving() {
@@ -398,7 +391,7 @@ public class Freecam extends Module {
     }
 
     public float getYaw(float tickDelta) {
-        return MathHelper.lerp(tickDelta, prevYaw, yaw);
+        return Mth.lerp(tickDelta, prevYaw, yaw);
     }
 
     public float getPitch() {
@@ -406,7 +399,7 @@ public class Freecam extends Module {
     }
 
     public float getPitch(float tickDelta) {
-        return MathHelper.lerp(tickDelta, prevPitch, pitch);
+        return Mth.lerp(tickDelta, prevPitch, pitch);
     }
 
     public float getPrevYaw() {
@@ -418,15 +411,15 @@ public class Freecam extends Module {
     }
 
     public double getX(float tickDelta) {
-        return MathHelper.lerp(tickDelta, prevPos.x, pos.x);
+        return Mth.lerp(tickDelta, prevPos.x, pos.x);
     }
 
     public double getY(float tickDelta) {
-        return MathHelper.lerp(tickDelta, prevPos.y, pos.y);
+        return Mth.lerp(tickDelta, prevPos.y, pos.y);
     }
 
     public double getZ(float tickDelta) {
-        return MathHelper.lerp(tickDelta, prevPos.z, pos.z);
+        return Mth.lerp(tickDelta, prevPos.z, pos.z);
     }
 
     public boolean isCrouching() {

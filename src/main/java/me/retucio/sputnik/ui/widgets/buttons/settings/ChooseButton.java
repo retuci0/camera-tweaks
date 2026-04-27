@@ -9,11 +9,12 @@ import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+
 
 // botón para los ajustes de selección única
 public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
@@ -39,23 +40,23 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         int bgColor = isHovered(mouseX, mouseY)
                 ? Colors.buttonColor.brighter().getRGB()
                 : Colors.buttonColor.getRGB();
-        ctx.fill(x, y, x + w, y + h, bgColor);
+        gui.fill(x, y, x + w, y + h, bgColor);
 
         // texto
         String label = setting.getName() + ": " + setting.getDisplayName(setting.getValue());
-        ctx.drawText(mc.textRenderer, label, x + 5, y + 3, -1, true);
+        gui.text(mc.font, label, x + 5, y + 3, -1, true);
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
             // click izquierdo / derecho: abrir marco
-            if (button <= 1 && !mc.isShiftPressed()) {
+            if (button <= 1 && !KeyUtil.isShiftDown()) {
                 openFrame();
                 // shift + clic derecho: restablecer valores
             } else if (button == 1 && KeyUtil.isShiftDown()) {

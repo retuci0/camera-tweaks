@@ -1,7 +1,6 @@
 package me.retucio.sputnik.module.modules.network;
 
 import com.github.retucio.neutrino.EventListener;
-import it.unimi.dsi.fastutil.booleans.BooleanSet;
 import me.retucio.sputnik.event.interact.AttackBlockEvent;
 import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.module.Category;
@@ -13,16 +12,13 @@ import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.EntityUtil;
-import me.retucio.sputnik.util.MiscUtil;
 import me.retucio.sputnik.util.render.RenderUtil;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -132,7 +128,7 @@ public class PacketMine extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.world == null || mc.interactionManager == null) return;
+        if (mc.player == null || mc.level == null || mc.gameMode == null) return;
         if (miningBlocks.isEmpty()) {
             currentOrderIndex = 0;
             return;
@@ -141,7 +137,7 @@ public class PacketMine extends Module {
         Iterator<MiningBlock> iterator = miningBlocks.iterator();
         while (iterator.hasNext()) {
             MiningBlock block = iterator.next();
-            if (mc.world.getBlockState(block.pos).isAir()) {
+            if (mc.level.getBlockState(block.pos).isAir()) {
                 iterator.remove();
                 if (currentOrderIndex >= miningBlocks.size()) {
                     currentOrderIndex = 0;
@@ -223,7 +219,7 @@ public class PacketMine extends Module {
 
     private boolean processBlock(MiningBlock block) {
         // por si las moscas
-        if (mc.world.getBlockState(block.pos).isAir()) {
+        if (mc.level.getBlockState(block.pos).isAir()) {
             return false;
         }
 
@@ -266,14 +262,14 @@ public class PacketMine extends Module {
         }
 
         public boolean mine() {
-            if (pos.getSquaredDistance(mc.player.getEntityPos()) > Math.pow(mc.player.getBlockInteractionRange(), 2)
+            if (mc.player.position().distanceToSqr(Vec3.atLowerCornerOf(pos)) > Math.pow(mc.player.blockInteractionRange(), 2)
                     && cancelOutOfReach.getValue()) {
                 return false;
             }
 
             if (dontBreak.getValue()
-                    && mc.player.isHolding(ItemStack::isDamageable)
-                    && mc.player.getMainHandStack().getMaxDamage() - mc.player.getMainHandStack().getDamage() <= 1) {
+                    && mc.player.isHolding(ItemStack::isDamageableItem)
+                    && mc.player.getMainHandItem().getMaxDamage() - mc.player.getMainHandItem().getDamageValue() <= 1) {
                 ChatUtil.warn("pico por romperse");
                 toggle();
                 return false;
@@ -281,17 +277,17 @@ public class PacketMine extends Module {
 
             rotate();
 
-            mc.interactionManager.sendSequencedPacket(mc.world, sequence ->
-                    new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, dir, sequence));
+            mc.gameMode.startPrediction(mc.level, sequence ->
+                    new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, pos, dir, sequence));
             mining = true;
-            mc.interactionManager.sendSequencedPacket(mc.world, sequence ->
-                    new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, dir, sequence));
+            mc.gameMode.startPrediction(mc.level, sequence ->
+                    new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, pos, dir, sequence));
 
             return true;
         }
 
         public void render(Render3DEvent event) {
-            VoxelShape shape = mc.world.getBlockState(pos).getOutlineShape(mc.world, pos);
+            VoxelShape shape = mc.level.getBlockState(pos).getShape(mc.level, pos);
             if (shape.isEmpty()) return;
 
             RenderUtil.drawVoxelShapeOutline(
@@ -305,7 +301,7 @@ public class PacketMine extends Module {
         }
 
         private void rotate() {
-            Vec3d pos = Vec3d.of(this.pos);
+            Vec3 pos = Vec3.atLowerCornerOf(this.pos);
             switch (rotate.getValue()) {
                 case CLIENT -> EntityUtil.lookAtClient(pos);
                 case SERVER -> EntityUtil.lookAtServer(pos);

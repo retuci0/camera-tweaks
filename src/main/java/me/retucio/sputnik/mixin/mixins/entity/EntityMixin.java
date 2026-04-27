@@ -1,8 +1,8 @@
 package me.retucio.sputnik.mixin.mixins.entity;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.render.ChangeRotationEvent;
-import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.camera.Freelook;
@@ -11,35 +11,43 @@ import me.retucio.sputnik.module.modules.misc.AntiInvis;
 import me.retucio.sputnik.module.modules.movement.BoatFly;
 import me.retucio.sputnik.module.modules.movement.Velocity;
 import me.retucio.sputnik.module.modules.render.Nametags;
-import net.minecraft.entity.*;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
+import me.retucio.sputnik.util.interfaces.IVec3;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.phys.HitResult;
+import org.joml.Vector3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.retucio.sputnik.Sputnik.EVENT_BUS;
-import static me.retucio.sputnik.Sputnik.mc;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
 
-    @Shadow public abstract Text getName();
+    @Unique boolean freecamDone;
+
+    @Shadow public abstract Component getName();
     @Shadow public abstract EntityType<?> getType();
 
-    @Shadow private float yaw;
-    @Shadow private float pitch;
+    @Shadow private float yRot;
+    @Shadow private float xRot;
+
+    @Shadow
+    public abstract HitResult pick(double range, float a, boolean withLiquids);
 
     @Unique
     Freecam freecam;
@@ -50,30 +58,74 @@ public abstract class EntityMixin {
     @Unique
     Rotations rotations;
 
-    @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void getModules(EntityType type, World world, CallbackInfo ci) {
+    private void getModules(CallbackInfo ci) {
         freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
         freelook = ModuleManager.INSTANCE.getModuleByClass(Freelook.class);
         nametags = ModuleManager.INSTANCE.getModuleByClass(Nametags.class);
         rotations = ModuleManager.INSTANCE.getModuleByClass(Rotations.class);
     }
 
+    @Inject(method = "pick", at = @At("HEAD"), cancellable = true)
+    private void updateTargetedEntityInvoke(double range, float a, boolean withLiquids, CallbackInfoReturnable<HitResult> cir) {
+        Minecraft mc = Minecraft.getInstance();
+        if ((freecam.isEnabled()) && mc.getCameraEntity() != null && !freecamDone) {
+            cir.cancel();
+
+            Entity cameraEntity = mc.getCameraEntity();
+            Vector3d pos = freecam.getPos();
+            Vector3d prevPos = freecam.getPrevPos();
+
+            double x = cameraEntity.getX();
+            double y = cameraEntity.getY();
+            double z = cameraEntity.getZ();
+            double lastX = cameraEntity.xo;
+            double lastY = cameraEntity.yo;
+            double lastZ = cameraEntity.zo;
+            float yaw = cameraEntity.getYRot();
+            float pitch = cameraEntity.getXRot();
+            float lastYaw = cameraEntity.yRotO;
+            float lastPitch = cameraEntity.xRotO;
+
+            ((IVec3) cameraEntity.position()).sputnik$set(pos.x, pos.y - cameraEntity.getEyeHeight(cameraEntity.getPose()), pos.z);
+            cameraEntity.xo = prevPos.x;
+            cameraEntity.yo = prevPos.y - cameraEntity.getEyeHeight(cameraEntity.getPose());
+            cameraEntity.zo = prevPos.z;
+            cameraEntity.setYRot(freecam.getYaw());
+            cameraEntity.setXRot(freecam.getPitch());
+            cameraEntity.yRotO = freecam.getPrevYaw();
+            cameraEntity.xRotO = freecam.getPrevPitch();
+
+            freecamDone = true;
+            pick(range, a, withLiquids);
+            freecamDone = false;
+
+            ((IVec3) cameraEntity.position()).sputnik$set(x, y, z);
+            cameraEntity.xo = lastX;
+            cameraEntity.yo = lastY;
+            cameraEntity.zo = lastZ;
+            cameraEntity.setYRot(yaw);
+            cameraEntity.setXRot(pitch);
+            cameraEntity.yRotO = lastYaw;
+            cameraEntity.xRotO = lastPitch;
+        }
+    }
+
 
     // cámara libre & perspectiva libre
 
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
-    private void onChangeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
-        if ((Object) this != mc.player) return;
+    @Inject(method = "turn", at = @At("HEAD"), cancellable = true)
+    private void onChangeLookDirection(double xo, double yo, CallbackInfo ci) {
+        if ((Object) this != Sputnik.mc.player) return;
 
         if (freecam.isEnabled()) {
-            freecam.changeLookDirection(cursorDeltaX * 0.15, cursorDeltaY * 0.15);
+            freecam.changeLookDirection(xo * 0.15, yo * 0.15);
             ci.cancel();
 
         } else if (freelook.isEnabled() && freelook.mode.is(Freelook.CameraMode.CAMERA)) {
-            freelook.setYaw(freelook.getYaw() + (float) (cursorDeltaX * freelook.mouseSens.getFloatValue()));
-            freelook.setPitch(freelook.getPitch() + (float) (cursorDeltaY * freelook.mouseSens.getFloatValue()));
+            freelook.setYaw(freelook.getYaw() + (float) (xo * freelook.mouseSens.getFloatValue()));
+            freelook.setPitch(freelook.getPitch() + (float) (yo * freelook.mouseSens.getFloatValue()));
 
             if (Math.abs(freelook.getPitch()) > 90) freelook.setPitch(freelook.getPitch() > 0 ? 90 : -90);
             ci.cancel();
@@ -87,39 +139,39 @@ public abstract class EntityMixin {
     @ModifyReturnValue(method = "isCustomNameVisible", at = @At("RETURN"))
     private boolean renderEntityNametags(boolean original) {
         if (!nametags.isEnabled()) return original;
-        if ((Object) this instanceof PersistentProjectileEntity p && p.isOnGround()) return false;
-        if ((Object) this instanceof ItemEntity i && !nametags.items.isEnabled(i.getStack().getItem())) return false;
+        if ((Object) this instanceof AbstractArrow p && p.onGround()) return false;
+        if ((Object) this instanceof ItemEntity i && !nametags.items.isEnabled(i.getItem().getItem())) return false;
         return nametags.entities.isEnabled((this.getType()));
     }
 
     @ModifyReturnValue(method = "getName", at = @At("RETURN"))
-    private Text showProjectileDamage(Text original) {
+    private Component showProjectileDamage(Component original) {
         if (!nametags.isEnabled() || !nametags.showProjectileDamage.getValue()) return original;
 
-        if ((Object) this instanceof PersistentProjectileEntity arrow) {  // aunque lo llame "arrow", también cubre flechas espectrales y tridentes
+        if ((Object) this instanceof AbstractArrow arrow) {  // aunque se llame "arrow", también cubre flechas espectrales y tridentes
             String damage = nametags.getArrowDamage(arrow);
-            if (!damage.equals("0")) return original.copy().append(Text.literal(" (" + damage + ")").formatted(Formatting.RED));
+            if (!damage.equals("0")) return original.copy().append(Component.literal(" (" + damage + ")").withStyle(ChatFormatting.RED));
         }
 
         return original;
     }
 
     @ModifyReturnValue(method = "getName", at = @At("RETURN"))
-    private Text showTntPrimeTime(Text original) {
+    private Component showTntPrimeTime(Component original) {
         if (!nametags.isEnabled() || !nametags.tntPrime.getValue()) return original;
-        if ((Object) this instanceof TntEntity tnt) {
-            return Text.of(nametags.getTntPrimeTime(tnt));
+        if ((Object) this instanceof PrimedTnt tnt) {
+            return Component.nullToEmpty(nametags.getTntPrimeTime(tnt));
         }
         return original;
     }
 
     @SuppressWarnings("ConstantConditions")
     @ModifyReturnValue(method = "getCustomName", at = @At("RETURN"))
-    private Text displayEntityOwner(Text original) {
+    private Component displayEntityOwner(Component original) {
         if (!nametags.isEnabled() || !nametags.petOwner.getValue()) return original;
-        if ((Object) this instanceof TameableEntity entity && entity.getOwnerReference() != null) {
+        if ((Object) this instanceof TamableAnimal entity && entity.getOwnerReference() != null) {
             if (original != null) return original.copy().append(" (de " + nametags.getOwnerName(entity.getOwnerReference()) + ")");
-            else return Text.of(nametags.getOwnerName(entity.getOwnerReference()));
+            else return Component.nullToEmpty(nametags.getOwnerName(entity.getOwnerReference()));
         }
         return original;
     }
@@ -127,7 +179,7 @@ public abstract class EntityMixin {
 
     @SuppressWarnings("ConstantConditions")
     @ModifyReturnValue(method = "getName", at = @At("RETURN"))
-    private Text showBabies(Text original) {
+    private Component showBabies(Component original) {
         if (!nametags.isEnabled() || !nametags.distinguishBabies.getValue()) return original;
         if ((Object) this instanceof LivingEntity entity && entity.isBaby()) return original.copy().append(" (baby)");
         return original;
@@ -136,24 +188,24 @@ public abstract class EntityMixin {
 
     // rotaciones
 
-    @Inject(method = "setRotation", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setRot", at = @At("HEAD"), cancellable = true)
     private void onRotation(float yaw, float pitch, CallbackInfo ci) {
-        if ((Object) this != mc.player) return;
-        ChangeRotationEvent event = EVENT_BUS.post(new ChangeRotationEvent(yaw, pitch));
+        if ((Object) this != Sputnik.mc.player) return;
+        ChangeRotationEvent event = Sputnik.EVENT_BUS.post(new ChangeRotationEvent(yaw, pitch));
         if (event.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "setYaw", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setYRot", at = @At("HEAD"), cancellable = true)
     private void onChangeYaw(float yaw, CallbackInfo ci) {
-        if ((Object) this != mc.player) return;
-        ChangeRotationEvent event = EVENT_BUS.post(new ChangeRotationEvent(yaw, this.pitch));
+        if ((Object) this != Sputnik.mc.player) return;
+        ChangeRotationEvent event = Sputnik.EVENT_BUS.post(new ChangeRotationEvent(yaw, this.xRot));
         if (event.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "setPitch", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setXRot", at = @At("HEAD"), cancellable = true)
     private void onChangePitch(float pitch, CallbackInfo ci) {
-        if ((Object) this != mc.player) return;
-        ChangeRotationEvent event = EVENT_BUS.post(new ChangeRotationEvent(this.yaw, pitch));
+        if ((Object) this != Sputnik.mc.player) return;
+        ChangeRotationEvent event = Sputnik.EVENT_BUS.post(new ChangeRotationEvent(this.yRot, pitch));
         if (event.isCancelled()) ci.cancel();
     }
 
@@ -161,22 +213,23 @@ public abstract class EntityMixin {
     // otros
 
     @Inject(method = "isInvisibleTo", at = @At("RETURN"), cancellable = true)
-    private void renderInvisPlayers(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+    private void renderInvisPlayers(Player player, CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.INSTANCE.getModuleByClass(AntiInvis.class).isEnabled()) cir.setReturnValue(false);
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "getStepHeight", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "maxUpStep", at = @At("RETURN"), cancellable = true)
     private void modifyBoatStepHeight(CallbackInfoReturnable<Float> cir) {
         BoatFly boatFly = ModuleManager.INSTANCE.getModuleByClass(BoatFly.class);
-        if (((Object) this) instanceof AbstractBoatEntity && boatFly.isEnabled()) {
+        if (((Object) this) instanceof AbstractBoat && boatFly.isEnabled()) {
             cir.setReturnValue(boatFly.stepHeight.getFloatValue());
         }
     }
 
-    @Inject(method = "pushAwayFrom", at = @At("HEAD"), cancellable = true)
+    @SuppressWarnings("ConstantConditions")
+    @Inject(method = "push(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private void onPushed(Entity entity, CallbackInfo ci) {
         Velocity velocity = ModuleManager.INSTANCE.getModuleByClass(Velocity.class);
-        if (velocity.isEnabled() && !velocity.push.getValue() && (Object) this == mc.player) ci.cancel();
+        if (velocity.isEnabled() && !velocity.push.getValue() && (Object) this == Sputnik.mc.player) ci.cancel();
     }
 }

@@ -1,6 +1,6 @@
 package me.retucio.sputnik.util;
 
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
 
 import java.awt.Color;
 
@@ -111,18 +111,18 @@ public class Colors {
         return new Color((int) r, (int) g, (int) b, alpha);
     }
 
-    public static Formatting getFormatting(Color color) {
+    public static ChatFormatting getFormatting(Color color) {
         return nearest(color);
     }
 
-    public static Formatting nearest(Color input) {
-        Formatting nearest = null;
+    public static ChatFormatting nearest(Color input) {
+        ChatFormatting nearest = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (Formatting formatting : Formatting.values()) {
-            if (formatting.getColorValue() == null) continue; // saltarse los modificadores
+        for (ChatFormatting formatting : ChatFormatting.values()) {
+            if (formatting.getColor() == null) continue;  // saltarse los modificadores
 
-            Color candidate = new Color(formatting.getColorValue());
+            Color candidate = new Color(formatting.getColor());
             double dist = colorDistance(input, candidate);
 
             if (dist < minDistance) {

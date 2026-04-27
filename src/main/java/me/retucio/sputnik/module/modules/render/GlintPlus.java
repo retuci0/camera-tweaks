@@ -1,21 +1,21 @@
 package me.retucio.sputnik.module.modules.render;
 
-import me.retucio.sputnik.mixin.mixins.render.BufferStorageMixin;
-import me.retucio.sputnik.mixin.mixins.render.EquipmentRendererMixin;
-import me.retucio.sputnik.mixin.mixins.render.ItemRendererMixin;
+import me.retucio.sputnik.mixin.mixins.render.RenderBuffersMixin;
+import me.retucio.sputnik.mixin.mixins.render.EquipmentLayerRendererMixin;
+import me.retucio.sputnik.mixin.mixins.render.ItemFeatureRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
-import me.retucio.sputnik.util.render.GlintRenderLayer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.util.DyeColor;
+import me.retucio.sputnik.util.render.GlintRenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.world.item.DyeColor;
 
 /** continúa en:
- * @see BufferStorageMixin
- * @see EquipmentRendererMixin
- * @see ItemRendererMixin
+ * @see RenderBuffersMixin
+ * @see EquipmentLayerRendererMixin
+ * @see ItemFeatureRendererMixin
  */
 
 public class GlintPlus extends Module {
@@ -45,22 +45,22 @@ public class GlintPlus extends Module {
                 Category.RENDER);
     }
 
-    public RenderLayer getGlint() {
+    public RenderType getGlint() {
         int color = getColor();
-        if (!isEnabled() || !items.getValue()) return RenderLayers.glint();
-        return GlintRenderLayer.glintColor.get(color);
+        if (!isEnabled() || !items.getValue()) return RenderTypes.glint();
+        return GlintRenderType.glintColor.get(color);
     }
 
-    public RenderLayer getEntityGlint() {
+    public RenderType getEntityGlint() {
         int color = getColor();
-        if (!isEnabled() || !items.getValue()) return RenderLayers.entityGlint();
-        return GlintRenderLayer.entityGlintColor.get(color);
+        if (!isEnabled() || !items.getValue()) return RenderTypes.entityGlint();
+        return GlintRenderType.entityGlintColor.get(color);
     }
 
-    public RenderLayer getArmorEntityGlint() {
+    public RenderType getArmorEntityGlint() {
         int color = getColor();
-        if (!isEnabled() || !armor.getValue()) return RenderLayers.armorEntityGlint();
-        return GlintRenderLayer.armorEntityGlintColor.get(color);
+        if (!isEnabled() || !armor.getValue()) return RenderTypes.armorEntityGlint();
+        return GlintRenderType.armorEntityGlintColor.get(color);
     }
 
     public int getColor() {
@@ -74,7 +74,7 @@ public class GlintPlus extends Module {
         }
 
         for (DyeColor dye : DyeColor.values())
-            if (dye.name().equalsIgnoreCase(colorName)) return dye.getIndex();
+            if (dye.name().equalsIgnoreCase(colorName)) return dye.getId();
 
         return -1;
     }

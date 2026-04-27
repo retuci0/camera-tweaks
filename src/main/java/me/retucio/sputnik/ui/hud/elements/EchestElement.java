@@ -4,14 +4,15 @@ import me.retucio.sputnik.module.modules.client.HUD;
 import me.retucio.sputnik.ui.hud.ImageHudElement;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.InventoryUtil;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class EchestElement extends ImageHudElement {
 
@@ -26,10 +27,10 @@ public class EchestElement extends ImageHudElement {
     }
 
     @Override
-    public void renderInGame(DrawContext ctx, float delta, HUD hud) {
+    public void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud) {
         if (!textureLoaded || !isVisible()) return;
 
-        ctx.drawTexture(
+        gui.blit(
                 RenderPipelines.GUI_TEXTURED,
                 textureId,
                 x, y,
@@ -39,25 +40,26 @@ public class EchestElement extends ImageHudElement {
                 Colors.PURPLE.getRGB()
         );
 
-        ctx.drawText(
-                mc.textRenderer,
+
+        gui.text(
+                mc.font,
                 "echest",
-                x + w / 2 - mc.textRenderer.getWidth("echest") / 2,
-                y + mc.textRenderer.fontHeight - 3,
+                x + w / 2 - mc.font.width("echest") / 2,
+                y + mc.font.lineHeight - 3,
                 Colors.instructionsTextColor.getRGB(),
                 false
         );
 
-        renderItems(ctx, InventoryUtil.getEchestInv());
+        renderItems(gui, InventoryUtil.getEchestInv());
     }
 
     @Override
-    public void renderInEditor(DrawContext ctx, HUD hud) {
+    public void renderInEditor(GuiGraphicsExtractor gui, HUD hud) {
         if (!textureLoaded) return;
 
-        drawEditorBackground(ctx);
+        drawEditorBackground(gui);
 
-        ctx.drawTexture(
+        gui.blit(
                 RenderPipelines.GUI_TEXTURED,
                 textureId,
                 x, y,
@@ -69,27 +71,27 @@ public class EchestElement extends ImageHudElement {
                         : Colors.RED.getRGB()
         );
 
-        ctx.drawText(
-                mc.textRenderer,
+        gui.text(
+                mc.font,
                 "echest",
-                x + w / 2 - mc.textRenderer.getWidth("echest") / 2,
-                y + mc.textRenderer.fontHeight - 3,
+                x + w / 2 - mc.font.width("echest") / 2,
+                y + mc.font.lineHeight - 3,
                 Colors.instructionsTextColor.getRGB(),
                 false
         );
 
-        renderItems(ctx, InventoryUtil.getEchestInv());
+        renderItems(gui, InventoryUtil.getEchestInv());
     }
 
     @Override
-    public List<Text> getTooltip() {
-        List<Text> tooltip = new ArrayList<>();
-        tooltip.add(Text.literal("echest"));
-        tooltip.add(Text.literal("items en tu echest"));
+    public List<Component> getTooltip() {
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.literal("echest"));
+        tooltip.add(Component.literal("items en tu echest"));
         return tooltip;
     }
 
-    private void renderItems(DrawContext ctx, Inventory inventory) {
+    private void renderItems(GuiGraphicsExtractor gui, Container inventory) {
         if (inventory == null) return;
 
         int drawX = x + 7;
@@ -102,8 +104,8 @@ public class EchestElement extends ImageHudElement {
         for (ItemStack item : inventory) {
             if (item.isEmpty()) continue;
 
-            ctx.drawItem(item, drawX, drawY);
-            ctx.drawStackOverlay(mc.textRenderer, item, drawX, drawY);
+            gui.item(item, drawX, drawY);
+            gui.itemDecorations(mc.font, item, drawX, drawY);
 
             drawX += 18;
             count++;

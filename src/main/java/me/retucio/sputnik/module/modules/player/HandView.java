@@ -1,20 +1,21 @@
 package me.retucio.sputnik.module.modules.player;
 
 import com.github.retucio.neutrino.EventListener;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import me.retucio.sputnik.event.render.RenderHeldItemEvent;
 import me.retucio.sputnik.event.render.RenderArmEvent;
-import me.retucio.sputnik.mixin.mixins.render.HeldItemRendererMixin;
+import me.retucio.sputnik.mixin.mixins.render.ItemInHandRendererMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
+
 
 /** continúa en:
- * @see HeldItemRendererMixin
+ * @see ItemInHandRendererMixin
  */
 
 public class HandView extends Module {
@@ -105,36 +106,36 @@ public class HandView extends Module {
     private void onRenderHand(RenderHeldItemEvent event) {
         switch (event.getHand()) {
             case MAIN_HAND -> {
-                scale(event.getMatrices(), new Vec3d(scaleMainX.getValue(), scaleMainY.getValue(), scaleMainZ.getValue()));
-                translate(event.getMatrices(), new Vec3d(posMainX.getValue(), posMainY.getValue(), posMainZ.getValue()));
-                rotate(event.getMatrices(), new Vec3d(rotMainX.getValue(), rotMainY.getValue(), rotMainZ.getValue()));
+                scale(event.getMatrices(), new Vec3(scaleMainX.getValue(), scaleMainY.getValue(), scaleMainZ.getValue()));
+                translate(event.getMatrices(), new Vec3(posMainX.getValue(), posMainY.getValue(), posMainZ.getValue()));
+                rotate(event.getMatrices(), new Vec3(rotMainX.getValue(), rotMainY.getValue(), rotMainZ.getValue()));
             }
             case OFF_HAND -> {
-                scale(event.getMatrices(), new Vec3d(scaleOffX.getValue(), scaleOffY.getValue(), scaleOffZ.getValue()));
-                translate(event.getMatrices(), new Vec3d(posOffX.getValue(), posOffY.getValue(), posOffZ.getValue()));
-                rotate(event.getMatrices(), new Vec3d(rotOffX.getValue(), rotOffY.getValue(), rotOffZ.getValue()));
+                scale(event.getMatrices(), new Vec3(scaleOffX.getValue(), scaleOffY.getValue(), scaleOffZ.getValue()));
+                translate(event.getMatrices(), new Vec3(posOffX.getValue(), posOffY.getValue(), posOffZ.getValue()));
+                rotate(event.getMatrices(), new Vec3(rotOffX.getValue(), rotOffY.getValue(), rotOffZ.getValue()));
             }
         }
     }
 
     @EventListener
     private void onRenderArm(RenderArmEvent event) {
-        scale(event.getMatrices(), new Vec3d(scaleArmX.getValue(), scaleArmY.getValue(), scaleArmZ.getValue()));
-        translate(event.getMatrices(), new Vec3d(posArmX.getValue(), posArmY.getValue(), posArmZ.getValue()));
-        rotate(event.getMatrices(), new Vec3d(rotArmX.getValue(), rotArmY.getValue(), rotArmZ.getValue()));
+        scale(event.getMatrices(), new Vec3(scaleArmX.getValue(), scaleArmY.getValue(), scaleArmZ.getValue()));
+        translate(event.getMatrices(), new Vec3(posArmX.getValue(), posArmY.getValue(), posArmZ.getValue()));
+        rotate(event.getMatrices(), new Vec3(rotArmX.getValue(), rotArmY.getValue(), rotArmZ.getValue()));
     }
 
-    private void rotate(MatrixStack matrix, Vec3d rotation) {
-        matrix.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) rotation.x));
-        matrix.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) rotation.y));
-        matrix.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) rotation.z));
+    private void rotate(PoseStack matrix, Vec3 rotation) {
+        matrix.mulPose(Axis.XP.rotationDegrees((float) rotation.x));
+        matrix.mulPose(Axis.YP.rotationDegrees((float) rotation.y));
+        matrix.mulPose(Axis.ZP.rotationDegrees((float) rotation.z));
     }
 
-    private void scale(MatrixStack matrix, Vec3d scale) {
+    private void scale(PoseStack matrix, Vec3 scale) {
         matrix.scale((float) scale.x, (float) scale.y, (float) scale.z);
     }
 
-    private void translate(MatrixStack matrix, Vec3d translation) {
+    private void translate(PoseStack matrix, Vec3 translation) {
         matrix.translate((float) translation.x, (float) translation.y, (float) translation.z);
     }
 }

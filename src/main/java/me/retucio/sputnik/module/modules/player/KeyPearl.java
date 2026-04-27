@@ -5,8 +5,9 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.InventoryUtil;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Items;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Items;
+
 
 public class KeyPearl extends Module {
 
@@ -44,16 +45,16 @@ public class KeyPearl extends Module {
     }
 
     private void switchToPearl() {
-        PlayerInventory inv = mc.player.getInventory();
+        Inventory inv = mc.player.getInventory();
 
-        int slot = InventoryUtil.findSlot(stack -> stack.isOf(Items.ENDER_PEARL));
+        int slot = InventoryUtil.findSlot(stack -> stack.is(Items.ENDER_PEARL));
         if (slot < 0) {
             ChatUtil.error("no tienes perlas");
             toggle();
             return;
         }
 
-        if (PlayerInventory.isValidHotbarIndex(slot)) {
+        if (Inventory.isHotbarSlot(slot)) {
             prevSlot = inv.getSelectedSlot();
             inv.setSelectedSlot(slot);
             return;
@@ -65,8 +66,8 @@ public class KeyPearl extends Module {
     }
 
     private void throwPearl() {
-        if (!mc.player.getMainHandStack().isOf(Items.ENDER_PEARL)) return;
-        mc.doItemUse();
+        if (!mc.player.getMainHandItem().is(Items.ENDER_PEARL)) return;
+        mc.startUseItem();
     }
 
     private void switchBack() {

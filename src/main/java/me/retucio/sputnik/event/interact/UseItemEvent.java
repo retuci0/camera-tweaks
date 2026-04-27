@@ -1,20 +1,21 @@
 package me.retucio.sputnik.event.interact;
 
 import com.github.retucio.neutrino.Event;
-import me.retucio.sputnik.mixin.mixins.misc.MinecraftClientMixin;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
+import me.retucio.sputnik.mixin.mixins.misc.MinecraftMixin;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 
 /**
- * @see MinecraftClientMixin#onUseItem
+ * @see MinecraftMixin#onUseItem
  */
 public class UseItemEvent extends Event {
 
     private ItemStack stack;
-    private Hand hand;
+    private InteractionHand hand;
 
-    public UseItemEvent(ItemStack stack, Hand hand) {
+    public UseItemEvent(ItemStack stack, InteractionHand hand) {
         this.stack = stack;
         this.hand = hand;
     }
@@ -27,11 +28,15 @@ public class UseItemEvent extends Event {
         this.stack = stack;
     }
 
-    public Hand getHand() {
+    public Item getItem() {
+        return stack.getItem();
+    }
+
+    public InteractionHand getHand() {
         return hand;
     }
 
-    public void setHand(Hand hand) {
+    public void setHand(InteractionHand hand) {
         this.hand = hand;
     }
 }

@@ -2,13 +2,15 @@ package me.retucio.sputnik.module.modules.movement;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NonNull;
 
 
 /**
  * @link <a href="https://github.com/mioclient/hitbox-desync"></a>
+ *
  * @author retucio
  */
 
@@ -23,14 +25,14 @@ public class HitboxDesync extends Module {
 
     @Override
     public void onTick() {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
-        Direction dir = mc.player.getFacing();
-        Box box = mc.player.getBoundingBox();
-        Vec3d center = box.getCenter();
-        Vec3d offset = new Vec3d(dir.getOffsetX(), dir.getOffsetY(), dir.getOffsetZ());
-        Vec3d posVec = merge(new Vec3d(Math.floor(center.x) + 0.5, Math.floor(center.y), Math.floor(center.z) + 0.5)
-                .add(new Vec3d(
+        Direction dir = mc.player.getNearestViewDirection();
+        AABB box = mc.player.getBoundingBox();
+        Vec3 center = box.getCenter();
+        Vec3 offset = new Vec3(dir.getStepX(), dir.getStepY(), dir.getStepZ());
+        Vec3 posVec = merge(new Vec3(Math.floor(center.x) + 0.5, Math.floor(center.y), Math.floor(center.z) + 0.5)
+                .add(new Vec3(
                         offset.x * MAGIC_OFFSET,
                         offset.y * MAGIC_OFFSET,
                         offset.z * MAGIC_OFFSET
@@ -40,7 +42,7 @@ public class HitboxDesync extends Module {
         toggle();
     }
 
-    private Vec3d merge(Vec3d a, Direction facing) {
-        return new Vec3d(a.x * Math.abs(facing.getOffsetX()), a.y * Math.abs(facing.getOffsetY()), a.z * Math.abs(facing.getOffsetZ()));
+    private Vec3 merge(@NonNull Vec3 a, Direction facing) {
+        return new Vec3(a.x * Math.abs(facing.getStepX()), a.y * Math.abs(facing.getStepY()), a.z * Math.abs(facing.getStepZ()));
     }
 }

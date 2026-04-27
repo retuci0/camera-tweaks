@@ -9,8 +9,8 @@ import me.retucio.sputnik.ui.screen.ClickGUI;
 import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
 import java.util.*;
 
@@ -40,22 +40,22 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         // fondo
         int bgColor = isHovered(mouseX, mouseY)
                 ? Colors.buttonColor.brighter().getRGB()
                 : Colors.buttonColor.getRGB();
-        ctx.fill(x, y, x + w, y + h, bgColor);
+        gui.fill(x, y, x + w, y + h, bgColor);
 
         // texto: nombre + número de opciones seleccionadas / total de opciones
         String label = setting.getName() + " (" + countEnabled() + "/" + setting.getOptions().size() + ")";
-        ctx.drawText(mc.textRenderer, label, x + 5, y + 3, -1, true);
+        gui.text(mc.font, label, x + 5, y + 3, -1, true);
     }
 
     @Override
-    public void drawTooltip(DrawContext ctx, int mouseX, int mouseY) {
+    public void drawTooltip(GuiGraphicsExtractor gui, int mouseX, int mouseY) {
         if (isHovered(mouseX, mouseY))
-            ctx.drawTooltip(Text.of(
+            gui.setTooltipForNextFrame(Component.literal(
                     setting.getDescription()
                             + " (" + countEnabled() + " de "
                             + setting.getOptions().size() + ")"),
