@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -66,52 +67,6 @@ public abstract class EntityMixin {
         rotations = ModuleManager.INSTANCE.getModuleByClass(Rotations.class);
     }
 
-    @Inject(method = "pick", at = @At("HEAD"), cancellable = true)
-    private void updateTargetedEntityInvoke(double range, float a, boolean withLiquids, CallbackInfoReturnable<HitResult> cir) {
-        Minecraft mc = Minecraft.getInstance();
-        if ((freecam.isEnabled()) && mc.getCameraEntity() != null && !freecamDone) {
-            cir.cancel();
-
-            Entity cameraEntity = mc.getCameraEntity();
-            Vector3d pos = freecam.getPos();
-            Vector3d prevPos = freecam.getPrevPos();
-
-            double x = cameraEntity.getX();
-            double y = cameraEntity.getY();
-            double z = cameraEntity.getZ();
-            double lastX = cameraEntity.xo;
-            double lastY = cameraEntity.yo;
-            double lastZ = cameraEntity.zo;
-            float yaw = cameraEntity.getYRot();
-            float pitch = cameraEntity.getXRot();
-            float lastYaw = cameraEntity.yRotO;
-            float lastPitch = cameraEntity.xRotO;
-
-            ((IVec3) cameraEntity.position()).sputnik$set(pos.x, pos.y - cameraEntity.getEyeHeight(cameraEntity.getPose()), pos.z);
-            cameraEntity.xo = prevPos.x;
-            cameraEntity.yo = prevPos.y - cameraEntity.getEyeHeight(cameraEntity.getPose());
-            cameraEntity.zo = prevPos.z;
-            cameraEntity.setYRot(freecam.getYaw());
-            cameraEntity.setXRot(freecam.getPitch());
-            cameraEntity.yRotO = freecam.getPrevYaw();
-            cameraEntity.xRotO = freecam.getPrevPitch();
-
-            freecamDone = true;
-            pick(range, a, withLiquids);
-            freecamDone = false;
-
-            ((IVec3) cameraEntity.position()).sputnik$set(x, y, z);
-            cameraEntity.xo = lastX;
-            cameraEntity.yo = lastY;
-            cameraEntity.zo = lastZ;
-            cameraEntity.setYRot(yaw);
-            cameraEntity.setXRot(pitch);
-            cameraEntity.yRotO = lastYaw;
-            cameraEntity.xRotO = lastPitch;
-        }
-    }
-
-
     // cámara libre & perspectiva libre
 
     @SuppressWarnings("ConstantConditions")
@@ -120,7 +75,7 @@ public abstract class EntityMixin {
         if ((Object) this != Sputnik.mc.player) return;
 
         if (freecam.isEnabled()) {
-            freecam.changeLookDirection(xo * 0.15, yo * 0.15);
+            freecam.changeLookDirection(xo * 0.15f, yo * 0.15f);
             ci.cancel();
 
         } else if (freelook.isEnabled() && freelook.mode.is(Freelook.CameraMode.CAMERA)) {

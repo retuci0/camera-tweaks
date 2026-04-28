@@ -4,11 +4,11 @@ import me.retucio.sputnik.Sputnik;
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.ReloadableTexture;
 import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 
 public class Cape {
 

@@ -34,6 +34,7 @@ public class Fullbright extends Module {
             false
     )).visibility(() -> mode.is(Modes.GAMMA));
 
+
     public Fullbright() {
         super("brilli brilli",
                 "deshabilita la oscuridad (y aplica colores a los shaders)",
@@ -41,10 +42,6 @@ public class Fullbright extends Module {
                 GLFW.GLFW_KEY_K);
 
         mode.onUpdate(mode -> { if (mode != Modes.POTION) disableNightVision(); });
-        mode.onUpdate(mode -> {
-            boolean v = mode.equals(Modes.GAMMA);
-            if (v) disableNightVision();
-        });
     }
 
     @Override
@@ -67,8 +64,9 @@ public class Fullbright extends Module {
 
     private void disableNightVision() {
         if (mc.player == null) return;
-        if (mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value())))
+        if (mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()))) {
             mc.player.removeEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()));
+        }
     }
 
 

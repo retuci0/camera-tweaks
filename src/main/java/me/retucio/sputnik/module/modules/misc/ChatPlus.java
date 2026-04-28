@@ -10,7 +10,7 @@ import me.retucio.sputnik.event.input.ClientClickEvent;
 import me.retucio.sputnik.event.network.ReceiveMessageEvent;
 import me.retucio.sputnik.event.network.SendMessageEvent;
 import me.retucio.sputnik.mixin.mixins.hud.ChatComponentMixin;
-import me.retucio.sputnik.mixin.mixins.hud.InGameHudMixin;
+import me.retucio.sputnik.mixin.mixins.hud.GuiMixin;
 import me.retucio.sputnik.mixin.mixins.misc.StringUtilMixin;
 import me.retucio.sputnik.mixin.mixins.screen.ChatScreenMixin;
 import me.retucio.sputnik.module.Category;
@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 /** continúa en:
  * @see ChatComponentMixin
  * @see ChatScreenMixin
- * @see InGameHudMixin
+ * @see GuiMixin
  * @see StringUtilMixin
  */
 

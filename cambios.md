@@ -1,19 +1,16 @@
-# v4.1
+# v4.2
 
 ## novedades
-
-- actualizado a 26.1
 
 ### adiciones
 
 #### módulos nuevos:
 
-- autopechera: equipa una pechera antes de atacar con el mazo
-
 ### arreglos / mejoras
 
-- arreglado el cálculo de anchura de los marcos de ajustes para tener en cuenta los botones de los ajustes de colores
+- freecam ya no crashea, pero el movimiento se siente laggy
 
 ## problemas reconocidos
 
-- lo de siempre
+- brilli brilli (modo gamma) solo funciona al cambiar el modo de poción a gamma, y no al activarlo sin más
+- lo de siempre, pero más

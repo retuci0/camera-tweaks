@@ -49,7 +49,7 @@
     "mixins.hud.DrawingFocusedGraphicsAccessMixin",
     "mixins.hud.GuiMessageLineMixin",
     "mixins.hud.GuiMessageMixin",
-    "mixins.hud.InGameHudMixin",
+    "mixins.hud.GuiMixin",
     "mixins.io.KeyboardHandlerMixin",
     "mixins.io.MouseHandlerMixin",
     "mixins.io.ScreenshotMixin",

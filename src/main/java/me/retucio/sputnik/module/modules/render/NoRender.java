@@ -1,6 +1,6 @@
 package me.retucio.sputnik.module.modules.render;
 
-import me.retucio.sputnik.mixin.mixins.hud.InGameHudMixin;
+import me.retucio.sputnik.mixin.mixins.hud.GuiMixin;
 import me.retucio.sputnik.mixin.mixins.network.ClientPacketListenerMixin;
 import me.retucio.sputnik.mixin.mixins.render.*;
 import me.retucio.sputnik.mixin.mixins.world.ParticleEngineMixin;
@@ -18,7 +18,7 @@ import net.minecraft.core.particles.ParticleType;
  * @see ClientPacketListenerMixin
  * @see FogRendererMixin
  * @see GameRendererMixin
- * @see InGameHudMixin
+ * @see GuiMixin
  * @see ScreenEffectRendererMixin
  * @see ParticleEngineMixin
  * @see MobEffectFogEnvironmentMixin

@@ -48,24 +48,69 @@ import org.lwjgl.glfw.GLFW;
 public class Freecam extends Module {
 
     // ajustes
+
     private final SettingGroup sgSpeed = addSg(new SettingGroup("velocidad", true));
 
-    private final BooleanSetting toggleOnDamage = sgGeneral.add(new BooleanSetting("desactivar al recibir daño", "desactiva el módulo tras recibir daño", true));
-    private final BooleanSetting reloadChunks = sgGeneral.add(new BooleanSetting("recargar chunks", "recargar chunks para arreglar el culling de las cuevas", true));
-    public final BooleanSetting renderHands = sgGeneral.add(new BooleanSetting("manos visibles", "decide si se renderizan las manos mientras la cámara esté libre", true));
-    public final BooleanSetting stayCrouching = sgGeneral.add(new BooleanSetting("mantenerse agachado", "mantener al jugador agachado tras entrar en el modo de cámara libre", false));
-    private final BooleanSetting staticView = sgGeneral.add(new BooleanSetting("visión estática", "desactiva ajustes que muevan la cámara", true));
-    private final BooleanSetting cancelActionPackets = sgGeneral.add(new BooleanSetting("cancelar paquetes", "evita flaggear el anticheat al interactuar con bloques / entidades", true));
-    public final BooleanSetting blockOutlines = sgGeneral.add(new BooleanSetting("contorno de bloques", "mostrar el contorno de los bloques estando en el modo de cámara libre", true));
+    private final BooleanSetting toggleOnDamage = sgGeneral.add(new BooleanSetting(
+            "desactivar al recibir daño",
+            "desactiva el módulo tras recibir daño",
+            true
+    ));
+
+    private final BooleanSetting reloadChunks = sgGeneral.add(new BooleanSetting(
+            "recargar chunks",
+            "recargar chunks para arreglar el culling de las cuevas",
+            true
+    ));
+
+    public final BooleanSetting renderHands = sgGeneral.add(new BooleanSetting(
+            "manos visibles",
+            "decide si se renderizan las manos mientras la cámara esté libre",
+            true
+    ));
+
+    public final BooleanSetting stayCrouching = sgGeneral.add(new BooleanSetting(
+            "mantenerse agachado",
+            "mantener al jugador agachado tras entrar en el modo de cámara libre",
+            false
+    ));
+
+    private final BooleanSetting staticView = sgGeneral.add(new BooleanSetting(
+            "visión estática",
+            "desactiva ajustes que muevan la cámara",
+            true
+    ));
+
+    private final BooleanSetting cancelActionPackets = sgGeneral.add(new BooleanSetting(
+            "cancelar paquetes",
+            "evita flaggear el anticheat al interactuar con bloques / entidades",
+            true
+    ));
+
+    public final BooleanSetting blockOutlines = sgGeneral.add(new BooleanSetting(
+            "contorno de bloques",
+            "mostrar el contorno de los bloques estando en el modo de cámara libre",
+            true
+    ));
+
 
     private final NumberSetting speedSetting = sgSpeed.add(new NumberSetting(
-            "velocidad", "velocidad de movimiento de la cámara",
-            1, 0, 10, 0.2));
+            "velocidad",
+            "velocidad de movimiento de la cámara",
+            1, 0, 10, 0.2
+    ));
 
-    private final KeySetting scrollKey = sgSpeed.add(new KeySetting("tecla del scroll", "tecla a mantener pulsada para cambiar velocidad con el scroll", GLFW.GLFW_KEY_LEFT_CONTROL));
+    private final KeySetting scrollKey = sgSpeed.add(new KeySetting(
+            "tecla del scroll",
+            "tecla a mantener pulsada para cambiar velocidad con el scroll",
+            GLFW.GLFW_KEY_LEFT_CONTROL
+    ));
+
     private final NumberSetting scrollSens = sgSpeed.add(new NumberSetting(
-            "sensibilidad del scroll", "sensibilidad de la rueda del ratón para modificar la velocidad, 0 para desactivar",
-            1, 0, 2, 0.1));
+            "sensibilidad del scroll",
+            "sensibilidad de la rueda del ratón para modificar la velocidad, 0 para desactivar",
+            1, 0, 2, 0.1
+    ));
 
 
     private final Vector3d prevPos = new Vector3d();
@@ -74,7 +119,8 @@ public class Freecam extends Module {
     private final Vector3d pos = new Vector3d();
     private CameraType perspective;
     private double fovScale, speed;
-    private boolean forward, backward, right, left, up, down, crouching, viewBobbing;
+    private boolean forward, backward, right,
+            left, up, down, crouching, viewBobbing;
     private float yaw, pitch;
 
     public Freecam() {

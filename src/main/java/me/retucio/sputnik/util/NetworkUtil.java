@@ -16,12 +16,12 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,9 @@ public class NetworkUtil {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
+
     // tps
+
     private static final List<Float> tpsHistory = new ArrayList<>();
     private static float estimatedTPS = 20f;
     private static long lastWorldTime = -1L;
@@ -75,6 +77,7 @@ public class NetworkUtil {
     }
 
 
+
     public static void sendPacketNoEvent(Packet<?> packet) {
         mc.getConnection().getConnection().sendPacket(packet, null, true);
     }
@@ -87,6 +90,8 @@ public class NetworkUtil {
         Connection.genericsFtw(packet, listener);
     }
 
+
+    // interactuar con un bloque mediante MultiPlayerGameMode
     public static void interactBlock(BlockHitResult blockHitResult, InteractionHand hand, boolean swing) {
         boolean wasSneaking = mc.player.isCrouching();
         mc.player.setShiftKeyDown(false);
@@ -101,19 +106,22 @@ public class NetworkUtil {
         mc.player.setShiftKeyDown(wasSneaking);
     }
 
-    public static boolean placeBlock(BlockPos blockPos, InteractionHand hand, int slot, boolean rotate,
-                                     boolean swingHand, boolean checkEntities, boolean swapBack) {
-        if (slot < 0 || slot > 8) return false;
+    // colocar un bloque
+    public static boolean placeBlock(BlockPos blockPos, InteractionHand hand, int slot,
+                                     boolean rotateClient, boolean rotateServer, boolean swingHand,
+                                     boolean checkEntities, boolean swapBack)
+    {
+        if (slot < 0 || slot > 8 || mc.player == null) return false;
 
         Block toPlace = Blocks.OBSIDIAN;
-        ItemStack i = hand == InteractionHand.MAIN_HAND ? mc.player.getInventory().getItem(slot) : mc.player.getOffhandItem();
-        if (i.getItem() instanceof BlockItem blockItem) toPlace = blockItem.getBlock();
+        ItemStack stack = hand == InteractionHand.MAIN_HAND ? mc.player.getInventory().getItem(slot) : mc.player.getOffhandItem();
+        if (stack.getItem() instanceof BlockItem blockItem) toPlace = blockItem.getBlock();
         if (!canPlaceBlock(blockPos, checkEntities, toPlace)) return false;
 
         Vec3 hitPos = Vec3.atCenterOf(blockPos);
 
         BlockPos neighbour;
-        Direction side = getClosestSide(blockPos);
+        Direction side = getPlaceSide(blockPos);
 
         if (side == null) {
             side = Direction.UP;
@@ -124,12 +132,10 @@ public class NetworkUtil {
         }
 
         BlockHitResult bhr = new BlockHitResult(hitPos, side.getOpposite(), neighbour, false);
-
         int prevSlot = mc.player.getInventory().getSelectedSlot();
 
-        if (rotate) {
-            EntityUtil.lookAtServer(hitPos);
-        }
+        if (rotateClient) EntityUtil.lookAtClient(hitPos);
+        if (rotateServer) EntityUtil.lookAtServer(hitPos);
 
         InventoryUtil.swapWithHotbar(mc.player.getInventory().getSelectedSlot(), slot);
         interactBlock(bhr, hand, swingHand);
@@ -141,6 +147,7 @@ public class NetworkUtil {
         return true;
     }
 
+    // retorna verdadero si puede colocar un bloque de tipo `block` en `blockPos`
     public static boolean canPlaceBlock(BlockPos blockPos, boolean checkEntities, Block block) {
         if (blockPos == null) return false;
         if (!Level.isInSpawnableBounds(blockPos)) return false;
@@ -148,7 +155,9 @@ public class NetworkUtil {
         return !checkEntities || mc.level.isUnobstructed(block.defaultBlockState(), blockPos, CollisionContext.empty());
     }
 
-    public static Direction getClosestSide(BlockPos blockPos) {
+
+    // retorna la dirección desde la que el jugador colocará bloques
+    public static Direction getPlaceSide(BlockPos blockPos) {
         Vec3 lookVec = blockPos.getCenter().subtract(mc.player.getEyePosition());
         double bestRelevancy = -Double.MAX_VALUE;
         Direction bestSide = null;
@@ -157,7 +166,7 @@ public class NetworkUtil {
             BlockPos neighbor = blockPos.relative(side);
             BlockState state = mc.level.getBlockState(neighbor);
 
-            if (state.isAir()) continue;
+            if (state.isAir() || isInteractableBlock(state.getBlock())) continue;
 
             if (!state.getFluidState().isEmpty()) continue;
 
@@ -169,5 +178,23 @@ public class NetworkUtil {
         }
 
         return bestSide;
+    }
+
+    // retorna verdadero si es un bloque interactuable
+    public static boolean isInteractableBlock(Block block) {
+        return block instanceof CraftingTableBlock
+                || block instanceof AnvilBlock
+                || block instanceof LoomBlock
+                || block instanceof CartographyTableBlock
+                || block instanceof GrindstoneBlock
+                || block instanceof StonecutterBlock
+                || block instanceof ButtonBlock
+                || block instanceof BasePressurePlateBlock
+                || block instanceof BaseEntityBlock
+                || block instanceof BedBlock
+                || block instanceof FenceGateBlock
+                || block instanceof DoorBlock
+                || block instanceof NoteBlock
+                || block instanceof TrapDoorBlock;
     }
 }

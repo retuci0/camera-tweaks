@@ -25,9 +25,9 @@
 	],
 	"accessWidener": "sputnik.accesswidener",
 	"depends": {
-		"fabricloader": ">=0.19.2",
-		"minecraft": "~26.1.2",
-		"java": ">=25",
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=${jdk_version}",
 		"fabric-api": "*"
 	},
 	"suggests": {}

@@ -8,11 +8,14 @@ import me.retucio.sputnik.event.ShutdownEvent;
 import me.retucio.sputnik.event.TickEvent;
 import me.retucio.sputnik.event.interact.UseItemEvent;
 import me.retucio.sputnik.module.ModuleManager;
+import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.player.FastUse;
+import me.retucio.sputnik.util.interfaces.IVec3;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
@@ -30,11 +33,19 @@ public abstract class MinecraftMixin {
     @Shadow
     private static Minecraft instance;
 
+    @Unique
+    private boolean freecamSet = false;
 
     // eventos
 
     @Shadow @Nullable
     public Screen screen;
+
+    @Shadow
+    public abstract @Nullable Entity getCameraEntity();
+
+    @Shadow
+    protected abstract void pick(float partialTicks);
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTickPre(CallbackInfo ci) {
@@ -86,5 +97,56 @@ public abstract class MinecraftMixin {
         FastUse fastUse = ModuleManager.INSTANCE.getModuleByClass(FastUse.class);
         if (!fastUse.isEnabled()) return;
         rightClickDelay = fastUse.getCooldown(stack);
+    }
+
+
+    // cámara libre
+
+    @Inject(method = "pick", at = @At("HEAD"), cancellable = true)
+    private void updateTargetedEntityInvoke(float partialTicks, CallbackInfo ci) {
+        Freecam freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
+
+        if ((freecam.isEnabled()) && this.getCameraEntity() != null && !freecamSet) {
+            ci.cancel();
+            Entity cameraEntity = this.getCameraEntity();
+
+            double x = cameraEntity.getX();
+            double y = cameraEntity.getY();
+            double z = cameraEntity.getZ();
+            double lastX = cameraEntity.xo;
+            double lastY = cameraEntity.yo;
+            double lastZ = cameraEntity.zo;
+            float yaw = cameraEntity.getYRot();
+            float pitch = cameraEntity.getXRot();
+            float lastYaw = cameraEntity.yRotO;
+            float lastPitch = cameraEntity.xRotO;
+
+            ((IVec3) cameraEntity.position()).sputnik$set(
+                    freecam.getPos().x,
+                    freecam.getPos().y - cameraEntity.getEyeHeight(cameraEntity.getPose()),
+                    freecam.getPos().z
+            );
+
+            cameraEntity.xo = freecam.getPrevPos().x;
+            cameraEntity.yo = freecam.getPrevPos().y - cameraEntity.getEyeHeight(cameraEntity.getPose());
+            cameraEntity.zo = freecam.getPrevPos().z;
+            cameraEntity.setYRot(freecam.getYaw());
+            cameraEntity.setXRot(freecam.getPitch());
+            cameraEntity.yRotO = freecam.getPrevYaw();
+            cameraEntity.xRotO = freecam.getPrevPitch();
+
+            freecamSet = true;
+            pick(partialTicks);
+            freecamSet = false;
+
+            ((IVec3) cameraEntity.position()).sputnik$set(x, y, z);
+            cameraEntity.xo = lastX;
+            cameraEntity.yo = lastY;
+            cameraEntity.zo = lastZ;
+            cameraEntity.setYRot(yaw);
+            cameraEntity.setXRot(pitch);
+            cameraEntity.yRotO = lastYaw;
+            cameraEntity.xRotO = lastPitch;
+        }
     }
 }

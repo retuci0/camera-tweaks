@@ -186,6 +186,12 @@ public class Scaffold extends Module {
             0.1
     )).visibility(showLastPlaced::getValue);
 
+    private final BooleanSetting swingHand = sgRender.add(new BooleanSetting(
+            "mover mano",
+            "mover la mano al colocar bloques",
+            true
+    ));
+
 
     private final BlockPos.MutableBlockPos bp = new BlockPos.MutableBlockPos();
     private final List<PlacedBlock> lastPlacedBlocks = new ArrayList<>();
@@ -330,7 +336,8 @@ public class Scaffold extends Module {
                 pos, InteractionHand.MAIN_HAND,
                 mc.player.getInventory().getSelectedSlot(),
                 rotate.getValue(),
-                false,
+                rotate.getValue(),
+                swingHand.getValue(),
                 true,
                 true
         )) {
