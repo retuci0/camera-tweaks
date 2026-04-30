@@ -1,9 +1,12 @@
 package me.retucio.sputnik.mixin.mixins.hud;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.render.Render2DEvent;
 import me.retucio.sputnik.module.ModuleManager;
+import me.retucio.sputnik.module.modules.camera.CrosshairPlus;
 import me.retucio.sputnik.module.modules.misc.ChatPlus;
 import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.render.NoRender;
@@ -11,12 +14,16 @@ import me.retucio.sputnik.ui.hud.HudRenderer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {
@@ -73,6 +80,18 @@ public abstract class GuiMixin {
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void renderHUD(GuiGraphicsExtractor gui, DeltaTracker dt, CallbackInfo ci) {
         HudRenderer.render(gui, dt);
+    }
+
+    @Redirect(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V", ordinal = 0))
+    private void onRenderCrosshair(GuiGraphicsExtractor gui, RenderPipeline pipeline, Identifier id, int x, int y, int width, int height) {
+        // dangerous abbreviation
+        CrosshairPlus cp = ModuleManager.INSTANCE.getModuleByClass(CrosshairPlus.class);
+
+        int color = cp.isEnabled() ? cp.color.getRGB() : -1;
+        int w = cp.isEnabled() ? cp.width.getIntValue() : width;
+        int h = cp.isEnabled() ? cp.height.getIntValue() : height;
+
+        gui.blitSprite(pipeline, id, (gui.guiWidth() - w) / 2, (gui.guiHeight() - h) / 2, w, h, color);
     }
 
     @ModifyExpressionValue(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/CameraType;isFirstPerson()Z"))

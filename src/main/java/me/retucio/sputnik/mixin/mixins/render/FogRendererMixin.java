@@ -59,7 +59,7 @@ public abstract class FogRendererMixin {
             args.set(0, original.x);
             args.set(1, original.y);
             args.set(2, original.z);
-            args.set(3, 0);
+            args.set(3, 0f);
         }
     }
 

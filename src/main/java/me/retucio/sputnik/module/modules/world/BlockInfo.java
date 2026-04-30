@@ -10,6 +10,9 @@ import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.util.ChatUtil;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -18,6 +21,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 public class BlockInfo extends Module {
@@ -76,16 +81,45 @@ public class BlockInfo extends Module {
     }
 
     private void copy(BlockHitResult result, Collection<Property<?>> data) {
-        String json = new Gson().toJson(data);
-        String name = mc.level.getBlockState(result.getBlockPos()).getBlock().getDescriptionId();
-        Vec3 pos = result.getLocation();
+        BlockPos pos = result.getBlockPos();
+        BlockState state = mc.level.getBlockState(pos);
+
+        Map<String, String> propertyMap = new LinkedHashMap<>();
+        for (Property<?> property : data) {
+            propertyMap.put(property.getName(), state.getValue(property).toString());
+        }
+
+        if (propertyMap.isEmpty()) {
+            ChatUtil.warn("no hay propiedades que copiar para este bloque");
+            return;
+        }
+
+        String json = new Gson().toJson(propertyMap);
         switch (copy.getValue()) {
             case JSON -> mc.keyboardHandler.setClipboard(json);
             case COMMAND -> mc.keyboardHandler.setClipboard(
-                    String.format("/setblock %f %f %f %s %s", pos.x, pos.y, pos.z, name, json));
+                    String.format("/setblock %d %d %d %s", pos.getX(), pos.getY(), pos.getZ(), formatBlockState(state))
+            );
         }
     }
 
+    private String formatBlockState(BlockState state) {
+        Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+        StringBuilder sb = new StringBuilder(id.toString());
+
+        Collection<Property<?>> props = state.getProperties();
+        if (!props.isEmpty()) {
+            sb.append("[");
+            boolean first = true;
+            for (Property<?> prop : props) {
+                if (!first) sb.append(",");
+                sb.append(prop.getName()).append("=").append(state.getValue(prop).toString());
+                first = false;
+            }
+            sb.append("]");
+        }
+        return sb.toString();
+    }
     private enum CopyMode {
         DONT("no copiar"),
         COMMAND("copiar comando /setblock"),

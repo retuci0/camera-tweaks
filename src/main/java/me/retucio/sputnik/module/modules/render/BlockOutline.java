@@ -25,7 +25,7 @@ public class BlockOutline extends Module {
     private final NumberSetting lineWidth = sgGeneral.add(new NumberSetting(
             "grosor",
             "grosor de las líneas",
-            0.5,
+            1,
             0.1,
             10,
             0.1

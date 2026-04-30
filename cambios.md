@@ -1,4 +1,4 @@
-# v4.2
+# v4.3
 
 ## novedades
 
@@ -6,11 +6,15 @@
 
 #### módulos nuevos:
 
+- mira plus: personalizaciones a la mira (crosshair)
+- moro: te permite robar items de cofres más fácilmente
+
 ### arreglos / mejoras
 
-- freecam ya no crashea, pero el movimiento se siente laggy
+- info. de bloque ahora funciona y tal
+- arreglado varios crashes
 
 ## problemas reconocidos
 
-- brilli brilli (modo gamma) solo funciona al cambiar el modo de poción a gamma, y no al activarlo sin más
-- lo de siempre, pero más
+- lo de siempre, +
+

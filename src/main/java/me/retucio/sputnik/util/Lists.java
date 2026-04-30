@@ -42,32 +42,34 @@ public class Lists {
     // intentar traducir nombres y fallar miserablemente
     public static void init() {
         entityNames = getMapOfLists(entityList,
-                entityList.stream().map(entity -> Component.translatable(entity.getDescriptionId()).getString()).toList());
+                entityList.stream().map(entity -> Component.translatable(
+                        entity.getDescriptionId()
+                ).getString()).toList());
 
         particleNames = getMapOfLists(particleList,
                 particleList.stream().map(particle -> Component.translatable(
-                        BuiltInRegistries.PARTICLE_TYPE.getKey(particle).toShortLanguageKey()
-                ).toString()).toList());
+                        BuiltInRegistries.PARTICLE_TYPE.getKey(particle).toLanguageKey()
+                ).getString()).toList());
 
         itemNames = getMapOfLists(itemList,
                 itemList.stream().map(item -> Component.translatable(
-                        item.getDescriptionId()).getString()
-                ).toList());
+                        item.getDescriptionId()
+                ).getString()).toList());
 
         blockNames = getMapOfLists(blockList,
                 blockList.stream().map(block -> Component.translatable(
-                        block.getDescriptionId()).getString()
-                ).toList());
+                        block.getDescriptionId()
+                ).getString()).toList());
 
         soundNames = getMapOfLists(soundList,
                 soundList.stream().map(sound -> Component.translatable(
-                        sound.location().toShortLanguageKey()).getString()
-                ).toList());
+                        sound.location().toShortLanguageKey()
+                ).getString()).toList());
 
         screenNames = getMapOfLists(screenList,
                 screenList.stream().map(screen -> Component.translatable(
-                        BuiltInRegistries.MENU.getKey(screen).toShortLanguageKey()).getString()
-                ).toList());
+                        BuiltInRegistries.MENU.getKey(screen).toLanguageKey()
+                ).getString()).toList());
 
         colorList.addAll(Arrays.asList(
                 RED, ORANGE, YELLOW, LIME, GREEN, CYAN,

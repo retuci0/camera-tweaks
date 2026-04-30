@@ -66,7 +66,7 @@ public class NoRender extends Module {
     public final BooleanSetting stuckArrows = sgMisc.add(new BooleanSetting("flechas clavadas", "renderizar flechas clavadas en jugadores", false));
 
     public NoRender() {
-        super("no extractRenderState",
+        super("no render",
                 "customiza qué se renderiza y qué no",
                 Category.RENDER);
     }

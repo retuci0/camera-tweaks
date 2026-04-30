@@ -67,6 +67,7 @@ public class ModuleManager {
 
     private void addCamera() {
         add(new Autism());
+        add(new CrosshairPlus());
         add(new Freecam());
         add(new Freelook());
         add(new Fullbright());
@@ -102,6 +103,7 @@ public class ModuleManager {
 
     private void addInventory() {
         add(new BundleDupe());
+        add(new Burglar());
         add(new CreativeInventoryHotbarKeybinds());
         add(new InventoryPlus());
         add(new Offhand());

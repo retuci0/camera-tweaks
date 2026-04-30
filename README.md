@@ -10,7 +10,7 @@ mod para Minecraft Fabric 26.1 que añade algunas cosas QOL, mayormente relacion
 3. descargar el .jar
 4. moverlo a tu directorio de mods (probablemente `%appdata%/.minecraft/mods`)
 
-asegúrate de tener una version de Minecraft y Fabric compatibles con el mod (MC `26.1`; Fabric `0.18.5`)
+asegúrate de tener una version de Minecraft y Fabric compatibles con el mod (MC `26.1.2`; Fabric `0.19.2`)
 es posible que haya problemas al usarlo junto a otros mods, especialmente junto a otros clientes, pues pueden conflictar entre ellos.
 
 ### para frikis de 200 de iq

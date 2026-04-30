@@ -82,6 +82,7 @@ public class KeyUtil {
             case GLFW.GLFW_KEY_RIGHT -> "derecha";
             case GLFW.GLFW_KEY_PAGE_UP -> "pág. arriba";
             case GLFW.GLFW_KEY_PAGE_DOWN -> "pág. abajo";
+            case GLFW.GLFW_KEY_CAPS_LOCK -> "bloq. mayús.";
             default -> {
                 if (key >= GLFW.GLFW_KEY_F1 && key <= GLFW.GLFW_KEY_F25)
                     yield "F" + (key - GLFW.GLFW_KEY_F1 + 1);  // F1–F25
