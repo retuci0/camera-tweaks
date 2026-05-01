@@ -53,7 +53,7 @@ public class ModuleButton extends Button {
                     ClickGUI.INSTANCE.closeSettingsFrame(module);
                 else
                     ClickGUI.INSTANCE.openSettingsFrame(module,
-                            parent.getX() + parent.getW() + 120, parent.getY() + offset);
+                            parent.getX() + parent.getW() + 120, parent.getRenderY() + offset);
             }
         }
     }

@@ -1,6 +1,7 @@
 package me.retucio.sputnik.mixin.mixins.render;
 
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.retucio.sputnik.event.render.GetFOVEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
@@ -56,15 +57,16 @@ public abstract class GameRendererMixin {
         }
     }
 
+    @ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F", ordinal = 0))
+    private float applyCameraTransformationsMathHelperLerpProxy(float original) {
+        return (noRender.isEnabled() && !noRender.nauseaEffect.getValue()) ? 0 : original;
+    }
+
+
     @Inject(method = "renderItemInHand", at = @At("HEAD"), cancellable = true)
     private void renderHand(CameraRenderState cameraState, float deltaPartialTick, Matrix4fc modelViewMatrix, CallbackInfo ci) {
         if ((zoom.isEnabled() && !zoom.showHands.getValue())
                 || (freecam.isEnabled() && !freecam.renderHands.getValue()))
             ci.cancel();
-    }
-
-    @ModifyVariable(method = "renderLevel", at = @At(value = "STORE"), name = "skew")
-    private float noRenderNauseaDistortion(float scaledNauseaEffectFactor) {
-        return (noRender.isEnabled() && !noRender.nauseaEffect.getValue()) ? 0 : scaledNauseaEffectFactor;
     }
 }

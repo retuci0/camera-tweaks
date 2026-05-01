@@ -1,7 +1,7 @@
 package me.retucio.sputnik.module.modules.camera;
 
 import me.retucio.sputnik.mixin.accessors.MobEffectInstanceAccessor;
-import me.retucio.sputnik.mixin.mixins.render.LightmapTextureManagerMixin;
+import me.retucio.sputnik.mixin.mixins.render.LightmapRenderStateExtractorMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
@@ -14,7 +14,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 /** continúa en:
- * @see LightmapTextureManagerMixin
+ * @see LightmapRenderStateExtractorMixin
  *
  * @author retucio
  */
