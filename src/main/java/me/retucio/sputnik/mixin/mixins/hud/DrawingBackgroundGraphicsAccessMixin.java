@@ -24,11 +24,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * al parecer si hago un mixin combinado ninguno de los dos funciona
- * @see DrawingBackgroundGraphicsAccessMixin
+ * @see DrawingFocusedGraphicsAccessMixin
  */
 
-@Mixin(ChatComponent.DrawingFocusedGraphicsAccess.class)
-public abstract class DrawingFocusedGraphicsAccessMixin {
+@Mixin(ChatComponent.DrawingBackgroundGraphicsAccess.class)
+public abstract class DrawingBackgroundGraphicsAccessMixin {
 
     @Unique
     private static ChatPlus chatPlus;

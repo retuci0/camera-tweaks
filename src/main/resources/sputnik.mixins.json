@@ -46,6 +46,7 @@
     "mixins.hud.BossBarHudMixin",
     "mixins.hud.ChatComponentLineConsumerMixin",
     "mixins.hud.ChatComponentMixin",
+    "mixins.hud.DrawingBackgroundGraphicsAccessMixin",
     "mixins.hud.DrawingFocusedGraphicsAccessMixin",
     "mixins.hud.GuiMessageLineMixin",
     "mixins.hud.GuiMessageMixin",

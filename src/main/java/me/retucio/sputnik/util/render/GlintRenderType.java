@@ -1,6 +1,5 @@
 package me.retucio.sputnik.util.render;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -26,12 +25,14 @@ import java.util.function.Function;
 
 public class GlintRenderType extends RenderType {
 
-    public static List<RenderType> glintColor = newRenderList(GlintRenderType::buildGlintRenderLayer);
-    public static List<RenderType> entityGlintColor = newRenderList(GlintRenderType::buildEntityGlintRenderLayer);
-    public static List<RenderType> armorEntityGlintColor = newRenderList(GlintRenderType::buildArmorEntityGlintRenderLayer);
+    public static List<RenderType> glintColor = newRenderList(GlintRenderType::buildGlintRenderType);
+    public static List<RenderType> entityGlintColor = newRenderList(GlintRenderType::buildEntityGlintRenderType);
+    public static List<RenderType> armorEntityGlintColor = newRenderList(GlintRenderType::buildArmorEntityGlintRenderType);
+    public static List<RenderType> glintTranslucentColor = newRenderList(GlintRenderType::buildGlintTranslucentRenderType);
 
     public static void addGlintTypes(Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> map) {
         addGlintTypes(map, glintColor);
+        addGlintTypes(map, glintTranslucentColor);
         addGlintTypes(map, entityGlintColor);
         addGlintTypes(map, armorEntityGlintColor);
     }
@@ -58,38 +59,55 @@ public class GlintRenderType extends RenderType {
                 map.put(renderType, new ByteBufferBuilder(renderType.bufferSize()));
     }
 
-    private static RenderType buildGlintRenderLayer(String name) {
+    private static RenderType buildGlintRenderType(String name) {
         final Identifier res = Identifier.fromNamespaceAndPath(Sputnik.MOD_ID, "textures/misc/glint_" + name.toLowerCase() + ".png");
 
-        return RenderType.create("glint_" + name, RenderSetup.builder(RenderPipelines.GLINT)
+        return RenderType.create(
+            "glint_" + name,
+            RenderSetup.builder(RenderPipelines.GLINT)
                 .withTexture("Sampler0", res)
                 .setTextureTransform(TextureTransform.GLINT_TEXTURING)
-                .sortOnUpload()
-                .createRenderSetup());
-
+                .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+                .createRenderSetup()
+        );
     }
 
-    private static RenderType buildEntityGlintRenderLayer(String name) {
+    private static RenderType buildGlintTranslucentRenderType(String name) {
         final Identifier res = Identifier.fromNamespaceAndPath(Sputnik.MOD_ID, "textures/misc/glint_" + name.toLowerCase() + ".png");
 
-        return RenderType.create("entity_glint_" + name, RenderSetup.builder(RenderPipelines.GLINT)
+        return RenderType.create(
+            "glint_translucent_" + name,
+            RenderSetup.builder(RenderPipelines.GLINT)
+                .withTexture("Sampler0", res)
+                .setTextureTransform(TextureTransform.GLINT_TEXTURING)
+                .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+                .createRenderSetup()
+        );
+    }
+
+    private static RenderType buildEntityGlintRenderType(String name) {
+        final Identifier res = Identifier.fromNamespaceAndPath(Sputnik.MOD_ID, "textures/misc/glint_" + name.toLowerCase() + ".png");
+
+        return RenderType.create(
+            "entity_glint_" + name,
+            RenderSetup.builder(RenderPipelines.GLINT)
                 .withTexture("Sampler0", res)
                 .setTextureTransform(TextureTransform.ENTITY_GLINT_TEXTURING)
-                .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
-                .sortOnUpload()
-                .createRenderSetup());
+                .createRenderSetup()
+        );
     }
 
-
-    private static RenderType buildArmorEntityGlintRenderLayer(String name) {
+    private static RenderType buildArmorEntityGlintRenderType(String name) {
         final Identifier res = Identifier.fromNamespaceAndPath(Sputnik.MOD_ID, "textures/misc/glint_" + name.toLowerCase() + ".png");
 
-        return RenderType.create("armor_glint_" + name, RenderSetup.builder(RenderPipelines.GLINT)
+        return RenderType.create(
+            "armor_glint_" + name,
+            RenderSetup.builder(RenderPipelines.GLINT)
                 .withTexture("Sampler0", res)
                 .setTextureTransform(TextureTransform.ARMOR_ENTITY_GLINT_TEXTURING)
                 .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-                .sortOnUpload()
-                .createRenderSetup());
+                .createRenderSetup()
+        );
     }
 
     @Override

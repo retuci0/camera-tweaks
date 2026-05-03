@@ -51,6 +51,12 @@ public class GlintPlus extends Module {
         return GlintRenderType.glintColor.get(color);
     }
 
+    public RenderType getGlintTranslucent() {
+        int color = getColor();
+        if (!isEnabled() || !items.getValue()) return RenderTypes.glintTranslucent();
+        return GlintRenderType.glintTranslucentColor.get(color);
+    }
+
     public RenderType getEntityGlint() {
         int color = getColor();
         if (!isEnabled() || !items.getValue()) return RenderTypes.entityGlint();

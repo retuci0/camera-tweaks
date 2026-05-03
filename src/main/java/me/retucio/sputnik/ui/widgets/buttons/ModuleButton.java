@@ -49,11 +49,15 @@ public class ModuleButton extends Button {
             if (button == 0) {  // clic izquierdo para activar / desactivar el módulo
                 module.toggle();
             } else if (button == 1) {  // clic derecho para el marco de ajustes (también lo cierra si está abierto)
-                if (ClickGUI.INSTANCE.isSettingsFrameOpen(module))
+                if (ClickGUI.INSTANCE.isSettingsFrameOpen(module)) {
                     ClickGUI.INSTANCE.closeSettingsFrame(module);
-                else
-                    ClickGUI.INSTANCE.openSettingsFrame(module,
-                            parent.getX() + parent.getW() + 120, parent.getRenderY() + offset);
+                } else {
+                    ClickGUI.INSTANCE.openSettingsFrame(
+                            module,
+                            parent.getX() + parent.getW() + 120,
+                            parent.getY() + offset
+                    );
+                }
             }
         }
     }

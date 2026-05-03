@@ -9,10 +9,6 @@ import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.input.ClientClickEvent;
 import me.retucio.sputnik.event.network.ReceiveMessageEvent;
 import me.retucio.sputnik.event.network.SendMessageEvent;
-import me.retucio.sputnik.mixin.mixins.hud.ChatComponentMixin;
-import me.retucio.sputnik.mixin.mixins.hud.GuiMixin;
-import me.retucio.sputnik.mixin.mixins.misc.StringUtilMixin;
-import me.retucio.sputnik.mixin.mixins.screen.ChatScreenMixin;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -45,8 +41,12 @@ import java.util.regex.Pattern;
 /** continúa en:
  * @see ChatComponentMixin
  * @see ChatScreenMixin
+ * @see DrawingBackgroundGraphicsAccessMixin
+ * @see DrawingFocusedGraphicsAccessMixin
  * @see GuiMixin
  * @see StringUtilMixin
+ *
+ * @author retucio
  */
 
 public class ChatPlus extends Module {
@@ -82,10 +82,10 @@ public class ChatPlus extends Module {
     private static final List<CustomHeadEntry> CUSTOM_HEAD_ENTRIES = new ArrayList<>();
     private SimpleDateFormat dateFormat;
 
-    private static final Pattern loggerRegex = Pattern.compile("\\n(\\n|\\s)+\\n");
-    private static final Pattern usernameRegex = Pattern.compile("^(?:\\[[0-9]{2}:[0-9]{2}\\]\\s*)?(?:<([^<>\\s]+)>|([^<>\\s]+)).*");
-    private static final Pattern timestampRegex = Pattern.compile("^<\\d{1,2}:\\d{1,2}>");
-    private static final Pattern coordRegex = Pattern.compile("(?<x>-?\\d{3,}(?:\\.\\d*)?)(?:\\s+(?<y>-?\\d{1,3}(?:\\.\\d*)?))?\\s+(?<z>-?\\d{3,}(?:\\.\\d*)?)");
+    private static final Pattern LOGGER_REGEX = Pattern.compile("\\n([\\n\\s])+\\n");
+    private static final Pattern USERNAME_REGEX = Pattern.compile("^(?:\\[[0-9]{2}:[0-9]{2}]\\s*)?(?:<([^<>\\s]+)>|([^<>\\s]+)).*");
+    private static final Pattern TIMESTAMP_REGEX = Pattern.compile("^<\\d{1,2}:\\d{1,2}>");
+    private static final Pattern COORDS_REGEX = Pattern.compile("(?<x>-?\\d{3,}(?:\\.\\d*)?)(?:\\s+(?<y>-?\\d{1,3}(?:\\.\\d*)?))?\\s+(?<z>-?\\d{3,}(?:\\.\\d*)?)");
 
     @EventListener
     private void onReceiveMessage(ReceiveMessageEvent event) {
@@ -94,10 +94,10 @@ public class ChatPlus extends Module {
         // registrar mensajes para evitar su eliminación
         if (logger.getValue()) {
             String messageString = message.getString();
-            if (loggerRegex.matcher(messageString).find()) {
+            if (LOGGER_REGEX.matcher(messageString).find()) {
                 MutableComponent newMessage = Component.empty();
                 TextVisitor.visit(message, (text, style, string) -> {
-                    Matcher antiClearMatcher = loggerRegex.matcher(string);
+                    Matcher antiClearMatcher = LOGGER_REGEX.matcher(string);
                     if (antiClearMatcher.find())
                         newMessage.append(Component.literal(antiClearMatcher.replaceAll("\n\n")).setStyle(style));
                     else
@@ -156,7 +156,7 @@ public class ChatPlus extends Module {
         int startOffset = 0;
 
         try {
-            Matcher m = timestampRegex.matcher(text);
+            Matcher m = TIMESTAMP_REGEX.matcher(text);
             if (m.find()) startOffset = m.end() + 1;
         }
         catch (IllegalStateException ignored) {}
@@ -183,7 +183,7 @@ public class ChatPlus extends Module {
         GameProfile sender = line.sputnik$getSender();
 
         if (sender == null) {
-            Matcher usernameMatcher = usernameRegex.matcher(text);
+            Matcher usernameMatcher = USERNAME_REGEX.matcher(text);
 
             if (usernameMatcher.matches()) {
                 String username = usernameMatcher.group(1);
@@ -226,6 +226,6 @@ public class ChatPlus extends Module {
     }
 
     private boolean containsCoordinates(String message) {
-        return coordRegex.matcher(message).find();
+        return COORDS_REGEX.matcher(message).find();
     }
 }

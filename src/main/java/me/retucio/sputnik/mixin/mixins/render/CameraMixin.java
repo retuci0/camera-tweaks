@@ -1,6 +1,7 @@
 package me.retucio.sputnik.mixin.mixins.render;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.render.GetFOVEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freelook;
@@ -8,7 +9,6 @@ import me.retucio.sputnik.module.modules.camera.Freecam;
 import me.retucio.sputnik.module.modules.camera.PerspectivePlus;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,8 +19,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-
-import static me.retucio.sputnik.Sputnik.EVENT_BUS;
 
 
 @Mixin(Camera.class)
@@ -50,12 +48,12 @@ public abstract class CameraMixin {
 
     @Inject(method = "update", at = @At("HEAD"))
     private void onUpdateHead(DeltaTracker deltaTracker, CallbackInfo ci) {
-        this.tickDelta = deltaTracker.getGameTimeDeltaTicks();
+        this.tickDelta = deltaTracker.getGameTimeDeltaPartialTick(true);
     }
 
-    @ModifyReturnValue(method = "getFov", at = @At("RETURN"))
+    @ModifyReturnValue(method = "calculateFov", at = @At("RETURN"))
     private float modifyFov(float original) {
-        return EVENT_BUS.post(new GetFOVEvent(original)).getFov();
+        return Sputnik.EVENT_BUS.post(new GetFOVEvent(original)).getFov();
     }
 
     // perspectiva

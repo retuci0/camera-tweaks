@@ -163,7 +163,7 @@ public class ClickGUI extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
+    public boolean mouseDragged(@NonNull MouseButtonEvent click, double deltaX, double deltaY) {
         miscWidgets.forEach(w -> w.mouseDragged(
                 (int) click.x(),
                 (int) click.y()));
@@ -275,7 +275,6 @@ public class ClickGUI extends Screen {
     public void openSettingsFrame(Module module, int x, int y) {
         // asegurarse de que no se sale de la pantalla
         x = Math.clamp(x, 0, mc.getWindow().getGuiScaledWidth() - 80);
-        y = Math.clamp(y, 0, mc.getWindow().getGuiScaledHeight() - 120);
 
         SettingsFrame frame = new SettingsFrame(module, x, y, 100, 20);
         settingsFrames.add(frame);
@@ -378,8 +377,8 @@ public class ClickGUI extends Screen {
     }
 
     @Override
-    protected void extractBlurredBackground(GuiGraphicsExtractor ctx) {
-        if (guiSettings.blur.getValue()) super.extractBlurredBackground(ctx);
+    protected void extractBlurredBackground(@NonNull GuiGraphicsExtractor gui) {
+        if (guiSettings.blur.getValue()) super.extractBlurredBackground(gui);
     }
 
 

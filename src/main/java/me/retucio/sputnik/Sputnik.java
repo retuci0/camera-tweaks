@@ -140,7 +140,8 @@ public class Sputnik implements ClientModInitializer {
 
     // se ejecuta cada vez que se presiona una tecla
     public void onInput(int key, int action) {
-        if (key == GLFW.GLFW_KEY_F3) return;  // prevenir interrumpir combos de F3
+        // prevenir interrumpir combos de F3
+        if (key == GLFW.GLFW_KEY_F3) return;
 
         boolean anyFocused = isAnySettingButtonFocused() || ClickGUI.INSTANCE.getSearchBar().isFocused();
         ClickGUI.INSTANCE.setAnyFocused(anyFocused);
