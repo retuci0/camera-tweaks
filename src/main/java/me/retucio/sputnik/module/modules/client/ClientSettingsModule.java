@@ -4,7 +4,7 @@ import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.TickEvent;
-import me.retucio.sputnik.event.sputnik.LoadClickGUIEvent;
+import me.retucio.sputnik.event.sputnik.LoadClickGuiEvent;
 import me.retucio.sputnik.event.sputnik.LoadCommandManagerEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -22,11 +22,12 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 
-/** módulo no visible solo para los ajustes del mod
+/**
+ * módulo solo para los ajustes del mod
  * @author retucio
  */
 
-public class GUI extends Module {
+public class ClientSettingsModule extends Module {
 
     private final SettingGroup sgWidgets = addSg(new SettingGroup("widgets", true));
     private final SettingGroup sgUi = addSg(new SettingGroup("interfaz", true));
@@ -109,7 +110,7 @@ public class GUI extends Module {
             50
     ));
 
-    public GUI() {
+    public ClientSettingsModule() {
         super("interfaz",
                 "ajustes de la interfaz, y otros misceláneos",
                 Category.CLIENT,
@@ -133,7 +134,7 @@ public class GUI extends Module {
     }
 
     @EventListener
-    public void onLoadClickGUI(LoadClickGUIEvent event) {
+    public void onLoadClickGui(LoadClickGuiEvent event) {
         color.onUpdate(v -> {
             Colors.red = color.getR();
             Colors.green = color.getG();

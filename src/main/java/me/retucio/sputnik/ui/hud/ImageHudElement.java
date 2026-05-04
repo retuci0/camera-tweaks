@@ -2,7 +2,7 @@ package me.retucio.sputnik.ui.hud;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -68,7 +68,7 @@ public abstract class ImageHudElement extends HudElement {
     }
 
     @Override
-    public void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud) {
+    public void renderInGame(GuiGraphicsExtractor gui, float delta, Hud hud) {
         if (!textureLoaded || !isVisible()) return;
 
         gui.blit(
@@ -82,7 +82,7 @@ public abstract class ImageHudElement extends HudElement {
     }
 
     @Override
-    public void renderInEditor(GuiGraphicsExtractor gui, HUD hud) {
+    public void renderInEditor(GuiGraphicsExtractor gui, Hud hud) {
         w = imageWidth;
         h = imageHeight;
 

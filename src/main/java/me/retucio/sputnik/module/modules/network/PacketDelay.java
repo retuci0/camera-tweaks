@@ -12,6 +12,7 @@ import me.retucio.sputnik.util.NetworkUtil;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket;
 import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket;
 
 import java.util.*;
@@ -33,6 +34,16 @@ public class PacketDelay extends Module {
         super("delay de paquetes",
                 "aplica un delay a los paquetes",
                 Category.NETWORK);
+    }
+
+    @Override
+    public void onEnable() {
+        if (mc.isSingleplayer()) {
+            ChatUtil.error("delay de paquetes no funciona en un solo jugador");
+            toggle();
+            return;
+        }
+        super.onEnable();
     }
 
     @Override
@@ -87,8 +98,9 @@ public class PacketDelay extends Module {
     private void onPacketReceive(PacketEvent.Receive event) {
         if (mc.player == null || mc.level == null
                 || mc.getConnection() == null
-                || event.getPacket() instanceof ServerboundKeepAlivePacket
-                    && !packets.is(Packets.OTHERS)) {
+                || directions.is(Directions.C2S)
+                || (event.getPacket() instanceof ClientboundKeepAlivePacket
+                && !packets.is(Packets.OTHERS))) {
             return;
         }
 

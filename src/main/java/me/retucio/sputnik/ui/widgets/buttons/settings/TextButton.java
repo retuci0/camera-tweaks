@@ -2,8 +2,8 @@ package me.retucio.sputnik.ui.widgets.buttons.settings;
 
 import me.retucio.sputnik.module.setting.settings.StringSetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.MiscUtil;
@@ -19,7 +19,7 @@ public class TextButton extends SettingButton<StringSetting> {
     private final StringSetting setting;
     private final StringBuilder buffer = new StringBuilder();
 
-    public TextButton(StringSetting setting, SettingsFrame parent, int offset) {
+    public TextButton(StringSetting setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
     }
@@ -39,7 +39,7 @@ public class TextButton extends SettingButton<StringSetting> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (button == 0) {
                 typing = true;
                 buffer.setLength(0);

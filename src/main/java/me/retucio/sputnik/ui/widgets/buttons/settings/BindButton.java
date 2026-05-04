@@ -2,9 +2,9 @@ package me.retucio.sputnik.ui.widgets.buttons.settings;
 
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
@@ -24,7 +24,7 @@ public class BindButton extends SettingButton<KeySetting> {
 
     private boolean listening = false;
 
-    public BindButton(KeySetting setting, SettingsFrame parent, int offset) {
+    public BindButton(KeySetting setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
     }
@@ -46,11 +46,11 @@ public class BindButton extends SettingButton<KeySetting> {
     public void mouseClicked(int mouseX, int mouseY, int button) {
         boolean hovered = isHovered(mouseX, mouseY);
 
-        if (hovered && ClickGUI.INSTANCE.trySelect(this)) {
+        if (hovered && ClickGui.INSTANCE.trySelect(this)) {
             if (listening) {
                 List<KeyMapping> keys = new ArrayList<>(List.of(mc.options.keyMappings));
                 keys.removeAll(List.of(mc.options.debugKeys));
-                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
+                boolean allowMultiple = ClientSettingsPanel.clientSettings.multipleKeybinds.getValue();
 
                 for (KeyMapping bind : keys) {
                     if (bind.matches(new KeyEvent(button, 0, 0))) {
@@ -90,7 +90,7 @@ public class BindButton extends SettingButton<KeySetting> {
             for (KeyMapping bind : keys) {
                 // no permitir usar la misma tecla para varias acciones, si el ajuste para esto está activado
                 boolean keyAlreadyBound = bind.matches(new KeyEvent(key, 0, 0));
-                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
+                boolean allowMultiple = ClientSettingsPanel.clientSettings.multipleKeybinds.getValue();
 
                 if (keyAlreadyBound && !allowMultiple) {
                     ChatUtil.warn("esa tecla ya está cogida por "

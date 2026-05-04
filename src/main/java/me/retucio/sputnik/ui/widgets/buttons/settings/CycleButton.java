@@ -1,9 +1,9 @@
 package me.retucio.sputnik.ui.widgets.buttons.settings;
 
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.ChatFormatting;
@@ -18,7 +18,7 @@ import java.util.List;
 // botón para los ajustes tipo EnumSetting (de modo)
 public class CycleButton<E extends Enum<E>> extends SettingButton<EnumSetting<E>> {
 
-    public CycleButton(EnumSetting<E> setting, SettingsFrame parent, int offset) {
+    public CycleButton(EnumSetting<E> setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
     }
@@ -40,7 +40,7 @@ public class CycleButton<E extends Enum<E>> extends SettingButton<EnumSetting<E>
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (button == 0) {
                 setting.cycle();  // clic izquierdo -> ciclar
             } else if (button == 1) {

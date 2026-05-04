@@ -2,8 +2,8 @@ package me.retucio.sputnik.ui.widgets.buttons.settings;
 
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.render.DrawUtil;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ColorButton extends SettingButton<ColorSetting> {
 
-    public ColorButton(ColorSetting setting, SettingsFrame parent, int offset) {
+    public ColorButton(ColorSetting setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
     }
@@ -56,10 +56,10 @@ public class ColorButton extends SettingButton<ColorSetting> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (button == 0) {
                 // clic izq.: abrir selector de colores
-                ClickGUI.INSTANCE.openColorPickerFrame(
+                ClickGui.INSTANCE.openColorPickerPanel(
                         setting.getSg().getModule(), setting,
                         parent.getX() + parent.getW() + 120,
                         parent.getRenderY() + offset);

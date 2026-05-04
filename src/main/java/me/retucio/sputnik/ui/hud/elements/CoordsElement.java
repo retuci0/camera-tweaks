@@ -2,7 +2,7 @@ package me.retucio.sputnik.ui.hud.elements;
 
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.TextHudElement;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
@@ -17,7 +17,7 @@ public class CoordsElement extends TextHudElement {
     }
 
     @Override
-    public String getText(float delta, HUD hud) {
+    public String getText(float delta, Hud hud) {
         Freecam freecam = ModuleManager.INSTANCE.getModuleByClass(Freecam.class);
         Vec3 pos = freecam != null && freecam.isEnabled()
                 ? new Vec3(freecam.getX(delta), freecam.getY(delta), freecam.getZ(delta))
@@ -28,9 +28,9 @@ public class CoordsElement extends TextHudElement {
         String overworldCoords = (int) pos.x + " " + (int) pos.y + " " + (int) pos.z;
         String netherCoords = (int) pos.x / 8 + " " + (int) pos.y / 8 + " " + (int) pos.z / 8;
 
-        if (hud.coordsMode.is(HUD.CoordsMode.OVERWORLD)) {
+        if (hud.coordsMode.is(Hud.CoordsMode.OVERWORLD)) {
             return overworldCoords;
-        } else if (hud.coordsMode.is(HUD.CoordsMode.NETHER)) {
+        } else if (hud.coordsMode.is(Hud.CoordsMode.NETHER)) {
             return netherCoords;
         } else {
             return overworldCoords + " (" + netherCoords + ")";
@@ -41,7 +41,7 @@ public class CoordsElement extends TextHudElement {
     public String getPreviewText() {
         return getText(
                 mc.getDeltaTracker().getGameTimeDeltaTicks(),
-                ModuleManager.INSTANCE.getModuleByClass(HUD.class));
+                ModuleManager.INSTANCE.getModuleByClass(Hud.class));
     }
 
     @Override

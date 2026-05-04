@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.hud.elements;
 
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.ImageHudElement;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -25,7 +25,7 @@ public class TotemsElement extends ImageHudElement {
     }
 
     @Override
-    public void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud) {
+    public void renderInGame(GuiGraphicsExtractor gui, float delta, Hud hud) {
         if (!isVisible()) return;
 
         int count = 0;
@@ -42,7 +42,7 @@ public class TotemsElement extends ImageHudElement {
     }
 
     @Override
-    public void renderInEditor(GuiGraphicsExtractor gui, HUD hud) {
+    public void renderInEditor(GuiGraphicsExtractor gui, Hud hud) {
         int count = 0;
         if (mc.player != null) {
             for (ItemStack stack : mc.player.getInventory()) {

@@ -3,10 +3,7 @@ package me.retucio.sputnik.command.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.command.Command;
-import me.retucio.sputnik.command.CommandManager;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.ChatUtil;
 import net.minecraft.commands.SharedSuggestionProvider;
 

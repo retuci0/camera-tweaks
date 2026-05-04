@@ -11,23 +11,23 @@ import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.event.ShutdownEvent;
 import me.retucio.sputnik.event.interact.OpenScreenEvent;
 import me.retucio.sputnik.event.sputnik.LoadCapeManagerEvent;
-import me.retucio.sputnik.event.sputnik.LoadClickGUIEvent;
+import me.retucio.sputnik.event.sputnik.LoadClickGuiEvent;
 import me.retucio.sputnik.event.sputnik.LoadCommandManagerEvent;
 import me.retucio.sputnik.event.sputnik.LoadModuleManagerEvent;
 
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 
 import me.retucio.sputnik.ui.hud.HudRenderer;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.hud.HudEditorScreen;
 import me.retucio.sputnik.ui.screen.UpdateScreen;
 import me.retucio.sputnik.ui.widgets.buttons.settings.BindButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.TextButton;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.ui.widgets.Button;
 
 import me.retucio.sputnik.util.*;
@@ -113,9 +113,9 @@ public class Sputnik implements ClientModInitializer {
 
         mc.execute(() -> {
             Textures.init();
-            ClickGUI.INSTANCE = new ClickGUI();
+            ClickGui.INSTANCE = new ClickGui();
             HudEditorScreen.INSTANCE = new HudEditorScreen();
-            EVENT_BUS.post(new LoadClickGUIEvent());
+            EVENT_BUS.post(new LoadClickGuiEvent());
             HudRenderer.init();
         });
 
@@ -134,7 +134,7 @@ public class Sputnik implements ClientModInitializer {
         }
 
         ModuleManager.INSTANCE.getEnabledModules().forEach(Module::onTick);
-        mc.getWindow().setTitle(ClientSettingsFrame.guiSettings.windowTitle.getValue());
+        mc.getWindow().setTitle(ClientSettingsPanel.clientSettings.windowTitle.getValue());
     }
 
 
@@ -143,8 +143,8 @@ public class Sputnik implements ClientModInitializer {
         // prevenir interrumpir combos de F3
         if (key == GLFW.GLFW_KEY_F3) return;
 
-        boolean anyFocused = isAnySettingButtonFocused() || ClickGUI.INSTANCE.getSearchBar().isFocused();
-        ClickGUI.INSTANCE.setAnyFocused(anyFocused);
+        boolean anyFocused = isAnySettingButtonFocused() || ClickGui.INSTANCE.getSearchBar().isFocused();
+        ClickGui.INSTANCE.setAnyFocused(anyFocused);
 
         if (action != GLFW.GLFW_RELEASE) {
             if (BindCommand.onKeyPress(key)) return;
@@ -164,7 +164,7 @@ public class Sputnik implements ClientModInitializer {
 
     // verifica si algún botón de ajustes está escuchando
     private boolean isAnySettingButtonFocused() {
-        for (SettingsFrame sf : ClickGUI.INSTANCE.getSettingsFrames())
+        for (SettingsPanel sf : ClickGui.INSTANCE.getSettingsPanels())
             for (Button sb : sf.getButtons())
                 if ((sb instanceof BindButton b && b.isFocused()) || (sb instanceof TextButton t && t.isFocused()))
                     return true;
@@ -173,7 +173,7 @@ public class Sputnik implements ClientModInitializer {
 
     // se ocupa de la lógica de encendido y apagado de los módulos
     private void handleModuleToggle(int key, boolean anyFocused) {
-        if (mc.screen != null && mc.screen != ClickGUI.INSTANCE) return;
+        if (mc.screen != null && mc.screen != ClickGui.INSTANCE) return;
 
         for (Module module : ModuleManager.INSTANCE.getModules()) {
             if (key != module.getKey() || anyFocused || KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) continue;  // evitar interrumpir combinaciones de teclas del F3
@@ -187,7 +187,7 @@ public class Sputnik implements ClientModInitializer {
 
     // se ocupa de hacer los botones de ajustes que lo necesiten escuchar teclas
     private void handleSettingButtonsKey(int key, int action) {
-        for (SettingsFrame sf : ClickGUI.INSTANCE.getSettingsFrames()) {
+        for (SettingsPanel sf : ClickGui.INSTANCE.getSettingsPanels()) {
             for (SettingButton<?> sb : sf.getButtons()) {
                 if (sb instanceof BindButton bb) bb.onKey(key, action);
                 if (sb instanceof TextButton tb) tb.onKey(key, action);
@@ -197,21 +197,21 @@ public class Sputnik implements ClientModInitializer {
 
     // maneja la lógica de apertura de la interfaz
     private void handleClickGUIKey(int key, boolean anyFocused) {
-        if (key != ClientSettingsFrame.guiSettings.getKey() || anyFocused || isOnTypingScreen())
+        if (key != ClientSettingsPanel.clientSettings.getKey() || anyFocused || isOnTypingScreen())
             return;
 
-        if (mc.screen != ClickGUI.INSTANCE) {
+        if (mc.screen != ClickGui.INSTANCE) {
             prevScreen = mc.screen;
-            mc.setScreen(ClickGUI.INSTANCE);
+            mc.setScreen(ClickGui.INSTANCE);
         } else {
-            ClickGUI.INSTANCE.onClose();
+            ClickGui.INSTANCE.onClose();
             mc.setScreen(prevScreen);
         }
     }
 
     // manejar la lógica de apertura del editor de elementos del hud, con la misma lógica que handleClickGUIKey()
     private void handleHudEditorKey(int key, boolean anyFocused) {
-        HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+        Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
         if (key != hud.editorKey.getValue() || anyFocused || isOnTypingScreen()) return;
 
         if (mc.screen != HudEditorScreen.INSTANCE) {
@@ -229,7 +229,7 @@ public class Sputnik implements ClientModInitializer {
 
     // se ocupa de apagar los módulos que tengan configurado hacerlo tras soltar su tecla
     private void handleModuleRelease(int key) {
-        if (mc.screen != null && mc.screen != ClickGUI.INSTANCE) return;
+        if (mc.screen != null && mc.screen != ClickGui.INSTANCE) return;
 
         for (Module module : ModuleManager.INSTANCE.getEnabledModules())
             if (module.shouldToggleOnBindRelease() && key == module.getKey())

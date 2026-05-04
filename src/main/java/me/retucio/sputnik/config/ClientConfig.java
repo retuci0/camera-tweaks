@@ -3,7 +3,7 @@ package me.retucio.sputnik.config;
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.sputnik.*;
 import me.retucio.sputnik.module.setting.settings.*;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.screen.ClickGui;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,10 +23,10 @@ public class ClientConfig {
     public Map<String, Object> settings = new HashMap<>();
 
     // nombre del módulo -> posición (x, y)
-    public Map<String, int[]> settingsFrames = new HashMap<>();
+    public Map<String, int[]> settingsPanels = new HashMap<>();
 
     // nombre del frame -> FrameData (que contiene extended, x & y)
-    public Map<String, FrameData> extendableFrames = new HashMap<>();
+    public Map<String, PanelData> extendablePanels = new HashMap<>();
 
     // id del elemento del hud -> posición (x, y)
     public Map<String, int[]> hudPositions = new HashMap<>();
@@ -34,7 +34,7 @@ public class ClientConfig {
     // id del elemento del hud -> true: visible / false: no visible
     public Map<String, Boolean> hudVisibilities = new HashMap<>();
 
-    // id del elemento del hud -> ruta de la imagen (NEW)
+    // id del elemento del hud -> ruta de la imagen
     public Map<String, String> hudImagePaths = new HashMap<>();
 
     // posición de la barra de búsqueda (x, y)
@@ -72,55 +72,55 @@ public class ClientConfig {
     }
 
     @EventListener
-    public void onOpenSettingsFrame(SettingsFrameEvent.Open event) {
-        ConfigManager.setFramePosition(event.getFrame());
+    public void onOpenSettingsPanel(SettingsPanelEvent.Open event) {
+        ConfigManager.setPanelPosition(event.getPanel());
     }
 
     @EventListener
-    public void onCloseSettingsFrame(SettingsFrameEvent.Close event) {
-        settingsFrames.remove(event.getFrame().getModule().getName());
+    public void onCloseSettingsPanel(SettingsPanelEvent.Close event) {
+        settingsPanels.remove(event.getPanel().getModule().getName());
         ConfigManager.save();
     }
 
     @EventListener
-    public void onMoveSettingsFrame(SettingsFrameEvent.Move event) {
-        settingsFrames.replace(event.getFrame().getModule().getName(), new int[]{event.getFrame().getX(), event.getFrame().getY()});
+    public void onMoveSettingsPanel(SettingsPanelEvent.Move event) {
+        settingsPanels.replace(event.getPanel().getModule().getName(), new int[]{event.getPanel().getX(), event.getPanel().getY()});
         ConfigManager.save();
     }
 
     @EventListener
-    public void onExtendModuleFrame(ModuleFrameEvent.Extend event) {
-        extendableFrames.put("M", new FrameData(
-                ClickGUI.INSTANCE.getModulesFrame().getX(),
-                ClickGUI.INSTANCE.getModulesFrame().getY(),
-                ClickGUI.INSTANCE.getModulesFrame().extended));
+    public void onExtendModulePanel(ModulePanelEvent.Extend event) {
+        extendablePanels.put("M", new PanelData(
+                ClickGui.INSTANCE.getModulesPanel().getX(),
+                ClickGui.INSTANCE.getModulesPanel().getY(),
+                ClickGui.INSTANCE.getModulesPanel().extended));
     }
 
     @EventListener
-    public void onMoveModuleFrame(ModuleFrameEvent.Move event) {
-        extendableFrames.replace("M", new FrameData(
-                ClickGUI.INSTANCE.getModulesFrame().getX(),
-                ClickGUI.INSTANCE.getModulesFrame().getY(),
-                ClickGUI.INSTANCE.getModulesFrame().extended));
+    public void onMoveModulePanel(ModulePanelEvent.Move event) {
+        extendablePanels.replace("M", new PanelData(
+                ClickGui.INSTANCE.getModulesPanel().getX(),
+                ClickGui.INSTANCE.getModulesPanel().getY(),
+                ClickGui.INSTANCE.getModulesPanel().extended));
     }
 
     @EventListener
-    public void onExtendGUISettingsFrame(GUISettingsFrameEvent.Extend event) {
-        extendableFrames.put("S", new FrameData(
-                ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),
-                ClickGUI.INSTANCE.getGuiSettingsFrame().getY(),
-                ClickGUI.INSTANCE.getGuiSettingsFrame().extended));
+    public void onExtendClientSettingsPanel(ClientSettingsPanelEvent.Extend event) {
+        extendablePanels.put("S", new PanelData(
+                ClickGui.INSTANCE.getClientSettingsPanel().getX(),
+                ClickGui.INSTANCE.getClientSettingsPanel().getY(),
+                ClickGui.INSTANCE.getClientSettingsPanel().extended));
     }
 
     @EventListener
-    public void onMoveGUISettingsFrame(GUISettingsFrameEvent.Move event) {
-        extendableFrames.replace("S", new FrameData(
-                ClickGUI.INSTANCE.getGuiSettingsFrame().getX(),
-                ClickGUI.INSTANCE.getGuiSettingsFrame().getY(),
-                ClickGUI.INSTANCE.getGuiSettingsFrame().extended));
+    public void onMoveClientSettingsPanel(ClientSettingsPanelEvent.Move event) {
+        extendablePanels.replace("S", new PanelData(
+                ClickGui.INSTANCE.getClientSettingsPanel().getX(),
+                ClickGui.INSTANCE.getClientSettingsPanel().getY(),
+                ClickGui.INSTANCE.getClientSettingsPanel().extended));
     }
 
-    public record FrameData(int x, int y, boolean extended) implements Serializable {
+    public record PanelData(int x, int y, boolean extended) implements Serializable {
         @Serial private static final long serialVersionUID = 1L;
     }
 }

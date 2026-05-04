@@ -4,8 +4,8 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.client.HUD;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.sputnik.module.modules.client.Hud;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.client.Minecraft;
@@ -25,7 +25,7 @@ public class HudEditorScreen extends Screen {
 
     public static HudEditorScreen INSTANCE;
     private final Minecraft mc = Minecraft.getInstance();
-    private final HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+    private final Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
 
     private final List<HudElement> elements = new ArrayList<>();
     @Nullable private HudElement selected = null;
@@ -199,7 +199,7 @@ public class HudEditorScreen extends Screen {
 
     @Override
     protected void extractBlurredBackground(@NonNull GuiGraphicsExtractor gui) {
-        if (ClientSettingsFrame.guiSettings.blur.getValue()) {
+        if (ClientSettingsPanel.clientSettings.blur.getValue()) {
             super.extractBlurredBackground(gui);
         }
     }

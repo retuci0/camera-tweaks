@@ -5,8 +5,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.ModuleArgumentType;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import net.minecraft.commands.SharedSuggestionProvider;
 import me.retucio.sputnik.module.Module;
 
@@ -40,27 +40,27 @@ public class ConfigCommand extends Command {
 
     private void openSf(CommandContext<SharedSuggestionProvider> ctx) {
         Module module = ctx.getArgument("módulo", Module.class);
-        mc.setScreen(ClickGUI.INSTANCE);
+        mc.setScreen(ClickGui.INSTANCE);
 
-        if (ClickGUI.INSTANCE.isSettingsFrameOpen(module)) return;
+        if (ClickGui.INSTANCE.isSettingsPanelOpen(module)) return;
 
-        SettingsFrame sf = ClickGUI.INSTANCE.getSfOfModule(module);
+        SettingsPanel sf = ClickGui.INSTANCE.getSettingsPanelOfModule(module);
         int x = mc.getWindow().getGuiScaledWidth() / 2 - sf.getW() / 2;
         int y = 67;
 
-        ClickGUI.INSTANCE.openSettingsFrame(module, x, y);
+        ClickGui.INSTANCE.openSettingsPanel(module, x, y);
     }
 
     private void openSfWithPos(CommandContext<SharedSuggestionProvider> ctx, int x, int y) {
         Module module = ctx.getArgument("módulo", Module.class);
-        mc.setScreen(ClickGUI.INSTANCE);
+        mc.setScreen(ClickGui.INSTANCE);
 
-        if (ClickGUI.INSTANCE.isSettingsFrameOpen(module)) {
-            SettingsFrame sf = ClickGUI.INSTANCE.getSfOfModule(module);
+        if (ClickGui.INSTANCE.isSettingsPanelOpen(module)) {
+            SettingsPanel sf = ClickGui.INSTANCE.getSettingsPanelOfModule(module);
             sf.setX(x);
             sf.setY(y);
         }
 
-        ClickGUI.INSTANCE.openSettingsFrame(module, x, y);
+        ClickGui.INSTANCE.openSettingsPanel(module, x, y);
     }
 }

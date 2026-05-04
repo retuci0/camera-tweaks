@@ -2,8 +2,8 @@ package me.retucio.sputnik.ui.widgets.buttons.settings;
 
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -16,7 +16,7 @@ public class ToggleButton extends SettingButton<BooleanSetting> {
 
     private final BooleanSetting setting;
 
-    public ToggleButton(BooleanSetting setting, SettingsFrame parent, int offset) {
+    public ToggleButton(BooleanSetting setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
     }
@@ -39,7 +39,7 @@ public class ToggleButton extends SettingButton<BooleanSetting> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (button == 0) setting.toggle();  // clic izquierdo para alternar
             else if (button == 1 && KeyUtil.isShiftDown())
                 // shift + clic derecho para restablecer al valor por defecto

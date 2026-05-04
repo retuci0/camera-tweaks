@@ -4,10 +4,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public abstract class Button extends Widget {
 
-    protected Frame<?> parent;
+    protected Panel<?> parent;
     protected int offset;
 
-    public Button(Frame<?> parent, int offset) {
+    public Button(Panel<?> parent, int offset) {
         super(parent.getX(), parent.getRenderY(), parent.getW(), parent.getH());
         this.parent = parent;
         this.offset = offset;
@@ -24,7 +24,7 @@ public abstract class Button extends Widget {
         this.offset = offset;
     }
 
-    public Frame<?> getParent() {
+    public Panel<?> getParent() {
         return parent;
     }
 }

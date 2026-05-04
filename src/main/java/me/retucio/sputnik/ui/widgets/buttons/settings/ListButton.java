@@ -5,8 +5,8 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,7 +22,7 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
 
     private final Map<T, BooleanSetting> optionButtons = new HashMap<>();
 
-    public ListButton(ListSetting<T> setting, SettingsFrame parent, int offset) {
+    public ListButton(ListSetting<T> setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
 
@@ -64,16 +64,16 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             // clic izquierdo / derecho: abrir marco
             if (button <= 1 && !KeyUtil.isShiftDown()) {
-                if (ClickGUI.INSTANCE.isSettingsFrameOpen(dummy)) {
-                    ClickGUI.INSTANCE.closeSettingsFrame(dummy);
+                if (ClickGui.INSTANCE.isSettingsPanelOpen(dummy)) {
+                    ClickGui.INSTANCE.closeSettingsPanel(dummy);
                     return;
                 }
 
                 rebuildDummy();
-                ClickGUI.INSTANCE.openListSettingsFrame(dummy, parent.getX() + 40, parent.getY() + 40);
+                ClickGui.INSTANCE.openListSettingsPanel(dummy, parent.getX() + 40, parent.getY() + 40);
             // shift + clic derecho: restablecer valores
             } else if (button == 1 && KeyUtil.isShiftDown()) {
                 setting.reset();

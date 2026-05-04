@@ -1,6 +1,6 @@
 # jenny's mod 2 100% real
 
-mod para Minecraft Fabric 26.1 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
+mod para Minecraft Fabric 26.1.2 que añade algunas cosas QOL, mayormente relacionadas a la cámara.
 
 ## instalación
 
@@ -23,7 +23,7 @@ es posible que haya problemas al usarlo junto a otros mods, especialmente junto 
 
 `shift derecho` por defecto para abrir la interfaz
 
-`pág. arriba` por defecto para abrir el editor del hud
+`insertar` por defecto para abrir el editor del hud
 
 `$` como prefijo por defecto para comandos (se autocompletan)
 

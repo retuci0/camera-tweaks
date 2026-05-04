@@ -5,7 +5,7 @@ import me.retucio.sputnik.command.Command;
 import me.retucio.sputnik.command.args.ModuleArgumentType;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.ChatFormatting;
@@ -51,13 +51,13 @@ public class BindCommand extends Command {
         if (listeningModule == null) return false;
         KeySetting bind = listeningModule.getBind();
 
-        if (ClientSettingsFrame.guiSettings.multipleKeybinds.getValue()) {
+        if (ClientSettingsPanel.clientSettings.multipleKeybinds.getValue()) {
             List<KeyMapping> keys = new ArrayList<>(List.of(mc.options.keyMappings));
             keys.removeAll(List.of(mc.options.debugKeys));
 
             for (KeyMapping kb : keys) {
                 boolean keyAlreadyBound = kb.matches(new KeyEvent(key, 0, 0));
-                boolean allowMultiple = ClientSettingsFrame.guiSettings.multipleKeybinds.getValue();
+                boolean allowMultiple = ClientSettingsPanel.clientSettings.multipleKeybinds.getValue();
 
                 if (keyAlreadyBound && !allowMultiple) {
                     ChatUtil.warn("esa tecla ya está cogida por "

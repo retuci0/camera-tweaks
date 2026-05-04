@@ -4,7 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.event.input.ClientClickEvent;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -29,11 +29,11 @@ public class ScreenMixin {
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void renderWatermark(GuiGraphicsExtractor gui, int mouseX, int mouseY, float a, CallbackInfo ci) {
         if (!ConfigManager.hasLoaded()) return;  // para evitar dibujar la marca de agua por defecto
-        String watermark = ClientSettingsFrame.guiSettings.watermark.getValue();
+        String watermark = ClientSettingsPanel.clientSettings.watermark.getValue();
         if (watermark == null || watermark.isEmpty()) return;
         gui.text(mc.font, watermark,
                 mc.getWindow().getGuiScaledWidth() - mc.font.width(watermark) - 2, 2,
-                ClientSettingsFrame.guiSettings.color.getRGB(), false
+                ClientSettingsPanel.clientSettings.color.getRGB(), false
         );
     }
 }

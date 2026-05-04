@@ -3,7 +3,7 @@ package me.retucio.sputnik.module.modules.inventory;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.ListSetting;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.util.KeyUtil;
 import me.retucio.sputnik.util.Lists;
 
@@ -63,7 +63,7 @@ public class UIMove extends Module {
         if (mc.player == null || mc.screen == null) return;
 
         MenuType<?> handler = null;
-        if (mc.screen == ClickGUI.INSTANCE)
+        if (mc.screen == ClickGui.INSTANCE)
             handler = clickGuiHandlerType;
 
         if (mc.screen instanceof AbstractContainerScreen<?> screen) {

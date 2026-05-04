@@ -3,7 +3,7 @@ package me.retucio.sputnik.util;
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.TickEvent;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
@@ -57,12 +57,12 @@ public class MiscUtil {
 
     public static String getFormattedTime(long timeMillis) {
         try {
-            HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+            Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
             Instant instant = Instant.ofEpochMilli(timeMillis);
             ZoneOffset offset = ZoneOffset.ofHours(hud.timezone.getIntValue());
             LocalTime time = LocalTime.from(instant.atOffset(offset));
 
-            boolean is24 = hud.timeFormat.is(HUD.TimeFormat.TWENTY_FOUR_HOUR);
+            boolean is24 = hud.timeFormat.is(Hud.TimeFormat.TWENTY_FOUR_HOUR);
             DateTimeFormatter format = DateTimeFormatter.ofPattern(is24 ? "HH:mm" : "hh:mm a");
             return time.format(format);
         } catch (Exception e) {

@@ -5,7 +5,7 @@ import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.event.input.MouseClickEvent;
 import me.retucio.sputnik.event.input.MouseScrollEvent;
-import me.retucio.sputnik.event.sputnik.SettingsFrameEvent;
+import me.retucio.sputnik.event.sputnik.SettingsPanelEvent;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.Setting;
@@ -13,12 +13,12 @@ import me.retucio.sputnik.module.setting.settings.ColorSetting;
 import me.retucio.sputnik.ui.widgets.buttons.settings.ListButton;
 import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
-import me.retucio.sputnik.ui.widgets.frames.settings.ColorPickerFrame;
-import me.retucio.sputnik.ui.widgets.frames.ModuleFrame;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
+import me.retucio.sputnik.ui.widgets.panels.settings.ColorPickerPanel;
+import me.retucio.sputnik.ui.widgets.panels.ModulePanel;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.ui.widgets.Button;
-import me.retucio.sputnik.ui.widgets.Frame;
+import me.retucio.sputnik.ui.widgets.Panel;
 import me.retucio.sputnik.ui.widgets.Widget;
 import me.retucio.sputnik.ui.widgets.misc.ScrollBarWidget;
 import me.retucio.sputnik.ui.widgets.misc.SearchBarWidget;
@@ -40,31 +40,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame.guiSettings;
+import static me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel.clientSettings;
 
 
 // interfaz gráfica, se abre con el shift derecho por defecto. aquí se encuentran los módulos y sus ajustes
-public class ClickGUI extends Screen {
+public class ClickGui extends Screen {
 
     private final Minecraft mc = Minecraft.getInstance();
-    public static ClickGUI INSTANCE;
+    public static ClickGui INSTANCE;
 
     private boolean anyFocused;
     private @Nullable Widget selected = null;
 
     private Category categoryFilter = Category.ALL;
 
-    private final ModuleFrame modulesFrame = new ModuleFrame(20, 30, 100, 20);
-    private final List<SettingsFrame> settingsFrames = new ArrayList<>();
-    private final ClientSettingsFrame guiSettingsFrame = new ClientSettingsFrame(200, 30, 100, 20);
+    private final ModulePanel modulesPanel = new ModulePanel(20, 30, 100, 20);
+    private final List<SettingsPanel> settingsPanels = new ArrayList<>();
+    private final ClientSettingsPanel clientSettingsPanel = new ClientSettingsPanel(200, 30, 100, 20);
 
     private final ScrollBarWidget scrollBar = new ScrollBarWidget();
     private final SearchBarWidget searchBar = new SearchBarWidget(340, 16, 320, 20);
     private final List<Widget> miscWidgets = Arrays.asList(scrollBar, searchBar);
 
-    public ClickGUI() {
+    public ClickGui() {
         super(Component.nullToEmpty("interfaz"));
-        settingsFrames.add(guiSettingsFrame);
+        settingsPanels.add(clientSettingsPanel);
         Sputnik.EVENT_BUS.subscribe(this);
     }
 
@@ -81,22 +81,22 @@ public class ClickGUI extends Screen {
         searchBar.updatePosition(mouseX, mouseY);
 
         // actualizar la posición de renderizado vertical de los marcos cada tick
-        modulesFrame.updateRenderY(scrollOffset);
-        for (SettingsFrame sf : settingsFrames)
-            sf.updateRenderY(scrollOffset);
+        modulesPanel.updateRenderY(scrollOffset);
+        for (SettingsPanel sp : settingsPanels)
+            sp.updateRenderY(scrollOffset);
 
         // renderizar el marco de los ajustes de cada módulo que lo tenga abierto. se abre haciendo clic derecho sobre el módulo
-        for (SettingsFrame sf : settingsFrames.reversed()) {
-            sf.render(gui, mouseX, mouseY, delta);
-            sf.updatePosition(mouseX, mouseY);
+        for (SettingsPanel sp : settingsPanels.reversed()) {
+            sp.render(gui, mouseX, mouseY, delta);
+            sp.updatePosition(mouseX, mouseY);
         }
 
         // renderizar el marco de los módulos
-        modulesFrame.render(gui, mouseX, mouseY, delta);
-        modulesFrame.updatePosition(mouseX, mouseY);
+        modulesPanel.render(gui, mouseX, mouseY, delta);
+        modulesPanel.updatePosition(mouseX, mouseY);
 
-        for (SettingsFrame sf : settingsFrames)
-            sf.drawTooltips(gui, mouseX, mouseY);
+        for (SettingsPanel sp : settingsPanels)
+            sp.drawTooltips(gui, mouseX, mouseY);
 
         filterSearchResults();
 
@@ -124,9 +124,9 @@ public class ClickGUI extends Screen {
     }
 
     private int calculateContentHeight() {
-        int bottom = modulesFrame.getY() + modulesFrame.getH() + modulesFrame.getTotalHeight();
-        for (SettingsFrame frame : settingsFrames)
-            bottom = Math.max(bottom, frame.getY() + frame.getH() + frame.getTotalHeight());
+        int bottom = modulesPanel.getY() + modulesPanel.getH() + modulesPanel.getTotalHeight();
+        for (SettingsPanel panel : settingsPanels)
+            bottom = Math.max(bottom, panel.getY() + panel.getH() + panel.getTotalHeight());
 
         return bottom + 20;  // padding
     }
@@ -140,9 +140,9 @@ public class ClickGUI extends Screen {
         ));
 
         // detectar clics sobre los marcos
-        modulesFrame.mouseClicked((int) click.x(), (int) click.y(), click.button());
-        for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseClicked((int) click.x(), (int) click.y(), click.button());
+        modulesPanel.mouseClicked((int) click.x(), (int) click.y(), click.button());
+        for (SettingsPanel sp : new ArrayList<>(settingsPanels))
+            sp.mouseClicked((int) click.x(), (int) click.y(), click.button());
 
         return super.mouseClicked(click, doubled);
     }
@@ -155,9 +155,9 @@ public class ClickGUI extends Screen {
                 click.button()));
 
         // registrar cuándo se suelta el clic, en cada marco respectivamente
-        modulesFrame.mouseReleased((int) click.x(), (int) click.y(), click.button());
-        for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseReleased((int) click.x(), (int) click.y(), click.button());
+        modulesPanel.mouseReleased((int) click.x(), (int) click.y(), click.button());
+        for (SettingsPanel sp : new ArrayList<>(settingsPanels))
+            sp.mouseReleased((int) click.x(), (int) click.y(), click.button());
 
         return super.mouseReleased(click);
     }
@@ -168,8 +168,8 @@ public class ClickGUI extends Screen {
                 (int) click.x(),
                 (int) click.y()));
 
-        for (SettingsFrame sf : new ArrayList<>(settingsFrames))
-            sf.mouseDragged((int) click.x(), (int) click.y());
+        for (SettingsPanel sp : new ArrayList<>(settingsPanels))
+            sp.mouseDragged((int) click.x(), (int) click.y());
 
         return super.mouseDragged(click, deltaX, deltaY);
     }
@@ -182,7 +182,7 @@ public class ClickGUI extends Screen {
     @EventListener
     public void onMouseScroll(MouseScrollEvent event) {
         miscWidgets.forEach(w -> w.mouseScrolled(
-                event.getVertical() * guiSettings.scrollSens.getValue()));
+                event.getVertical() * clientSettings.scrollSens.getValue()));
     }
 
     @EventListener
@@ -191,22 +191,22 @@ public class ClickGUI extends Screen {
         if (Sputnik.mc.screen != this || event.getButton() != 2 || !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) return;
 
         int h = Sputnik.mc.getWindow().getGuiScaledHeight();
-        int minY = Math.min(modulesFrame.getY(), settingsFrames.stream().mapToInt(Frame::getY).min().orElse(modulesFrame.getY()));
-        int maxY = Math.max(modulesFrame.getY() + modulesFrame.getH(), settingsFrames.stream().mapToInt(sf -> sf.getY() + sf.getH()).max().orElse(modulesFrame.getY() + modulesFrame.getH()));
+        int minY = Math.min(modulesPanel.getY(), settingsPanels.stream().mapToInt(Panel::getY).min().orElse(modulesPanel.getY()));
+        int maxY = Math.max(modulesPanel.getY() + modulesPanel.getH(), settingsPanels.stream().mapToInt(sp -> sp.getY() + sp.getH()).max().orElse(modulesPanel.getY() + modulesPanel.getH()));
         int correction = minY < 0 ? -minY + 4 : (maxY > h ? h - maxY - 4 : 0);
 
         if (correction != 0) {
-            modulesFrame.setY(modulesFrame.getY() + correction);
-            settingsFrames.forEach(sf -> sf.setY(sf.getY() + correction));
+            modulesPanel.setY(modulesPanel.getY() + correction);
+            settingsPanels.forEach(sp -> sp.setY(sp.getY() + correction));
         }
     }
 
     public void filterSearchResults() {
-        if (!guiSettings.searchBar.getValue()) return;
+        if (!clientSettings.searchBar.getValue()) return;
         String searchInput = searchBar.getSearchInput().trim();
-        if (!guiSettings.matchCase.getValue()) searchInput = searchInput.toLowerCase();
+        if (!clientSettings.matchCase.getValue()) searchInput = searchInput.toLowerCase();
 
-        for (Button b : modulesFrame.getButtons()) {
+        for (Button b : modulesPanel.getButtons()) {
             if (!(b instanceof ModuleButton mb)) return;
             Module module = mb.getModule();
 
@@ -224,7 +224,7 @@ public class ClickGUI extends Screen {
             String description = MiscUtil.removeAccentMarks(module.getDescription());
             String category = MiscUtil.removeAccentMarks(module.getCategory().toString());
 
-            if (!guiSettings.matchCase.getValue()) {
+            if (!clientSettings.matchCase.getValue()) {
                 name = name.toLowerCase();
                 description = description.toLowerCase();
                 category = category.toLowerCase();
@@ -236,8 +236,8 @@ public class ClickGUI extends Screen {
                     || category.contains(searchInput));
         }
 
-        for (SettingsFrame sf : settingsFrames) {
-            for (Button b : sf.getButtons()) {
+        for (SettingsPanel sp : settingsPanels) {
+            for (Button b : sp.getButtons()) {
                 if (!(b instanceof SettingButton<?> sb)) return;
                 Setting<?> setting = sb.getSetting();
 
@@ -250,7 +250,7 @@ public class ClickGUI extends Screen {
                 String description = MiscUtil.removeAccentMarks(setting.getDescription());
                 String sgName = MiscUtil.removeAccentMarks(setting.getSg().getName());
 
-                if (!guiSettings.matchCase.getValue()) {
+                if (!clientSettings.matchCase.getValue()) {
                     name = name.toLowerCase();
                     description = description.toLowerCase();
                     sgName = sgName.toLowerCase();
@@ -261,85 +261,85 @@ public class ClickGUI extends Screen {
         }
     }
 
-    public SettingsFrame getSfOfModule(Module module) {
-        Optional<SettingsFrame> frame = settingsFrames.stream()
-                .filter(sf -> sf.getModule().equals(module))
+    public SettingsPanel getSettingsPanelOfModule(Module module) {
+        Optional<SettingsPanel> panel = settingsPanels.stream()
+                .filter(sp -> sp.getModule().equals(module))
                 .findFirst();
 
-        return frame.orElseGet(() ->
-                new SettingsFrame(module, 0, 0, 100, 20)
+        return panel.orElseGet(() ->
+                new SettingsPanel(module, 0, 0, 100, 20)
         );
     }
 
     // abrir un marco donde se encuentran los ajustes del módulo deseado
-    public void openSettingsFrame(Module module, int x, int y) {
+    public void openSettingsPanel(Module module, int x, int y) {
         // asegurarse de que no se sale de la pantalla
         x = Math.clamp(x, 0, mc.getWindow().getGuiScaledWidth() - 80);
 
-        SettingsFrame frame = new SettingsFrame(module, x, y, 100, 20);
-        settingsFrames.add(frame);
+        SettingsPanel panel = new SettingsPanel(module, x, y, 100, 20);
+        settingsPanels.add(panel);
 
-        Sputnik.EVENT_BUS.post(new SettingsFrameEvent.Open(frame));
+        Sputnik.EVENT_BUS.post(new SettingsPanelEvent.Open(panel));
     }
 
     // abrir un marco de ajustes específicamente para ajustes de selección múltiple
-    public void openListSettingsFrame(Module dummy, int x, int y) {
-        if (isSettingsFrameOpen(dummy)) return;
-        SettingsFrame frame = new SettingsFrame(dummy, x, y, 120, 18);
-        settingsFrames.add(frame);
+    public void openListSettingsPanel(Module dummy, int x, int y) {
+        if (isSettingsPanelOpen(dummy)) return;
+        SettingsPanel panel = new SettingsPanel(dummy, x, y, 120, 18);
+        settingsPanels.add(panel);
     }
 
     // cerrar el marco de ajustes
-    public void closeSettingsFrame(Module module) {
+    public void closeSettingsPanel(Module module) {
         // porque java.util.ConcurrentModificationException o algo no sé es lo único que se me ha ocurrido hacer
-        List<SettingsFrame> toRemove = new ArrayList<>();
-        for (SettingsFrame sf : settingsFrames) {
-            if ((sf instanceof ColorPickerFrame cpf && cpf.dummyModule == module)  // para los selectores de colores
-                    || (!(sf instanceof ColorPickerFrame) && sf.getModule() == module)) { // lógica muy mierdas, lo sé, pero paso de hacerlo bien
-                toRemove.add(sf);
-                Sputnik.EVENT_BUS.post(new SettingsFrameEvent.Close(sf));
-                unselect(sf);
+        List<SettingsPanel> toRemove = new ArrayList<>();
+        for (SettingsPanel sp : settingsPanels) {
+            if ((sp instanceof ColorPickerPanel cpp && cpp.dummyModule == module)  // para los selectores de colores
+                    || (!(sp instanceof ColorPickerPanel) && sp.getModule() == module)) { // lógica muy mierdas, lo sé, pero paso de hacerlo bien
+                toRemove.add(sp);
+                Sputnik.EVENT_BUS.post(new SettingsPanelEvent.Close(sp));
+                unselect(sp);
             }
         }
 
-        settingsFrames.removeAll(toRemove);
+        settingsPanels.removeAll(toRemove);
     }
 
     // verificar si un módulo tiene su marco de ajustes abierto
-    public boolean isSettingsFrameOpen(Module module) {
-        return settingsFrames.stream().anyMatch(
-                sf -> sf.getModule().equals(module));
+    public boolean isSettingsPanelOpen(Module module) {
+        return settingsPanels.stream().anyMatch(
+                sp -> sp.getModule().equals(module));
     }
 
-    public boolean isColorPickerFrameOpen(ColorSetting setting) {
-        for (SettingsFrame sf : getSettingsFrames()) {
-            if (sf instanceof ColorPickerFrame cpf)
-                if (cpf.getColorSetting().equals(setting)) return true;
+    public boolean isColorPickerPanelOpen(ColorSetting setting) {
+        for (SettingsPanel sp : getSettingsPanels()) {
+            if (sp instanceof ColorPickerPanel cpp)
+                if (cpp.getColorSetting().equals(setting)) return true;
         }
         return false;
     }
 
-    public void openColorPickerFrame(Module module, ColorSetting colorSetting, int x, int y) {
-        ColorPickerFrame frame = new ColorPickerFrame(module, colorSetting, x + 80, y + 5, 153, 20);
-        if (isColorPickerFrameOpen(frame.getColorSetting())) {
-            closeColorPickerFrame(frame.getColorSetting());
+    public void openColorPickerPanel(Module module, ColorSetting colorSetting, int x, int y) {
+        ColorPickerPanel panel = new ColorPickerPanel(module, colorSetting, x + 80, y + 5, 153, 20);
+        if (isColorPickerPanelOpen(panel.getColorSetting())) {
+            closeColorPickerPanel(panel.getColorSetting());
             return;
         }
-        settingsFrames.add(frame);
+        settingsPanels.add(panel);
     }
 
-    public void closeColorPickerFrame(ColorSetting setting) {
-        for (SettingsFrame sf : getSettingsFrames()) {
-            if (sf instanceof ColorPickerFrame cpf && cpf.getColorSetting().equals(setting)) {
-                settingsFrames.remove(cpf);
+    public void closeColorPickerPanel(ColorSetting setting) {
+        for (SettingsPanel sp : getSettingsPanels()) {
+            if (sp instanceof ColorPickerPanel cpp && cpp.getColorSetting().equals(setting)) {
+                settingsPanels.remove(cpp);
                 break;
             }
         }
     }
 
     public void refreshListButtons() {
-        for (SettingsFrame frame : settingsFrames)
-            for (Button button : frame.getButtons())
+        for (SettingsPanel panel : settingsPanels)
+            for (Button button : panel.getButtons())
                 if (button instanceof ListButton<?> lb)
                     lb.refreshDummy();
     }
@@ -356,8 +356,8 @@ public class ClickGUI extends Screen {
 
     @Override
     public void onClose() {  // evitar que al reabrir la interfaz sin previamente haber soltado el clic, se sigan arrastrando objetos
-        modulesFrame.mouseReleased(0, 0, 0);
-        settingsFrames.forEach(sf -> sf.mouseReleased(0, 0, 0));
+        modulesPanel.mouseReleased(0, 0, 0);
+        settingsPanels.forEach(sp -> sp.mouseReleased(0, 0, 0));
         scrollBar.mouseReleased(0, 0, 0);
         searchBar.mouseReleased(0, 0, 0);
 
@@ -378,24 +378,24 @@ public class ClickGUI extends Screen {
 
     @Override
     protected void extractBlurredBackground(@NonNull GuiGraphicsExtractor gui) {
-        if (guiSettings.blur.getValue()) super.extractBlurredBackground(gui);
+        if (clientSettings.blur.getValue()) super.extractBlurredBackground(gui);
     }
 
 
     // getters y setters de widgets
 
-    public ModuleFrame getModulesFrame() {
-        return modulesFrame;
+    public ModulePanel getModulesPanel() {
+        return modulesPanel;
     }
 
-    public ClientSettingsFrame getGuiSettingsFrame() {
-        return guiSettingsFrame;
+    public ClientSettingsPanel getClientSettingsPanel() {
+        return clientSettingsPanel;
     }
 
     public List<Widget> getMiscWidgets() { return miscWidgets; }
 
-    public List<SettingsFrame> getSettingsFrames() {
-        return settingsFrames;
+    public List<SettingsPanel> getSettingsPanels() {
+        return settingsPanels;
     }
 
     public SearchBarWidget getSearchBar() {

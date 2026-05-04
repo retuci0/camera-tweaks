@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.hud.elements;
 
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.ImageHudElement;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.InventoryUtil;
@@ -27,7 +27,7 @@ public class EchestElement extends ImageHudElement {
     }
 
     @Override
-    public void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud) {
+    public void renderInGame(GuiGraphicsExtractor gui, float delta, Hud hud) {
         if (!textureLoaded || !isVisible()) return;
 
         gui.blit(
@@ -54,7 +54,7 @@ public class EchestElement extends ImageHudElement {
     }
 
     @Override
-    public void renderInEditor(GuiGraphicsExtractor gui, HUD hud) {
+    public void renderInEditor(GuiGraphicsExtractor gui, Hud hud) {
         if (!textureLoaded) return;
 
         drawEditorBackground(gui);

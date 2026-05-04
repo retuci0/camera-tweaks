@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.widgets;
 
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
@@ -28,7 +28,7 @@ public abstract class Widget {
     public void mouseClicked(int mouseX, int mouseY, int button) {}
 
     public void mouseReleased(int mouseX, int mouseY, int button) {
-        ClickGUI.INSTANCE.unselect(this);
+        ClickGui.INSTANCE.unselect(this);
     }
 
     public void mouseDragged(int mouseX, int mouseY) {}
@@ -36,7 +36,7 @@ public abstract class Widget {
     public void mouseScrolled(double amount) {}
 
     public boolean isHovered(int mouseX, int mouseY) {
-        if (!ClickGUI.INSTANCE.canSelect(this)) return false;
+        if (!ClickGui.INSTANCE.canSelect(this)) return false;
         return mouseX > x && mouseX < x + w &&
                 mouseY > y && mouseY < y + h;
     }

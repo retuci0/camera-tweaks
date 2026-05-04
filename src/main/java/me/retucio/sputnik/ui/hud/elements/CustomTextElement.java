@@ -3,7 +3,7 @@ package me.retucio.sputnik.ui.hud.elements;
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.sputnik.UpdateSettingEvent;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.TextHudElement;
 import net.minecraft.network.chat.Component;
 
@@ -16,13 +16,13 @@ public class CustomTextElement extends TextHudElement {
     }
 
     @Override
-    public String getText(float delta, HUD hud) {
+    public String getText(float delta, Hud hud) {
         return hud != null && hud.customText != null ? hud.customText.getValue() : "";
     }
 
     @Override
     public String getPreviewText() {
-        HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+        Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
         if (hud != null && hud.customText != null && !hud.customText.getValue().isEmpty())
             return hud.customText.getValue();
 
@@ -40,7 +40,7 @@ public class CustomTextElement extends TextHudElement {
     @EventListener
     public void onUpdateSetting(UpdateSettingEvent event) {
         if (ModuleManager.INSTANCE == null) return;
-        HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+        Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
         if (hud != null && event.getSetting() == hud.customText) {
             int newX = mc.getWindow().getGuiScaledWidth() / 2 - mc.font.width(hud.customText.getValue()) / 2;
             setPosition(newX, y);

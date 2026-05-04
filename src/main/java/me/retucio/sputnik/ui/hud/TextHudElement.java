@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.hud;
 
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
@@ -11,11 +11,11 @@ public abstract class TextHudElement extends HudElement {
         super(id, defaultX, defaultY);
     }
 
-    public abstract String getText(float delta, HUD hud);
+    public abstract String getText(float delta, Hud hud);
     public abstract String getPreviewText();
 
     @Override
-    public void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud) {
+    public void renderInGame(GuiGraphicsExtractor gui, float delta, Hud hud) {
         String text = getText(delta, hud);
         int color = hud != null ? hud.color.getValue().getRGB() : -1;
         boolean shadow = hud != null && hud.shadow.getValue();
@@ -23,7 +23,7 @@ public abstract class TextHudElement extends HudElement {
     }
 
     @Override
-    public void renderInEditor(GuiGraphicsExtractor gui, HUD hud) {
+    public void renderInEditor(GuiGraphicsExtractor gui, Hud hud) {
         String previewText = getPreviewText();
         w = mc.font.width(previewText);
         h = mc.font.lineHeight;

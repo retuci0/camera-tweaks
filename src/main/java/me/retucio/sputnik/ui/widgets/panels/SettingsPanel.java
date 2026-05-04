@@ -1,14 +1,14 @@
-package me.retucio.sputnik.ui.widgets.frames;
+package me.retucio.sputnik.ui.widgets.panels;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.sputnik.SettingsFrameEvent;
+import me.retucio.sputnik.event.sputnik.SettingsPanelEvent;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.*;
 import me.retucio.sputnik.module.setting.settings.*;
 import me.retucio.sputnik.ui.widgets.buttons.settings.*;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.widgets.buttons.*;
-import me.retucio.sputnik.ui.widgets.Frame;
+import me.retucio.sputnik.ui.widgets.Panel;
 import me.retucio.sputnik.util.Colors;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,13 +19,13 @@ import java.util.List;
 
 
 // marco para los botones de los ajustes de cada módulo
-public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
+public class SettingsPanel extends Panel<SettingButton<? extends Setting<?>>> {
 
     private Module module;
     protected List<SettingGroup> settingGroups;
     private static final int PADDING = 4; // para ser consistente
 
-    public SettingsFrame(Module module, int x, int y, int w, int h) {
+    public SettingsPanel(Module module, int x, int y, int w, int h) {
         super("ajustes de " + module.getName(), x, y, w, h);
         this.module = module;
         this.settingGroups = module.getSgs();
@@ -98,7 +98,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
         }
 
         // fondo del marco
-        gui.fill(x, descBoxTop - PADDING + 1, x + w, descBoxTop + totalHeight, Colors.frameBGColor.getRGB());
+        gui.fill(x, descBoxTop - PADDING + 1, x + w, descBoxTop + totalHeight, Colors.panelBgColor.getRGB());
 
         // fondo de la descripción
         gui.fill(x + PADDING, descBoxTop, x + w - PADDING, descBoxBottom, Colors.buttonColor.getRGB());
@@ -162,9 +162,9 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (isCloseButtonHovered(mouseX, mouseY)) {
-                ClickGUI.INSTANCE.closeSettingsFrame(this.module);
+                ClickGui.INSTANCE.closeSettingsPanel(this.module);
                 return;
             }
             if (button == 0) {
@@ -172,7 +172,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
                 dragX = mouseX - x;
                 dragY = mouseY - y;
             } else if (button == 1) {
-                ClickGUI.INSTANCE.closeSettingsFrame(module);
+                ClickGui.INSTANCE.closeSettingsPanel(module);
             }
         }
 
@@ -198,7 +198,7 @@ public class SettingsFrame extends Frame<SettingButton<? extends Setting<?>>> {
             dragging = false;
 
             if (isHovered(mouseX, mouseY)) {
-                Sputnik.EVENT_BUS.post(new SettingsFrameEvent.Move(this));
+                Sputnik.EVENT_BUS.post(new SettingsPanelEvent.Move(this));
             }
         }
 

@@ -2,7 +2,7 @@ package me.retucio.sputnik.ui.hud;
 
 import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.elements.*;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -75,7 +75,7 @@ public class HudRenderer {
     }
 
 
-    public static Color getColor(HUD hud) {
+    public static Color getColor(Hud hud) {
         return hud.color.getValue();
     }
 
@@ -94,7 +94,7 @@ public class HudRenderer {
     }
 
     public static void render(GuiGraphicsExtractor gui, DeltaTracker dt) {
-        HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+        Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
 
         for (HudElement element : elements) {
             if (element.isVisible() && !shouldSkipRendering()) {
@@ -104,7 +104,7 @@ public class HudRenderer {
     }
 
     private static boolean shouldSkipRendering() {
-        HUD hud = ModuleManager.INSTANCE.getModuleByClass(HUD.class);
+        Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
         return ModuleManager.INSTANCE == null
                 || mc.player == null
                 || mc.getCameraEntity() == null

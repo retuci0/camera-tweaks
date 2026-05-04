@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.hud.elements;
 
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.TextHudElement;
 import net.minecraft.network.chat.Component;
 
@@ -14,7 +14,7 @@ public class FpsElement extends TextHudElement {
     }
 
     @Override
-    public String getText(float delta, HUD hud) {
+    public String getText(float delta, Hud hud) {
         return "FPS: " + mc.getFps();
     }
 

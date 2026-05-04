@@ -1,4 +1,4 @@
-# v4.5
+# v4.6
 
 ## novedades
 
@@ -8,14 +8,14 @@
 
 ### arreglos / mejoras
 
-- zoom ahora ya sí que ya funciona
-- arreglado el movimiento laggy de cámara libre
-- las cabezas de chatplus ya se renderizan correctamente
+- el editor del hud por defecto ahora se abre con `insertar` (no confundir con `enter`)
+- renombrado todos los `frame`s a `panel`s
+- `colocar en aire` ya funciona correctamente
+- `delay de paquetes` no _debería_ de crashear el juego ya
 
 ## problemas reconocidos
 
 - lo de siempre, además de:
-  - `colocar en aire` no funciona si el bloque está muy cerca, aunque no colisione con el jugador
   - `delay de paquetes` puede crashear el juego
   - `inventario plus` no funciona en creativo
   - `RPC de Discord` no funciona e incluso puede provocar crashes

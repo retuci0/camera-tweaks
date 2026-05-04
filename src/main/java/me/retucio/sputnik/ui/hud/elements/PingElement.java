@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.hud.elements;
 
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.TextHudElement;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
@@ -15,7 +15,7 @@ public class PingElement extends TextHudElement {
     }
 
     @Override
-    public String getText(float delta, HUD hud) {
+    public String getText(float delta, Hud hud) {
         if (mc.getConnection() == null || mc.player == null) return "? ms";
         if (mc.isSingleplayer()) return "-1 ms";
 

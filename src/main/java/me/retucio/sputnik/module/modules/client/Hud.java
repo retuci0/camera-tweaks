@@ -21,7 +21,7 @@ import java.awt.*;
  * @author retucio
  */
 
-public class HUD extends Module {
+public class Hud extends Module {
 
     private final SettingGroup sgEditor = addSg(new SettingGroup("editor", true));
     private final SettingGroup sgDisplay = addSg(new SettingGroup("visualización", true));
@@ -31,7 +31,7 @@ public class HUD extends Module {
     public KeySetting editorKey = sgEditor.add(new KeySetting(
             "tecla del editor",
             "tecla asignada al editor de elementos del hud",
-            GLFW.GLFW_KEY_PAGE_UP
+            GLFW.GLFW_KEY_INSERT
     ));
 
     public BooleanSetting axialMovement = sgEditor.add(new BooleanSetting(
@@ -126,7 +126,7 @@ public class HUD extends Module {
             Dynosaurs.class, Dynosaurs.SPINOSAURUS
     ));
 
-    public HUD() {
+    public Hud() {
         super("HUD",
                 "superposición de la pantalla con info. adicional",
                 Category.CLIENT,

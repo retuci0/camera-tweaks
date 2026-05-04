@@ -31,8 +31,8 @@ public class BinarySerializer {
             // mapas
             writeStringBooleanMap(out, config.moduleStates);
             writeSettingsMap(out, config.settings);
-            writeStringIntArrayMap(out, config.settingsFrames);
-            writeExtendableFrames(out, config.extendableFrames);
+            writeStringIntArrayMap(out, config.settingsPanels);
+            writeExtendableFrames(out, config.extendablePanels);
             writeStringIntArrayMap(out, config.hudPositions);
             writeStringBooleanMap(out, config.hudVisibilities);
             writeStringStringMap(out, config.hudImagePaths);
@@ -77,8 +77,8 @@ public class BinarySerializer {
             // leer mapas
             config.moduleStates = readStringBooleanMap(in);
             config.settings = readSettingsMap(in);
-            config.settingsFrames = readStringIntArrayMap(in);
-            config.extendableFrames = readExtendableFrames(in);
+            config.settingsPanels = readStringIntArrayMap(in);
+            config.extendablePanels = readExtendablePanels(in);
             config.hudPositions = readStringIntArrayMap(in);
             config.hudVisibilities = readStringBooleanMap(in);
             config.hudImagePaths = readStringStringMap(in);
@@ -281,32 +281,32 @@ public class BinarySerializer {
         return map;
     }
 
-    private static void writeExtendableFrames(DataOutputStream out, Map<String, ClientConfig.FrameData> map)
+    private static void writeExtendableFrames(DataOutputStream out, Map<String, ClientConfig.PanelData> map)
             throws IOException {
         if (map == null) {
             out.writeInt(0);
             return;
         }
         out.writeInt(map.size());
-        for (Map.Entry<String, ClientConfig.FrameData> entry : map.entrySet()) {
+        for (Map.Entry<String, ClientConfig.PanelData> entry : map.entrySet()) {
             writeString(out, entry.getKey());
-            ClientConfig.FrameData data = entry.getValue();
+            ClientConfig.PanelData data = entry.getValue();
             out.writeInt(data.x());
             out.writeInt(data.y());
             out.writeBoolean(data.extended());
         }
     }
 
-    private static Map<String, ClientConfig.FrameData> readExtendableFrames(DataInputStream in)
+    private static Map<String, ClientConfig.PanelData> readExtendablePanels(DataInputStream in)
             throws IOException {
         int size = in.readInt();
-        Map<String, ClientConfig.FrameData> map = new HashMap<>(size);
+        Map<String, ClientConfig.PanelData> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
             String key = readString(in);
             int x = in.readInt();
             int y = in.readInt();
             boolean extended = in.readBoolean();
-            map.put(key, new ClientConfig.FrameData(x, y, extended));
+            map.put(key, new ClientConfig.PanelData(x, y, extended));
         }
         return map;
     }

@@ -5,8 +5,8 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.OptionSetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,7 +22,7 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
     private final Module dummy;
     private final Map<T, BooleanSetting> optionButtons = new HashMap<>();
 
-    public ChooseButton(OptionSetting<T> setting, SettingsFrame parent, int offset) {
+    public ChooseButton(OptionSetting<T> setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
 
@@ -54,10 +54,10 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             // click izquierdo / derecho: abrir marco
             if (button <= 1 && !KeyUtil.isShiftDown()) {
-                openFrame();
+                openPanel();
                 // shift + clic derecho: restablecer valores
             } else if (button == 1 && KeyUtil.isShiftDown()) {
                 setting.reset();
@@ -109,15 +109,15 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
         }
     }
 
-    public void openFrame() {
-        if (ClickGUI.INSTANCE.isSettingsFrameOpen(dummy)) {
-            ClickGUI.INSTANCE.closeSettingsFrame(dummy);
+    public void openPanel() {
+        if (ClickGui.INSTANCE.isSettingsPanelOpen(dummy)) {
+            ClickGui.INSTANCE.closeSettingsPanel(dummy);
             return;
         }
 
         rebuildDummy();
 
-        ClickGUI.INSTANCE.openListSettingsFrame(
+        ClickGui.INSTANCE.openListSettingsPanel(
                 dummy,
                 parent.getX() + 40,
                 parent.getY() + 40

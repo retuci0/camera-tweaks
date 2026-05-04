@@ -1,7 +1,7 @@
 package me.retucio.sputnik.ui.widgets.buttons;
 
 import me.retucio.sputnik.module.setting.Setting;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.ui.widgets.Button;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -11,7 +11,7 @@ public abstract class SettingButton<S extends Setting<?>> extends Button {
 
     protected S setting;
 
-    public SettingButton(S setting, SettingsFrame parent, int offset) {
+    public SettingButton(S setting, SettingsPanel parent, int offset) {
         super(parent, offset);
         this.setting = setting;
     }

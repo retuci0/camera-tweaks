@@ -1,7 +1,7 @@
 package me.retucio.sputnik.ui.widgets.misc;
 
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.ui.widgets.Widget;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -24,7 +24,7 @@ public class ScrollBarWidget extends Widget {
 
     @Override
     public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
-        if (contentHeight <= windowHeight || !ClientSettingsFrame.guiSettings.scrollBar.getValue()) return;
+        if (contentHeight <= windowHeight || !ClientSettingsPanel.clientSettings.scrollBar.getValue()) return;
 
         int trackX1 = mc.getWindow().getGuiScaledWidth() - 10;
         int trackX2 = trackX1 + 10;
@@ -45,8 +45,8 @@ public class ScrollBarWidget extends Widget {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (button != 0 || !ClientSettingsFrame.guiSettings.scrollBar.getValue()) return;
-        if (isThumbHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (button != 0 || !ClientSettingsPanel.clientSettings.scrollBar.getValue()) return;
+        if (isThumbHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             dragging = true;
             dragY = mouseY;
             scrollStart = scrollOffset;
@@ -55,13 +55,13 @@ public class ScrollBarWidget extends Widget {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
-        ClickGUI.INSTANCE.unselect(this);
+        ClickGui.INSTANCE.unselect(this);
         dragging = false;
     }
 
     @Override
     public void mouseDragged(int mouseX, int mouseY) {
-        if (!dragging || !ClientSettingsFrame.guiSettings.scrollBar.getValue()) return;
+        if (!dragging || !ClientSettingsPanel.clientSettings.scrollBar.getValue()) return;
 
         int thumbHeight = getThumbHeight();
         int trackHeight = windowHeight - thumbHeight;
@@ -80,7 +80,7 @@ public class ScrollBarWidget extends Widget {
     }
 
     private boolean isThumbHovered(double mouseX, double mouseY) {
-        if (!ClickGUI.INSTANCE.canSelect(this)) return false;
+        if (!ClickGui.INSTANCE.canSelect(this)) return false;
         int trackX1 = mc.getWindow().getGuiScaledWidth() - 10;
         int trackX2 = trackX1 + 10;
         int thumbY = getThumbY();

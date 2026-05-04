@@ -2,7 +2,7 @@ package me.retucio.sputnik.ui.screen;
 
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.module.modules.inventory.ShulkerPeek;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -124,7 +124,7 @@ public class PreviewScreen extends Screen {
 
     @Override
     public void extractBlurredBackground(@NonNull GuiGraphicsExtractor gui) {
-        if (ClientSettingsFrame.guiSettings.blur.getValue()) super.extractBlurredBackground(gui);
+        if (ClientSettingsPanel.clientSettings.blur.getValue()) super.extractBlurredBackground(gui);
     }
 
     @Override

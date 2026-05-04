@@ -1,8 +1,8 @@
 package me.retucio.sputnik.ui.widgets.buttons;
 
 import me.retucio.sputnik.module.Module;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.ModuleFrame;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.ModulePanel;
 import me.retucio.sputnik.ui.widgets.Button;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -15,7 +15,7 @@ public class ModuleButton extends Button {
     private final Module module;
     public final int height = 18;
 
-    public ModuleButton(Module module, ModuleFrame parent, int offset) {
+    public ModuleButton(Module module, ModulePanel parent, int offset) {
         super(parent, offset);
         this.module = module;
     }
@@ -45,14 +45,14 @@ public class ModuleButton extends Button {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (button == 0) {  // clic izquierdo para activar / desactivar el módulo
                 module.toggle();
             } else if (button == 1) {  // clic derecho para el marco de ajustes (también lo cierra si está abierto)
-                if (ClickGUI.INSTANCE.isSettingsFrameOpen(module)) {
-                    ClickGUI.INSTANCE.closeSettingsFrame(module);
+                if (ClickGui.INSTANCE.isSettingsPanelOpen(module)) {
+                    ClickGui.INSTANCE.closeSettingsPanel(module);
                 } else {
-                    ClickGUI.INSTANCE.openSettingsFrame(
+                    ClickGui.INSTANCE.openSettingsPanel(
                             module,
                             parent.getX() + parent.getW() + 120,
                             parent.getY() + offset
@@ -65,7 +65,7 @@ public class ModuleButton extends Button {
     // verifica si el puntero del ratón se encuentra sobre el botón del módulo
     @Override
     public boolean isHovered(int mouseX, int mouseY) {
-        return ClickGUI.INSTANCE.canSelect(this)
+        return ClickGui.INSTANCE.canSelect(this)
                 && mouseX > parent.getX()
                 && mouseX < parent.getX() + parent.getW()
                 && mouseY > parent.getRenderY() + offset

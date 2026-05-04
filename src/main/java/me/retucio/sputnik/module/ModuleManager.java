@@ -3,7 +3,7 @@ package me.retucio.sputnik.module;
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.module.modules.client.DiscordRPC;
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.module.modules.camera.*;
 import me.retucio.sputnik.module.modules.combat.*;
 import me.retucio.sputnik.module.modules.inventory.*;
@@ -78,7 +78,7 @@ public class ModuleManager {
 
     private void addClient() {
         add(new DiscordRPC());
-        add(new HUD());
+        add(new Hud());
     }
 
     private void addCombat() {

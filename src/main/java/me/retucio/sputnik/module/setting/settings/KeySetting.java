@@ -3,13 +3,9 @@ package me.retucio.sputnik.module.setting.settings;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.setting.Setting;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
 import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.KeyUtil;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Objects;
-import java.util.function.Consumer;
 
 public class KeySetting extends Setting<Integer> {
 

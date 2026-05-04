@@ -4,20 +4,20 @@ import net.minecraft.ChatFormatting;
 
 import java.awt.Color;
 
-import static me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame.guiSettings;
+import static me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel.clientSettings;
 
 
 // clase para los colores
 // si se ve especificado como color en algún lado "-1", significa blanco
 public class Colors {
 
-    public static int red = guiSettings.color.getR();
-    public static int green = guiSettings.color.getG();
-    public static int blue = guiSettings.color.getB();
-    public static int alpha = guiSettings.color.getA();
+    public static int red = clientSettings.color.getR();
+    public static int green = clientSettings.color.getG();
+    public static int blue = clientSettings.color.getB();
+    public static int alpha = clientSettings.color.getA();
 
     public static Color mainColor;
-    public static Color frameBGColor = new Color(40, 40, 40, 75);
+    public static Color panelBgColor = new Color(40, 40, 40, 75);
     public static Color buttonColor = new Color(75, 75, 75, 100);
     public static Color hudEditorScreenBackgroundColor = new Color(0, 0, 0, 120);
     public static Color instructionsTextColor = new Color(190, 190, 190, 255);

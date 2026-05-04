@@ -1,10 +1,10 @@
 package me.retucio.sputnik.ui.widgets.buttons.settings;
 
 import me.retucio.sputnik.module.setting.settings.NumberSetting;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.KeyUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -20,7 +20,7 @@ public class SliderButton extends SettingButton<NumberSetting> {
     private boolean dragging = false;
     public final DecimalFormat df;  // usar formato decimal para el valor del ajuste
 
-    public SliderButton(NumberSetting setting, SettingsFrame parent, int offset) {
+    public SliderButton(NumberSetting setting, SettingsPanel parent, int offset) {
         super(setting, parent, offset);
         this.setting = setting;
         this.df = new DecimalFormat("#.##");  // solo mostrar dos décimales
@@ -61,13 +61,13 @@ public class SliderButton extends SettingButton<NumberSetting> {
         // de no ser de esto, si se cierra la interfaz sin haber soltado el ratón mientras se arrastraba el valor,
         // al reabrir la interfaz se seguía arrastrando, aun habiendo soltado ya el clic
         if (key == GLFW.GLFW_KEY_ESCAPE
-                || key == ClientSettingsFrame.guiSettings.getKey())
+                || key == ClientSettingsPanel.clientSettings.getKey())
             dragging = false;
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (button == 0) dragging = true;  // arrastrar con el clic izquierdo
             else if (button == 1 && KeyUtil.isShiftDown())
                 // restablecer al valor por defecto con shift + clic derecho

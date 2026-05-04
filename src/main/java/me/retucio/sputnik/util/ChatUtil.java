@@ -4,7 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.command.CommandManager;
 import me.retucio.sputnik.event.sputnik.LoadModuleManagerEvent;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -16,7 +16,7 @@ public class ChatUtil {
     private static String prefix = getDefaultPrefix();
 
     public static void onLoadModuleManager(LoadModuleManagerEvent event) {
-        prefix = Colors.getFormatting(Colors.mainColor) + "[" + ClientSettingsFrame.guiSettings.chatName.getValue() + "] ";
+        prefix = Colors.getFormatting(Colors.mainColor) + "[" + ClientSettingsPanel.clientSettings.chatName.getValue() + "] ";
     }
 
     public static void simulateChatMessage(String message) {
@@ -80,7 +80,7 @@ public class ChatUtil {
     }
 
     public static String getJustPrefix() {
-        return ClientSettingsFrame.guiSettings.chatName.getValue();
+        return ClientSettingsPanel.clientSettings.chatName.getValue();
     }
 
     public static String getPrefixNoFormatting() {

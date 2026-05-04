@@ -7,11 +7,11 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.setting.*;
 import me.retucio.sputnik.module.setting.settings.*;
-import me.retucio.sputnik.ui.widgets.Frame;
-import me.retucio.sputnik.ui.widgets.frames.ModuleFrame;
-import me.retucio.sputnik.ui.screen.ClickGUI;
-import me.retucio.sputnik.ui.widgets.frames.settings.ClientSettingsFrame;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
+import me.retucio.sputnik.ui.widgets.Panel;
+import me.retucio.sputnik.ui.widgets.panels.ModulePanel;
+import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 
 import java.io.File;
 import java.io.FileReader;
@@ -83,10 +83,10 @@ public class ConfigManager {
 
         applyModuleStates();
         applyModuleSettings();
-        applySettingsFrames();
+        applySettingsPanels();
         applySearchBarPosition();
-        applyGuiSettings();
-        applyExtendableFrames();
+        applyClientSettings();
+        applyExtendablePanels();
 
         loaded = true;
         Sputnik.LOGGER.info("ajustes aplicados");
@@ -113,18 +113,18 @@ public class ConfigManager {
         save();
     }
 
-    public static void setFramePosition(SettingsFrame frame) {
+    public static void setPanelPosition(SettingsPanel frame) {
         ensureConfig();
-        if (!config.settingsFrames.containsKey(frame.getModule().getName()))
-            config.settingsFrames.put(frame.getModule().getName(), new int[] {frame.getX(), frame.getY()});
+        if (!config.settingsPanels.containsKey(frame.getModule().getName()))
+            config.settingsPanels.put(frame.getModule().getName(), new int[] {frame.getX(), frame.getY()});
         else
-            config.settingsFrames.replace(frame.getModule().getName(), new int[] {frame.getX(), frame.getY()});
+            config.settingsPanels.replace(frame.getModule().getName(), new int[] {frame.getX(), frame.getY()});
         save();
     }
 
-    public static void setExtendableFrame(String key, ClientConfig.FrameData data) {
+    public static void setExtendablePanel(String key, ClientConfig.PanelData data) {
         ensureConfig();
-        config.extendableFrames.put(key, data);
+        config.extendablePanels.put(key, data);
         save();
     }
 
@@ -186,8 +186,8 @@ public class ConfigManager {
         Sputnik.LOGGER.info("ajustes de módulos aplicados");
     }
 
-    private static void applySettingsFrames() {
-        config.settingsFrames.forEach((moduleName, position) -> {
+    private static void applySettingsPanels() {
+        config.settingsPanels.forEach((moduleName, position) -> {
             Module module = ModuleManager.INSTANCE.getModuleByName(moduleName);
 
             if (module == null) {
@@ -195,7 +195,7 @@ public class ConfigManager {
                 return;
             }
 
-            ClickGUI.INSTANCE.openSettingsFrame(module, position[0], position[1]);
+            ClickGui.INSTANCE.openSettingsPanel(module, position[0], position[1]);
         });
 
         Sputnik.LOGGER.info("estados de marcos de ajustes aplicados");
@@ -203,44 +203,44 @@ public class ConfigManager {
 
     private static void applySearchBarPosition() {
         if (config.searchBarPosition != null && config.searchBarPosition.length == 2) {
-            ClickGUI.INSTANCE.getSearchBar().setX(config.searchBarPosition[0]);
-            ClickGUI.INSTANCE.getSearchBar().setY(config.searchBarPosition[1]);
+            ClickGui.INSTANCE.getSearchBar().setX(config.searchBarPosition[0]);
+            ClickGui.INSTANCE.getSearchBar().setY(config.searchBarPosition[1]);
         }
         Sputnik.LOGGER.info("posición de la barra de búsqueda aplicada");
     }
 
-    private static void applyGuiSettings() {
-        ClientSettingsFrame.guiSettings.setEnabled(true);
-        ClientSettingsFrame.guiSettings.getSettings().forEach(setting -> {
-            applySetting(ClientSettingsFrame.guiSettings, setting);
+    private static void applyClientSettings() {
+        ClientSettingsPanel.clientSettings.setEnabled(true);
+        ClientSettingsPanel.clientSettings.getSettings().forEach(setting -> {
+            applySetting(ClientSettingsPanel.clientSettings, setting);
         });
         Sputnik.LOGGER.info("ajustes del cliente aplicados");
     }
 
-    private static void applyExtendableFrames() {
-        applyExtendableFrame(ClickGUI.INSTANCE.getModulesFrame());
-        applyExtendableFrame(ClickGUI.INSTANCE.getGuiSettingsFrame());
+    private static void applyExtendablePanels() {
+        applyExtendablePanel(ClickGui.INSTANCE.getModulesPanel());
+        applyExtendablePanel(ClickGui.INSTANCE.getClientSettingsPanel());
 
         Sputnik.LOGGER.info("posiciones de marcos extendibles aplicadas");
-        ClickGUI.INSTANCE.refreshListButtons();
+        ClickGui.INSTANCE.refreshListButtons();
     }
 
-    private static void applyExtendableFrame(Frame<?> frame) {
-        ClientConfig.FrameData frameData = null;
-        if (frame instanceof ModuleFrame)
-            frameData = config.extendableFrames.get("M");
+    private static void applyExtendablePanel(Panel<?> panel) {
+        ClientConfig.PanelData panelData = null;
+        if (panel instanceof ModulePanel)
+            panelData = config.extendablePanels.get("M");
 
-        if (frame instanceof ClientSettingsFrame)
-            frameData = config.extendableFrames.get("S");
+        if (panel instanceof ClientSettingsPanel)
+            panelData = config.extendablePanels.get("S");
 
-        if (frameData != null) {
-            frame.setX(frameData.x());
-            frame.setY(frameData.y());
+        if (panelData != null) {
+            panel.setX(panelData.x());
+            panel.setY(panelData.y());
 
-            if (frame instanceof ModuleFrame mFrame)
-                mFrame.extended = frameData.extended();
-            if (frame instanceof ClientSettingsFrame sFrame)
-                sFrame.extended = frameData.extended();
+            if (panel instanceof ModulePanel mFrame)
+                mFrame.extended = panelData.extended();
+            if (panel instanceof ClientSettingsPanel sFrame)
+                sFrame.extended = panelData.extended();
         }
     }
 

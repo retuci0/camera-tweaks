@@ -1,22 +1,22 @@
-package me.retucio.sputnik.ui.widgets.frames.settings;
+package me.retucio.sputnik.ui.widgets.panels.settings;
 
 import me.retucio.sputnik.Sputnik;
-import me.retucio.sputnik.event.sputnik.GUISettingsFrameEvent;
-import me.retucio.sputnik.module.modules.client.GUI;
+import me.retucio.sputnik.event.sputnik.ClientSettingsPanelEvent;
+import me.retucio.sputnik.module.modules.client.ClientSettingsModule;
 import me.retucio.sputnik.module.setting.SettingGroup;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
-public class ClientSettingsFrame extends SettingsFrame {
+public class ClientSettingsPanel extends SettingsPanel {
 
-    public static final GUI guiSettings = new GUI();
+    public static final ClientSettingsModule clientSettings = new ClientSettingsModule();
     public boolean extended = false;
 
-    public ClientSettingsFrame(int x, int y, int w, int h) {
-        super(guiSettings, x, y, w, h);
+    public ClientSettingsPanel(int x, int y, int w, int h) {
+        super(clientSettings, x, y, w, h);
         title = "ajustes del mod";
     }
 
@@ -46,14 +46,14 @@ public class ClientSettingsFrame extends SettingsFrame {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (button == 0) {
                 dragging = true;
                 dragX = mouseX - x;
                 dragY = mouseY - y;
             } else if (button == 1) {
                 extended = !extended;
-                Sputnik.EVENT_BUS.post(new GUISettingsFrameEvent.Extend());
+                Sputnik.EVENT_BUS.post(new ClientSettingsPanelEvent.Extend());
             }
         }
 
@@ -76,9 +76,9 @@ public class ClientSettingsFrame extends SettingsFrame {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
-        ClickGUI.INSTANCE.unselect(this);
+        ClickGui.INSTANCE.unselect(this);
         if (button == 0 && dragging)
-            Sputnik.EVENT_BUS.post(new GUISettingsFrameEvent.Move());
+            Sputnik.EVENT_BUS.post(new ClientSettingsPanelEvent.Move());
 
         super.mouseReleased(mouseX, mouseY, button);
     }

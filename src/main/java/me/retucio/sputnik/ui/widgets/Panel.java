@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class Frame<B extends Button> extends Widget  {
+public abstract class Panel<B extends Button> extends Widget  {
 
     protected String title;
 
@@ -19,7 +19,7 @@ public abstract class Frame<B extends Button> extends Widget  {
     protected int dragX, dragY;
     protected boolean dragging;
 
-    public Frame(String title, int x, int y, int w, int h) {
+    public Panel(String title, int x, int y, int w, int h) {
         super(x, y, w, h);
         this.title = title;
     }

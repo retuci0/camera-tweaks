@@ -1,6 +1,6 @@
 package me.retucio.sputnik.ui.hud;
 
-import me.retucio.sputnik.module.modules.client.HUD;
+import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.widgets.Widget;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -22,8 +22,8 @@ public abstract class HudElement extends Widget {
         this.visible = true;
     }
 
-    public abstract void renderInGame(GuiGraphicsExtractor gui, float delta, HUD hud);
-    public abstract void renderInEditor(GuiGraphicsExtractor gui, HUD hud);
+    public abstract void renderInGame(GuiGraphicsExtractor gui, float delta, Hud hud);
+    public abstract void renderInEditor(GuiGraphicsExtractor gui, Hud hud);
     public abstract List<Component> getTooltip();
 
     public String getId() { return id; }

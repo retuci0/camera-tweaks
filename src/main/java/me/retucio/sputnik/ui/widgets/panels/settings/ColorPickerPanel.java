@@ -1,4 +1,4 @@
-package me.retucio.sputnik.ui.widgets.frames.settings;
+package me.retucio.sputnik.ui.widgets.panels.settings;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
@@ -9,8 +9,8 @@ import me.retucio.sputnik.module.setting.settings.NumberSetting;
 import me.retucio.sputnik.ui.widgets.buttons.*;
 import me.retucio.sputnik.ui.widgets.buttons.settings.SliderButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.ToggleButton;
-import me.retucio.sputnik.ui.widgets.frames.SettingsFrame;
-import me.retucio.sputnik.ui.screen.ClickGUI;
+import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
+import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.util.Colors;
 import me.retucio.sputnik.util.render.DrawUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -18,7 +18,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import java.awt.*;
 
 
-public class ColorPickerFrame extends SettingsFrame {
+public class ColorPickerPanel extends SettingsPanel {
 
     private final ColorSetting colorSetting;
     private Color currentColor;
@@ -39,7 +39,7 @@ public class ColorPickerFrame extends SettingsFrame {
 
     public final Module dummyModule;
 
-    public ColorPickerFrame(Module module, ColorSetting colorSetting, int x, int y, int w, int h) {
+    public ColorPickerPanel(Module module, ColorSetting colorSetting, int x, int y, int w, int h) {
         super(module, x, y, w, h);
 
         this.colorSetting = colorSetting;
@@ -175,7 +175,7 @@ public class ColorPickerFrame extends SettingsFrame {
         int bgY2 = bgY1 + previewHeight + saturationBrightnessPickerHeight + alphaPickerHeight
                 + buttonAreaHeight + (padding * 6) - 11;
 
-        gui.fill(bgX1, bgY1, bgX2, bgY2, Colors.frameBGColor.getRGB());
+        gui.fill(bgX1, bgY1, bgX2, bgY2, Colors.panelBgColor.getRGB());
 
         DrawUtil.drawBorder(gui, previewX, previewY, previewWidth, previewHeight, -1);
 
@@ -314,9 +314,9 @@ public class ColorPickerFrame extends SettingsFrame {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (isHovered(mouseX, mouseY) && ClickGUI.INSTANCE.trySelect(this)) {
+        if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
             if (isCloseButtonHovered(mouseX, mouseY)) {
-                ClickGUI.INSTANCE.closeSettingsFrame(this.dummyModule);
+                ClickGui.INSTANCE.closeSettingsPanel(this.dummyModule);
                 return;
             }
             if (button == 0) {
@@ -324,7 +324,7 @@ public class ColorPickerFrame extends SettingsFrame {
                 dragX = (int) (mouseX - x);
                 dragY = (int) (mouseY - y);
             } else if (button == 1) {
-                ClickGUI.INSTANCE.closeSettingsFrame(dummyModule);
+                ClickGui.INSTANCE.closeSettingsPanel(dummyModule);
             }
         }
 

@@ -30,16 +30,25 @@ public class AirPlace extends Module {
 
 
     // general
+
     private final NumberSetting range = sgGeneral.add(new NumberSetting(
             "rango",
             "distancia a la que colocar el bloque",
+            4,
             1,
-            4,
-            4,
+            8,
             1
     ));
 
+    private final BooleanSetting placeNormallyIfInRange = sgGeneral.add(new BooleanSetting(
+            "colocar con normalidad",
+            "colocar con normalidad si ya se está mirando a un bloque en rango",
+            true
+    ));
+
+
     // scroll
+
     private final KeySetting scrollKey = sgScroll.add(new KeySetting(
             "tecla del scroll",
             "tecla a mantener para que el scroll funcione",
@@ -55,7 +64,9 @@ public class AirPlace extends Module {
             0.1
     ));
 
-    // extractRenderState
+
+    // renderizado
+
     private final BooleanSetting outlines = sgRender.add(new BooleanSetting(
             "contorno",
             "renderizar contorno de la caja de prev.",
@@ -108,6 +119,8 @@ public class AirPlace extends Module {
     @EventListener
     private void onUseItem(UseItemEvent event) {
         if (!(result instanceof BlockHitResult bhr) || !(event.getStack().getItem() instanceof BlockItem)) return;
+        if (mc.hitResult != null && mc.hitResult.getType() != HitResult.Type.MISS && placeNormallyIfInRange.getValue()) return;
+
         Vec3 hitPos = Vec3.atCenterOf(bhr.getBlockPos());
 
         BlockHitResult result = new BlockHitResult(
@@ -138,9 +151,11 @@ public class AirPlace extends Module {
                 || !mc.level.getBlockState(bhr.getBlockPos()).canBeReplaced())
             return;
 
-        if (outlines.getValue())
-            RenderUtil.drawBlockOutline(event.getMatrices(), bhr.getBlockPos(), outlineColor.getValue(),  lineWidth.getFloatValue(), false);
-        if (filling.getValue())
+        if (outlines.getValue()) {
+            RenderUtil.drawBlockOutline(event.getMatrices(), bhr.getBlockPos(), outlineColor.getValue(), lineWidth.getFloatValue(), false);
+        }
+        if (filling.getValue()) {
             RenderUtil.drawBlockFilled(event.getMatrices(), bhr.getBlockPos(), fillingColor.getValue(), false);
+        }
     }
 }
