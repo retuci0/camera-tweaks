@@ -2,6 +2,7 @@ package me.retucio.sputnik.module.modules.combat;
 
 import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.render.Render3DEvent;
+import me.retucio.sputnik.friend.FriendManager;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.SettingGroup;
@@ -53,6 +54,12 @@ public class CrystalAura extends Module {
             "rango",
             "rango de detección de blancos",
             5, 0, 12, 0.1
+    ));
+
+    private final BooleanSetting ignoreFriends = sgGeneral.add(new BooleanSetting(
+            "ignorar amigos",
+            "no targetear amigos",
+            true
     ));
 
 
@@ -296,6 +303,7 @@ public class CrystalAura extends Module {
             if (!entity.isAlive() || entity.hasInfiniteMaterials() || entity.equals(mc.player)) continue;
             if (!entities.isEnabled(entity.getType())) continue;
             if (entity.distanceToSqr(mc.player) > targetRange.getValue() * targetRange.getValue()) continue;
+            if (ignoreFriends.getValue() && FriendManager.INSTANCE.isFriend(entity)) continue;
             targets.add(entity);
         }
     }

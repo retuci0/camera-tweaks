@@ -2,13 +2,15 @@ package me.retucio.sputnik.config;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BinarySerializer {
 
-    private static final int MAGIC_NUMBER = 0x53505554; // "SPUT"
-    private static final int VERSION = 1;
+    private static final int MAGIC_NUMBER = 0x53505554;  // "SPUT"
+    private static final int VERSION = 2;
 
     private static final byte TYPE_NULL = 0;
     private static final byte TYPE_BOOLEAN = 1;
@@ -36,6 +38,7 @@ public class BinarySerializer {
             writeStringIntArrayMap(out, config.hudPositions);
             writeStringBooleanMap(out, config.hudVisibilities);
             writeStringStringMap(out, config.hudImagePaths);
+            writeStringStringMap(out, config.friends);
 
             // posición de la barra de búsqueda
             if (config.searchBarPosition != null) {
@@ -82,6 +85,7 @@ public class BinarySerializer {
             config.hudPositions = readStringIntArrayMap(in);
             config.hudVisibilities = readStringBooleanMap(in);
             config.hudImagePaths = readStringStringMap(in);
+            config.friends = readStringStringMap(in);
 
             // leer pos. de la barra de búsqueda
             if (in.readBoolean()) {
@@ -297,8 +301,7 @@ public class BinarySerializer {
         }
     }
 
-    private static Map<String, ClientConfig.PanelData> readExtendablePanels(DataInputStream in)
-            throws IOException {
+    private static Map<String, ClientConfig.PanelData> readExtendablePanels(DataInputStream in) throws IOException {
         int size = in.readInt();
         Map<String, ClientConfig.PanelData> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
@@ -336,7 +339,6 @@ public class BinarySerializer {
         return map;
     }
 
-    // Optimized string writing (UTF-8 with length prefix)
     private static void writeString(DataOutputStream out, String str) throws IOException {
         if (str == null) {
             out.writeInt(-1);
@@ -352,6 +354,6 @@ public class BinarySerializer {
         if (length == -1) return null;
         byte[] bytes = new byte[length];
         in.readFully(bytes);
-        return new String(bytes, "UTF-8");
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }

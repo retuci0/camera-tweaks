@@ -1,7 +1,10 @@
 package me.retucio.sputnik.mixin.mixins.item;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.interact.DamageItemEvent;
+import me.retucio.sputnik.module.ModuleManager;
+import me.retucio.sputnik.module.modules.render.GlintPlus;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

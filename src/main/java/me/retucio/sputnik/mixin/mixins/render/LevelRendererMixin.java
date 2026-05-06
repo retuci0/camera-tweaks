@@ -10,7 +10,6 @@ import me.retucio.sputnik.event.render.Render3DEvent;
 import me.retucio.sputnik.event.render.RenderBlockOutlineEvent;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.camera.Freecam;
-import me.retucio.sputnik.module.modules.render.NoRender;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,7 +22,6 @@ import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import static me.retucio.sputnik.Sputnik.EVENT_BUS;

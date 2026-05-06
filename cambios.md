@@ -1,22 +1,22 @@
-# v4.6
+# v4.7
 
 ## novedades
 
 ### adiciones
 
+- sistema de amigos
+
 #### módulos nuevos:
+
+- amigos: añade o elimina amigos con la rueda del ratón, para evitar atacarles por accidente
 
 ### arreglos / mejoras
 
-- el editor del hud por defecto ahora se abre con `insertar` (no confundir con `enter`)
-- renombrado todos los `frame`s a `panel`s
-- `colocar en aire` ya funciona correctamente
-- `delay de paquetes` no _debería_ de crashear el juego ya
+- `destello de enchants.` ya funciona en items 2d
 
 ## problemas reconocidos
 
 - lo de siempre, además de:
-  - `delay de paquetes` puede crashear el juego
   - `inventario plus` no funciona en creativo
   - `RPC de Discord` no funciona e incluso puede provocar crashes
-  - `destello de enchants.` no funciona, solamente lo hace en la armadura equipada y en ítems translúcidos.
+  - las cajas `puntos de desconexión` están mal renderizadas

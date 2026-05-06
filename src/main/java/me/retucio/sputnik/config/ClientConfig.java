@@ -4,10 +4,13 @@ import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.sputnik.*;
 import me.retucio.sputnik.module.setting.settings.*;
 import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.util.ChatUtil;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static me.retucio.sputnik.Sputnik.EVENT_BUS;
@@ -39,6 +42,9 @@ public class ClientConfig {
 
     // posición de la barra de búsqueda (x, y)
     public int[] searchBarPosition = new int[] { 340, 16 };
+
+    // amigos: uuid -> nombre
+    public Map<String, String> friends = new HashMap<>();
 
     public ClientConfig() {
         EVENT_BUS.subscribe(this);
@@ -94,6 +100,7 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getModulesPanel().getX(),
                 ClickGui.INSTANCE.getModulesPanel().getY(),
                 ClickGui.INSTANCE.getModulesPanel().extended));
+        ConfigManager.save();
     }
 
     @EventListener
@@ -102,6 +109,7 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getModulesPanel().getX(),
                 ClickGui.INSTANCE.getModulesPanel().getY(),
                 ClickGui.INSTANCE.getModulesPanel().extended));
+        ConfigManager.save();
     }
 
     @EventListener
@@ -110,6 +118,7 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
                 ClickGui.INSTANCE.getClientSettingsPanel().extended));
+        ConfigManager.save();
     }
 
     @EventListener
@@ -118,6 +127,22 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
                 ClickGui.INSTANCE.getClientSettingsPanel().extended));
+        ConfigManager.save();
+    }
+
+    @EventListener
+    public void onAddFriend(FriendEvent.Add event) {
+        String uuid = event.getFriend().getUuid().toString();
+        String name = event.getFriend().getName();
+        if (!friends.containsKey(uuid)) {
+            friends.put(uuid, name);
+        }
+        ConfigManager.save();
+    }
+    @EventListener
+    public void onRemoveFriend(FriendEvent.Remove event) {
+        friends.remove(event.getFriend().getUuid().toString());
+        ConfigManager.save();
     }
 
     public record PanelData(int x, int y, boolean extended) implements Serializable {

@@ -3,6 +3,8 @@ package me.retucio.sputnik.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.retucio.sputnik.Sputnik;
+import me.retucio.sputnik.friend.Friend;
+import me.retucio.sputnik.friend.FriendManager;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.setting.*;
@@ -18,6 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 // se ocupa de guardar, cargar y aplicar ajustes
@@ -58,7 +61,7 @@ public class ConfigManager {
             }
         }
 
-        // Fallback to legacy JSON
+        // fallback to legacy JSON
         if (LEGACY_JSON_FILE.exists()) {
             try (FileReader reader = new FileReader(LEGACY_JSON_FILE)) {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -87,6 +90,7 @@ public class ConfigManager {
         applySearchBarPosition();
         applyClientSettings();
         applyExtendablePanels();
+        applyFriends();
 
         loaded = true;
         Sputnik.LOGGER.info("ajustes aplicados");
@@ -149,8 +153,17 @@ public class ConfigManager {
 
     // ------------------ APLICAR AJUSTES ------------------
 
+    public static void applyFriends() {
+        Sputnik.LOGGER.info("aplicando amigos: {}", config.friends);
+        config.friends.forEach((uuid, name) -> {
+            Friend friend = new Friend(UUID.fromString(uuid));
+            friend.setName(name);
+            FriendManager.INSTANCE.add(friend);
+        });
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void applySetting(Module parent, Setting<?> setting) {
+    public static void applySetting(Setting<?> setting) {
         String key = getSettingKey(setting);
 
         if (!config.settings.containsKey(key)) return;
@@ -181,7 +194,7 @@ public class ConfigManager {
 
     private static void applyModuleSettings() {
         ModuleManager.INSTANCE.getModules().forEach(module -> {
-            module.getSettings().forEach(setting -> applySetting(module, setting));
+            module.getSettings().forEach(ConfigManager::applySetting);
         });
         Sputnik.LOGGER.info("ajustes de módulos aplicados");
     }
@@ -211,9 +224,7 @@ public class ConfigManager {
 
     private static void applyClientSettings() {
         ClientSettingsPanel.clientSettings.setEnabled(true);
-        ClientSettingsPanel.clientSettings.getSettings().forEach(setting -> {
-            applySetting(ClientSettingsPanel.clientSettings, setting);
-        });
+        ClientSettingsPanel.clientSettings.getSettings().forEach(ConfigManager::applySetting);
         Sputnik.LOGGER.info("ajustes del cliente aplicados");
     }
 

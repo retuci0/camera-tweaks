@@ -108,6 +108,47 @@ public class EntityUtil {
         ));
     }
 
+    public static Vec3 getHorizontalVelocity(double bps) {
+        float yaw = mc.player.getYRot();
+
+        Vec3 forward = Vec3.directionFromRotation(0, yaw);
+        Vec3 right = Vec3.directionFromRotation(0, yaw + 90);
+        double velX = 0;
+        double velZ = 0;
+
+
+        boolean x = false;
+        if (mc.player.input.keyPresses.right()) {
+            velX += right.x / 20 * bps;
+            velZ += right.z / 20 * bps;
+            x = true;
+        }
+        if (mc.player.input.keyPresses.left()) {
+            velX -= right.x / 20 * bps;
+            velZ -= right.z / 20 * bps;
+            x = true;
+        }
+
+        boolean z = false;
+        if (mc.player.input.keyPresses.forward()) {
+            velX += forward.x / 20 * bps;
+            velZ += forward.z / 20 * bps;
+            z = true;
+        }
+        if (mc.player.input.keyPresses.backward()) {
+            velX -= forward.x / 20 * bps;
+            velZ -= forward.z / 20 * bps;
+            z = true;
+        }
+
+        if (x && z) {
+            velX /= Mth.SQRT_OF_TWO;
+            velZ /= Mth.SQRT_OF_TWO;
+        }
+
+        return new Vec3(velX, 0, velZ);
+    }
+
     public enum Target {
         HEAD,
         BODY,

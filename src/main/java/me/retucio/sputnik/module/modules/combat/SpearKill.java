@@ -1,5 +1,6 @@
 package me.retucio.sputnik.module.modules.combat;
 
+import me.retucio.sputnik.friend.FriendManager;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
@@ -30,7 +31,6 @@ public class SpearKill extends Module {
             true
     ));
 
-
     private final NumberSetting speed = sgGeneral.add(new NumberSetting(
             "velocidad",
             "velocidad del impulso",
@@ -38,6 +38,12 @@ public class SpearKill extends Module {
             1,
             15,
             0.2
+    ));
+
+    private final BooleanSetting ignoreFriends = sgGeneral.add(new BooleanSetting(
+            "ignorar amigos",
+            "no targetear amigos",
+            true
     ));
 
     private int heldTicks = 0;
@@ -106,18 +112,20 @@ public class SpearKill extends Module {
 
         List<Entity> candidates = mc.level.getEntities(mc.player,
                 mc.player.getBoundingBox().expandTowards(lookVec.scale(rayLength)),
-                e -> e instanceof LivingEntity && e.isAlive() && e != mc.player);
+                e -> e instanceof LivingEntity
+                        && e.isAlive() && e != mc.player
+                        && (!ignoreFriends.getValue() || FriendManager.INSTANCE.isFriend(e)));
 
         candidates.sort(Comparator.comparingDouble(e ->
                 eyePos.distanceToSqr(e.getBoundingBox().getCenter())));
 
         double coneAngle = 0.999;
-        for (Entity e : candidates) {
-            if (eyePos.distanceTo(e.getBoundingBox().getCenter()) > rayLength) break;
-            Vec3 toEntity = e.getBoundingBox().getCenter().subtract(eyePos).normalize();
+        for (Entity entity : candidates) {
+            if (eyePos.distanceTo(entity.getBoundingBox().getCenter()) > rayLength) break;
+            Vec3 toEntity = entity.getBoundingBox().getCenter().subtract(eyePos).normalize();
             if (lookVec.dot(toEntity) > coneAngle &&
-                    (!onlyPlayers.getValue() || e instanceof Player)) {
-                return e;
+                    (!onlyPlayers.getValue() || entity instanceof Player)) {
+                return entity;
             }
         }
 

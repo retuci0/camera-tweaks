@@ -58,4 +58,8 @@ public class FakePlayer extends Module {
         player.onClientRemoval();
         player = null;
     }
+
+    public RemotePlayer getPlayer() {
+        return player;
+    }
 }

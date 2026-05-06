@@ -36,6 +36,7 @@ public class CommandManager {
         addCommand(new ConfigCommand());
         addCommand(new CopyScreenshotCommand());
         addCommand(new EnderChestCommand());
+        addCommand(new FriendCommand());
         addCommand(new GarbageCleanerCommand());
         addCommand(new PeekCommand());
         addCommand(new PluginsCommand());

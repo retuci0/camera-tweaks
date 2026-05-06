@@ -10,11 +10,9 @@ import me.retucio.sputnik.config.ConfigManager;
 
 import me.retucio.sputnik.event.ShutdownEvent;
 import me.retucio.sputnik.event.interact.OpenScreenEvent;
-import me.retucio.sputnik.event.sputnik.LoadCapeManagerEvent;
-import me.retucio.sputnik.event.sputnik.LoadClickGuiEvent;
-import me.retucio.sputnik.event.sputnik.LoadCommandManagerEvent;
-import me.retucio.sputnik.event.sputnik.LoadModuleManagerEvent;
+import me.retucio.sputnik.event.sputnik.*;
 
+import me.retucio.sputnik.friend.FriendManager;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.Hud;
@@ -111,11 +109,16 @@ public class Sputnik implements ClientModInitializer {
         CommandManager.INSTANCE = new CommandManager();
         EVENT_BUS.post(new LoadCommandManagerEvent());
 
+        FriendManager.INSTANCE = new FriendManager();
+        EVENT_BUS.post(new LoadFriendManagerEvent());
+
         mc.execute(() -> {
             Textures.init();
+
             ClickGui.INSTANCE = new ClickGui();
             HudEditorScreen.INSTANCE = new HudEditorScreen();
             EVENT_BUS.post(new LoadClickGuiEvent());
+
             HudRenderer.init();
         });
 
