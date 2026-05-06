@@ -1,35 +1,39 @@
 package me.retucio.sputnik.ui.widgets.panels;
 
+import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.Sputnik;
+import me.retucio.sputnik.event.sputnik.FriendEvent;
+import me.retucio.sputnik.event.sputnik.FriendPanelEvent;
 import me.retucio.sputnik.event.sputnik.ModulePanelEvent;
-import me.retucio.sputnik.module.Module;
-import me.retucio.sputnik.module.ModuleManager;
+import me.retucio.sputnik.friend.Friend;
+import me.retucio.sputnik.friend.FriendManager;
 import me.retucio.sputnik.ui.screen.ClickGui;
-import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
 import me.retucio.sputnik.ui.widgets.Panel;
+import me.retucio.sputnik.ui.widgets.buttons.FriendButton;
+import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
 import me.retucio.sputnik.util.Colors;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
 
-// panel para los módulos
-public class ModulePanel extends Panel<ModuleButton> {
+public class FriendsPanel extends Panel<FriendButton> {
 
     public boolean extended;
+    private int offset;
 
-    public ModulePanel(int x, int y, int w, int h) {
-        super("módulos", x, y, w, h);
+    public FriendsPanel(int x, int y, int w, int h) {
+        super("amigos", x, y, w, h);
         dragging = false;
         extended = true;
 
-        // determinar el saliente para cada botón de módulo
-        int offset = h;
-        for (Module module : ModuleManager.INSTANCE.getModules()) {
-            buttons.add(new ModuleButton(module, this, offset));
+        Sputnik.EVENT_BUS.subscribe(this);
+
+        offset = h;
+        for (Friend friend : FriendManager.INSTANCE.getFriends()) {
+            buttons.add(new FriendButton(friend, this, offset));
             offset += h;
         }
     }
@@ -38,9 +42,9 @@ public class ModulePanel extends Panel<ModuleButton> {
     protected void updateWidth() {
         // asegurarse de que todos los botones caben en el panel, haciendo
         // que la anchura se ajuste al texto más largo
-        int maxWidth = mc.font.width(title);
-        for (ModuleButton button : buttons) {
-            String text = button.getModule().getName();
+        int maxWidth = mc.font.width(title) + mc.font.width("  +");
+        for (FriendButton button : buttons) {
+            String text = button.getFriend().getName();
             int textWidth = mc.font.width(text);
             maxWidth = Math.max(maxWidth, textWidth);
         }
@@ -50,10 +54,10 @@ public class ModulePanel extends Panel<ModuleButton> {
     @Override
     public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         updateWidth();
-        gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB()); // cabeza del marco
+        gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB());  // cabeza del panel
 
-        // título del marco
-        gui.text(mc.font, Component.literal(ChatFormatting.BOLD + title),
+        // título del panel
+        gui.text(mc.font, Component.literal(title),
                 x + 8,
                 renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
@@ -63,11 +67,11 @@ public class ModulePanel extends Panel<ModuleButton> {
                 renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
 
-        List<ModuleButton> visibleButtons = buttons.stream()
-                .filter(mb -> mb.getModule().isSearchMatch())
+        List<FriendButton> visibleButtons = buttons.stream()
+                .filter(fb -> fb.getFriend().isSearchMatch())
                 .toList();
 
-        // dibujar sus módulos solo si está extendido
+        // dibujar los botones solo si está extendido
         if (extended) {
             totalHeight = visibleButtons.size() * h + 3;
             gui.fill(  // fondo para los botones
@@ -77,7 +81,7 @@ public class ModulePanel extends Panel<ModuleButton> {
 
             // dibujar los botones para cada módulo
             int buttonY =  renderY + h + 1;
-            for (ModuleButton moduleButton : visibleButtons) {
+            for (FriendButton moduleButton : visibleButtons) {
                 moduleButton.setOffset(buttonY - renderY);
                 moduleButton.render(gui, mouseX, mouseY, delta);
                 buttonY += h;
@@ -97,22 +101,21 @@ public class ModulePanel extends Panel<ModuleButton> {
                 dragY = mouseY - y;
             } else if (button == 1) {  // clic derecho para extenderlo
                 extended = !extended;
-                Sputnik.EVENT_BUS.post(new ModulePanelEvent.Extend());
+                Sputnik.EVENT_BUS.post(new FriendPanelEvent.Extend());
             }
         }
 
-        if (!extended) return;  // solo dejar clicar en los módulos si el marco está extendido
+        if (!extended) return;  // solo dejar clicar en los botones si el marco está extendido
 
-        List<ModuleButton> visibleModuleButtons = buttons.stream()
-                .filter(mb -> mb.getModule().isSearchMatch())
+        List<FriendButton> visibleFriendButtons = buttons.stream()
+                .filter(fb -> fb.getFriend().isSearchMatch())
                 .toList();
 
-        for (ModuleButton moduleButton : visibleModuleButtons) {
-            moduleButton.mouseClicked(mouseX, mouseY, button);
+        for (FriendButton friendButton : visibleFriendButtons) {
+            friendButton.mouseClicked(mouseX, mouseY, button);
         }
     }
 
-    // detectar cuándo se suelta el clic
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
         ClickGui.INSTANCE.unselect(this);
@@ -120,18 +123,18 @@ public class ModulePanel extends Panel<ModuleButton> {
             dragging = false;
         }
 
-        List<ModuleButton> visibleModuleButtons = buttons.stream()
-                .filter(mb -> mb.getModule().isSearchMatch())
+        List<FriendButton> visibleFriendButtons = buttons.stream()
+                .filter(fb -> fb.getFriend().isSearchMatch())
                 .toList();
 
-        for (ModuleButton moduleButton : visibleModuleButtons) {
-            if (moduleButton.isHovered(mouseX, mouseY)) {
-                moduleButton.mouseReleased(mouseX, mouseY, button);
+        for (FriendButton friendButton : visibleFriendButtons) {
+            if (friendButton.isHovered(mouseX, mouseY)) {
+                friendButton.mouseReleased(mouseX, mouseY, button);
             }
         }
 
         if (isHovered(mouseX, mouseY)) {
-            Sputnik.EVENT_BUS.post(new ModulePanelEvent.Move());
+            Sputnik.EVENT_BUS.post(new FriendPanelEvent.Move());
         }
     }
 
@@ -141,5 +144,24 @@ public class ModulePanel extends Panel<ModuleButton> {
             x = (int) (mouseX - dragX);
             y = (int) (mouseY - dragY);
         }
+    }
+
+    @EventListener
+    private void onAddFriend(FriendEvent.Add event) {
+        buttons.add(new FriendButton(event.getFriend(), this, offset));
+    }
+
+    @EventListener
+    private void onRemoveFriend(FriendEvent.Remove event) {
+        buttons.remove(getButtonOfFriend(event.getFriend()));
+    }
+
+    public FriendButton getButtonOfFriend(Friend friend) {
+        for (FriendButton button : buttons) {
+            if (button.getFriend().getUuid().equals(friend.getUuid())) {
+                return button;
+            }
+        }
+        return null;
     }
 }

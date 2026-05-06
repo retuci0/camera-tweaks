@@ -31,6 +31,8 @@ import net.minecraft.world.level.entity.UniquelyIdentifyable;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,6 +62,7 @@ public class Nametags extends Module {
 
     public final BooleanSetting alwaysVisible = sgGeneral.add(new BooleanSetting("siempre mostrar nametags", "mostrar nametag cuando el jugador está agachado o es invisible", false));
     public final BooleanSetting showSelf = sgGeneral.add(new BooleanSetting("mostrar propio", "mostrar nametag propio", false));
+    public final BooleanSetting friendNick = sgGeneral.add(new BooleanSetting("motes", "usar los motes de amigos", true));
 
     public final BooleanSetting countItems = sgInfo.add(new BooleanSetting("contar items", "muestra cuánto de un item hay en un stack dropeado", true));
     public final BooleanSetting showProjectileDamage = sgInfo.add(new BooleanSetting("daño del proyectil", "muestra cuánto daño hace un proyectil en su nametag", true));

@@ -332,19 +332,19 @@ public class ColorPickerPanel extends SettingsPanel {
         if (colorSetting != null) {
             if (isSBPickerHovered(mouseX, mouseY)) {
                 pickingSaturationBrightness = true;
-                updateColorFromPicker((int) mouseX, (int) mouseY);
+                updateColorFromPicker(mouseX, mouseY);
             }
 
             if (!colorSetting.isRainbow() && isHuePickerHovered(mouseX, mouseY)) {
                 pickingHue = true;
-                updateColorFromPicker((int) mouseX, (int) mouseY);
+                updateColorFromPicker(mouseX, mouseY);
             }
         }
 
         // opacidad
         if (isAlphaPickerHovered(mouseX, mouseY)) {
             pickingAlpha = true;
-            updateColorFromPicker((int) mouseX, (int) mouseY);
+            updateColorFromPicker(mouseX, mouseY);
         }
 
         for (SettingButton<?> sb : visibleButtons)

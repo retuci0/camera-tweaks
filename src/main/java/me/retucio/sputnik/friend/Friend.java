@@ -15,6 +15,8 @@ public class Friend {
     private String name;
     private final UUID uuid;
 
+    private boolean searchMatch;
+
     public Friend(UUID uuid) {
         this.uuid = uuid;
     }
@@ -36,6 +38,14 @@ public class Friend {
         Entity entity = mc.level.getEntity(uuid);
         if (!(entity instanceof Player player)) return null;
         return player;
+    }
+
+    public boolean isSearchMatch() {
+        return searchMatch;
+    }
+
+    public void setSearchMatch(boolean searchMatch) {
+        this.searchMatch = searchMatch;
     }
 
     public enum Status {

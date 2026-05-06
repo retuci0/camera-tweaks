@@ -10,6 +10,7 @@ import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.setting.*;
 import me.retucio.sputnik.module.setting.settings.*;
 import me.retucio.sputnik.ui.widgets.Panel;
+import me.retucio.sputnik.ui.widgets.panels.FriendsPanel;
 import me.retucio.sputnik.ui.widgets.panels.ModulePanel;
 import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
@@ -117,12 +118,12 @@ public class ConfigManager {
         save();
     }
 
-    public static void setPanelPosition(SettingsPanel frame) {
+    public static void setPanelPosition(SettingsPanel panel) {
         ensureConfig();
-        if (!config.settingsPanels.containsKey(frame.getModule().getName()))
-            config.settingsPanels.put(frame.getModule().getName(), new int[] {frame.getX(), frame.getY()});
+        if (!config.settingsPanels.containsKey(panel.getModule().getName()))
+            config.settingsPanels.put(panel.getModule().getName(), new int[] {panel.getX(), panel.getY()});
         else
-            config.settingsPanels.replace(frame.getModule().getName(), new int[] {frame.getX(), frame.getY()});
+            config.settingsPanels.replace(panel.getModule().getName(), new int[] {panel.getX(), panel.getY()});
         save();
     }
 
@@ -231,6 +232,7 @@ public class ConfigManager {
     private static void applyExtendablePanels() {
         applyExtendablePanel(ClickGui.INSTANCE.getModulesPanel());
         applyExtendablePanel(ClickGui.INSTANCE.getClientSettingsPanel());
+        applyExtendablePanel(ClickGui.INSTANCE.getFriendsPanel());
 
         Sputnik.LOGGER.info("posiciones de marcos extendibles aplicadas");
         ClickGui.INSTANCE.refreshListButtons();
@@ -238,20 +240,30 @@ public class ConfigManager {
 
     private static void applyExtendablePanel(Panel<?> panel) {
         ClientConfig.PanelData panelData = null;
-        if (panel instanceof ModulePanel)
-            panelData = config.extendablePanels.get("M");
 
-        if (panel instanceof ClientSettingsPanel)
+        if (panel instanceof ModulePanel) {
+            panelData = config.extendablePanels.get("M");
+        }
+        if (panel instanceof ClientSettingsPanel) {
             panelData = config.extendablePanels.get("S");
+        }
+        if (panel instanceof FriendsPanel) {
+            panelData = config.extendablePanels.get("F");
+        }
 
         if (panelData != null) {
             panel.setX(panelData.x());
             panel.setY(panelData.y());
 
-            if (panel instanceof ModulePanel mFrame)
-                mFrame.extended = panelData.extended();
-            if (panel instanceof ClientSettingsPanel sFrame)
-                sFrame.extended = panelData.extended();
+            if (panel instanceof ModulePanel mPanel) {
+                mPanel.extended = panelData.extended();
+            }
+            if (panel instanceof ClientSettingsPanel sPanel) {
+                sPanel.extended = panelData.extended();
+            }
+            if (panel instanceof FriendsPanel fPanel) {
+                fPanel.extended = panelData.extended();
+            }
         }
     }
 

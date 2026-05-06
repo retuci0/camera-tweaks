@@ -2,6 +2,7 @@ package me.retucio.sputnik.mixin.mixins.player;
 
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.interact.ClipAtLedgeEvent;
+import me.retucio.sputnik.friend.FriendManager;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.render.Nametags;
 
@@ -54,7 +55,12 @@ public abstract class PlayerMixin extends LivingEntity {
                         : "") +
                 ChatFormatting.RESET + "]";
 
-        return original.copy().append(text);
+        // mote de amigo
+        Component name = FriendManager.INSTANCE.isFriend((Player) (Object) this) && nametags.friendNick.getValue()
+                ? Component.literal(FriendManager.INSTANCE.get(uuid).getName())
+                : original;
+
+        return name.copy().append(text);
     }
 
     @Inject(method = "isStayingOnGroundSurface", at = @At("HEAD"), cancellable = true)

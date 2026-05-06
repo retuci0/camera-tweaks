@@ -1,18 +1,16 @@
-# v4.7
+# v4.8
 
 ## novedades
 
 ### adiciones
 
-- sistema de amigos
+- panel para gestionar los amigos, y la habilidad de añadirles motes
 
 #### módulos nuevos:
 
-- amigos: añade o elimina amigos con la rueda del ratón, para evitar atacarles por accidente
-
 ### arreglos / mejoras
 
-- `destello de enchants.` ya funciona en items 2d
+- `puntos de desconexión` ya renderiza la caja correctamente
 
 ## problemas reconocidos
 

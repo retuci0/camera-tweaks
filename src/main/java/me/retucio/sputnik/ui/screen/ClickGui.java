@@ -6,13 +6,16 @@ import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.event.input.MouseClickEvent;
 import me.retucio.sputnik.event.input.MouseScrollEvent;
 import me.retucio.sputnik.event.sputnik.SettingsPanelEvent;
+import me.retucio.sputnik.friend.Friend;
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.setting.Setting;
 import me.retucio.sputnik.module.setting.settings.ColorSetting;
+import me.retucio.sputnik.ui.widgets.buttons.FriendButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.ListButton;
 import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
+import me.retucio.sputnik.ui.widgets.panels.FriendsPanel;
 import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.ui.widgets.panels.settings.ColorPickerPanel;
 import me.retucio.sputnik.ui.widgets.panels.ModulePanel;
@@ -22,6 +25,7 @@ import me.retucio.sputnik.ui.widgets.Panel;
 import me.retucio.sputnik.ui.widgets.Widget;
 import me.retucio.sputnik.ui.widgets.misc.ScrollBarWidget;
 import me.retucio.sputnik.ui.widgets.misc.SearchBarWidget;
+import me.retucio.sputnik.ui.widgets.panels.settings.FriendSettingsPanel;
 import me.retucio.sputnik.util.KeyUtil;
 
 import me.retucio.sputnik.util.MiscUtil;
@@ -57,9 +61,10 @@ public class ClickGui extends Screen {
     private final ModulePanel modulesPanel = new ModulePanel(20, 30, 100, 20);
     private final List<SettingsPanel> settingsPanels = new ArrayList<>();
     private final ClientSettingsPanel clientSettingsPanel = new ClientSettingsPanel(200, 30, 100, 20);
+    private final FriendsPanel friendsPanel = new FriendsPanel(770, 30, 100, 20);
 
     private final ScrollBarWidget scrollBar = new ScrollBarWidget();
-    private final SearchBarWidget searchBar = new SearchBarWidget(340, 16, 320, 20);
+    private final SearchBarWidget searchBar = new SearchBarWidget(500, 30, 320, 20);
     private final List<Widget> miscWidgets = Arrays.asList(scrollBar, searchBar);
 
     public ClickGui() {
@@ -82,6 +87,7 @@ public class ClickGui extends Screen {
 
         // actualizar la posición de renderizado vertical de los marcos cada tick
         modulesPanel.updateRenderY(scrollOffset);
+        friendsPanel.updateRenderY(scrollOffset);
         for (SettingsPanel sp : settingsPanels)
             sp.updateRenderY(scrollOffset);
 
@@ -95,8 +101,12 @@ public class ClickGui extends Screen {
         modulesPanel.render(gui, mouseX, mouseY, delta);
         modulesPanel.updatePosition(mouseX, mouseY);
 
-        for (SettingsPanel sp : settingsPanels)
+        for (SettingsPanel sp : settingsPanels) {
             sp.drawTooltips(gui, mouseX, mouseY);
+        }
+
+        friendsPanel.render(gui, mouseX, mouseY, delta);
+        friendsPanel.updatePosition(mouseX, mouseY);
 
         filterSearchResults();
 
@@ -133,31 +143,37 @@ public class ClickGui extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
+        int x = (int) click.x();
+        int y = (int) click.y();
+
         miscWidgets.forEach(w -> w.mouseClicked(
-                (int) click.x(),
-                (int) click.y(),
-                click.button()
+                x, y, click.button()
         ));
 
         // detectar clics sobre los marcos
-        modulesPanel.mouseClicked((int) click.x(), (int) click.y(), click.button());
-        for (SettingsPanel sp : new ArrayList<>(settingsPanels))
-            sp.mouseClicked((int) click.x(), (int) click.y(), click.button());
+        modulesPanel.mouseClicked(x, y, click.button());
+        friendsPanel.mouseClicked(x, y, click.button());
+        for (SettingsPanel sp : new ArrayList<>(settingsPanels)) {
+            sp.mouseClicked(x, y, click.button());
+        }
 
         return super.mouseClicked(click, doubled);
     }
 
     @Override
     public boolean mouseReleased(MouseButtonEvent click) {
+        int x = (int) click.x();
+        int y = (int) click.y();
+
         miscWidgets.forEach(w -> w.mouseReleased(
-                (int) click.x(),
-                (int) click.y(),
-                click.button()));
+                x, y, click.button()));
 
         // registrar cuándo se suelta el clic, en cada marco respectivamente
-        modulesPanel.mouseReleased((int) click.x(), (int) click.y(), click.button());
-        for (SettingsPanel sp : new ArrayList<>(settingsPanels))
-            sp.mouseReleased((int) click.x(), (int) click.y(), click.button());
+        modulesPanel.mouseReleased(x, y, click.button());
+        friendsPanel.mouseReleased(x, y, click.button());
+        for (SettingsPanel sp : new ArrayList<>(settingsPanels)) {
+            sp.mouseReleased(x, y, click.button());
+        }
 
         return super.mouseReleased(click);
     }
@@ -207,7 +223,7 @@ public class ClickGui extends Screen {
         if (!clientSettings.matchCase.getValue()) searchInput = searchInput.toLowerCase();
 
         for (Button b : modulesPanel.getButtons()) {
-            if (!(b instanceof ModuleButton mb)) return;
+            if (!(b instanceof ModuleButton mb)) continue;
             Module module = mb.getModule();
 
             if (getCategoryFilter() != Category.ALL) {
@@ -238,7 +254,7 @@ public class ClickGui extends Screen {
 
         for (SettingsPanel sp : settingsPanels) {
             for (Button b : sp.getButtons()) {
-                if (!(b instanceof SettingButton<?> sb)) return;
+                if (!(b instanceof SettingButton<?> sb)) continue;
                 Setting<?> setting = sb.getSetting();
 
                 if (searchInput.isEmpty()) {
@@ -258,6 +274,26 @@ public class ClickGui extends Screen {
 
                 setting.setSearchMatch(name.contains(searchInput) || description.contains(searchInput) || sgName.contains(searchInput));
             }
+        }
+
+        for (Button b : friendsPanel.getButtons()) {
+            if (!(b instanceof FriendButton fb)) continue;
+            Friend friend = fb.getFriend();
+
+            if (searchInput.isEmpty()) {
+                friend.setSearchMatch(true);
+                continue;
+            }
+
+            String name = MiscUtil.removeAccentMarks(friend.getName());
+            String uuid = MiscUtil.removeAccentMarks(friend.getUuid().toString());
+
+            if (!clientSettings.matchCase.getValue()) {
+                name = name.toLowerCase();
+                uuid = uuid.toLowerCase();
+            }
+
+            friend.setSearchMatch(name.contains(searchInput) || uuid.contains(searchInput));
         }
     }
 
@@ -337,6 +373,33 @@ public class ClickGui extends Screen {
         }
     }
 
+    public boolean isFriendSettingsPanelOpen(Friend friend) {
+        for (SettingsPanel sp : getSettingsPanels()) {
+            if (sp instanceof FriendSettingsPanel fsp) {
+                if (fsp.getFriend().getUuid().equals(friend.getUuid())) return true;
+            }
+        }
+        return false;
+    }
+
+    public void openFriendSettingsPanel(Friend friend, int x, int y) {
+        FriendSettingsPanel panel = new FriendSettingsPanel(friend, x + 80, y + 5, 153, 20);
+        if (isFriendSettingsPanelOpen(friend)) {
+            closeFriendSettingsPanel(friend);
+            return;
+        }
+        settingsPanels.add(panel);
+    }
+
+    public void closeFriendSettingsPanel(Friend friend) {
+        for (SettingsPanel sp : getSettingsPanels()) {
+            if (sp instanceof FriendSettingsPanel fsp && fsp.getFriend().getUuid().equals(friend.getUuid())) {
+                settingsPanels.remove(fsp);
+                break;
+            }
+        }
+    }
+
     public void refreshListButtons() {
         for (SettingsPanel panel : settingsPanels)
             for (Button button : panel.getButtons())
@@ -390,6 +453,10 @@ public class ClickGui extends Screen {
 
     public ClientSettingsPanel getClientSettingsPanel() {
         return clientSettingsPanel;
+    }
+
+    public FriendsPanel getFriendsPanel() {
+        return friendsPanel;
     }
 
     public List<Widget> getMiscWidgets() { return miscWidgets; }

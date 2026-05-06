@@ -4,6 +4,7 @@ import com.github.retucio.neutrino.EventListener;
 import me.retucio.sputnik.event.sputnik.*;
 import me.retucio.sputnik.module.setting.settings.*;
 import me.retucio.sputnik.ui.screen.ClickGui;
+import me.retucio.sputnik.ui.widgets.panels.FriendsPanel;
 import me.retucio.sputnik.util.ChatUtil;
 
 import java.io.Serial;
@@ -127,6 +128,24 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
                 ClickGui.INSTANCE.getClientSettingsPanel().extended));
+        ConfigManager.save();
+    }
+
+    @EventListener
+    public void onExtendFriendsPanel(FriendPanelEvent.Extend event) {
+        extendablePanels.put("F", new PanelData(
+                ClickGui.INSTANCE.getFriendsPanel().getX(),
+                ClickGui.INSTANCE.getFriendsPanel().getY(),
+                ClickGui.INSTANCE.getFriendsPanel().extended));
+        ConfigManager.save();
+    }
+
+    @EventListener
+    public void onMoveFriendsPanel(FriendPanelEvent.Move event) {
+        extendablePanels.replace("F", new PanelData(
+                ClickGui.INSTANCE.getFriendsPanel().getX(),
+                ClickGui.INSTANCE.getFriendsPanel().getY(),
+                ClickGui.INSTANCE.getFriendsPanel().extended));
         ConfigManager.save();
     }
 

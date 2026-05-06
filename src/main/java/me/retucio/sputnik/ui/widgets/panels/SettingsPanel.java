@@ -23,7 +23,7 @@ public class SettingsPanel extends Panel<SettingButton<? extends Setting<?>>> {
 
     private Module module;
     protected List<SettingGroup> settingGroups;
-    private static final int PADDING = 4; // para ser consistente
+    protected static final int PADDING = 4; // para ser consistente
 
     public SettingsPanel(Module module, int x, int y, int w, int h) {
         super("ajustes de " + module.getName(), x, y, w, h);

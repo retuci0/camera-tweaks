@@ -233,8 +233,8 @@ public class LogoutSpots extends Module {
 
             AABB box = player.getBoundingBox();
             this.xWidth = box.getXsize();
-            this.zWidth = box.getYsize();
-            this.height = box.getZsize();
+            this.height = box.getYsize();
+            this.zWidth = box.getZsize();
 
             this.uuid = player.getUUID();
             this.name = player.getName().getString();
