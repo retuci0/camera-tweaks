@@ -1,4 +1,4 @@
-# v4.8
+# v4.9
 
 ## novedades
 
@@ -8,13 +8,15 @@
 
 #### módulos nuevos:
 
+- notificaciones: te avisa de ciertos eventos mediante notificaciones
+
 ### arreglos / mejoras
 
 - `puntos de desconexión` ya renderiza la caja correctamente
+- movido `aviso de baja durabilidad` a `notificaciones`
 
 ## problemas reconocidos
 
 - lo de siempre, además de:
   - `inventario plus` no funciona en creativo
   - `RPC de Discord` no funciona e incluso puede provocar crashes
-  - las cajas `puntos de desconexión` están mal renderizadas

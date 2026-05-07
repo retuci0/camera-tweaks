@@ -15,6 +15,7 @@ import me.retucio.sputnik.ui.widgets.buttons.FriendButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.ListButton;
 import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
+import me.retucio.sputnik.ui.widgets.misc.NotificationWidget;
 import me.retucio.sputnik.ui.widgets.panels.FriendsPanel;
 import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.ui.widgets.panels.settings.ColorPickerPanel;

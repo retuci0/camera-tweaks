@@ -5,6 +5,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -65,6 +66,7 @@ public class Lists {
                 soundList.stream().map(sound -> Component.translatable(
                         sound.location().toShortLanguageKey()
                 ).getString()).toList());
+        soundNames.replace(SoundEvents.EMPTY, "NINGUNO");
 
         screenNames = getMapOfLists(screenList,
                 screenList.stream().map(screen -> Component.translatable(

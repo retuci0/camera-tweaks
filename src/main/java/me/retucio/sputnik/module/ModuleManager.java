@@ -6,6 +6,7 @@ import me.retucio.sputnik.module.modules.client.DiscordRPC;
 import me.retucio.sputnik.module.modules.client.Friends;
 import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.module.modules.camera.*;
+import me.retucio.sputnik.module.modules.client.Notifications;
 import me.retucio.sputnik.module.modules.combat.*;
 import me.retucio.sputnik.module.modules.inventory.*;
 import me.retucio.sputnik.module.modules.misc.*;
@@ -81,6 +82,7 @@ public class ModuleManager {
         add(new DiscordRPC());
         add(new Friends());
         add(new Hud());
+        add(new Notifications());
     }
 
     private void addCombat() {
@@ -154,7 +156,6 @@ public class ModuleManager {
         add(new HandView());
         add(new KeyPearl());
         add(new NoFall());
-        add(new WarnLowDurability());
     }
 
     private void addRender() {

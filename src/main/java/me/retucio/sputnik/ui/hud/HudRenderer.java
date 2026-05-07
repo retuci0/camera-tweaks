@@ -4,6 +4,7 @@ import me.retucio.sputnik.config.ConfigManager;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.module.modules.client.Hud;
 import me.retucio.sputnik.ui.hud.elements.*;
+import me.retucio.sputnik.ui.widgets.misc.NotificationWidget;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 
 public class HudRenderer {
@@ -21,6 +23,7 @@ public class HudRenderer {
     private static final Minecraft mc = Minecraft.getInstance();
 
     private static final List<HudElement> elements = new ArrayList<>();
+    private static final Stack<NotificationWidget> notifications = new Stack<>();
     private static boolean initialized = false;
 
     public static void init() {
@@ -101,6 +104,16 @@ public class HudRenderer {
                 element.renderInGame(gui, dt.getGameTimeDeltaTicks(), hud);
             }
         }
+
+        List<NotificationWidget> toRemove = new ArrayList<>();
+        for (NotificationWidget notification : notifications) {
+            notification.setIndex(notifications.indexOf(notification));
+            notification.render(gui, 0, 0, 0);
+            if (System.currentTimeMillis() >= notification.popTime) {
+                toRemove.add(notification);
+            }
+        }
+        notifications.removeAll(toRemove);
     }
 
     private static boolean shouldSkipRendering() {
@@ -114,6 +127,10 @@ public class HudRenderer {
                 || (mc.debugEntries.isOverlayVisible() && !hud.showOnF3.getValue())
                 || (mc.screen instanceof ChatScreen && !hud.showOnChat.getValue())
                 || mc.screen instanceof HudEditorScreen;
+    }
+
+    public static void pushNotification(String title, String desc) {
+        notifications.push(new NotificationWidget(title, desc));
     }
 
     public static List<HudElement> getElements() {

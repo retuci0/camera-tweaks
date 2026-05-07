@@ -24,6 +24,7 @@ import me.retucio.sputnik.ui.screen.UpdateScreen;
 import me.retucio.sputnik.ui.widgets.buttons.settings.BindButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.TextButton;
+import me.retucio.sputnik.ui.widgets.misc.NotificationWidget;
 import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.ui.widgets.Button;
