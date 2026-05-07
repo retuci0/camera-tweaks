@@ -15,9 +15,7 @@ public enum Category {
     INVENTORY("inventario"),
 
     CLIENT("cliente"),
-    MISC("misc."),
-
-    ALL("todos");
+    MISC("misc.");
 
     private final String name;
     Category(String name) { this.name = name; }

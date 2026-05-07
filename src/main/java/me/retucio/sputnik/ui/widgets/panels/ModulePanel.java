@@ -2,6 +2,7 @@ package me.retucio.sputnik.ui.widgets.panels;
 
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.sputnik.ModulePanelEvent;
+import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.ui.screen.ClickGui;
@@ -20,15 +21,18 @@ import java.util.List;
 public class ModulePanel extends Panel<ModuleButton> {
 
     public boolean extended;
+    public final Category category;
 
-    public ModulePanel(int x, int y, int w, int h) {
-        super("módulos", x, y, w, h);
+    public ModulePanel(Category category, int x, int y, int w, int h) {
+        super(category.toString(), x, y, w, h);
+        this.category = category;
         dragging = false;
         extended = true;
 
         // determinar el saliente para cada botón de módulo
         int offset = h;
         for (Module module : ModuleManager.INSTANCE.getModules()) {
+            if (!module.getCategory().equals(this.category)) continue;
             buttons.add(new ModuleButton(module, this, offset));
             offset += h;
         }
@@ -53,7 +57,7 @@ public class ModulePanel extends Panel<ModuleButton> {
         gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB()); // cabeza del marco
 
         // título del marco
-        gui.text(mc.font, Component.literal(ChatFormatting.BOLD + title),
+        gui.text(mc.font, Component.literal(title),
                 x + 8,
                 renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
@@ -97,7 +101,7 @@ public class ModulePanel extends Panel<ModuleButton> {
                 dragY = mouseY - y;
             } else if (button == 1) {  // clic derecho para extenderlo
                 extended = !extended;
-                Sputnik.EVENT_BUS.post(new ModulePanelEvent.Extend());
+                Sputnik.EVENT_BUS.post(new ModulePanelEvent.Extend(this));
             }
         }
 
@@ -131,7 +135,7 @@ public class ModulePanel extends Panel<ModuleButton> {
         }
 
         if (isHovered(mouseX, mouseY)) {
-            Sputnik.EVENT_BUS.post(new ModulePanelEvent.Move());
+            Sputnik.EVENT_BUS.post(new ModulePanelEvent.Move(this));
         }
     }
 

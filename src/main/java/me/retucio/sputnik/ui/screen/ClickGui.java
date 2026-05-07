@@ -1,6 +1,7 @@
 package me.retucio.sputnik.ui.screen;
 
 import com.github.retucio.neutrino.EventListener;
+
 import me.retucio.sputnik.Sputnik;
 import me.retucio.sputnik.event.input.KeyEvent;
 import me.retucio.sputnik.event.input.MouseClickEvent;
@@ -15,7 +16,6 @@ import me.retucio.sputnik.ui.widgets.buttons.FriendButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.ListButton;
 import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
-import me.retucio.sputnik.ui.widgets.misc.NotificationWidget;
 import me.retucio.sputnik.ui.widgets.panels.FriendsPanel;
 import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.ui.widgets.panels.settings.ColorPickerPanel;
@@ -27,6 +27,7 @@ import me.retucio.sputnik.ui.widgets.Widget;
 import me.retucio.sputnik.ui.widgets.misc.ScrollBarWidget;
 import me.retucio.sputnik.ui.widgets.misc.SearchBarWidget;
 import me.retucio.sputnik.ui.widgets.panels.settings.FriendSettingsPanel;
+import me.retucio.sputnik.util.ChatUtil;
 import me.retucio.sputnik.util.KeyUtil;
 
 import me.retucio.sputnik.util.MiscUtil;
@@ -36,6 +37,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
@@ -48,7 +50,11 @@ import java.util.Optional;
 import static me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel.clientSettings;
 
 
-// interfaz gráfica, se abre con el shift derecho por defecto. aquí se encuentran los módulos y sus ajustes
+/**
+ * interfaz gráfica, Screen que se abre con el shift derecho por defecto. aquí se encuentran los módulos y sus ajustes.
+ * @author retucio
+ */
+
 public class ClickGui extends Screen {
 
     private final Minecraft mc = Minecraft.getInstance();
@@ -57,21 +63,26 @@ public class ClickGui extends Screen {
     private boolean anyFocused;
     private @Nullable Widget selected = null;
 
-    private Category categoryFilter = Category.ALL;
-
-    private final ModulePanel modulesPanel = new ModulePanel(20, 30, 100, 20);
+    private final List<ModulePanel> modulePanels = new ArrayList<>();
     private final List<SettingsPanel> settingsPanels = new ArrayList<>();
-    private final ClientSettingsPanel clientSettingsPanel = new ClientSettingsPanel(200, 30, 100, 20);
-    private final FriendsPanel friendsPanel = new FriendsPanel(770, 30, 100, 20);
+    private final ClientSettingsPanel clientSettingsPanel = new ClientSettingsPanel(620, 280, 100, 20);
+    private final FriendsPanel friendsPanel = new FriendsPanel(40, 280, 100, 20);
 
     private final ScrollBarWidget scrollBar = new ScrollBarWidget();
-    private final SearchBarWidget searchBar = new SearchBarWidget(500, 30, 320, 20);
-    private final List<Widget> miscWidgets = Arrays.asList(scrollBar, searchBar);
+    private final SearchBarWidget searchBar = new SearchBarWidget(320, 10, 320, 20);
+    private final List<Widget> miscWidgets = List.of(scrollBar, searchBar);
 
     public ClickGui() {
-        super(Component.nullToEmpty("interfaz"));
-        settingsPanels.add(clientSettingsPanel);
+        super(Component.literal("interfaz"));
         Sputnik.EVENT_BUS.subscribe(this);
+
+        settingsPanels.add(clientSettingsPanel);
+
+        int x = 4;
+        for (Category category : Category.values()) {
+            modulePanels.add(new ModulePanel(category, x, 40, 100, 20));
+            x += 88;
+        }
     }
 
     @Override
@@ -86,21 +97,26 @@ public class ClickGui extends Screen {
         searchBar.render(gui, mouseX, mouseY, delta);
         searchBar.updatePosition(mouseX, mouseY);
 
-        // actualizar la posición de renderizado vertical de los marcos cada tick
-        modulesPanel.updateRenderY(scrollOffset);
+        // actualizar la posición de renderizado vertical de los paneles cada tick
         friendsPanel.updateRenderY(scrollOffset);
-        for (SettingsPanel sp : settingsPanels)
+        for (ModulePanel mp : modulePanels) {
+            mp.updateRenderY(scrollOffset);
+        }
+        for (SettingsPanel sp : settingsPanels) {
             sp.updateRenderY(scrollOffset);
+        }
 
-        // renderizar el marco de los ajustes de cada módulo que lo tenga abierto. se abre haciendo clic derecho sobre el módulo
+        // renderizar el panel de los ajustes de cada módulo que lo tenga abierto. se abre haciendo clic derecho sobre el módulo.
         for (SettingsPanel sp : settingsPanels.reversed()) {
             sp.render(gui, mouseX, mouseY, delta);
             sp.updatePosition(mouseX, mouseY);
         }
 
-        // renderizar el marco de los módulos
-        modulesPanel.render(gui, mouseX, mouseY, delta);
-        modulesPanel.updatePosition(mouseX, mouseY);
+        // renderizar los paneles de los módulos
+        for (ModulePanel mp : modulePanels) {
+            mp.render(gui, mouseX, mouseY, delta);
+            mp.updatePosition(mouseX, mouseY);
+        }
 
         for (SettingsPanel sp : settingsPanels) {
             sp.drawTooltips(gui, mouseX, mouseY);
@@ -135,9 +151,13 @@ public class ClickGui extends Screen {
     }
 
     private int calculateContentHeight() {
-        int bottom = modulesPanel.getY() + modulesPanel.getH() + modulesPanel.getTotalHeight();
-        for (SettingsPanel panel : settingsPanels)
-            bottom = Math.max(bottom, panel.getY() + panel.getH() + panel.getTotalHeight());
+        int bottom = mc.getWindow().getGuiScaledHeight();
+        for (ModulePanel mp : modulePanels) {
+            bottom = mp.getY() + mp.getH() + mp.getTotalHeight();
+        }
+        for (SettingsPanel sp : settingsPanels) {
+            bottom = Math.max(bottom, sp.getY() + sp.getH() + sp.getTotalHeight());
+        }
 
         return bottom + 20;  // padding
     }
@@ -147,13 +167,17 @@ public class ClickGui extends Screen {
         int x = (int) click.x();
         int y = (int) click.y();
 
+        ChatUtil.info(x + " " + y);
+
         miscWidgets.forEach(w -> w.mouseClicked(
                 x, y, click.button()
         ));
 
         // detectar clics sobre los marcos
-        modulesPanel.mouseClicked(x, y, click.button());
         friendsPanel.mouseClicked(x, y, click.button());
+        for (ModulePanel mp : new ArrayList<>(modulePanels)) {
+            mp.mouseClicked(x, y, click.button());
+        }
         for (SettingsPanel sp : new ArrayList<>(settingsPanels)) {
             sp.mouseClicked(x, y, click.button());
         }
@@ -170,8 +194,10 @@ public class ClickGui extends Screen {
                 x, y, click.button()));
 
         // registrar cuándo se suelta el clic, en cada marco respectivamente
-        modulesPanel.mouseReleased(x, y, click.button());
         friendsPanel.mouseReleased(x, y, click.button());
+        for (ModulePanel mp : new ArrayList<>(modulePanels)) {
+            mp.mouseReleased(x, y, click.button());
+        }
         for (SettingsPanel sp : new ArrayList<>(settingsPanels)) {
             sp.mouseReleased(x, y, click.button());
         }
@@ -208,12 +234,12 @@ public class ClickGui extends Screen {
         if (Sputnik.mc.screen != this || event.getButton() != 2 || !KeyUtil.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) return;
 
         int h = Sputnik.mc.getWindow().getGuiScaledHeight();
-        int minY = Math.min(modulesPanel.getY(), settingsPanels.stream().mapToInt(Panel::getY).min().orElse(modulesPanel.getY()));
-        int maxY = Math.max(modulesPanel.getY() + modulesPanel.getH(), settingsPanels.stream().mapToInt(sp -> sp.getY() + sp.getH()).max().orElse(modulesPanel.getY() + modulesPanel.getH()));
+        int minY = Math.min(modulePanels.stream().mapToInt(Panel::getY).min().getAsInt(), settingsPanels.stream().mapToInt(Panel::getY).min().getAsInt());
+        int maxY = Math.max(modulePanels.stream().mapToInt(mp -> mp.getY() + mp.getH()).max().getAsInt(), settingsPanels.stream().mapToInt(sp -> sp.getY() + sp.getH()).max().getAsInt());
         int correction = minY < 0 ? -minY + 4 : (maxY > h ? h - maxY - 4 : 0);
 
         if (correction != 0) {
-            modulesPanel.setY(modulesPanel.getY() + correction);
+            modulePanels.forEach(mp -> mp.setY(mp.getY() + correction));
             settingsPanels.forEach(sp -> sp.setY(sp.getY() + correction));
         }
     }
@@ -223,34 +249,31 @@ public class ClickGui extends Screen {
         String searchInput = searchBar.getSearchInput().trim();
         if (!clientSettings.matchCase.getValue()) searchInput = searchInput.toLowerCase();
 
-        for (Button b : modulesPanel.getButtons()) {
-            if (!(b instanceof ModuleButton mb)) continue;
-            Module module = mb.getModule();
 
-            if (getCategoryFilter() != Category.ALL) {
-                module.setSearchMatch(getCategoryFilter() == module.getCategory());
-            } else {
-                module.setSearchMatch(true);
+        for (ModulePanel mp : modulePanels) {
+            for (Button b : mp.getButtons()) {
+                if (!(b instanceof ModuleButton mb)) continue;
+                Module module = mb.getModule();
+
+                if (searchInput.isEmpty()) {
+                    continue;
+                }
+
+                String name = MiscUtil.removeAccentMarks(module.getName());
+                String description = MiscUtil.removeAccentMarks(module.getDescription());
+                String category = MiscUtil.removeAccentMarks(module.getCategory().toString());
+
+                if (!clientSettings.matchCase.getValue()) {
+                    name = name.toLowerCase();
+                    description = description.toLowerCase();
+                    category = category.toLowerCase();
+                }
+
+                module.setSearchMatch(
+                        name.contains(searchInput)
+                                || description.contains(searchInput)
+                                || category.contains(searchInput));
             }
-
-            if (searchInput.isEmpty()) {
-                continue;
-            }
-
-            String name = MiscUtil.removeAccentMarks(module.getName());
-            String description = MiscUtil.removeAccentMarks(module.getDescription());
-            String category = MiscUtil.removeAccentMarks(module.getCategory().toString());
-
-            if (!clientSettings.matchCase.getValue()) {
-                name = name.toLowerCase();
-                description = description.toLowerCase();
-                category = category.toLowerCase();
-            }
-
-            module.setSearchMatch(
-                    name.contains(searchInput)
-                    || description.contains(searchInput)
-                    || category.contains(searchInput));
         }
 
         for (SettingsPanel sp : settingsPanels) {
@@ -408,19 +431,11 @@ public class ClickGui extends Screen {
                     lb.refreshDummy();
     }
 
-    public void setCategoryFilter(Category category) {
-        this.categoryFilter = category;
-    }
-
-    public Category getCategoryFilter() {
-        return categoryFilter;
-    }
-
     // métodos del súper
 
     @Override
     public void onClose() {  // evitar que al reabrir la interfaz sin previamente haber soltado el clic, se sigan arrastrando objetos
-        modulesPanel.mouseReleased(0, 0, 0);
+        modulePanels.forEach(mp -> mp.mouseReleased(0, 0, 0));
         settingsPanels.forEach(sp -> sp.mouseReleased(0, 0, 0));
         scrollBar.mouseReleased(0, 0, 0);
         searchBar.mouseReleased(0, 0, 0);
@@ -448,8 +463,8 @@ public class ClickGui extends Screen {
 
     // getters y setters de widgets
 
-    public ModulePanel getModulesPanel() {
-        return modulesPanel;
+    public List<ModulePanel> getModulePanels() {
+        return modulePanels;
     }
 
     public ClientSettingsPanel getClientSettingsPanel() {

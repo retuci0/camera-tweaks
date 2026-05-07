@@ -32,27 +32,8 @@ public class SearchBarWidget extends Widget {
     private boolean focused;
     private final StringBuilder buffer = new StringBuilder();
 
-    // simular un módulo
-    private final Module dummy = new Module("", "", Category.ALL);
-    private final OptionSetting<Category> categories = dummy.getSgGeneral().add(
-            new OptionSetting<>(
-                "filtrar",
-                "filtrar módulos por categoría",
-                List.of(Category.values()),
-                Category.ALL
-            )
-    );
-    private final ChooseButton<Category> dummyButton = new ChooseButton<>(
-            categories, new SettingsPanel(dummy, 0, 0, 50, 50), 0
-    );
-
-
     public SearchBarWidget(int x, int y, int w, int h) {
         super(x, y, w, h);
-
-        categories.onUpdate(v -> {
-            if (ClickGui.INSTANCE != null) ClickGui.INSTANCE.setCategoryFilter(v);
-        });
     }
 
     @Override
@@ -73,14 +54,6 @@ public class SearchBarWidget extends Widget {
 
         gui.fill(x + 20, renderY + 2, x + w - 20, renderY + h - 2, textFieldColor.getRGB());
 
-        gui.blit(RenderPipelines.GUI_TEXTURED, Textures.SEARCH_BAR_FILTER,
-                x + w - 35, renderY + h / 2 - 6,
-                0, 0, 12, 12, 12, 12,
-                isFilterButtonHovered(mouseX, mouseY)
-                        ? Colors.SILVER.getRGB()
-                        : Colors.WHITE.getRGB()
-        );
-
         // dibujar líneas en la parte agarrable, para indicárselo al usuario
         for (int i = 0; i < 4; i++) {
             gui.horizontalLine(x + 4, x + 16, renderY + 3 * i + 5, Color.LIGHT_GRAY.getRGB());
@@ -95,10 +68,6 @@ public class SearchBarWidget extends Widget {
         // botón para borrar búsqueda actual
         gui.text(mc.font, "×", x + w - mc.font.width("×") - 6, renderY + (h / 2) - mc.font.lineHeight / 2,
                 isClearButtonHovered(mouseX, mouseY) ? Color.RED.getRGB() : -1, true);
-
-        if (isFilterButtonHovered(mouseX, mouseY)) {
-            gui.setTooltipForNextFrame(mc.font, Component.literal("filtrar por categoría"), mouseX + 7, mouseY + 20);
-        }
     }
 
     @Override
@@ -110,8 +79,6 @@ public class SearchBarWidget extends Widget {
             dragY = mouseY - y;
         } else if (isClearButtonHovered(mouseX, mouseY)) {
             buffer.setLength(0);
-        } else if (isFilterButtonHovered(mouseX, mouseY)) {
-            openFilterPanel(mouseX, mouseY);
         }
         focused = isTextFieldHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this);
     }
@@ -183,20 +150,13 @@ public class SearchBarWidget extends Widget {
     public boolean isTextFieldHovered(int mouseX, int mouseY) {
         return ClickGui.INSTANCE.canSelect(this)
                 && mouseX > x + 20 && mouseX < x + w - 20
-                && mouseY > renderY + 2 && mouseY < renderY + h - 2
-                && !isFilterButtonHovered(mouseX, mouseY);
+                && mouseY > renderY + 2 && mouseY < renderY + h - 2;
     }
 
     public boolean isClearButtonHovered(int mouseX, int mouseY) {
         return ClickGui.INSTANCE.canSelect(this)
                 && mouseX > x + w - 15 && mouseX < x + w - 3
                 && mouseY > renderY + 3 && mouseY < renderY + h - 5;
-    }
-
-    public boolean isFilterButtonHovered(int mouseX, int mouseY) {
-        return ClickGui.INSTANCE.canSelect(this)
-                && mouseX > x + w - 37 && mouseX < x + w - 21
-                && mouseY > renderY + h / 2 - 8 && mouseY < renderY + h / 2 + 8;
     }
 
     public boolean isFocused() {
@@ -218,11 +178,5 @@ public class SearchBarWidget extends Widget {
         if (ConfigManager.getConfig() != null) {
             ConfigManager.setSearchBarPosition(x, y);
         }
-    }
-
-    private void openFilterPanel(int mouseX, int mouseY) {
-        dummyButton.getParent().setX(mouseX);
-        dummyButton.getParent().setY(mouseY);
-        dummyButton.openPanel();
     }
 }

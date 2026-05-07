@@ -97,25 +97,25 @@ public class ClientConfig {
 
     @EventListener
     public void onExtendModulePanel(ModulePanelEvent.Extend event) {
-        extendablePanels.put("M", new PanelData(
-                ClickGui.INSTANCE.getModulesPanel().getX(),
-                ClickGui.INSTANCE.getModulesPanel().getY(),
-                ClickGui.INSTANCE.getModulesPanel().extended));
+        extendablePanels.put(event.getPanel().category.toString(), new PanelData(
+                event.getPanel().getX(),
+                event.getPanel().getY(),
+                event.getPanel().extended));
         ConfigManager.save();
     }
 
     @EventListener
     public void onMoveModulePanel(ModulePanelEvent.Move event) {
-        extendablePanels.replace("M", new PanelData(
-                ClickGui.INSTANCE.getModulesPanel().getX(),
-                ClickGui.INSTANCE.getModulesPanel().getY(),
-                ClickGui.INSTANCE.getModulesPanel().extended));
+        extendablePanels.replace(event.getPanel().category.toString(), new PanelData(
+                event.getPanel().getX(),
+                event.getPanel().getY(),
+                event.getPanel().extended));
         ConfigManager.save();
     }
 
     @EventListener
     public void onExtendClientSettingsPanel(ClientSettingsPanelEvent.Extend event) {
-        extendablePanels.put("S", new PanelData(
+        extendablePanels.put("ajustes", new PanelData(
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
                 ClickGui.INSTANCE.getClientSettingsPanel().extended));
@@ -124,7 +124,7 @@ public class ClientConfig {
 
     @EventListener
     public void onMoveClientSettingsPanel(ClientSettingsPanelEvent.Move event) {
-        extendablePanels.replace("S", new PanelData(
+        extendablePanels.replace("ajustes", new PanelData(
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
                 ClickGui.INSTANCE.getClientSettingsPanel().extended));
@@ -133,7 +133,7 @@ public class ClientConfig {
 
     @EventListener
     public void onExtendFriendsPanel(FriendPanelEvent.Extend event) {
-        extendablePanels.put("F", new PanelData(
+        extendablePanels.put("amigos", new PanelData(
                 ClickGui.INSTANCE.getFriendsPanel().getX(),
                 ClickGui.INSTANCE.getFriendsPanel().getY(),
                 ClickGui.INSTANCE.getFriendsPanel().extended));
@@ -142,7 +142,7 @@ public class ClientConfig {
 
     @EventListener
     public void onMoveFriendsPanel(FriendPanelEvent.Move event) {
-        extendablePanels.replace("F", new PanelData(
+        extendablePanels.replace("amigos", new PanelData(
                 ClickGui.INSTANCE.getFriendsPanel().getX(),
                 ClickGui.INSTANCE.getFriendsPanel().getY(),
                 ClickGui.INSTANCE.getFriendsPanel().extended));

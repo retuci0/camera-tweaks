@@ -230,7 +230,9 @@ public class ConfigManager {
     }
 
     private static void applyExtendablePanels() {
-        applyExtendablePanel(ClickGui.INSTANCE.getModulesPanel());
+        for (ModulePanel panel : ClickGui.INSTANCE.getModulePanels()) {
+            applyExtendablePanel(panel);
+        }
         applyExtendablePanel(ClickGui.INSTANCE.getClientSettingsPanel());
         applyExtendablePanel(ClickGui.INSTANCE.getFriendsPanel());
 
@@ -241,8 +243,8 @@ public class ConfigManager {
     private static void applyExtendablePanel(Panel<?> panel) {
         ClientConfig.PanelData panelData = null;
 
-        if (panel instanceof ModulePanel) {
-            panelData = config.extendablePanels.get("M");
+        if (panel instanceof ModulePanel mp) {
+            panelData = config.extendablePanels.get(mp.category.toString());
         }
         if (panel instanceof ClientSettingsPanel) {
             panelData = config.extendablePanels.get("S");
