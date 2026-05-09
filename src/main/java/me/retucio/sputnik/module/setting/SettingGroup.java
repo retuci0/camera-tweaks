@@ -12,7 +12,7 @@ import java.util.List;
 public class SettingGroup implements Iterable<Setting<?>> {
 
     private Module module;
-    private final String name;
+    private String name;
     private boolean extended;
 
     final List<Setting<?>> settings = new ArrayList<>(1);
@@ -55,6 +55,8 @@ public class SettingGroup implements Iterable<Setting<?>> {
     public String getName() {
         return name;
     }
+
+    public void setName(String name) { this.name = name; }
 
     public boolean isExtended() {
         return extended;

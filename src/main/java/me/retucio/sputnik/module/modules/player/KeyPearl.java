@@ -19,7 +19,7 @@ public class KeyPearl extends Module {
 
     public KeyPearl() {
         super("tecla de perla", "lanza una perla con una tecla", Category.PLAYER);
-        keyMode.setValue(KeyModes.HOLD);
+        keyMode.setValue(KeyMode.HOLD);
     }
 
     private int prevSlot = -1;

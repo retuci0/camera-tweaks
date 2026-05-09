@@ -13,10 +13,10 @@ public class DrawUtil {
     }
 
     public static void drawCircle(GuiGraphicsExtractor gui, int x, int y, int radius, int color) {
-        for (int i = -radius; i <= radius; i++)
-            for (int j = -radius; j <= radius; j++)
-                if (i * i + j * j <= radius * radius)
-                    gui.fill(x + i, y + j, x + i + 1, y + j + 1, color);
+        for (int dy = -radius; dy <= radius; dy++) {
+            int dx = (int) Math.sqrt(radius * radius - dy * dy);
+            gui.fill(x - dx, y + dy, x + dx + 1, y + dy + 1, color);
+        }
     }
 
     public static void drawCheckerBoard(GuiGraphicsExtractor gui, int x, int y, int width, int height, int checkerSize, int color1, int color2) {

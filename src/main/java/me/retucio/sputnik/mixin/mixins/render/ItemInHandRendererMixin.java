@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import me.retucio.sputnik.event.render.RenderHeldItemEvent;
 import me.retucio.sputnik.event.render.RenderArmEvent;
 import me.retucio.sputnik.module.ModuleManager;
-import me.retucio.sputnik.module.modules.player.HandView;
+import me.retucio.sputnik.module.modules.render.HandView;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;

@@ -247,10 +247,10 @@ public class ConfigManager {
             panelData = config.extendablePanels.get(mp.category.toString());
         }
         if (panel instanceof ClientSettingsPanel) {
-            panelData = config.extendablePanels.get("S");
+            panelData = config.extendablePanels.get("ajustes");
         }
         if (panel instanceof FriendsPanel) {
-            panelData = config.extendablePanels.get("F");
+            panelData = config.extendablePanels.get("amigos");
         }
 
         if (panelData != null) {
@@ -258,13 +258,13 @@ public class ConfigManager {
             panel.setY(panelData.y());
 
             if (panel instanceof ModulePanel mPanel) {
-                mPanel.extended = panelData.extended();
+                mPanel.setExtended(panelData.extended());
             }
             if (panel instanceof ClientSettingsPanel sPanel) {
-                sPanel.extended = panelData.extended();
+                sPanel.setExtended(panelData.extended());
             }
             if (panel instanceof FriendsPanel fPanel) {
-                fPanel.extended = panelData.extended();
+                fPanel.setExtended(panelData.extended());
             }
         }
     }

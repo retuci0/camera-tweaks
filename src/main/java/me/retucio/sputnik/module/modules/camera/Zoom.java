@@ -51,8 +51,8 @@ public class Zoom extends Module {
                 Category.CAMERA,
                 GLFW.GLFW_KEY_F);
 
-        keyMode.setDefaultValue(KeyModes.HOLD);
-        keyMode.setValue(KeyModes.HOLD);
+        keyMode.setDefaultValue(KeyMode.HOLD);
+        keyMode.setValue(KeyMode.HOLD);
 
         notify.setDefaultValue(false);
         notify.setValue(false);

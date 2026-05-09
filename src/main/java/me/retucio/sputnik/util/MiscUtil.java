@@ -32,23 +32,22 @@ public class MiscUtil {
         }
     }
 
-    public static void copyVector(Vector3d destination, Vec3 source) {
-        destination.x = source.x;
-        destination.y = source.y;
-        destination.z = source.z;
+    public static void copyVector(Vector3d dst, Vec3 src) {
+        dst.x = src.x;
+        dst.y = src.y;
+        dst.z = src.z;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T getHighest(List<T> list) {
-        if (list.getFirst() == null || !(list.getFirst() instanceof Number value)) return null;
-        Number maxValue = value;
+    public static <T extends Number> T getHighest(List<T> list) {
+        if (list.getFirst() == null) return null;
+        T maxValue = list.getFirst();
         for (T t : list) {
-            if (((Number) t).doubleValue() > maxValue.doubleValue()) {
-                maxValue = (Number) t;
+            if (t.doubleValue() > maxValue.doubleValue()) {
+                maxValue = t;
             }
         }
 
-        return (T) maxValue;
+        return maxValue;
     }
 
     public static String getCurrentFormattedTime() {

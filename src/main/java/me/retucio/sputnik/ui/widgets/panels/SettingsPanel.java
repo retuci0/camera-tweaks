@@ -18,15 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-// marco para los botones de los ajustes de cada módulo
-public class SettingsPanel extends Panel<SettingButton<? extends Setting<?>>> {
+// panel para los botones de los ajustes de cada módulo
+public class SettingsPanel extends CloseablePanel<SettingButton<? extends Setting<?>>> {
 
-    private Module module;
+    protected Module module;
     protected List<SettingGroup> settingGroups;
-    protected static final int PADDING = 4; // para ser consistente
+    public boolean drawHeader = true;
 
     public SettingsPanel(Module module, int x, int y, int w, int h) {
         super("ajustes de " + module.getName(), x, y, w, h);
+
         this.module = module;
         this.settingGroups = module.getSgs();
 
@@ -41,23 +42,25 @@ public class SettingsPanel extends Panel<SettingButton<? extends Setting<?>>> {
     public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         updateWidth();
 
-        // cabezal
         int centerX = x + w / 2;
         int centerY = renderY + h / 2;
-        int titleX = x + 2 * PADDING;
-        int titleY = centerY - mc.font.lineHeight / 2;
 
-        int headerColor = module.isEnabled()
-                ? Colors.enabledToggleButtonColor.getRGB()
-                : Colors.disabledToggleButtonColor.getRGB();
+        if (drawHeader) {
+            int titleX = x + 2 * PADDING;
+            int titleY = centerY - mc.font.lineHeight / 2;
 
-        int closeButtonColor = isCloseButtonHovered(mouseX, mouseY)
-                ? Color.RED.getRGB()
-                : -1;
+            int headerColor = module.isEnabled()
+                    ? Colors.enabledToggleButtonColor.getRGB()
+                    : Colors.disabledToggleButtonColor.getRGB();
 
-        gui.fill(x, renderY, x + w, renderY + h, headerColor);
-        gui.text(mc.font, title, titleX, titleY, -1, true);
-        gui.text(mc.font, "×", x + w - mc.font.width("×") - 2 * PADDING, titleY, closeButtonColor, true);
+            int closeButtonColor = isCloseButtonHovered(mouseX, mouseY)
+                    ? Color.RED.getRGB()
+                    : -1;
+
+            gui.fill(x, renderY, x + w, renderY + h, headerColor);
+            gui.text(mc.font, title, titleX, titleY, -1, true);
+            drawCloseButton(gui, mouseX, mouseY, closeButtonColor);
+        }
 
         // filtrar botones visibles
         visibleButtons = buttons.stream()
@@ -155,28 +158,22 @@ public class SettingsPanel extends Panel<SettingButton<? extends Setting<?>>> {
     }
 
     @Override
-    public void drawTooltips(GuiGraphicsExtractor gui, int mouseX, int mouseY) {
-        for (SettingButton<?> sb : visibleButtons)
-            sb.drawTooltip(gui, mouseX, mouseY);
-    }
-
-    @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
+        if (isCloseButtonHovered(mouseX, mouseY)) {
+            onClose();
+            return;
+        }
+
         if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
-            if (isCloseButtonHovered(mouseX, mouseY)) {
-                ClickGui.INSTANCE.closeSettingsPanel(this.module);
-                return;
-            }
             if (button == 0) {
                 dragging = true;
                 dragX = mouseX - x;
                 dragY = mouseY - y;
             } else if (button == 1) {
-                ClickGui.INSTANCE.closeSettingsPanel(module);
+                onClose();
             }
         }
 
-        // al hacer clic en los cabezales de los grupos de ajustes
         for (int i = 0; i < settingGroups.size(); i++) {
             SettingGroup group = settingGroups.get(i);
             if (hasVisibleSettingsInGroup(group) && isGroupHeaderHovered(mouseX, mouseY, i)) {
@@ -186,9 +183,8 @@ public class SettingsPanel extends Panel<SettingButton<? extends Setting<?>>> {
             }
         }
 
-        for (SettingButton<?> sb : visibleButtons) {
+        for (SettingButton<?> sb : visibleButtons)
             sb.mouseClicked(mouseX, mouseY, button);
-        }
     }
 
     @Override
@@ -394,5 +390,10 @@ public class SettingsPanel extends Panel<SettingButton<? extends Setting<?>>> {
 
     public void setSettingGroups(List<SettingGroup> settingGroups) {
         this.settingGroups = settingGroups;
+    }
+
+    @Override
+    public void onClose() {
+        ClickGui.INSTANCE.closeSettingsPanel(this.module);
     }
 }

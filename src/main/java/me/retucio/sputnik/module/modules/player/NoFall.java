@@ -64,7 +64,7 @@ public class NoFall extends Module {
 
     private final NumberSetting distance = sgGeneral.add(new NumberSetting(
             "distancia",
-            "distancia mínima de caída para aplicar el amortiguamiento",
+            "distancia mínima de caída para aplicar la amortiguación",
             3,
             3,
             23,

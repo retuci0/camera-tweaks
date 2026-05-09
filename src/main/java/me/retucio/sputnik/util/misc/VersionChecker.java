@@ -11,15 +11,17 @@ import java.time.Duration;
 
 public class VersionChecker {
 
-    private static final URI PROPERTIES_URL = getFileURI();
+    public static final VersionChecker INSTANCE = new VersionChecker();
 
-    public static boolean updateAvailable = false;
-    public static String latestRemoteVersion = null;
-    public static String currentVersion = Sputnik.MOD_VERSION;
+    private final URI PROPERTIES_URL = getFileURI();
+    private final String CURRENT_VERSION = Sputnik.MOD_VERSION;
 
-    public static boolean shouldShowScreen = false;
+    private boolean updateAvailable = false;
+    private String latestRemoteVersion = null;
 
-    public static void check() {
+    public boolean shouldShowScreen = false;
+
+    public void check() {
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -35,17 +37,17 @@ public class VersionChecker {
 
                 if (latestRemoteVersion != null) {
                     String remoteVersion = cleanVersion(latestRemoteVersion);
-                    String localVersion = cleanVersion(currentVersion);
+                    String localVersion = cleanVersion(CURRENT_VERSION);
 
                     if (compareVersions(localVersion, remoteVersion) == -1) {
                         updateAvailable = true;
                         Sputnik.LOGGER.info("actualización disponible. local: {}, más reciente: {}",
-                                currentVersion, latestRemoteVersion);
+                                CURRENT_VERSION, latestRemoteVersion);
                         shouldShowScreen = true;
                     } else if (compareVersions(localVersion, remoteVersion) == 0){
-                        Sputnik.LOGGER.info("el mod está al día: v{}", currentVersion);
+                        Sputnik.LOGGER.info("el mod está al día: v{}", CURRENT_VERSION);
                     } else {
-                        Sputnik.LOGGER.info("mod en estado de desarrollo: v{}", currentVersion);
+                        Sputnik.LOGGER.info("mod en estado de desarrollo: v{}", CURRENT_VERSION);
                     }
                 }
             } else {
@@ -135,7 +137,11 @@ public class VersionChecker {
         return null;
     }
 
-    public static String getLatestVersion() {
+    public String getLatestVersion() {
         return latestRemoteVersion;
+    }
+
+    public boolean isUpdateAvailable() {
+        return updateAvailable;
     }
 }

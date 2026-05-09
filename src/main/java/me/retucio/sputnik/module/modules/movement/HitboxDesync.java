@@ -20,7 +20,7 @@ public class HitboxDesync extends Module {
 
     public HitboxDesync() {
         super("desync de hitbox", "exploit chino", Category.MOVEMENT);
-        keyMode.setDefaultValue(KeyModes.HOLD);
+        keyMode.setDefaultValue(KeyMode.HOLD);
     }
 
     @Override

@@ -72,7 +72,7 @@ public abstract class Setting<T> {
     }
 
     public void setValue(T value) {
-        if (this.value != value) {
+        if (!this.value.equals(value)) {
             this.value = value;
 
             fireUpdateEvent();

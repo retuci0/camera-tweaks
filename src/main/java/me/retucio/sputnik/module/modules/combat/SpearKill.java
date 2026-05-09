@@ -114,7 +114,7 @@ public class SpearKill extends Module {
                 mc.player.getBoundingBox().expandTowards(lookVec.scale(rayLength)),
                 e -> e instanceof LivingEntity
                         && e.isAlive() && e != mc.player
-                        && (!ignoreFriends.getValue() || FriendManager.INSTANCE.isFriend(e)));
+                        && (!ignoreFriends.getValue() || !FriendManager.INSTANCE.isFriend(e)));
 
         candidates.sort(Comparator.comparingDouble(e ->
                 eyePos.distanceToSqr(e.getBoundingBox().getCenter())));

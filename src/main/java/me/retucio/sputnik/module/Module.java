@@ -9,6 +9,7 @@ import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.EnumSetting;
 import me.retucio.sputnik.module.setting.settings.KeySetting;
 import me.retucio.sputnik.module.setting.Setting;
+import me.retucio.sputnik.ui.hud.HudRenderer;
 import me.retucio.sputnik.util.ChatUtil;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
@@ -29,29 +30,52 @@ public class Module {
     private boolean saveSettings = true;
     private boolean searchMatch = true;
 
+
+    // ajustes que están en todos los módulos
+
+    protected KeySetting bind = new KeySetting(
+            "tecla",
+            "tecla asignada al módulo, ESC para desactivar",
+            GLFW.GLFW_KEY_UNKNOWN
+    );
+
     // dejar al usuario elegir si el módulo debería apagarse tras soltar su tecla asignada, o si la tecla debería alternar su estado
-    protected EnumSetting<KeyModes> keyMode = new EnumSetting<>("modo de tecla", "cómo interpretar la tecla configurada", KeyModes.class, KeyModes.TOGGLE);
-    protected KeySetting bind = new KeySetting("tecla", "tecla asignada al módulo, ESC para desactivar", GLFW.GLFW_KEY_UNKNOWN);
-    protected BooleanSetting notify = new BooleanSetting("notificar", "notificar en el chat al activar / desactivar", true);
+    protected EnumSetting<KeyMode> keyMode = new EnumSetting<>(
+            "modo de tecla",
+            "cómo interpretar la tecla configurada",
+            KeyMode.class, KeyMode.TOGGLE
+    );
+
+    protected BooleanSetting notify = new BooleanSetting(
+            "notificar",
+            "notificar al activar / desactivar",
+            true
+    );
+
+    protected EnumSetting<NotifyMode> notifyMode = new EnumSetting<>(
+            "modo de notificación",
+            "cómo notificar cuando se activa / desactiva",
+            NotifyMode.class, NotifyMode.WIDGET
+    );
 
     protected final List<SettingGroup> sgs = new ArrayList<>();
+    protected final SettingGroup sgModule = addSg(new SettingGroup("módulo", false));
     protected final SettingGroup sgGeneral = addSg(new SettingGroup("general", true));
 
-    protected Minecraft mc = Minecraft.getInstance();
-
+    protected static final Minecraft mc = Minecraft.getInstance();
 
     public Module(String name, String description, Category category) {
         this.name = name;
         this.description = description;
         this.category =  category;
-        sgGeneral.addAll(bind, keyMode, notify);
+        sgModule.addAll(bind, keyMode, notify, notifyMode);
     }
 
     public Module(String name, String description, Category category, int key) {
         this.name = name;
         this.description = description;
         this.category = category;
-        sgGeneral.addAll(bind, keyMode, notify);
+        sgModule.addAll(bind, keyMode, notify, notifyMode);
         this.bind.setDefaultValue(key);
 
         // puto marcos
@@ -67,6 +91,10 @@ public class Module {
         sgs.add(sg);
         sg.setModule(this);
         return sg;
+    }
+
+    public void removeSg(SettingGroup sg) {
+        sgs.remove(sg);
     }
 
     public List<SettingGroup> getSgs() {
@@ -86,6 +114,10 @@ public class Module {
         return sgGeneral;
     }
 
+    public SettingGroup getSgModule() {
+        return sgModule;
+    }
+
     public List<Setting<?>> getSettings() {
         List<Setting<?>> settings = new ArrayList<>();
         sgs.forEach(sg -> sg.forEach(settings::add));
@@ -102,27 +134,33 @@ public class Module {
     }
 
     public void onEnable() {
-        if (notify.getValue()) ChatUtil.info(getName() + " fue activado");
-        for (Method method : getClass().getDeclaredMethods())
+        if (notify.getValue()) {
+            if (notifyMode.is(NotifyMode.CHAT)) ChatUtil.info(getName() + " fue activado");
+            else HudRenderer.pushNotification(getName() + " fue activado", getName() + "fue activado.");
+        }
+        for (Method method : getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(EventListener.class)) {
                 Sputnik.EVENT_BUS.subscribe(this);
                 break;
+            }
         }
-        Sputnik.EVENT_BUS.post(new ToggleModuleEvent(this));
     }
 
     public void onDisable() {
-        if (notify.getValue()) ChatUtil.info(getName() + " fue desactivado");
-        if (Sputnik.EVENT_BUS.isSubscribed(this))
+        if (notifyMode.is(NotifyMode.CHAT)) ChatUtil.info(getName() + " fue desactivado");
+        else HudRenderer.pushNotification(getName() + " fue desactivado", getName() + "fue desactivado.");
+        if (Sputnik.EVENT_BUS.isSubscribed(this)) {
             Sputnik.EVENT_BUS.unsubscribe(this);
-        Sputnik.EVENT_BUS.post(new ToggleModuleEvent(this));
+        }
     }
 
 
     // tick (ejecutado 20 veces por segundo)
     public void onTick() {}
 
+
     // getters y setters
+
     public String getName() {
         return name;
     }
@@ -156,7 +194,7 @@ public class Module {
     }
 
     public boolean shouldToggleOnBindRelease() {
-        return keyMode.is(KeyModes.HOLD);
+        return keyMode.is(KeyMode.HOLD);
     }
 
     public boolean shouldSaveSettings() {
@@ -192,13 +230,22 @@ public class Module {
         this.searchMatch = searchMatch;
     }
 
-    public enum KeyModes {
+    public enum KeyMode {
         HOLD("mantener"),
         TOGGLE("alternar");
 
         // ojalá hubiera una manera de evitar repetirse con esto pero no la hay (creo) ...
         private final String name;
-        KeyModes(String name) { this.name = name; }
+        KeyMode(String name) { this.name = name; }
+        @Override public String toString() { return name; }
+    }
+
+    public enum NotifyMode {
+        CHAT("por chat"),
+        WIDGET("por widget");
+
+        private final String name;
+        NotifyMode(String name) { this.name = name; }
         @Override public String toString() { return name; }
     }
 }

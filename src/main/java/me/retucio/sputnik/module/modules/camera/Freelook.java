@@ -39,8 +39,8 @@ public class Freelook extends Module {
                 Category.CAMERA,
                 GLFW.GLFW_KEY_B);
 
-        keyMode.setDefaultValue(KeyModes.HOLD);
-        keyMode.setValue(KeyModes.HOLD);
+        keyMode.setDefaultValue(KeyMode.HOLD);
+        keyMode.setValue(KeyMode.HOLD);
 
         notify.setDefaultValue(false);
         notify.setValue(false);

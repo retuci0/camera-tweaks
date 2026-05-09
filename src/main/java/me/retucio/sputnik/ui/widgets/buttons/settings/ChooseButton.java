@@ -2,6 +2,7 @@ package me.retucio.sputnik.ui.widgets.buttons.settings;
 
 import me.retucio.sputnik.module.Category;
 import me.retucio.sputnik.module.Module;
+import me.retucio.sputnik.module.setting.SettingGroup;
 import me.retucio.sputnik.module.setting.settings.BooleanSetting;
 import me.retucio.sputnik.module.setting.settings.OptionSetting;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
@@ -67,6 +68,8 @@ public class ChooseButton<T> extends SettingButton<OptionSetting<T>> {
     }
 
     private void rebuildDummy() {
+        dummy.removeSg(dummy.getSgModule());
+        dummy.getSgGeneral().setName("opciones");
         dummy.getSgGeneral().getSettings().clear();
         optionButtons.clear();
 

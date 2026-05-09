@@ -83,7 +83,8 @@ public class ListButton<T> extends SettingButton<ListSetting<T>> {
     }
 
     private void rebuildDummy() {
-        dummy.getSettings().clear();
+        dummy.removeSg(dummy.getSgModule());
+        dummy.getSgGeneral().setName("opciones");
         dummy.getSgGeneral().getSettings().clear();
         optionButtons.clear();
 

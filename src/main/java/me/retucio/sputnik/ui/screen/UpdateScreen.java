@@ -31,7 +31,7 @@ public class UpdateScreen extends Screen {
     );
 
     private final Component outdatedText = Component.literal("version desactualizada: " + Sputnik.MOD_VERSION);
-    private final Component updateText = Component.literal("descarga la última versión (" + VersionChecker.getLatestVersion() + ") desde aquí:");
+    private final Component updateText = Component.literal("descarga la última versión (" + VersionChecker.INSTANCE.getLatestVersion() + ") desde aquí:");
 
     private final Button idgafButton = Button.builder(
             Component.literal("me la pela"),

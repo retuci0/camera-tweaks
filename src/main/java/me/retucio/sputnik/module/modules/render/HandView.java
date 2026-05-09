@@ -1,4 +1,4 @@
-package me.retucio.sputnik.module.modules.player;
+package me.retucio.sputnik.module.modules.render;
 
 import com.github.retucio.neutrino.EventListener;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -97,9 +97,11 @@ public class HandView extends Module {
             0, -180, 180, 1));
 
     public HandView() {
-        super("manos",
+        super(
+                "manos",
                 "modifica la manera en la que se renderizan las manos",
-                Category.PLAYER);
+                Category.RENDER
+        );
     }
 
     @EventListener

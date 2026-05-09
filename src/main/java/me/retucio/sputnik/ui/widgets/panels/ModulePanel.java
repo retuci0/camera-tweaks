@@ -7,10 +7,8 @@ import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
 import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.widgets.buttons.ModuleButton;
-import me.retucio.sputnik.ui.widgets.Panel;
 import me.retucio.sputnik.util.Colors;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
+
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
@@ -18,18 +16,15 @@ import java.util.List;
 
 
 // panel para los módulos
-public class ModulePanel extends Panel<ModuleButton> {
+public class ModulePanel extends ExtendablePanel<ModuleButton> {
 
-    public boolean extended;
     public final Category category;
 
     public ModulePanel(Category category, int x, int y, int w, int h) {
         super(category.toString(), x, y, w, h);
         this.category = category;
         dragging = false;
-        extended = true;
 
-        // determinar el saliente para cada botón de módulo
         int offset = h;
         for (Module module : ModuleManager.INSTANCE.getModules()) {
             if (!module.getCategory().equals(this.category)) continue;
@@ -40,12 +35,9 @@ public class ModulePanel extends Panel<ModuleButton> {
 
     @Override
     protected void updateWidth() {
-        // asegurarse de que todos los botones caben en el panel, haciendo
-        // que la anchura se ajuste al texto más largo
         int maxWidth = mc.font.width(title);
         for (ModuleButton button : buttons) {
-            String text = button.getModule().getName();
-            int textWidth = mc.font.width(text);
+            int textWidth = mc.font.width(button.getModule().getName());
             maxWidth = Math.max(maxWidth, textWidth);
         }
         this.w = maxWidth + 22;
@@ -54,33 +46,24 @@ public class ModulePanel extends Panel<ModuleButton> {
     @Override
     public void render(GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
         updateWidth();
-        gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB()); // cabeza del marco
+        gui.fill(x, renderY, x + w, renderY + h, Colors.mainColor.getRGB());
 
-        // título del marco
         gui.text(mc.font, Component.literal(title),
                 x + 8,
                 renderY + (h / 2) - (mc.font.lineHeight / 2),
                 -1, true);
 
-        gui.text(mc.font, extended ? "-" : "+",
-                x + w - mc.font.width("+") - 8,  // '+' y '-' tienen la misma anchura, o sea que no importa cuál use
-                renderY + (h / 2) - (mc.font.lineHeight / 2),
-                -1, true);
+        drawExpandCollapse(gui, mouseX, mouseY);
 
         List<ModuleButton> visibleButtons = buttons.stream()
                 .filter(mb -> mb.getModule().isSearchMatch())
                 .toList();
 
-        // dibujar sus módulos solo si está extendido
         if (extended) {
             totalHeight = visibleButtons.size() * h + 3;
-            gui.fill(  // fondo para los botones
-                    x, renderY + h + 1,
-                    x + w, renderY + h + totalHeight,
-                    Colors.panelBgColor.getRGB());
+            gui.fill(x, renderY + h + 1, x + w, renderY + h + totalHeight, Colors.panelBgColor.getRGB());
 
-            // dibujar los botones para cada módulo
-            int buttonY =  renderY + h + 1;
+            int buttonY = renderY + h + 1;
             for (ModuleButton moduleButton : visibleButtons) {
                 moduleButton.setOffset(buttonY - renderY);
                 moduleButton.render(gui, mouseX, mouseY, delta);
@@ -93,19 +76,18 @@ public class ModulePanel extends Panel<ModuleButton> {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        // registrar clics
         if (isHovered(mouseX, mouseY) && ClickGui.INSTANCE.trySelect(this)) {
-            if (button == 0) {  // clic izquierdo para arrastrarlo
+            if (button == 0) {
                 dragging = true;
                 dragX = mouseX - x;
                 dragY = mouseY - y;
-            } else if (button == 1) {  // clic derecho para extenderlo
-                extended = !extended;
+            } else if (button == 1) {
+                toggleExtended();
                 Sputnik.EVENT_BUS.post(new ModulePanelEvent.Extend(this));
             }
         }
 
-        if (!extended) return;  // solo dejar clicar en los módulos si el marco está extendido
+        if (!extended) return;
 
         List<ModuleButton> visibleModuleButtons = buttons.stream()
                 .filter(mb -> mb.getModule().isSearchMatch())
@@ -116,30 +98,24 @@ public class ModulePanel extends Panel<ModuleButton> {
         }
     }
 
-    // detectar cuándo se suelta el clic
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
         ClickGui.INSTANCE.unselect(this);
-        if (button == 0 && dragging) {
-            dragging = false;
-        }
+        if (button == 0 && dragging) dragging = false;
 
         List<ModuleButton> visibleModuleButtons = buttons.stream()
                 .filter(mb -> mb.getModule().isSearchMatch())
                 .toList();
 
         for (ModuleButton moduleButton : visibleModuleButtons) {
-            if (moduleButton.isHovered(mouseX, mouseY)) {
+            if (moduleButton.isHovered(mouseX, mouseY))
                 moduleButton.mouseReleased(mouseX, mouseY, button);
-            }
         }
 
-        if (isHovered(mouseX, mouseY)) {
+        if (isHovered(mouseX, mouseY))
             Sputnik.EVENT_BUS.post(new ModulePanelEvent.Move(this));
-        }
     }
 
-    // actualizar la posición al arrastrar el panel
     public void updatePosition(double mouseX, double mouseY) {
         if (dragging) {
             x = (int) (mouseX - dragX);

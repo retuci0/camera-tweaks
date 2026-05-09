@@ -26,7 +26,7 @@ import org.lwjgl.glfw.GLFW;
 public class AirPlace extends Module {
 
     private final SettingGroup sgScroll = addSg(new SettingGroup("scrolleo", true));
-    private final SettingGroup sgRender = addSg(new SettingGroup("extractRenderState", true));
+    private final SettingGroup sgRender = addSg(new SettingGroup("renderizado", true));
 
 
     // general

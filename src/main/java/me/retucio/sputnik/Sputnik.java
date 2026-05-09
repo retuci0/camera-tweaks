@@ -24,7 +24,6 @@ import me.retucio.sputnik.ui.screen.UpdateScreen;
 import me.retucio.sputnik.ui.widgets.buttons.settings.BindButton;
 import me.retucio.sputnik.ui.widgets.buttons.SettingButton;
 import me.retucio.sputnik.ui.widgets.buttons.settings.TextButton;
-import me.retucio.sputnik.ui.widgets.misc.NotificationWidget;
 import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
 import me.retucio.sputnik.ui.widgets.Button;
@@ -56,8 +55,9 @@ import org.lwjgl.glfw.GLFW;
 
 public class Sputnik implements ClientModInitializer {
 
-    // cosas necesarias
     public static final Sputnik INSTANCE = new Sputnik();
+
+    // cosas del mod
     public static final EventBus EVENT_BUS = new EventBus();
     public static final Logger LOGGER = LogManager.getLogger(Sputnik.class);
     public static final long LAUNCH_TIME = System.currentTimeMillis();
@@ -85,7 +85,7 @@ public class Sputnik implements ClientModInitializer {
         mc = Minecraft.getInstance();
         ConfigManager.load();
 
-        VersionChecker.check();
+        VersionChecker.INSTANCE.check();
 
         EVENT_BUS.subscribe(this);
 
@@ -250,9 +250,9 @@ public class Sputnik implements ClientModInitializer {
     @EventListener
     // notificar al usuario de que hay una actualización disponible, si la hay
     public void onSetScreen(OpenScreenEvent event) {
-        if (VersionChecker.shouldShowScreen && event.getScreen() instanceof TitleScreen) {
+        if (VersionChecker.INSTANCE.shouldShowScreen && event.getScreen() instanceof TitleScreen) {
             event.cancel();
-            VersionChecker.shouldShowScreen = false;
+            VersionChecker.INSTANCE.shouldShowScreen = false;
             mc.execute(() -> mc.screen = new UpdateScreen());
         }
     }

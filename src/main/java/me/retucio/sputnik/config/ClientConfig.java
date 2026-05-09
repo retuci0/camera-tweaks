@@ -100,7 +100,7 @@ public class ClientConfig {
         extendablePanels.put(event.getPanel().category.toString(), new PanelData(
                 event.getPanel().getX(),
                 event.getPanel().getY(),
-                event.getPanel().extended));
+                event.getPanel().isExtended()));
         ConfigManager.save();
     }
 
@@ -109,7 +109,7 @@ public class ClientConfig {
         extendablePanels.replace(event.getPanel().category.toString(), new PanelData(
                 event.getPanel().getX(),
                 event.getPanel().getY(),
-                event.getPanel().extended));
+                event.getPanel().isExtended()));
         ConfigManager.save();
     }
 
@@ -118,7 +118,7 @@ public class ClientConfig {
         extendablePanels.put("ajustes", new PanelData(
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
-                ClickGui.INSTANCE.getClientSettingsPanel().extended));
+                ClickGui.INSTANCE.getClientSettingsPanel().isExtended()));
         ConfigManager.save();
     }
 
@@ -127,7 +127,7 @@ public class ClientConfig {
         extendablePanels.replace("ajustes", new PanelData(
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
-                ClickGui.INSTANCE.getClientSettingsPanel().extended));
+                ClickGui.INSTANCE.getClientSettingsPanel().isExtended()));
         ConfigManager.save();
     }
 
@@ -136,7 +136,7 @@ public class ClientConfig {
         extendablePanels.put("amigos", new PanelData(
                 ClickGui.INSTANCE.getFriendsPanel().getX(),
                 ClickGui.INSTANCE.getFriendsPanel().getY(),
-                ClickGui.INSTANCE.getFriendsPanel().extended));
+                ClickGui.INSTANCE.getFriendsPanel().isExtended()));
         ConfigManager.save();
     }
 
@@ -145,7 +145,7 @@ public class ClientConfig {
         extendablePanels.replace("amigos", new PanelData(
                 ClickGui.INSTANCE.getFriendsPanel().getX(),
                 ClickGui.INSTANCE.getFriendsPanel().getY(),
-                ClickGui.INSTANCE.getFriendsPanel().extended));
+                ClickGui.INSTANCE.getFriendsPanel().isExtended()));
         ConfigManager.save();
     }
 
