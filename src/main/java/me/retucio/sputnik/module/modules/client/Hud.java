@@ -134,7 +134,7 @@ public class Hud extends Module {
         );
 
         dyno.onUpdate(v -> {
-            DynoElement element = (DynoElement) HudRenderer.getElement(DynoElement.class);
+            DynoElement element = (DynoElement) HudRenderer.INSTANCE.getElement(DynoElement.class);
             if (element != null) element.reloadTexture();
         });
     }

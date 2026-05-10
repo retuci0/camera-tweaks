@@ -53,7 +53,7 @@ public class ClientConfig {
 
     @EventListener
     public void onToggleModule(ToggleModuleEvent event) {
-        ConfigManager.setModuleState(event.getModule());
+        ConfigManager.INSTANCE.setModuleState(event.getModule());
     }
 
     @SuppressWarnings("rawtypes")
@@ -75,24 +75,24 @@ public class ClientConfig {
             default: break;
         }
 
-        ConfigManager.setSetting(event.getSetting(), value);
+        ConfigManager.INSTANCE.setSetting(event.getSetting(), value);
     }
 
     @EventListener
     public void onOpenSettingsPanel(SettingsPanelEvent.Open event) {
-        ConfigManager.setPanelPosition(event.getPanel());
+        ConfigManager.INSTANCE.setPanelPosition(event.getPanel());
     }
 
     @EventListener
     public void onCloseSettingsPanel(SettingsPanelEvent.Close event) {
         settingsPanels.remove(event.getPanel().getModule().getName());
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
     public void onMoveSettingsPanel(SettingsPanelEvent.Move event) {
         settingsPanels.replace(event.getPanel().getModule().getName(), new int[]{event.getPanel().getX(), event.getPanel().getY()});
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
@@ -101,7 +101,7 @@ public class ClientConfig {
                 event.getPanel().getX(),
                 event.getPanel().getY(),
                 event.getPanel().isExtended()));
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
@@ -110,7 +110,7 @@ public class ClientConfig {
                 event.getPanel().getX(),
                 event.getPanel().getY(),
                 event.getPanel().isExtended()));
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
@@ -119,7 +119,7 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
                 ClickGui.INSTANCE.getClientSettingsPanel().isExtended()));
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
@@ -128,7 +128,7 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getClientSettingsPanel().getX(),
                 ClickGui.INSTANCE.getClientSettingsPanel().getY(),
                 ClickGui.INSTANCE.getClientSettingsPanel().isExtended()));
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
@@ -137,7 +137,7 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getFriendsPanel().getX(),
                 ClickGui.INSTANCE.getFriendsPanel().getY(),
                 ClickGui.INSTANCE.getFriendsPanel().isExtended()));
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
@@ -146,7 +146,7 @@ public class ClientConfig {
                 ClickGui.INSTANCE.getFriendsPanel().getX(),
                 ClickGui.INSTANCE.getFriendsPanel().getY(),
                 ClickGui.INSTANCE.getFriendsPanel().isExtended()));
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     @EventListener
@@ -156,12 +156,13 @@ public class ClientConfig {
         if (!friends.containsKey(uuid)) {
             friends.put(uuid, name);
         }
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
+
     @EventListener
     public void onRemoveFriend(FriendEvent.Remove event) {
         friends.remove(event.getFriend().getUuid().toString());
-        ConfigManager.save();
+        ConfigManager.INSTANCE.markDirty();
     }
 
     public record PanelData(int x, int y, boolean extended) implements Serializable {

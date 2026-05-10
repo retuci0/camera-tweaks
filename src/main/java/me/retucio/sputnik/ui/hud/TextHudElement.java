@@ -19,7 +19,7 @@ public abstract class TextHudElement extends HudElement {
         String text = getText(delta, hud);
         int color = hud != null ? hud.color.getValue().getRGB() : -1;
         boolean shadow = hud != null && hud.shadow.getValue();
-        HudRenderer.drawSnappedText(gui, text, x, y, color, shadow);
+        HudRenderer.INSTANCE.drawSnappedText(gui, text, x, y, color, shadow);
     }
 
     @Override
@@ -32,7 +32,7 @@ public abstract class TextHudElement extends HudElement {
 
         int color = hud != null ? hud.color.getValue().getRGB() : -1;
         boolean shadow = hud != null && hud.shadow.getValue();
-        HudRenderer.drawSnappedText(gui, previewText, x, y, color, shadow);
+        HudRenderer.INSTANCE.drawSnappedText(gui, previewText, x, y, color, shadow);
     }
 
     protected void drawEditorBackground(GuiGraphicsExtractor gui) {

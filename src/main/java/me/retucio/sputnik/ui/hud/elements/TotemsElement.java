@@ -12,6 +12,8 @@ import java.util.List;
 
 public class TotemsElement extends ImageHudElement {
 
+    private static ItemStack TOTEM_PREVIEW = null;
+
     public TotemsElement() {
         super("totems", 363, 521);
         w = 16;
@@ -38,7 +40,10 @@ public class TotemsElement extends ImageHudElement {
             count = 69;
         }
 
-        drawItem(gui, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
+        ItemStack stack = getTotemPreview(count);
+        if (stack != null) {
+            drawItem(gui, stack, count);
+        }
     }
 
     @Override
@@ -54,7 +59,11 @@ public class TotemsElement extends ImageHudElement {
         }
 
         drawEditorBackground(gui);
-        drawItem(gui, new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(1, count)), count);
+
+        ItemStack stack = getTotemPreview(count);
+        if (stack != null) {
+            drawItem(gui, stack, count);
+        }
     }
 
     @Override
@@ -79,5 +88,16 @@ public class TotemsElement extends ImageHudElement {
                     true
             );
         }
+    }
+
+    private static ItemStack getTotemPreview(int count) {
+        if (TOTEM_PREVIEW == null) {
+            try {
+                TOTEM_PREVIEW = new ItemStack(Items.TOTEM_OF_UNDYING, 1);
+            } catch (Exception e) {
+                return null; // registries not ready yet
+            }
+        }
+        return TOTEM_PREVIEW;
     }
 }

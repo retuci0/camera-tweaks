@@ -79,7 +79,7 @@ public abstract class GuiMixin {
 
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void renderHUD(GuiGraphicsExtractor gui, DeltaTracker dt, CallbackInfo ci) {
-        HudRenderer.render(gui, dt);
+        HudRenderer.INSTANCE.render(gui, dt);
     }
 
     @Redirect(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V", ordinal = 0))

@@ -7,14 +7,17 @@ import me.retucio.sputnik.friend.Friend;
 import me.retucio.sputnik.friend.FriendManager;
 import me.retucio.sputnik.module.Module;
 import me.retucio.sputnik.module.ModuleManager;
+import me.retucio.sputnik.module.modules.client.ClientSettingsModule;
 import me.retucio.sputnik.module.setting.*;
 import me.retucio.sputnik.module.setting.settings.*;
+import me.retucio.sputnik.ui.hud.HudRenderer;
 import me.retucio.sputnik.ui.widgets.Panel;
 import me.retucio.sputnik.ui.widgets.panels.FriendsPanel;
 import me.retucio.sputnik.ui.widgets.panels.ModulePanel;
 import me.retucio.sputnik.ui.screen.ClickGui;
 import me.retucio.sputnik.ui.widgets.panels.settings.ClientSettingsPanel;
 import me.retucio.sputnik.ui.widgets.panels.SettingsPanel;
+import me.retucio.sputnik.util.ChatUtil;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,6 +25,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 // se ocupa de guardar, cargar y aplicar ajustes
@@ -30,26 +37,70 @@ public class ConfigManager {
     private static final File CONFIG_FILE = new File("sputnik.dat");
     private static final File LEGACY_JSON_FILE = new File("sputnik.json");
 
-    private static boolean loaded = false;
-    private static ClientConfig config = null;
+    public static ConfigManager INSTANCE;
+
+    private boolean loaded = false;
+    private boolean dirty = false;
+    private long lastDirtyTime = 0L;
+    private ClientConfig config = null;
+
+    private final ExecutorService saveExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "sputnik-config-save");
+        t.setDaemon(true);  // no bloquear el cierre de la JVM
+        return t;
+    });
+
+    private final AtomicBoolean saveQueued = new AtomicBoolean(false);
 
 
     // ------------------ MÉTODOS PRINCIPALES ------------------
 
     // guardar configuraciones
-    public static void save() {
+    public void save() {
         if (!loaded) return;
         ensureConfig();
 
+        // serializar a bytes en el hilo principal (snapshot inmediato, evita race conditions)
+        final byte[] snapshot;
         try {
-            BinarySerializer.writeConfig(config, CONFIG_FILE);
-            Sputnik.LOGGER.info("ajustes guardados");
+            snapshot = BinarySerializer.toBytes(config);
         } catch (IOException e) {
-            Sputnik.LOGGER.error("error al guardar ajustes", e);
+            Sputnik.LOGGER.error("error al serializar ajustes", e);
+            return;
         }
+
+        // si ya hay un guardado en cola, no añadir otro
+        if (!saveQueued.compareAndSet(false, true)) return;
+
+        saveExecutor.execute(() -> {
+            try {
+                BinarySerializer.writeBytes(snapshot, CONFIG_FILE);
+                Sputnik.LOGGER.info("ajustes guardados");
+            } catch (IOException e) {
+                Sputnik.LOGGER.error("error al guardar ajustes", e);
+            } finally {
+                saveQueued.set(false);
+            }
+        });
     }
 
-    public static void load() {
+    public void saveOnShutdown() {
+        // esperar a que termine cualquier guardado en curso, luego guardar síncronamente
+        saveExecutor.shutdown();
+        try {
+            // dar hasta 5 segundos para que termine el guardado en curso
+            if (!saveExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                Sputnik.LOGGER.warn("el hilo de guardado no terminó a tiempo");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // guardado final sincrónico por si había cambios pendientes no guardados
+        if (dirty) save();
+    }
+
+    public void load() {
         Sputnik.LOGGER.info("cargando ajustes...");
 
         if (CONFIG_FILE.exists()) {
@@ -82,7 +133,7 @@ public class ConfigManager {
     }
 
     // aplicar configuraciones cargadas
-    public static void applyConfig() {
+    public void applyConfig() {
         if (!shouldApply()) return;
 
         applyModuleStates();
@@ -98,7 +149,7 @@ public class ConfigManager {
     }
 
     // obtener configuración actual
-    public static ClientConfig getConfig() {
+    public ClientConfig getConfig() {
         ensureConfig();
         return config;
     }
@@ -106,65 +157,65 @@ public class ConfigManager {
 
     // ------------------ GUARDAR VALORES INDIVIDUALES EN LA CONFIG. ------------------
 
-    public static void setModuleState(Module module) {
+    public void setModuleState(Module module) {
         ensureConfig();
         config.moduleStates.put(module.getName(), module.isEnabled());
-        save();
+        markDirty();
     }
 
-    public static void setSetting(Setting<?> setting, Object value) {
+    public void setSetting(Setting<?> setting, Object value) {
         ensureConfig();
         config.settings.put(getSettingKey(setting), value);
-        save();
+        markDirty();
     }
 
-    public static void setPanelPosition(SettingsPanel panel) {
+    public void setPanelPosition(SettingsPanel panel) {
         ensureConfig();
         if (!config.settingsPanels.containsKey(panel.getModule().getName()))
             config.settingsPanels.put(panel.getModule().getName(), new int[] {panel.getX(), panel.getY()});
         else
             config.settingsPanels.replace(panel.getModule().getName(), new int[] {panel.getX(), panel.getY()});
-        save();
+        markDirty();
     }
 
-    public static void setExtendablePanel(String key, ClientConfig.PanelData data) {
+    public void setExtendablePanel(String key, ClientConfig.PanelData data) {
         ensureConfig();
         config.extendablePanels.put(key, data);
-        save();
+        markDirty();
     }
 
-    public static void setHudPosition(String id, int x, int y) {
+    public void setHudPosition(String id, int x, int y) {
         ensureConfig();
         config.hudPositions.put(id, new int[] {x, y});
-        save();
+        markDirty();
     }
 
-    public static void setHudVisibility(String id, Boolean visible) {
+    public void setHudVisibility(String id, Boolean visible) {
         ensureConfig();
         config.hudVisibilities.put(id, visible);
-        save();
+        markDirty();
     }
 
-    public static void setSearchBarPosition(int x, int y) {
+    public void setSearchBarPosition(int x, int y) {
         ensureConfig();
         config.searchBarPosition = new int[] {x, y};
-        save();
+        markDirty();
     }
 
 
     // ------------------ APLICAR AJUSTES ------------------
 
-    public static void applyFriends() {
-        Sputnik.LOGGER.info("aplicando amigos: {}", config.friends);
+    public void applyFriends() {
         config.friends.forEach((uuid, name) -> {
             Friend friend = new Friend(UUID.fromString(uuid));
             friend.setName(name);
             FriendManager.INSTANCE.add(friend);
         });
+        Sputnik.LOGGER.info("amigos aplicados");
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void applySetting(Setting<?> setting) {
+    public void applySetting(Setting<?> setting) {
         String key = getSettingKey(setting);
 
         if (!config.settings.containsKey(key)) return;
@@ -184,7 +235,7 @@ public class ConfigManager {
         }
     }
 
-    private static void applyModuleStates() {
+    private void applyModuleStates() {
         ModuleManager.INSTANCE.getModules().forEach(module -> {
             if (config.moduleStates.containsKey(module.getName())) {
                 module.setEnabled(config.moduleStates.get(module.getName()));
@@ -193,14 +244,14 @@ public class ConfigManager {
         Sputnik.LOGGER.info("estados de módulos aplicados");
     }
 
-    private static void applyModuleSettings() {
+    private void applyModuleSettings() {
         ModuleManager.INSTANCE.getModules().forEach(module -> {
-            module.getSettings().forEach(ConfigManager::applySetting);
+            module.getSettings().forEach(this::applySetting);
         });
         Sputnik.LOGGER.info("ajustes de módulos aplicados");
     }
 
-    private static void applySettingsPanels() {
+    private void applySettingsPanels() {
         config.settingsPanels.forEach((moduleName, position) -> {
             Module module = ModuleManager.INSTANCE.getModuleByName(moduleName);
 
@@ -215,7 +266,7 @@ public class ConfigManager {
         Sputnik.LOGGER.info("estados de marcos de ajustes aplicados");
     }
 
-    private static void applySearchBarPosition() {
+    private void applySearchBarPosition() {
         if (config.searchBarPosition != null && config.searchBarPosition.length == 2) {
             ClickGui.INSTANCE.getSearchBar().setX(config.searchBarPosition[0]);
             ClickGui.INSTANCE.getSearchBar().setY(config.searchBarPosition[1]);
@@ -223,13 +274,13 @@ public class ConfigManager {
         Sputnik.LOGGER.info("posición de la barra de búsqueda aplicada");
     }
 
-    private static void applyClientSettings() {
+    private void applyClientSettings() {
         ClientSettingsPanel.clientSettings.setEnabled(true);
-        ClientSettingsPanel.clientSettings.getSettings().forEach(ConfigManager::applySetting);
+        ClientSettingsPanel.clientSettings.getSettings().forEach(this::applySetting);
         Sputnik.LOGGER.info("ajustes del cliente aplicados");
     }
 
-    private static void applyExtendablePanels() {
+    private void applyExtendablePanels() {
         for (ModulePanel panel : ClickGui.INSTANCE.getModulePanels()) {
             applyExtendablePanel(panel);
         }
@@ -240,7 +291,7 @@ public class ConfigManager {
         ClickGui.INSTANCE.refreshListButtons();
     }
 
-    private static void applyExtendablePanel(Panel<?> panel) {
+    private void applyExtendablePanel(Panel<?> panel) {
         ClientConfig.PanelData panelData = null;
 
         if (panel instanceof ModulePanel mp) {
@@ -359,19 +410,42 @@ public class ConfigManager {
 
     // ------------------ MÉTODOS DE AYUDA ------------------
 
-    private static boolean shouldApply() {
-        return Sputnik.mc != null && ModuleManager.INSTANCE != null && config != null;
-    }
-
-    private static void ensureConfig() {
-        if (config == null) config = new ClientConfig();
-    }
-
     private static String getSettingKey(Setting<?> setting) {
         return setting.getSg().getModule().getName() + ":" + setting.getTrueName();
     }
 
-    public static boolean hasLoaded() {
+    private boolean shouldApply() {
+        return Sputnik.mc != null && ModuleManager.INSTANCE != null && config != null;
+    }
+
+    private void ensureConfig() {
+        if (config == null) config = new ClientConfig();
+    }
+
+    public boolean hasLoaded() {
         return loaded;
+    }
+
+    public void markDirty() {
+        this.dirty = true;
+        this.lastDirtyTime = System.currentTimeMillis();
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void tickAutosave() {
+        if (!loaded || !dirty) return;
+
+        ClientSettingsModule settings = ClientSettingsPanel.clientSettings;
+        if (!settings.autosave.getValue()) return;
+
+        long intervalMs = (long) (settings.autosaveInterval.getValue() * 1000);
+        if (System.currentTimeMillis() - lastDirtyTime < intervalMs) return;
+
+        HudRenderer.INSTANCE.pushNotification("autoguardando...", "guardando configuración...");
+        save();
+        dirty = false;
     }
 }

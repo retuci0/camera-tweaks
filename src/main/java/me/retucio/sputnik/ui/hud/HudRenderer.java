@@ -22,16 +22,18 @@ public class HudRenderer {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
-    private static final List<HudElement> elements = new ArrayList<>();
-    private static final Stack<NotificationWidget> notifications = new Stack<>();
-    private static boolean initialized = false;
+    public static HudRenderer INSTANCE;
 
-    public static void init() {
+    private final List<HudElement> elements = new ArrayList<>();
+    private final Stack<NotificationWidget> notifications = new Stack<>();
+    private boolean initialized = false;
+
+    public void init() {
         if (initialized) return;
         initialized = true;
 
-        Map<String, int[]> positions = ConfigManager.getConfig().hudPositions;
-        Map<String, Boolean> visibilities = ConfigManager.getConfig().hudVisibilities;
+        Map<String, int[]> positions = ConfigManager.INSTANCE.getConfig().hudPositions;
+        Map<String, Boolean> visibilities = ConfigManager.INSTANCE.getConfig().hudVisibilities;
 
         addElement(new CoordsElement(), positions, visibilities);
         addElement(new FpsElement(), positions, visibilities);
@@ -49,7 +51,7 @@ public class HudRenderer {
         HudEditorScreen.INSTANCE.setElements(elements);
     }
 
-    private static void addElement(HudElement element, Map<String, int[]> positions, Map<String, Boolean> visibilities) {
+    private void addElement(HudElement element, Map<String, int[]> positions, Map<String, Boolean> visibilities) {
         int[] savedPos;
 
         if (positions.get(element.getId()) == null)
@@ -68,7 +70,7 @@ public class HudRenderer {
         elements.add(element);
     }
 
-    public static HudElement getElement(Class<? extends HudElement> clazz) {
+    public HudElement getElement(Class<? extends HudElement> clazz) {
         for (HudElement element : elements) {
             if (element.getClass() == clazz)
                 return element;
@@ -82,7 +84,7 @@ public class HudRenderer {
         return hud.color.getValue();
     }
 
-    public static void drawSnappedText(GuiGraphicsExtractor gui, String text, int x, int y, int color, boolean shadow) {
+    public void drawSnappedText(GuiGraphicsExtractor gui, String text, int x, int y, int color, boolean shadow) {
         int textWidth = mc.font.width(text);
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
@@ -96,7 +98,7 @@ public class HudRenderer {
         gui.text(mc.font, text, drawX, y, color, shadow);
     }
 
-    public static void render(GuiGraphicsExtractor gui, DeltaTracker dt) {
+    public void render(GuiGraphicsExtractor gui, DeltaTracker dt) {
         Hud hud = ModuleManager.INSTANCE.getModuleByClass(Hud.class);
 
         for (HudElement element : elements) {
@@ -129,11 +131,11 @@ public class HudRenderer {
                 || mc.screen instanceof HudEditorScreen;
     }
 
-    public static void pushNotification(String title, String desc) {
+    public void pushNotification(String title, String desc) {
         notifications.push(new NotificationWidget(title, desc));
     }
 
-    public static List<HudElement> getElements() {
+    public List<HudElement> getElements() {
         return elements;
     }
 }

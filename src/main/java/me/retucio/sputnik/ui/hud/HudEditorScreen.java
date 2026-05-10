@@ -186,9 +186,9 @@ public class HudEditorScreen extends Screen {
     }
 
     private void saveElementToConfig(HudElement element) {
-        ConfigManager.setHudPosition(element.getId(), element.getX(), element.getY());
-        ConfigManager.setHudVisibility(element.getId(), element.isVisible());
-        ConfigManager.save();
+        ConfigManager.INSTANCE.setHudPosition(element.getId(), element.getX(), element.getY());
+        ConfigManager.INSTANCE.setHudVisibility(element.getId(), element.isVisible());
+        ConfigManager.INSTANCE.save();
     }
 
     private void saveAllElementsToConfig() {

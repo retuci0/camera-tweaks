@@ -175,8 +175,8 @@ public class SearchBarWidget extends Widget {
     }
 
     public void savePosition() {
-        if (ConfigManager.getConfig() != null) {
-            ConfigManager.setSearchBarPosition(x, y);
+        if (ConfigManager.INSTANCE.getConfig() != null) {
+            ConfigManager.INSTANCE.setSearchBarPosition(x, y);
         }
     }
 }

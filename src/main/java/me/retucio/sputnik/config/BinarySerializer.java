@@ -2,6 +2,8 @@ package me.retucio.sputnik.config;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,33 +23,60 @@ public class BinarySerializer {
     private static final byte TYPE_INT_ARRAY = 6;
     private static final byte TYPE_FRAME_DATA = 7;
 
-    public static void writeConfig(ClientConfig config, File file)
-            throws IOException {
-        try (DataOutputStream out = new DataOutputStream(
-                new BufferedOutputStream(new FileOutputStream(file)))) {
+    public static void writeConfig(ClientConfig config, File file) throws IOException {
+        byte[] bytes = toBytes(config);
+        writeBytes(bytes, file);
+    }
 
-            // cabezal
-            out.writeInt(MAGIC_NUMBER);
-            out.writeInt(VERSION);
+    // serializar a bytes en memoria
+    public static byte[] toBytes(ClientConfig config) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (DataOutputStream out = new DataOutputStream(baos)) {
+            writeConfigTo(config, out);
+        }
+        return baos.toByteArray();
+    }
 
-            // mapas
-            writeStringBooleanMap(out, config.moduleStates);
-            writeSettingsMap(out, config.settings);
-            writeStringIntArrayMap(out, config.settingsPanels);
-            writeExtendableFrames(out, config.extendablePanels);
-            writeStringIntArrayMap(out, config.hudPositions);
-            writeStringBooleanMap(out, config.hudVisibilities);
-            writeStringStringMap(out, config.hudImagePaths);
-            writeStringStringMap(out, config.friends);
+    // escribir bytes a disco (puede llamarse desde un hilo de fondo)
+    public static void writeBytes(byte[] bytes, File file) throws IOException {
+        // escribir a archivo temporal primero para evitar corrupción si el proceso muere a mitad
+        File temp = new File(file.getParent(), file.getName() + ".tmp");
+        try (FileOutputStream fos = new FileOutputStream(temp);
+             BufferedOutputStream out = new BufferedOutputStream(fos)) {
+            out.write(bytes);
+            out.flush();
+            fos.getFD().sync();  // forzar flush al disco antes de renombrar
+        }
 
-            // posición de la barra de búsqueda
-            if (config.searchBarPosition != null) {
-                out.writeBoolean(true);
-                out.writeInt(config.searchBarPosition[0]);
-                out.writeInt(config.searchBarPosition[1]);
-            } else {
-                out.writeBoolean(false);
-            }
+        // renombrar atómicamente
+        if (!temp.renameTo(file)) {
+            // renameTo puede fallar entre sistemas de archivos distintos
+            Files.move(temp.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    // lógica de serialización compartida
+    private static void writeConfigTo(ClientConfig config, DataOutputStream out) throws IOException {
+        // cabezal
+        out.writeInt(MAGIC_NUMBER);
+        out.writeInt(VERSION);
+
+        // el resto
+        writeStringBooleanMap(out, config.moduleStates);
+        writeSettingsMap(out, config.settings);
+        writeStringIntArrayMap(out, config.settingsPanels);
+        writeExtendableFrames(out, config.extendablePanels);
+        writeStringIntArrayMap(out, config.hudPositions);
+        writeStringBooleanMap(out, config.hudVisibilities);
+        writeStringStringMap(out, config.hudImagePaths);
+        writeStringStringMap(out, config.friends);
+
+        if (config.searchBarPosition != null) {
+            out.writeBoolean(true);
+            out.writeInt(config.searchBarPosition[0]);
+            out.writeInt(config.searchBarPosition[1]);
+        } else {
+            out.writeBoolean(false);
         }
     }
 

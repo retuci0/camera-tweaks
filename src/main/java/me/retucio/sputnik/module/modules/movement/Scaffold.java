@@ -330,11 +330,10 @@ public class Scaffold extends Module {
             mc.player.getInventory().setSelectedSlot(slot);
         }
 
-
         // colocar bloque
         if (NetworkUtil.placeBlock(
                 pos, InteractionHand.MAIN_HAND,
-                mc.player.getInventory().getSelectedSlot(),
+                slot,
                 rotate.getValue(),
                 rotate.getValue(),
                 swingHand.getValue(),

@@ -42,8 +42,8 @@ public class FriendSettingsPanel extends SettingsPanel {
         dummyModule.getSgGeneral().add(nickname);
         nickname.onUpdate(name -> {
             friend.setName(name);
-            ConfigManager.getConfig().friends.put(friend.getUuid().toString(), name);
-            ConfigManager.save();
+            ConfigManager.INSTANCE.getConfig().friends.put(friend.getUuid().toString(), name);
+            ConfigManager.INSTANCE.save();
         });
 
         buttons.clear();

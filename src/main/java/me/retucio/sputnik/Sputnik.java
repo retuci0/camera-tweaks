@@ -83,7 +83,9 @@ public class Sputnik implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         mc = Minecraft.getInstance();
-        ConfigManager.load();
+
+        ConfigManager.INSTANCE = new ConfigManager();
+        ConfigManager.INSTANCE.load();
 
         VersionChecker.INSTANCE.check();
 
@@ -100,6 +102,8 @@ public class Sputnik implements ClientModInitializer {
         EVENT_BUS.subscribe(BlockIterator.class);
 
         Lists.init();
+
+        HudRenderer.INSTANCE = new HudRenderer();
 
         CapeManager.INSTANCE = new CapeManager();
         EVENT_BUS.post(new LoadCapeManagerEvent());
@@ -120,7 +124,7 @@ public class Sputnik implements ClientModInitializer {
             HudEditorScreen.INSTANCE = new HudEditorScreen();
             EVENT_BUS.post(new LoadClickGuiEvent());
 
-            HudRenderer.init();
+            HudRenderer.INSTANCE.init();
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -131,14 +135,16 @@ public class Sputnik implements ClientModInitializer {
     // se ejecuta cada tick, es decir, 20 veces por segundo
     public void onTick() {
         if (!settingsApplied
-                && ConfigManager.getConfig() != null
-                && !ConfigManager.hasLoaded()) {
-            ConfigManager.applyConfig();
+                && ConfigManager.INSTANCE.getConfig() != null
+                && !ConfigManager.INSTANCE.hasLoaded()) {
+            ConfigManager.INSTANCE.applyConfig();
             settingsApplied = true;
         }
 
         ModuleManager.INSTANCE.getEnabledModules().forEach(Module::onTick);
         mc.getWindow().setTitle(ClientSettingsPanel.clientSettings.windowTitle.getValue());
+
+        ConfigManager.INSTANCE.tickAutosave();
     }
 
 
@@ -180,7 +186,8 @@ public class Sputnik implements ClientModInitializer {
         if (mc.screen != null && mc.screen != ClickGui.INSTANCE) return;
 
         for (Module module : ModuleManager.INSTANCE.getModules()) {
-            if (key != module.getKey() || anyFocused || KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) continue;  // evitar interrumpir combinaciones de teclas del F3
+            // evitar interrumpir combinaciones de teclas del F3
+            if (key != module.getKey() || anyFocused || KeyUtil.isKeyDown(GLFW.GLFW_KEY_F3)) continue;
 
             if (module.shouldToggleOnBindRelease() && !module.isEnabled())
                 module.setEnabled(true);
@@ -259,7 +266,7 @@ public class Sputnik implements ClientModInitializer {
 
     @EventListener
     public void onStop(ShutdownEvent event) {
-        ConfigManager.save();
+        ConfigManager.INSTANCE.saveOnShutdown();
     }
 
     public static String getVersionName() {

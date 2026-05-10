@@ -28,7 +28,7 @@ public class ScreenMixin {
 
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void renderWatermark(GuiGraphicsExtractor gui, int mouseX, int mouseY, float a, CallbackInfo ci) {
-        if (!ConfigManager.hasLoaded()) return;  // para evitar dibujar la marca de agua por defecto
+        if (!ConfigManager.INSTANCE.hasLoaded()) return;  // para evitar dibujar la marca de agua por defecto
         String watermark = ClientSettingsPanel.clientSettings.watermark.getValue();
         if (watermark == null || watermark.isEmpty()) return;
         gui.text(mc.font, watermark,

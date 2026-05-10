@@ -110,6 +110,22 @@ public class ClientSettingsModule extends Module {
             50
     ));
 
+    public final BooleanSetting autosave = sgMisc.add(new BooleanSetting(
+            "autoguardado",
+            "autoguardar ajustes cada cierto intervalo de tiempo",
+            true
+    ));
+
+    public final NumberSetting autosaveInterval = sgMisc.add(new NumberSetting(
+            "intervalo de autoguardado",
+            "cada cuántos segundos autoguardar",
+            120,
+            1,
+            1000,
+            1
+    )).visibility(autosave::getValue);
+
+
     public ClientSettingsModule() {
         super("interfaz",
                 "ajustes de la interfaz, y otros misceláneos",

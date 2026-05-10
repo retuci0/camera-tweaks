@@ -10,6 +10,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -137,11 +138,13 @@ public class NetworkUtil {
         if (rotateClient) EntityUtil.lookAtClient(hitPos);
         if (rotateServer) EntityUtil.lookAtServer(hitPos);
 
-        InventoryUtil.swapWithHotbar(mc.player.getInventory().getSelectedSlot(), slot);
+        mc.getConnection().send(new ServerboundSetCarriedItemPacket(slot));
+
         interactBlock(bhr, hand, swingHand);
 
         if (swapBack) {
-            InventoryUtil.swapWithHotbar(mc.player.getInventory().getSelectedSlot(), prevSlot);
+            mc.player.getInventory().setSelectedSlot(prevSlot);
+            mc.getConnection().send(new ServerboundSetCarriedItemPacket(prevSlot));
         }
 
         return true;

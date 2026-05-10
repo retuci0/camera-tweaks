@@ -194,7 +194,7 @@ public class Notifications extends Module {
     // enviar una notificación
     private void push(String title, String desc) {
         if (popup.getValue()) {
-            HudRenderer.pushNotification(title, desc);
+            HudRenderer.INSTANCE.pushNotification(title, desc);
         }
         if (sound.getValue() != SoundEvents.EMPTY) {
             mc.level.playSound(mc.player, mc.player.blockPosition(),

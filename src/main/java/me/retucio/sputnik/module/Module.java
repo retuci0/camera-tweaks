@@ -79,7 +79,7 @@ public class Module {
         this.bind.setDefaultValue(key);
 
         // puto marcos
-        if (ConfigManager.getConfig().settings
+        if (ConfigManager.INSTANCE.getConfig().settings
                 .get(this.getName() + ":" + bind.getName()) == null)
             this.bind.setValue(key);
     }
@@ -136,7 +136,7 @@ public class Module {
     public void onEnable() {
         if (notify.getValue()) {
             if (notifyMode.is(NotifyMode.CHAT)) ChatUtil.info(getName() + " fue activado");
-            else HudRenderer.pushNotification(getName() + " fue activado", getName() + "fue activado.");
+            else HudRenderer.INSTANCE.pushNotification(getName() + " fue activado", getName() + " fue activado.");
         }
         for (Method method : getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(EventListener.class)) {
@@ -148,7 +148,7 @@ public class Module {
 
     public void onDisable() {
         if (notifyMode.is(NotifyMode.CHAT)) ChatUtil.info(getName() + " fue desactivado");
-        else HudRenderer.pushNotification(getName() + " fue desactivado", getName() + "fue desactivado.");
+        else HudRenderer.INSTANCE.pushNotification(getName() + " fue desactivado", getName() + " fue desactivado.");
         if (Sputnik.EVENT_BUS.isSubscribed(this)) {
             Sputnik.EVENT_BUS.unsubscribe(this);
         }
